@@ -1,21 +1,13 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { LOCALE_COOKIE, localeFromCountry } from "@/lib/i18n/config";
+import { updateSession } from "@/lib/supabase/middleware";
 
-// TEMPORARY DIAGNOSTIC BUILD — Supabase session refresh removed on purpose.
+/**
+ * Edge middleware: keeps the Supabase session fresh and resolves the
+ * visitor's language (IT/EN) from their country on the first visit.
+ */
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next({ request });
-
-  if (!request.cookies.get(LOCALE_COOKIE)) {
-    const locale = localeFromCountry(request.headers.get("x-vercel-ip-country"));
-    response.cookies.set(LOCALE_COOKIE, locale, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: "lax",
-    });
-  }
-
-  return response;
+  return updateSession(request);
 }
 
 export const config = {
