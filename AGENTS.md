@@ -18,6 +18,9 @@ Politica Zero Dati Finti (No Mock Data) e Test su Vercel:
 - Non usare mai dati finti o hardcodati per le funzionalità principali. Ogni fase si collega a database reali, Auth reale e API reali fin dal primo giorno.
 - OGNI FASE DEVE ESSERE TESTABILE IN PRODUZIONE: Alla fine di ogni fase il codice deve superare la build ed essere pronto per il deploy continuo su Vercel (tramite GitHub).
 
+REGOLE INTEGRATE E GUIDA AI SERVIZI ESTERNI (REGOLA FONDAMENTALE):
+Prima di iniziare a scrivere codice per qualsiasi fase, l'agente DEVE fermarsi e guidare l'utente. Deve elencare in chat TUTTI i servizi esterni necessari per la fase (es. GitHub, Vercel, Supabase, Resend, MapTiler, PayPal, ecc.), spiegare come configurarli/crearli, richiedere le variabili d'ambiente (.env.local) necessarie e chiedere l'identità Git (Nome/Email) prima di proseguire. Nessun codice verrà scritto prima dell'ok dell'utente.
+
 Integrazioni, Guida e Consulenza Critica sugli Strumenti:
 - Prima di integrare qualsiasi servizio esterno (Database, Auth, Email, Mappe, Pagamenti), l'agente DEVE fermarsi prima di costruire.
 - L'agente deve guidare l'utente passo-passo nella configurazione e nel recupero delle chiavi API.
