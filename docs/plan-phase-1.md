@@ -19,7 +19,7 @@
 | A | Client Supabase | `@supabase/ssr` (cookie-based, App Router) |
 | B | i18n | Dizionario modulare custom IT/EN + geo Vercel + cookie |
 | C | Conferma email | Disattivata in Fase 1 (Resend in fase dedicata) |
-| D | Region Supabase | Frankfurt `eu-central-1` |
+| D | Region Supabase | `eu-north-1` (progetto reale `tzdigzvkneonkhkwoeed`) |
 | E | Admin | `settings` + funzione `is_admin()` (nessun hardcode) |
 | F | `is_unclaimed` | flag boolean su `events` |
 | G | Stack | Next.js 15 + TypeScript + Tailwind v4 |
@@ -71,5 +71,30 @@ docs/                     # Piani di fase
 - [x] Auth reale funzionante (registrazione/login/logout) contro Supabase.
 - [x] RLS attiva (migrazione idempotente con policy per ogni tabella).
 - [x] i18n IT/EN con switch manuale e default da geolocalizzazione.
-- [ ] Commit Git "Fase 1" + push su GitHub (deploy Vercel).
-- [ ] Riepilogo finale in 5 righe (test / env vars / SQL).
+- [x] Commit Git "Fase 1" + push su GitHub (deploy Vercel).
+- [x] Riepilogo finale in 5 righe (test / env vars / SQL).
+
+## Verifica in produzione — 15/10/2026
+
+Deploy: `https://openstage-alpha.vercel.app` (progetto Vercel `openstage`, team `ceskobeatzmusic-2476`).
+
+| Verifica | Esito |
+|---|---|
+| Build Next.js su Vercel (framework preset corretto) | ✅ |
+| Rotte pubbliche + legali + `/login` `/register` `/onboarding/artist` `/events/new` | ✅ 200 |
+| Asset `/_next/static/*` (CSS + chunk) | ✅ 200 |
+| Middleware: cookie `NEXT_LOCALE` da geo (`x-vercel-ip-country`) + refresh sessione | ✅ |
+| Supabase raggiungibile (`tzdigzvkneonkhkwoeed`) | ✅ |
+| Migration `0001_init.sql`: 5 tabelle + 18 policy RLS + trigger (`on_auth_user_created`, `*_touch`, `profiles_guard`) | ✅ |
+| `settings.admin_email` = `ceskobeatzmusic@gmail.com` | ✅ |
+| RLS: lettura anon di `settings` → 0 righe (admin-only) | ✅ |
+| Supabase Auth: email+password, Google, `mailer_autoconfirm` on, redirect `localhost:3000` + dominio produzione | ✅ |
+| Anti-bot Turnstile attivo lato Supabase (signup senza token rifiutato) | ✅ |
+| Site key Turnstile presente nei chunk client di `/login` e `/register` | ✅ |
+
+Nota: il progetto Vercel era stato creato con framework preset "Other", quindi ogni deploy serviva
+solo `public/` (nessun asset `.next/static`, middleware in errore `MIDDLEWARE_INVOCATION_FAILED`).
+Risolto ricreando il deployment di Production con `projectSettings.framework = "nextjs"`.
+
+Test manuale residuo (richiede un umano per il captcha): registrazione con ruolo
+Artista / Venue / Fan → onboarding artista → creazione evento.
