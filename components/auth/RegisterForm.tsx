@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
 
 import GoogleButton from "./GoogleButton";
@@ -27,9 +28,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   const [loading, setLoading] = useState(false);
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-  const configured = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const configured = isSupabaseConfigured();
 
   if (!configured) {
     return (

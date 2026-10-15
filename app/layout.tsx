@@ -26,20 +26,29 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
+
+function resolveSiteUrl(): URL {
+  try {
+    return new URL(siteUrl);
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const dict = getDictionary(locale);
+  const base = resolveSiteUrl();
 
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase: base,
     title: { default: dict.meta.title, template: "%s · OpenStage" },
     description: dict.meta.description,
     openGraph: {
       type: "website",
       siteName: "OpenStage",
-      url: siteUrl,
+      url: base,
       title: dict.meta.title,
       description: dict.meta.description,
     },
