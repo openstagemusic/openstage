@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #07070d;
+  --color-surface: #0d0d1a;
+  --color-foreground: #e8e8f2;
+  --color-muted: #9aa0b8;
+  --color-violet: #8b5cf6;
+  --color-cyan: #22d3ee;
+  --color-pink: #f472b6;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Neon ambience: pure CSS, no images, no external requests. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 60rem at 12% -10%, rgba(139, 92, 246, 0.2), transparent 60%),
+    radial-gradient(50rem 50rem at 92% 0%, rgba(34, 211, 238, 0.14), transparent 55%),
+    radial-gradient(45rem 45rem at 50% 120%, rgba(244, 114, 182, 0.1), transparent 60%);
+}
+
+/* Glassmorphism: only used on navbar, cards and pop-ups — never behind long text. */
+.glass {
+  background-color: rgba(255, 255, 255, 0.04);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+}
+
+.text-gradient {
+  background-image: linear-gradient(100deg, #8b5cf6, #22d3ee 55%, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+::selection {
+  background-color: rgba(139, 92, 246, 0.35);
+}
+
+input,
+select,
+textarea {
+  color-scheme: dark;
+}
