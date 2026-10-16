@@ -104,7 +104,8 @@ export default function SearchBar({ locale }: { locale: Locale }) {
     params.delete("page");
 
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname);
+    // `scroll: false`: chi filtra sta guardando i filtri, non deve tornare in cima.
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
     setOpen(false);
   };
 

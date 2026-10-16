@@ -55,7 +55,8 @@ export default function QuickFilters({
     params.delete("page");
 
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname);
+    // `scroll: false`: la lista è appena sotto i filtri, la pagina non deve saltare.
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
   const chipClass = (isActive: boolean) =>

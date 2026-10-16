@@ -14,6 +14,10 @@ export type WhenPreset = (typeof WHEN_PRESETS)[number];
 export const RADIUS_OPTIONS = [10, 25, 50, 100, 250] as const;
 export type RadiusOption = (typeof RADIUS_OPTIONS)[number];
 
+/** Come si guarda l'elenco: schede o tabella. */
+export const VIEW_MODES = ["cards", "table"] as const;
+export type ViewMode = (typeof VIEW_MODES)[number];
+
 export type Center = { latitude: number; longitude: number };
 
 export type DiscoveryFilters = {
@@ -26,6 +30,8 @@ export type DiscoveryFilters = {
   radiusKm: RadiusOption | null;
   /** Centro del filtro per raggio. */
   center: Center | null;
+  /** Vista dell'elenco (anche questa vive nella URL, così resta condivisibile). */
+  view: ViewMode;
   page: number;
 };
 
@@ -37,6 +43,7 @@ export const EMPTY_FILTERS: DiscoveryFilters = {
   freeOnly: false,
   radiusKm: null,
   center: null,
+  view: "cards",
   page: 1,
 };
 
@@ -89,6 +96,7 @@ export function parseDiscoveryFilters(
     // Il raggio ha senso solo con un centro: se la URL non ce l'ha si ripiega
     // sulla posizione del visitatore (dai geo-header).
     center: radiusKm ? urlCenter ?? fallbackCenter : null,
+    view: single(raw.vista) === "table" ? "table" : "cards",
     page: Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1,
   };
 }
@@ -184,6 +192,7 @@ export function discoveryQuery(
   if (merged.genre) params.set("genre", merged.genre);
   if (merged.kind) params.set("kind", merged.kind);
   if (merged.freeOnly) params.set("free", "1");
+  if (merged.view === "table") params.set("vista", "table");
 
   if (merged.radiusKm) {
     params.set("radius", String(merged.radiusKm));

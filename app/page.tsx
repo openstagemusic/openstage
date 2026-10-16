@@ -3,7 +3,10 @@ import { Suspense } from "react";
 
 import QuickFilters from "@/components/discovery/QuickFilters";
 import SearchBar from "@/components/discovery/SearchBar";
+import ViewSwitcher from "@/components/discovery/ViewSwitcher";
+import EventTable from "@/components/events/EventTable";
 import EventTeaser from "@/components/events/EventTeaser";
+import BentoGrid from "@/components/home/BentoGrid";
 import GlobeMap from "@/components/map/GlobeMap";
 import Pagination from "@/components/ui/Pagination";
 import {
@@ -12,7 +15,14 @@ import {
   parseDiscoveryFilters,
   toQueryFilters,
 } from "@/lib/events/filters";
-import { listEvents, listGenres, listMapEvents, listSavedEventIds } from "@/lib/events/queries";
+import {
+  getDiscoveryCounters,
+  listEvents,
+  listFeaturedEvents,
+  listGenres,
+  listMapEvents,
+  listSavedEventIds,
+} from "@/lib/events/queries";
 import { getVisitorLocation } from "@/lib/geo/visitor";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getPageMetadata } from "@/lib/i18n/metadata";
@@ -43,11 +53,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const params = await searchParams;
 
-  const [visitor, session, savedIds, genres] = await Promise.all([
+  const [visitor, session, savedIds, genres, featured, counters] = await Promise.all([
     getVisitorLocation(),
     getSessionProfile(),
     listSavedEventIds(),
     listGenres(),
+    listFeaturedEvents(3),
+    getDiscoveryCounters(),
   ]);
 
   const filters = parseDiscoveryFilters(params, visitor.center);
@@ -75,12 +87,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const pageParams = Object.fromEntries(
     new URLSearchParams(discoveryQuery(filters, { page: 1 }))
   );
-
-  const values = [
-    { title: dict.home.values.undergroundTitle, text: dict.home.values.undergroundText },
-    { title: dict.home.values.ethicsTitle, text: dict.home.values.ethicsText },
-    { title: dict.home.values.authenticTitle, text: dict.home.values.authenticText },
-  ];
 
   const mapEmpty = filtered
     ? {
@@ -181,10 +187,36 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       <section id="eventi" className="mx-auto w-full max-w-7xl px-4 pt-16 sm:px-6">
-        <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          {dict.home.upcomingTitle}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted">{dict.home.upcomingSubtitle}</p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              {dict.home.upcomingTitle}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm text-muted">{dict.home.upcomingSubtitle}</p>
+          </div>
+
+          {list.total > 0 ? (
+            <Suspense fallback={<div className="h-9" />}>
+              <ViewSwitcher locale={locale} />
+            </Suspense>
+          ) : null}
+        </div>
+
+        {/* In evidenza: scelta editoriale, quindi fuori dai risultati filtrati. */}
+        {featured.length > 0 && !filtered ? (
+          <div className="mt-8">
+            <h3 className="font-display text-lg font-semibold">{dict.featured.title}</h3>
+            <p className="mt-1 text-sm text-muted">{dict.featured.subtitle}</p>
+
+            <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((event) => (
+                <li key={event.id} className="h-full">
+                  <EventTeaser event={event} locale={locale} dict={dict} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {list.events.length === 0 ? (
           <div className="glass mt-6 rounded-3xl border border-white/10 p-8 text-center">
@@ -203,13 +235,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </div>
         ) : (
           <>
-            <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {list.events.map((event) => (
-                <li key={event.id} className="h-full">
-                  <EventTeaser event={event} locale={locale} dict={dict} />
-                </li>
-              ))}
-            </ul>
+            {filters.view === "table" ? (
+              <EventTable events={list.events} locale={locale} dict={dict} />
+            ) : (
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {list.events.map((event) => (
+                  <li key={event.id} className="h-full">
+                    <EventTeaser event={event} locale={locale} dict={dict} />
+                  </li>
+                ))}
+              </ul>
+            )}
 
             <div className="mt-10">
               <Pagination
@@ -230,14 +266,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6">
-        <ul className="grid gap-4 sm:grid-cols-3">
-          {values.map((value) => (
-            <li key={value.title} className="glass rounded-3xl border border-white/10 p-6">
-              <h2 className="font-display text-lg font-semibold">{value.title}</h2>
-              <p className="mt-2 text-sm text-muted">{value.text}</p>
-            </li>
-          ))}
-        </ul>
+        <BentoGrid dict={dict} counters={counters} />
       </section>
     </>
   );

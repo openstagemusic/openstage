@@ -194,16 +194,23 @@ export async function listMapEvents(
   return events;
 }
 
-/** Eventi in evidenza (massimo 3 slot nella Home). */
+/**
+ * Eventi in evidenza (massimo 3 slot nella Home).
+ *
+ * `featured_until` è una scadenza vera: un evento in vetrina smette di esserlo
+ * da solo quando la data passa, senza che nessuno debba ricordarsene.
+ */
 export async function listFeaturedEvents(limit = 3): Promise<PublicEvent[]> {
   const supabase = await createClient();
+  const now = new Date().toISOString();
 
   const { data, error } = await supabase
     .from("events")
     .select(EVENT_SELECT)
     .eq("status", "published")
     .eq("is_featured", true)
-    .gte("starts_at", new Date().toISOString())
+    .gte("starts_at", now)
+    .or(`featured_until.is.null,featured_until.gt.${now}`)
     .order("starts_at", { ascending: true })
     .limit(limit);
 

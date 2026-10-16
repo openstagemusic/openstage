@@ -237,6 +237,57 @@ export const it: Dictionary = {
     noResultsTitle: "Nessun evento con questi filtri",
     noResultsText: "Prova ad allargare la ricerca: togli un filtro o aumenta la distanza.",
   },
+  showcase: {
+    viewLabel: "Come guardare l'elenco",
+    viewCards: "Schede",
+    viewTable: "Tabella",
+    paid: "Biglietto",
+    columns: {
+      date: "Data",
+      event: "Evento",
+      artist: "Artista",
+      venue: "Locale",
+      city: "Città",
+      genre: "Genere",
+      kind: "Tipo",
+      entry: "Ingresso",
+    },
+  },
+  featured: {
+    title: "In evidenza",
+    subtitle: "Le serate che OpenStage mette in vetrina: scelte una per una, mai pagate.",
+  },
+  bento: {
+    howTitle: "Come funziona",
+    howSteps: [
+      {
+        title: "Apri la mappa",
+        text: "Il globo parte dalla tua zona: ogni pin è una serata reale, non una pubblicità.",
+      },
+      {
+        title: "Filtra e salva",
+        text: "Stasera, questo weekend, gratis, a due passi da casa: due tocchi e hai trovato la serata.",
+      },
+      {
+        title: "Vai al concerto",
+        text: "Locandina, orari nel fuso del locale, biglietti e indicazioni: tutto dalla pagina evento.",
+      },
+    ],
+    numbersTitle: "Numeri veri",
+    numbersNote: "Letti dal database a ogni caricamento: nessuna stima, nessuna metrica di vanità.",
+    eventsLabel: "Eventi in programma",
+    artistsLabel: "Artisti",
+    venuesLabel: "Locali",
+    citiesLabel: "Città",
+    artistsTitle: "Per gli artisti",
+    artistsText:
+      "Crei la tua scheda in pochi minuti: la tua musica entra sulla mappa. Gratis, per sempre.",
+    artistsCta: "Come funziona per te",
+    venuesTitle: "Per i locali",
+    venuesText:
+      "Pubblichi la programmazione e riempi la sala. Nessun costo, nessun algoritmo pay-to-play.",
+    venuesCta: "Come funziona per te",
+  },
   pages: {
     placeholderNote: "Questa pagina è un segnaposto e sarà completata in una fase successiva.",
     artists: { title: "Artisti", description: "Scopri gli artisti indipendenti su OpenStage." },
