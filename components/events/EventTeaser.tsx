@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { formatEventDate } from "@/lib/events/format";
-import type { PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 
 type EventTeaserProps = {
@@ -60,7 +60,7 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
 
           <h3 className="mt-3 font-display text-base font-semibold leading-tight">{event.title}</h3>
 
-          {event.artist ? (
+          {event.artist && !artistRepeatsTitle(event) ? (
             <p className="mt-1 text-sm text-white/80">{event.artist.name}</p>
           ) : null}
 

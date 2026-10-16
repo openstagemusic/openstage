@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import ShareEventButton from "@/components/events/ShareEventButton";
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDateLong, timeZoneName } from "@/lib/events/format";
+import { artistRepeatsTitle } from "@/lib/events/types";
 import { getEventById, listSavedEventIds } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
@@ -103,7 +104,9 @@ export default async function EventPage({ params }: EventPageProps) {
         {event.title}
       </h1>
 
-      {event.artist ? <p className="mt-3 text-lg text-white/80">{event.artist.name}</p> : null}
+      {event.artist && !artistRepeatsTitle(event) ? (
+        <p className="mt-3 text-lg text-white/80">{event.artist.name}</p>
+      ) : null}
 
       <dl className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="glass rounded-2xl border border-white/10 p-5">

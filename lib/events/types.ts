@@ -62,3 +62,13 @@ export function hasCoordinates(
 ): event is PublicEvent & { latitude: number; longitude: number } {
   return typeof event.latitude === "number" && typeof event.longitude === "number";
 }
+
+/**
+ * Molti eventi hanno come titolo ufficiale il solo nome dell'artista (è la
+ * convenzione delle prevendite): in quel caso ripeterlo sotto il titolo è
+ * rumore, quindi la riga artista si mostra solo quando aggiunge informazione.
+ */
+export function artistRepeatsTitle(event: PublicEvent): boolean {
+  if (!event.artist) return false;
+  return event.artist.name.trim().toLowerCase() === event.title.trim().toLowerCase();
+}

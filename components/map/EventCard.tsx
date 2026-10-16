@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDate } from "@/lib/events/format";
-import type { PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
@@ -144,7 +144,7 @@ export default function EventCard({
               {event.title}
             </h3>
 
-            {event.artist ? (
+            {event.artist && !artistRepeatsTitle(event) ? (
               <p className="mt-0.5 text-sm text-white/80">{event.artist.name}</p>
             ) : null}
           </div>
