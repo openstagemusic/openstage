@@ -13,6 +13,10 @@ export type PaginationProps = {
   basePath: string;
   /** Query string parameter used for the page number. */
   queryParam?: string;
+  /** Altri parametri da conservare nei link (filtri, ricerca…). */
+  params?: Record<string, string>;
+  /** Ancora a cui tornare dopo il cambio pagina, senza "#". */
+  hash?: string;
   labels?: { previous?: string; next?: string; label?: string };
 };
 
@@ -25,6 +29,8 @@ export default function Pagination({
   totalItems,
   basePath,
   queryParam = "page",
+  params,
+  hash,
   labels,
 }: PaginationProps) {
   const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
@@ -40,8 +46,16 @@ export default function Pagination({
 
   if (totalPages <= 1) return null;
 
-  const href = (target: number) =>
-    target <= 1 ? basePath : `${basePath}?${queryParam}=${target}`;
+  const href = (target: number) => {
+    const search = new URLSearchParams(params ?? {});
+    if (target <= 1) search.delete(queryParam);
+    else search.set(queryParam, String(target));
+
+    const query = search.toString();
+    const suffix = hash ? `#${hash}` : "";
+
+    return query ? `${basePath}?${query}${suffix}` : `${basePath}${suffix}`;
+  };
 
   return (
     <nav aria-label={labels?.label ?? "Pagination"} className="flex items-center justify-center gap-2">

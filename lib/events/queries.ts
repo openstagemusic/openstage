@@ -108,29 +108,24 @@ function toPublicEvent(row: EventRow): PublicEvent {
 }
 
 export type EventFilters = {
+  /** Ricerca libera: titolo, città, genere, artista, locale. */
+  query?: string | null;
   /** Inizio finestra temporale (ISO). Default: adesso. */
-  from?: string;
+  from?: string | null;
   /** Fine finestra temporale (ISO). */
-  to?: string;
+  to?: string | null;
   genre?: string | null;
   kind?: EventKind | null;
   freeOnly?: boolean;
-  bbox?: {
-    minLatitude: number;
-    maxLatitude: number;
-    minLongitude: number;
-    maxLongitude: number;
-  } | null;
+  /** Centro del filtro per raggio. */
+  center?: { latitude: number; longitude: number } | null;
+  radiusKm?: number | null;
 };
 
 export type EventListResult = {
   events: PublicEvent[];
   total: number;
 };
-
-function startOfNow(filters: EventFilters): string {
-  return filters.from ?? new Date().toISOString();
-}
 
 export type ListEventsOptions = {
   filters?: EventFilters;
@@ -140,7 +135,13 @@ export type ListEventsOptions = {
   onlyLocated?: boolean;
 };
 
-/** Eventi pubblici futuri, ordinati per data, con paginazione opzionale. */
+/**
+ * Eventi pubblici futuri, ordinati per data, con paginazione.
+ *
+ * Ricerca, filtri e raggio si risolvono nel database (`search_events`): lista e
+ * mappa vedono così **lo stesso** insieme, e la paginazione resta corretta anche
+ * con il filtro per distanza (che altrimenti andrebbe applicato dopo il taglio).
+ */
 export async function listEvents({
   filters = {},
   page = 1,
@@ -148,43 +149,34 @@ export async function listEvents({
   onlyLocated = false,
 }: ListEventsOptions = {}): Promise<EventListResult> {
   const supabase = await createClient();
+  const offset = Math.max(0, (page - 1) * perPage);
 
-  let query = supabase
-    .from("events")
-    .select(EVENT_SELECT, { count: "exact" })
-    .eq("status", "published")
-    .gte("starts_at", startOfNow(filters))
-    .order("starts_at", { ascending: true })
-    .order("id", { ascending: true });
-
-  if (filters.to) query = query.lte("starts_at", filters.to);
-  if (filters.genre) query = query.eq("genre", filters.genre);
-  if (filters.kind) query = query.eq("kind", filters.kind);
-  if (filters.freeOnly) query = query.eq("is_free", true);
-  if (onlyLocated) {
-    query = query.not("latitude", "is", null).not("longitude", "is", null);
-  }
-  if (filters.bbox) {
-    query = query
-      .gte("latitude", filters.bbox.minLatitude)
-      .lte("latitude", filters.bbox.maxLatitude)
-      .gte("longitude", filters.bbox.minLongitude)
-      .lte("longitude", filters.bbox.maxLongitude);
-  }
-
-  const from = Math.max(0, (page - 1) * perPage);
-  query = query.range(from, from + perPage - 1);
-
-  const { data, count, error } = await query;
+  const { data, error } = await supabase.rpc("search_events", {
+    p_query: filters.query ?? null,
+    p_from: filters.from ?? new Date().toISOString(),
+    p_to: filters.to ?? null,
+    p_genre: filters.genre ?? null,
+    p_kind: filters.kind ?? null,
+    p_free_only: filters.freeOnly ?? false,
+    p_lat: filters.center?.latitude ?? null,
+    p_lng: filters.center?.longitude ?? null,
+    p_radius_km: filters.radiusKm ?? null,
+    p_only_located: onlyLocated,
+    p_limit: perPage,
+    p_offset: offset,
+  });
 
   if (error) {
     console.error("[events] listEvents:", error.message);
     return { events: [], total: 0 };
   }
 
+  const rows = (data ?? []) as unknown as Array<EventRow & { total_count: number }>;
+
   return {
-    events: (data as unknown as EventRow[]).map(toPublicEvent),
-    total: count ?? 0,
+    events: rows.map(toPublicEvent),
+    // Il totale viaggia con ogni riga (`count(*) over ()`).
+    total: rows[0]?.total_count ?? 0,
   };
 }
 
@@ -315,4 +307,41 @@ export async function listSavedEventIds(): Promise<Set<string>> {
   }
 
   return new Set((data as Array<{ event_id: string }>).map((row) => row.event_id));
+}
+
+export type SuggestionKind = "city" | "artist" | "venue" | "genre" | "event";
+
+export type EventSuggestion = {
+  kind: SuggestionKind;
+  id: string | null;
+  label: string;
+  detail: string | null;
+  /** Quanti eventi in programma porta con sé il suggerimento. */
+  hits: number;
+};
+
+/**
+ * Suggerimenti della barra di ricerca, raggruppati per tipo.
+ *
+ * Fonte unica: il nostro database (città, artisti, locali, generi, eventi già
+ * pubblicati). Nessun geocoder esterno, quindi nessun suggerimento che porta
+ * fuori da OpenStage.
+ */
+export async function suggestEvents(query: string, limit = 4): Promise<EventSuggestion[]> {
+  const term = query.trim();
+  if (term.length < 2) return [];
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("search_suggestions", {
+    p_query: term,
+    p_limit: limit,
+  });
+
+  if (error) {
+    console.error("[events] suggestEvents:", error.message);
+    return [];
+  }
+
+  return (data ?? []) as unknown as EventSuggestion[];
 }

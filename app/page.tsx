@@ -1,9 +1,18 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
+import QuickFilters from "@/components/discovery/QuickFilters";
+import SearchBar from "@/components/discovery/SearchBar";
 import EventTeaser from "@/components/events/EventTeaser";
 import GlobeMap from "@/components/map/GlobeMap";
 import Pagination from "@/components/ui/Pagination";
-import { listEvents, listMapEvents, listSavedEventIds } from "@/lib/events/queries";
+import {
+  discoveryQuery,
+  hasActiveFilters,
+  parseDiscoveryFilters,
+  toQueryFilters,
+} from "@/lib/events/filters";
+import { listEvents, listGenres, listMapEvents, listSavedEventIds } from "@/lib/events/queries";
 import { getVisitorLocation } from "@/lib/geo/visitor";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getPageMetadata } from "@/lib/i18n/metadata";
@@ -15,7 +24,7 @@ import { getSessionProfile } from "@/lib/supabase/session";
 export const generateMetadata = () => getPageMetadata((dict) => dict.meta);
 
 type HomePageProps = {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 /**
@@ -24,31 +33,68 @@ type HomePageProps = {
  * Tutto il contenuto è renderizzato dal server sui dati reali del database:
  * il globo riceve i pin già pronti e l'elenco sotto resta leggibile (e
  * indicizzabile) anche senza JavaScript.
+ *
+ * Ricerca e filtri vivono in `searchParams`: lista e mappa leggono gli stessi
+ * parametri, quindi non possono divergere, e una ricerca è condivisibile.
  */
 export default async function HomePage({ searchParams }: HomePageProps) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
 
   const params = await searchParams;
-  const parsedPage = Number.parseInt(params.page ?? "1", 10);
-  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-  const [visitor, session, mapEvents, list, savedIds] = await Promise.all([
+  const [visitor, session, savedIds, genres] = await Promise.all([
     getVisitorLocation(),
     getSessionProfile(),
-    listMapEvents({}, MAX_MAP_EVENTS),
-    listEvents({ page, perPage: ITEMS_PER_PAGE }),
     listSavedEventIds(),
+    listGenres(),
   ]);
+
+  const filters = parseDiscoveryFilters(params, visitor.center);
+  const queryFilters = toQueryFilters(filters);
+
+  const [firstPage, mapEvents] = await Promise.all([
+    listEvents({ filters: queryFilters, page: filters.page, perPage: ITEMS_PER_PAGE }),
+    listMapEvents(queryFilters, MAX_MAP_EVENTS),
+  ]);
+
+  // Una pagina fuori intervallo (link condiviso mentre la lista si accorcia) non
+  // è "nessun evento": si torna all'ultima pagina valida.
+  let list = firstPage;
+  if (firstPage.events.length === 0 && firstPage.total > 0) {
+    filters.page = Math.max(1, Math.ceil(firstPage.total / ITEMS_PER_PAGE));
+    list = await listEvents({ filters: queryFilters, page: filters.page, perPage: ITEMS_PER_PAGE });
+  }
 
   const savedEventIds = [...savedIds];
   const isAuthenticated = Boolean(session);
+  const filtered = hasActiveFilters(filters);
+
+  const query = discoveryQuery(filters);
+  // Paginazione: i filtri restano, la pagina no (cambia da sola).
+  const pageParams = Object.fromEntries(
+    new URLSearchParams(discoveryQuery(filters, { page: 1 }))
+  );
 
   const values = [
     { title: dict.home.values.undergroundTitle, text: dict.home.values.undergroundText },
     { title: dict.home.values.ethicsTitle, text: dict.home.values.ethicsText },
     { title: dict.home.values.authenticTitle, text: dict.home.values.authenticText },
   ];
+
+  const mapEmpty = filtered
+    ? {
+        title: dict.filters.noResultsTitle,
+        text: dict.filters.noResultsText,
+        cta: dict.filters.reset,
+        href: "/",
+      }
+    : {
+        title: dict.map.emptyTitle,
+        text: dict.map.emptyText,
+        cta: dict.map.emptyCta,
+        href: "/contatti",
+      };
 
   return (
     <>
@@ -99,9 +145,39 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             savedEventIds={savedEventIds}
             isAuthenticated={isAuthenticated}
             locale={locale}
-            emptyCtaHref="/contatti"
+            empty={mapEmpty}
+            fullscreenHref={query ? `/mappa?${query}` : "/mappa"}
           />
         </div>
+      </section>
+
+      {/* Ricerca e filtri: sotto il globo, sopra lo showcase. */}
+      <section className="mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6">
+        <Suspense fallback={<div className="h-[52px]" />}>
+          <SearchBar locale={locale} />
+          <QuickFilters
+            locale={locale}
+            genres={genres}
+            center={visitor.center}
+            className="mt-3"
+          />
+        </Suspense>
+
+        {filtered ? (
+          <p className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted">
+            <span>
+              <strong className="font-medium text-white">{list.total}</strong>{" "}
+              {list.total === 1 ? dict.filters.resultOne : dict.filters.resultMany}
+              {filters.q ? ` ${dict.filters.resultsFor} “${filters.q}”` : ""}
+            </span>
+            <Link
+              href="#eventi"
+              className="rounded-full border border-white/15 px-3 py-1 text-xs text-white transition-colors hover:border-white/30"
+            >
+              {dict.filters.goToResults}
+            </Link>
+          </p>
+        ) : null}
       </section>
 
       <section id="eventi" className="mx-auto w-full max-w-7xl px-4 pt-16 sm:px-6">
@@ -112,13 +188,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
         {list.events.length === 0 ? (
           <div className="glass mt-6 rounded-3xl border border-white/10 p-8 text-center">
-            <h3 className="font-display text-lg font-semibold">{dict.events.emptyTitle}</h3>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted">{dict.events.emptyText}</p>
+            <h3 className="font-display text-lg font-semibold">
+              {filtered ? dict.filters.noResultsTitle : dict.events.emptyTitle}
+            </h3>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-muted">
+              {filtered ? dict.filters.noResultsText : dict.events.emptyText}
+            </p>
             <Link
-              href="/contatti"
+              href={filtered ? "/" : "/contatti"}
               className="mt-5 inline-flex rounded-full bg-gradient-to-r from-violet to-cyan px-5 py-2.5 text-sm font-medium text-white"
             >
-              {dict.events.emptyCta}
+              {filtered ? dict.filters.reset : dict.events.emptyCta}
             </Link>
           </div>
         ) : (
@@ -133,9 +213,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
             <div className="mt-10">
               <Pagination
-                currentPage={page}
+                currentPage={filters.page}
                 totalItems={list.total}
                 basePath="/"
+                params={pageParams}
+                hash="eventi"
                 labels={{
                   previous: dict.pagination.previous,
                   next: dict.pagination.next,

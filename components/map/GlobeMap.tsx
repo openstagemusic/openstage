@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import EventCard from "@/components/map/EventCard";
 import VenueEventsCard from "@/components/map/VenueEventsCard";
@@ -54,7 +54,14 @@ export type GlobeMapProps = {
   /** `home`: riquadro dentro la pagina. `fullscreen`: pagina /mappa. */
   variant?: "home" | "fullscreen";
   className?: string;
-  emptyCtaHref: string;
+  /** Messaggio dello stato vuoto: dipende dai filtri, quindi lo decide la pagina. */
+  empty: { title: string; text: string; cta: string; href: string };
+  /** Dove porta "Apri a schermo intero" (i filtri correnti viaggiano con te). */
+  fullscreenHref?: string;
+  /** Dove porta "Torna a esplorare". */
+  backHref?: string;
+  /** Contenuto sovrapposto alla mappa (ricerca e filtri a schermo intero). */
+  overlay?: ReactNode;
 };
 
 /**
@@ -71,7 +78,10 @@ export default function GlobeMap({
   locale,
   variant = "home",
   className,
-  emptyCtaHref,
+  empty,
+  fullscreenHref = "/mappa",
+  backHref = "/",
+  overlay,
 }: GlobeMapProps) {
   const dict = getDictionary(locale);
   const isMobile = useIsMobile();
@@ -242,7 +252,7 @@ export default function GlobeMap({
             ) : null}
 
             <Link
-              href={variant === "home" ? "/mappa" : "/"}
+              href={variant === "home" ? fullscreenHref : backHref}
               aria-label={variant === "home" ? dict.map.fullscreen : dict.map.backToExplore}
               className={controlClass}
             >
@@ -256,17 +266,24 @@ export default function GlobeMap({
           </div>
         </div>
 
-        {/* Stato vuoto: nessun evento reale nel database */}
+        {/* Contenuto extra sovrapposto (ricerca e filtri della modalità Esplora) */}
+        {overlay ? (
+          <div className="pointer-events-none absolute inset-x-0 top-14 z-30 flex justify-center px-3 sm:top-16">
+            <div className="pointer-events-auto w-full max-w-2xl">{overlay}</div>
+          </div>
+        ) : null}
+
+        {/* Stato vuoto: nessun evento reale nel database (o nessuno con i filtri) */}
         {mounted && locatedEvents.length === 0 ? (
           <div className="absolute inset-x-0 bottom-0 flex justify-center p-4">
             <div className="glass max-w-md rounded-2xl border border-white/10 p-5 text-center">
-              <h2 className="font-display text-base font-semibold">{dict.map.emptyTitle}</h2>
-              <p className="mt-2 text-sm text-muted">{dict.map.emptyText}</p>
+              <h2 className="font-display text-base font-semibold">{empty.title}</h2>
+              <p className="mt-2 text-sm text-muted">{empty.text}</p>
               <Link
-                href={emptyCtaHref}
+                href={empty.href}
                 className="mt-4 inline-flex rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-xs font-medium text-white"
               >
-                {dict.map.emptyCta}
+                {empty.cta}
               </Link>
             </div>
           </div>
