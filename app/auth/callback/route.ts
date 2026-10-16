@@ -14,9 +14,16 @@ export async function GET(request: Request) {
 
   if (code && isSupabaseConfigured()) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // Google (like every OAuth provider) cannot carry sign-up metadata, so the
+      // profile is created with the default `fan` role: on the first access we
+      // ask for the real role instead of silently keeping the default.
+      if (!data.user?.user_metadata?.role) {
+        return NextResponse.redirect(`${origin}/onboarding/role`);
+      }
+
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
