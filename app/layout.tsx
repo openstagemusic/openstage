@@ -8,8 +8,7 @@ import Navbar from "@/components/layout/Navbar";
 import SpotifyPlayerDock from "@/components/layout/SpotifyPlayerDock";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
+import { getSessionProfile } from "@/lib/supabase/session";
 
 // Every public page is server-rendered (SSR) — never a client-only SPA.
 export const dynamic = "force-dynamic";
@@ -61,17 +60,18 @@ export default async function RootLayout({
   const locale = await getLocale();
   const dict = getDictionary(locale);
 
-  let userEmail: string | null = null;
-  if (isSupabaseConfigured()) {
-    const supabase = await createClient();
-    const { data } = await supabase.auth.getUser();
-    userEmail = data.user?.email ?? null;
-  }
+  // Un'unica lettura per richiesta (React `cache`): utente + ruolo dal database.
+  const session = await getSessionProfile();
 
   return (
     <html lang={locale} className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <Navbar locale={locale} dict={dict.nav} userEmail={userEmail} />
+        <Navbar
+          locale={locale}
+          dict={dict.nav}
+          userEmail={session?.email ?? null}
+          userRole={session?.role ?? null}
+        />
         <main className="flex-1 pt-16">{children}</main>
         <Footer dict={dict.footer} />
         <SpotifyPlayerDock />

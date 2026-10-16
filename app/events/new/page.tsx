@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { canManageEvents } from "@/lib/auth/roles";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getPageMetadata } from "@/lib/i18n/metadata";
 import { getLocale } from "@/lib/i18n/server";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
+import { getSessionProfile } from "@/lib/supabase/session";
 
 export const generateMetadata = () =>
   getPageMetadata((dict) => ({
@@ -14,17 +14,16 @@ export const generateMetadata = () =>
   }));
 
 export default async function NewEventPage() {
-  if (!isSupabaseConfigured()) {
+  const session = await getSessionProfile();
+
+  if (!session) {
     redirect("/login");
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
+  // Pubblicano eventi solo artisti e locali: la stessa regola vive nella RLS,
+  // qui evitiamo solo di mostrare una pagina che il database rifiuterebbe.
+  if (!canManageEvents(session.role)) {
+    redirect("/onboarding/role");
   }
 
   const locale = await getLocale();

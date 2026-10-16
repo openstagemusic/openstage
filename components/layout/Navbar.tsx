@@ -7,6 +7,7 @@ import { useState } from "react";
 import LogoutButton from "@/components/auth/LogoutButton";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { canManageEvents, ROLE_LABEL_KEY, type UserRole } from "@/lib/auth/roles";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +15,17 @@ type NavbarProps = {
   locale: Locale;
   dict: Dictionary["nav"];
   userEmail: string | null;
+  userRole: UserRole | null;
 };
 
-export default function Navbar({ locale, dict, userEmail }: NavbarProps) {
+const roleBadgeClass: Record<UserRole, string> = {
+  fan: "border-white/15 text-muted",
+  artist: "border-violet/40 bg-violet/10 text-white",
+  venue: "border-cyan/40 bg-cyan/10 text-white",
+  admin: "border-pink/40 bg-pink/10 text-white",
+};
+
+export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -61,7 +70,32 @@ export default function Navbar({ locale, dict, userEmail }: NavbarProps) {
           <LanguageSwitcher locale={locale} />
           {userEmail ? (
             <>
-              <span className="max-w-[12rem] truncate text-sm text-muted">{userEmail}</span>
+              <span className="max-w-[10rem] truncate text-sm text-muted">{userEmail}</span>
+              {userRole ? (
+                <span
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-xs",
+                    roleBadgeClass[userRole]
+                  )}
+                >
+                  {dict[ROLE_LABEL_KEY[userRole]]}
+                </span>
+              ) : null}
+              {canManageEvents(userRole) ? (
+                <Link
+                  href="/events/new"
+                  className="rounded-full border border-violet/40 px-3 py-2 text-sm text-white transition-colors hover:bg-violet/10"
+                >
+                  {dict.createEvent}
+                </Link>
+              ) : (
+                <Link
+                  href="/onboarding/role"
+                  className="rounded-full border border-cyan/40 px-3 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+                >
+                  {dict.upgrade}
+                </Link>
+              )}
               <LogoutButton label={dict.logout} />
             </>
           ) : (
@@ -118,7 +152,26 @@ export default function Navbar({ locale, dict, userEmail }: NavbarProps) {
           <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 pb-4">
             <LanguageSwitcher locale={locale} />
             {userEmail ? (
-              <LogoutButton label={dict.logout} />
+              <>
+                {userRole ? (
+                  <span
+                    className={cn(
+                      "rounded-full border px-2.5 py-1 text-xs",
+                      roleBadgeClass[userRole]
+                    )}
+                  >
+                    {dict[ROLE_LABEL_KEY[userRole]]}
+                  </span>
+                ) : null}
+                <Link
+                  href={canManageEvents(userRole) ? "/events/new" : "/onboarding/role"}
+                  onClick={() => setOpen(false)}
+                  className="rounded-full border border-violet/40 px-4 py-2 text-sm text-white"
+                >
+                  {canManageEvents(userRole) ? dict.createEvent : dict.upgrade}
+                </Link>
+                <LogoutButton label={dict.logout} />
+              </>
             ) : (
               <>
                 <Link

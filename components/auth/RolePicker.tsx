@@ -9,10 +9,12 @@ import { createClient } from "@/lib/supabase/client";
 type Role = "fan" | "artist" | "venue";
 
 /**
- * Role picker shown right after the first OAuth sign-in (Google does not carry
- * sign-up metadata, so the profile is created with the default `fan` role).
- * Writes the real role on the profile row and marks `user_metadata.role`, which
- * is what tells the callback that the choice has already been made.
+ * Scelta del ruolo, mostrata ai **fan**: al primo accesso con Google e a chi,
+ * essendo fan, decide di passare ad artista o locale.
+ *
+ * La transizione è irreversibile: la regola vera è nel database
+ * (`prevent_role_escalation`, migration 0004), qui la verifichiamo rileggendo
+ * il ruolo salvato, così l'utente non vede mai una finta riuscita.
  */
 export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] }) {
   const router = useRouter();
@@ -46,15 +48,19 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
       return;
     }
 
-    // 1. Profilo: RLS consente di aggiornare solo la propria riga.
-    const { error: profileError } = await supabase
+    // 1. Profilo: RLS consente di aggiornare solo la propria riga, e il trigger
+    //    accetta solo la transizione fan -> artist | venue. Rileggiamo la riga
+    //    risultante: se il database non l'ha accettata, lo diciamo.
+    const { data: updated, error: profileError } = await supabase
       .from("profiles")
       .update({ role })
-      .eq("id", user.id);
+      .eq("id", user.id)
+      .select("role")
+      .single();
 
-    if (profileError) {
+    if (profileError || updated?.role !== role) {
       setLoading(false);
-      setError(profileError.message || dict.roleError);
+      setError(profileError?.message || dict.roleError);
       return;
     }
 
@@ -96,6 +102,8 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
           </span>
         </label>
       ))}
+
+      <p className="text-xs text-muted">{dict.roleIrreversible}</p>
 
       {error ? <p className="text-sm text-pink">{error}</p> : null}
 

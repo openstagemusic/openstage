@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 
 import OnboardingForm from "@/components/auth/OnboardingForm";
+import { canManageArtistProfile } from "@/lib/auth/roles";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getPageMetadata } from "@/lib/i18n/metadata";
 import { getLocale } from "@/lib/i18n/server";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
+import { getSessionProfile } from "@/lib/supabase/session";
 
 export const generateMetadata = () =>
   getPageMetadata((dict) => ({
@@ -14,17 +14,15 @@ export const generateMetadata = () =>
   }));
 
 export default async function ArtistOnboardingPage() {
-  if (!isSupabaseConfigured()) {
+  const session = await getSessionProfile();
+
+  if (!session) {
     redirect("/login");
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
+  // Il profilo artista appartiene agli artisti (la RLS lo impone anche sul database).
+  if (!canManageArtistProfile(session.role)) {
+    redirect(session.role === "venue" ? "/" : "/onboarding/role");
   }
 
   const locale = await getLocale();

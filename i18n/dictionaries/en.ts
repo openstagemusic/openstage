@@ -22,6 +22,12 @@ export const en = {
     openMenu: "Open menu",
     closeMenu: "Close menu",
     language: "Language",
+    roleFan: "Fan",
+    roleArtist: "Artist",
+    roleVenue: "Venue",
+    roleAdmin: "Admin",
+    createEvent: "Create event",
+    upgrade: "Become an artist or venue",
   },
   footer: {
     tagline: "Live music, real places, real people.",
@@ -80,7 +86,14 @@ export const en = {
   },
   onboarding: {
     roleTitle: "How do you want to use OpenStage?",
-    roleSubtitle: "Pick your role — you can always change it later.",
+    roleSubtitle: "Choose how you want to use OpenStage.",
+    roleIrreversible:
+      "Heads up: choosing Artist or Venue is permanent. A Fan can become an Artist or Venue later, only once.",
+    roleLockedTitle: "Your role is already active",
+    roleLockedText: "The role you chose at sign-up is permanent and can no longer be changed.",
+    roleLockedNewAccount: "If you want to go back to being a Fan, you need a new account.",
+    roleLockedCta: "Create an event",
+    roleAdmin: "Admin",
     roleFan: "Fan",
     roleFanText: "Discover live shows and events near you.",
     roleArtist: "Artist",

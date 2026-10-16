@@ -20,6 +20,12 @@ export const it: Dictionary = {
     openMenu: "Apri menu",
     closeMenu: "Chiudi menu",
     language: "Lingua",
+    roleFan: "Fan",
+    roleArtist: "Artista",
+    roleVenue: "Locale",
+    roleAdmin: "Admin",
+    createEvent: "Crea evento",
+    upgrade: "Diventa artista o locale",
   },
   footer: {
     tagline: "Musica dal vivo, luoghi reali, persone reali.",
@@ -78,7 +84,15 @@ export const it: Dictionary = {
   },
   onboarding: {
     roleTitle: "Come vuoi usare OpenStage?",
-    roleSubtitle: "Scegli il tuo ruolo — potrai cambiarlo quando vuoi.",
+    roleSubtitle: "Scegli come vuoi usare OpenStage.",
+    roleIrreversible:
+      "Attenzione: se scegli Artista o Locale la scelta è definitiva. Un Fan può invece diventare Artista o Locale in un secondo momento, una volta sola.",
+    roleLockedTitle: "Il tuo ruolo è già attivo",
+    roleLockedText:
+      "Il ruolo scelto alla registrazione è definitivo e non può più essere modificato.",
+    roleLockedNewAccount: "Se vuoi tornare a essere Fan ti serve un nuovo account.",
+    roleLockedCta: "Crea un evento",
+    roleAdmin: "Admin",
     roleFan: "Fan",
     roleFanText: "Scopri concerti ed eventi dal vivo vicino a te.",
     roleArtist: "Artista",
