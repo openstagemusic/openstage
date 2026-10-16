@@ -12,7 +12,7 @@ fatta dentro la fase indicata · **🔴 grossa** = da riprendere insieme a fine 
 | B01 | Attivare *Leaked password protection* su Supabase | 🔴 | Fase 1.2 | Può richiedere il piano Pro (che servirà comunque per i pagamenti) |
 | B02 | Revocare i token di servizio usati in configurazione (Vercel, Supabase) | 🟡 | Fase 1.2 | Azione dell'utente, non del codice |
 | B03 | `npm audit`: 7 segnalazioni su dipendenze di sviluppo e build | 🔴 | Fase 1.3 | Da `eslint-config-next` (braces/micromatch) e da `next` → `postcss`: serve un salto di versione maggiore, da pianificare |
-| B04 | Indici su `events` segnalati come "mai usati" | 🟢 | Fase 1.2 | Si risolvono da soli con eventi reali (Fase 2); se restano inutili, valutarne la rimozione |
+| B04 | Indici su `events` e trigram segnalati come "mai usati" | 🟡 | Fase 1.2 | Verificato a fine Fase 2: con 3 righe il pianificatore fa sempre una scansione completa, quindi gli indici non vengono toccati. Non è un difetto di progetto — da rimisurare con `EXPLAIN` quando gli eventi saranno centinaia |
 | B05 | Test automatici end-to-end sui flussi critici | 🔴 | Fase 1.3 | Primo caso: "registrazione come fan → diventa artista → bloccato"; poi accesso e creazione evento |
 | B06 | Colonna `role_chosen_at` su `profiles` | 🔴 | Fase 1.3 | Registra *quando* è stato scelto il ruolo: utile per l'assistenza e per metriche vere, non di vanità |
 | B07 | Cancellazione dell'account da parte dell'utente | 🔴 | Fase 1.3 | Diritto alla cancellazione (privacy): serve una procedura chiara con i dati collegati (artista, locale, eventi) |
