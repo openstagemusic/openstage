@@ -184,6 +184,7 @@ export const it: Dictionary = {
     fullscreen: "Apri a schermo intero",
     backToExplore: "Torna a esplorare",
     loading: "Carico la mappa…",
+    eventOnMap: "evento sulla mappa",
     eventsOnMap: "eventi sulla mappa",
     you: "Sei qui",
     close: "Chiudi",

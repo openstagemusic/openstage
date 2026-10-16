@@ -184,6 +184,7 @@ export const en = {
     fullscreen: "Open full screen",
     backToExplore: "Back to explore",
     loading: "Loading the map…",
+    eventOnMap: "event on the map",
     eventsOnMap: "events on the map",
     you: "You are here",
     close: "Close",

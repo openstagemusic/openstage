@@ -218,7 +218,8 @@ export default function GlobeMap({
           <div className="flex items-center gap-2">
             {locatedEvents.length > 0 ? (
               <span className="pointer-events-none hidden rounded-full border border-white/10 bg-bg/70 px-3 py-2 text-xs text-muted backdrop-blur sm:inline-flex">
-                {locatedEvents.length} {dict.map.eventsOnMap}
+                {locatedEvents.length}{" "}
+                {locatedEvents.length === 1 ? dict.map.eventOnMap : dict.map.eventsOnMap}
               </span>
             ) : null}
 

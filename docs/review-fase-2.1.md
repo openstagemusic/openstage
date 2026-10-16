@@ -67,6 +67,20 @@
 | Nessun test automatico sulla mappa | Bassa | La verifica è stata fatta con un browser reale e script temporaneo (worker, tile, pop-up, pagina evento, 404, zero errori in console), poi rimosso: va reso ripetibile quando introdurremo i test end-to-end |
 | `npm audit` con 7 segnalazioni su dipendenze di sviluppo/build | Bassa | Invariato dalla 1.3 (vedi backlog B03) |
 
+## Aggiornamento — primi eventi reali in produzione
+
+- **Migration `0007_artists_unclaimed.sql`**: `artists.profile_id` è diventato nullable, esattamente
+  come `venues.profile_id`. Serve per gli artisti reali che non sono ancora registrati su OpenStage:
+  l'evento si collega a una riga artista "non rivendicata" (`profile_id` null) che l'artista potrà
+  rivendicare in futuro. Le policy RLS non cambiano: `artists_insert_own` richiede
+  `profile_id = auth.uid()`, quindi un utente normale **non** può creare righe non rivendicate
+  (solo staff/admin).
+- **Primo evento reale verificato in produzione** (18 ottobre 2026, Druso — Ranica BG): pin visibile
+  in Lombardia su `/mappa`, pagina evento con locandina, fuso orario corretto
+  ("domenica 18 ottobre 2026 · 18:00 — Ora legale dell'Europa centrale"), descrizione ufficiale,
+  link biglietti funzionante e nota "non ancora rivendicato". Zero errori in console.
+- **Corretto**: il contatore della mappa scriveva "1 eventi sulla mappa" (mancava il singolare).
+
 ## Da riprendere
 
 In `docs/backlog.md`: prova con eventi reali e locandine, pagina "eventi salvati" nel profilo,
