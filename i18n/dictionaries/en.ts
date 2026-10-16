@@ -149,6 +149,7 @@ export const en = {
     shareCopied: "Link copied",
     freeEntry: "Free entry",
     openInMaps: "Open in Google Maps",
+    venueWebsite: "Venue website",
     tonight: "Tonight",
     tomorrow: "Tomorrow",
     approximateNote:

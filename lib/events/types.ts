@@ -30,6 +30,7 @@ export type EventVenue = {
   name: string;
   city: string | null;
   address: string | null;
+  website: string | null;
 };
 
 /** Evento pubblico già normalizzato (embed di artista e locale inclusi). */

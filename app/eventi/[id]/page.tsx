@@ -122,16 +122,28 @@ export default async function EventPage({ params }: EventPageProps) {
           {event.venue?.address ? (
             <dd className="mt-1 text-xs text-muted">{event.venue.address}</dd>
           ) : null}
-          {mapsUrl ? (
-            <dd className="mt-2">
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-cyan transition-opacity hover:opacity-80"
-              >
-                {t.openInMaps}
-              </a>
+          {mapsUrl || event.venue?.website ? (
+            <dd className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+              {mapsUrl ? (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-cyan transition-opacity hover:opacity-80"
+                >
+                  {t.openInMaps}
+                </a>
+              ) : null}
+              {event.venue?.website ? (
+                <a
+                  href={event.venue.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-cyan transition-opacity hover:opacity-80"
+                >
+                  {t.venueWebsite}
+                </a>
+              ) : null}
             </dd>
           ) : null}
         </div>

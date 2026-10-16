@@ -31,13 +31,19 @@ const EVENT_SELECT = [
   "is_featured",
   "is_unclaimed",
   "artists ( id, name, city )",
-  "venues ( id, name, city, address )",
+  "venues ( id, name, city, address, website )",
 ].join(", ");
 
 type Embedded<T> = T | T[] | null;
 
 type ArtistRow = { id: string; name: string; city: string | null };
-type VenueRow = { id: string; name: string; city: string | null; address: string | null };
+type VenueRow = {
+  id: string;
+  name: string;
+  city: string | null;
+  address: string | null;
+  website: string | null;
+};
 
 type EventRow = {
   id: string;
@@ -90,7 +96,13 @@ function toPublicEvent(row: EventRow): PublicEvent {
     isUnclaimed: row.is_unclaimed ?? false,
     artist: artist ? { id: artist.id, name: artist.name, city: artist.city } : null,
     venue: venue
-      ? { id: venue.id, name: venue.name, city: venue.city, address: venue.address }
+      ? {
+          id: venue.id,
+          name: venue.name,
+          city: venue.city,
+          address: venue.address,
+          website: venue.website,
+        }
       : null,
   };
 }

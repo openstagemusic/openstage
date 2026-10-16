@@ -148,6 +148,7 @@ export const it: Dictionary = {
     shareCopied: "Link copiato",
     freeEntry: "Ingresso gratuito",
     openInMaps: "Apri in Google Maps",
+    venueWebsite: "Sito del locale",
     tonight: "Stasera",
     tomorrow: "Domani",
     approximateNote:
