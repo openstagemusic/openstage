@@ -27,3 +27,6 @@ fatta dentro la fase indicata · **🔴 grossa** = da riprendere insieme a fine 
 | B16 | Pagamenti opzionali (PayPal) e passaggio a Vercel Pro | 🔴 | Fase 8 | Il piano Hobby non è commerciale: da pianificare bene prima di incassare |
 | B17 | Manuale: valutare immagini e impaginazione se il PDF cresce | 🟡 | Fase 1.3 | Oggi è testo e tabelle: sotto controllo |
 | B18 | Più eventi nello stesso locale si sovrappongono in un unico pin | ✅ fatta | Fase 2 | Risolto in Fase 2.1 con il raggruppamento per locale: un pin con il numero delle serate e la scheda che elenca le date (`lib/map/venues.ts`, `components/map/VenueEventsCard.tsx`) |
+| B19 | Pagina dei preferiti per gli eventi salvati | 🔴 | Fase 2.2 | "Salva" funziona e scrive nel database, ma non c'è ancora un posto dove rivedere gli eventi salvati: serve una sezione (profilo o pagina dedicata) |
+| B20 | Preset temporali ancorati al fuso `Europe/Rome` | 🟡 | Fase 2.2 | "Stasera / questo weekend…" sono calcolati sulla serata italiana. Se servirà il fuso del visitatore, il punto di modifica è uno solo (`lib/events/timezone.ts`) |
+| B21 | Ricerca: indici trigram non ancora sfruttati da `search_events` | 🟡 | Fase 2.2 | Con pochi eventi è irrilevante; da rivedere quando saranno migliaia (i suggerimenti li usano già) |
