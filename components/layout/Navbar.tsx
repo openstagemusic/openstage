@@ -31,6 +31,7 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
 
   const links = [
     { href: "/", label: dict.explore },
+    { href: "/mappa", label: dict.map },
     { href: "/artisti", label: dict.artists },
     { href: "/locali", label: dict.venues },
     { href: "/per-gli-artisti", label: dict.forArtists },

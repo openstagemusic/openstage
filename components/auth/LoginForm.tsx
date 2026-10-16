@@ -13,7 +13,14 @@ import TurnstileWidget from "./TurnstileWidget";
 const inputClass =
   "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
 
-export default function LoginForm({ dict }: { dict: Dictionary["auth"] }) {
+export default function LoginForm({
+  dict,
+  nextPath,
+}: {
+  dict: Dictionary["auth"];
+  /** Pagina interna su cui tornare dopo l'accesso (es. l'evento da salvare). */
+  nextPath?: string | null;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,7 +62,7 @@ export default function LoginForm({ dict }: { dict: Dictionary["auth"] }) {
       return;
     }
 
-    router.push("/");
+    router.push(nextPath ?? "/");
     router.refresh();
   }
 
