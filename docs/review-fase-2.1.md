@@ -61,7 +61,7 @@
 | Voce | Gravità | Nota |
 | --- | --- | --- |
 | Fornitore tile gratuito senza SLA | Media | OpenFreeMap è un'istanza pubblica finanziata da donazioni: nessuna garanzia di servizio. L'indirizzo vive in un solo file (`lib/map/config.ts`), quindi passare a MapTiler o a tile self-hosted è una modifica di poche righe |
-| Pin e pop-up provati con eventi reali | Bassa | Verificati in produzione con 3 eventi reali (pin, pagina evento, fusi orari, locandine). Resta da provare il caso di **più eventi nello stesso punto**: tre concerti nella stessa sala condividono le coordinate esatte e sullo zoom massimo i pin si sovrappongono, quindi serve un raggruppamento per locale (o uno "spiderfy") per poterli scegliere singolarmente |
+| Pin e pop-up provati con eventi reali | Bassa | Verificati in produzione con 3 eventi reali (pin, pagina evento, fusi orari, locandine). Il caso di **più eventi nello stesso punto** è risolto dal raggruppamento per locale (vedi Aggiornamento) |
 | "Salva" senza una pagina dei preferiti | Bassa | Il salvataggio funziona e resta nel database, ma l'utente non ha ancora un posto dove rivedere gli eventi salvati: serve una sezione nel profilo |
 | Rotazione del globo solo in ingresso | Bassa | Scelta deliberata: una rotazione continua allontana la zona dell'utente dallo schermo, consuma batteria e richieste di tile. Se in futuro si vorrà una rotazione continua, va legata a "nessuna interazione da N secondi" e spenta su mobile |
 | Nessun test automatico sulla mappa | Bassa | La verifica è stata fatta con un browser reale e script temporaneo (worker, tile, pop-up, pagina evento, 404, zero errori in console), poi rimosso: va reso ripetibile quando introdurremo i test end-to-end |
@@ -93,6 +93,16 @@
   da loggare. Il difetto era invisibile finché il database era vuoto: con zero eventi lo stato
   vuoto era semplicemente corretto. Ora la costante vive in `lib/pagination.ts`, un modulo neutro
   che server e client possono leggere.
+- **Raggruppamento per locale**: i tre concerti al Druso hanno le stesse coordinate, quindi allo
+  zoom massimo i pin coincidevano e solo l'ultimo era cliccabile — un caso normale, non
+  un'eccezione. Ora gli eventi si raggruppano per locale (`lib/map/venues.ts`): il pin è **uno
+  solo** con il numero delle serate e la scheda elenca le date, ognuna con il link alla pagina
+  evento. Vale sia per il pop-up desktop sia per il bottom sheet mobile. Il cluster di livello
+  superiore ora conta le **serate** (non i locali), che è il numero che interessa a chi cerca un
+  concerto.
+- **Mobile**: il link secondario sopra la mappa ("Torna a esplorare" / "Apri a schermo intero")
+  andava a capo su una riga sua a 390 px. Su mobile resta la sola icona, con l'etichetta
+  accessibile per i lettori di schermo.
 
 ## Da riprendere
 
