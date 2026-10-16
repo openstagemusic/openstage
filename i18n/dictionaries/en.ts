@@ -187,6 +187,8 @@ export const en = {
     loading: "Loading the map…",
     eventOnMap: "event on the map",
     eventsOnMap: "events on the map",
+    eventInProgram: "event scheduled",
+    eventsInProgram: "events scheduled",
     you: "You are here",
     close: "Close",
     emptyTitle: "No events on the map yet",

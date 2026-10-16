@@ -18,6 +18,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import EventCard from "@/components/map/EventCard";
+import VenueEventsCard from "@/components/map/VenueEventsCard";
 import { hasCoordinates, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 import {
@@ -34,6 +35,7 @@ import {
   MIN_ZOOM,
 } from "@/lib/map/config";
 import { circlePolygon } from "@/lib/map/geo";
+import { groupEventsByVenue, type MapSelection, type VenueGroup } from "@/lib/map/venues";
 
 // MapLibre v6 tiene il worker in un file separato: lo serviamo dalla nostra
 // origine (vedi `scripts/copy-maplibre-worker.mjs`).
@@ -50,25 +52,33 @@ const AREAS_LINE_LAYER = "openstage-areas-line";
 const CLUSTERS_LAYER = "openstage-clusters";
 const CLUSTER_COUNT_LAYER = "openstage-cluster-count";
 const POINTS_LAYER = "openstage-points";
+const POINT_COUNT_LAYER = "openstage-point-count";
 const SELECTED_LAYER = "openstage-selected-halo";
 
 const EMPTY_COLLECTION: FeatureCollection = { type: "FeatureCollection", features: [] };
 
-function buildEventsCollection(events: PublicEvent[]): FeatureCollection<Point> {
+/**
+ * Un punto per **locale**, non per evento: `count` dice quante serate ci sono.
+ * Il raggruppamento è già fatto da `groupEventsByVenue`.
+ */
+function buildPointsCollection(groups: VenueGroup[]): FeatureCollection<Point> {
   return {
     type: "FeatureCollection",
-    features: events.filter(hasCoordinates).map((event) => ({
+    features: groups.map((group) => ({
       type: "Feature",
-      geometry: { type: "Point", coordinates: [event.longitude, event.latitude] },
+      geometry: { type: "Point", coordinates: [group.longitude, group.latitude] },
       properties: {
-        eventId: event.id,
-        approximate: event.locationPrecision === "approximate",
+        pointKey: group.key,
+        count: group.events.length,
+        approximate: group.events.every((event) => event.locationPrecision === "approximate"),
       },
     })),
   };
 }
 
 function buildAreasCollection(events: PublicEvent[]): FeatureCollection<Polygon> {
+  const seen = new Set<string>();
+
   return {
     type: "FeatureCollection",
     features: events
@@ -76,6 +86,13 @@ function buildAreasCollection(events: PublicEvent[]): FeatureCollection<Polygon>
       .filter(
         (event) => event.locationPrecision === "approximate" && (event.areaRadiusM ?? 0) > 0
       )
+      .filter((event) => {
+        // Più serate nello stesso posto disegnerebbero la stessa area N volte.
+        const key = `${event.longitude.toFixed(5)},${event.latitude.toFixed(5)},${event.areaRadiusM}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .map((event) => ({
         type: "Feature",
         geometry: {
@@ -142,16 +159,19 @@ function applyLabelLanguage(map: MapLibreMap, locale: Locale) {
   }
 }
 
-function addLayers(map: MapLibreMap, events: PublicEvent[]) {
+function addLayers(map: MapLibreMap, groups: VenueGroup[]) {
   map.addSource(EVENTS_SOURCE, {
     type: "geojson",
-    data: buildEventsCollection(events),
+    data: buildPointsCollection(groups),
     cluster: true,
     clusterRadius: 48,
     clusterMaxZoom: CLUSTER_MAX_ZOOM,
+    // Il cluster conta le **serate** (somma dei punti), non i locali: è il numero
+    // che interessa a chi cerca un concerto.
+    clusterProperties: { eventCount: ["+", ["get", "count"]] },
   });
 
-  map.addSource(AREAS_SOURCE, { type: "geojson", data: buildAreasCollection(events) });
+  map.addSource(AREAS_SOURCE, { type: "geojson", data: buildAreasCollection(groups.flatMap((g) => g.events)) });
   map.addSource(SELECTED_SOURCE, { type: "geojson", data: EMPTY_COLLECTION });
 
   map.addLayer({
@@ -194,14 +214,14 @@ function addLayers(map: MapLibreMap, events: PublicEvent[]) {
     paint: {
       "circle-color": [
         "step",
-        ["get", "point_count"],
+        ["get", "eventCount"],
         MAP_COLORS.violet,
         8,
         MAP_COLORS.cyan,
         40,
         MAP_COLORS.pink,
       ],
-      "circle-radius": ["step", ["get", "point_count"], 16, 8, 22, 40, 28],
+      "circle-radius": ["step", ["get", "eventCount"], 16, 8, 22, 40, 28],
       "circle-opacity": 0.85,
       "circle-stroke-width": 1.5,
       "circle-stroke-color": "rgba(255,255,255,0.7)",
@@ -214,7 +234,7 @@ function addLayers(map: MapLibreMap, events: PublicEvent[]) {
     source: EVENTS_SOURCE,
     filter: ["has", "point_count"],
     layout: {
-      "text-field": ["get", "point_count_abbreviated"],
+      "text-field": ["to-string", ["get", "eventCount"]],
       "text-font": ["Noto Sans Regular"],
       "text-size": 12,
       "text-allow-overlap": true,
@@ -228,12 +248,35 @@ function addLayers(map: MapLibreMap, events: PublicEvent[]) {
     source: EVENTS_SOURCE,
     filter: ["!", ["has", "point_count"]],
     paint: {
-      "circle-radius": ["case", ["get", "approximate"], 8, 6],
+      // Un locale con più serate ha un pin più grande: si vede che lì c'è altro.
+      "circle-radius": [
+        "case",
+        [">", ["get", "count"], 1],
+        11,
+        ["get", "approximate"],
+        8,
+        6,
+      ],
       "circle-color": ["case", ["get", "approximate"], MAP_COLORS.cyan, MAP_COLORS.violet],
       "circle-stroke-width": 2,
       "circle-stroke-color": "#ffffff",
       "circle-opacity": 0.95,
     },
+  });
+
+  // Numero delle serate dentro il pin del locale.
+  map.addLayer({
+    id: POINT_COUNT_LAYER,
+    type: "symbol",
+    source: EVENTS_SOURCE,
+    filter: ["all", ["!", ["has", "point_count"]], [">", ["get", "count"], 1]],
+    layout: {
+      "text-field": ["to-string", ["get", "count"]],
+      "text-font": ["Noto Sans Regular"],
+      "text-size": 10,
+      "text-allow-overlap": true,
+    },
+    paint: { "text-color": "#ffffff" },
   });
 }
 
@@ -246,7 +289,8 @@ export type MapCanvasProps = {
   cooperativeGestures: boolean;
   /** Ingresso rotante del globo che si assesta sulla zona dell'utente. */
   introSpin: boolean;
-  selectedEventId: string | null;
+  /** Serata selezionata, oppure tutte le serate di un locale. */
+  selection: MapSelection | null;
   userPosition: { longitude: number; latitude: number } | null;
   savedEventIds: string[];
   isAuthenticated: boolean;
@@ -257,7 +301,7 @@ export type MapCanvasProps = {
   bottomInset?: boolean;
   /** Etichetta accessibile della regione mappa. */
   ariaLabel: string;
-  onSelectEvent: (event: PublicEvent | null) => void;
+  onSelect: (selection: MapSelection | null) => void;
 };
 
 /**
@@ -272,7 +316,7 @@ export default function MapCanvas({
   view,
   cooperativeGestures,
   introSpin,
-  selectedEventId,
+  selection,
   userPosition,
   savedEventIds,
   isAuthenticated,
@@ -280,7 +324,7 @@ export default function MapCanvas({
   popupEnabled,
   bottomInset = false,
   ariaLabel,
-  onSelectEvent,
+  onSelect,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -293,15 +337,24 @@ export default function MapCanvas({
     typeof document === "undefined" ? null : document.createElement("div")
   );
 
-  const selectedEvent = useMemo(
-    () => (selectedEventId ? events.find((item) => item.id === selectedEventId) ?? null : null),
-    [events, selectedEventId]
-  );
+  // Un punto per locale: più serate nella stessa sala non si sovrappongono.
+  const groups = useMemo(() => groupEventsByVenue(events), [events]);
 
-  const eventsRef = useRef(events);
-  eventsRef.current = events;
-  const selectRef = useRef(onSelectEvent);
-  selectRef.current = onSelectEvent;
+  const groupsRef = useRef(groups);
+  groupsRef.current = groups;
+  const selectRef = useRef(onSelect);
+  selectRef.current = onSelect;
+
+  /** Punto su cui centrare mappa e pop-up: la singola serata o il locale. */
+  const selectionCoordinates = useMemo(() => {
+    if (!selection) return null;
+    if (selection.type === "venue") {
+      return { longitude: selection.group.longitude, latitude: selection.group.latitude };
+    }
+    return hasCoordinates(selection.event)
+      ? { longitude: selection.event.longitude, latitude: selection.event.latitude }
+      : null;
+  }, [selection]);
 
   const [styleReady, setStyleReady] = useState(false);
 
@@ -337,7 +390,7 @@ export default function MapCanvas({
       applyProjection(map, view);
       applySky(map);
       applyLabelLanguage(map, locale);
-      addLayers(map, eventsRef.current);
+      addLayers(map, groupsRef.current);
       setStyleReady(true);
     });
 
@@ -357,9 +410,19 @@ export default function MapCanvas({
     };
 
     const handlePointClick = (event: MapLayerMouseEvent) => {
-      const eventId = event.features?.[0]?.properties?.eventId as string | undefined;
-      const found = eventsRef.current.find((item) => item.id === eventId);
-      if (found) selectRef.current(found);
+      const key = event.features?.[0]?.properties?.pointKey as string | undefined;
+      if (!key) return;
+
+      const group = groupsRef.current.find((item) => item.key === key);
+      if (!group) return;
+
+      // Una serata sola: si apre la sua scheda. Più serate: l'elenco del locale.
+      const [first] = group.events;
+      selectRef.current(
+        group.events.length === 1 && first
+          ? { type: "event", event: first }
+          : { type: "venue", group }
+      );
     };
 
     const handleBackgroundClick = (event: MapMouseEvent) => {
@@ -408,12 +471,12 @@ export default function MapCanvas({
     if (!map || !styleReady) return;
 
     (map.getSource(EVENTS_SOURCE) as GeoJSONSource | undefined)?.setData(
-      buildEventsCollection(events)
+      buildPointsCollection(groups)
     );
     (map.getSource(AREAS_SOURCE) as GeoJSONSource | undefined)?.setData(
-      buildAreasCollection(events)
+      buildAreasCollection(groups.flatMap((group) => group.events))
     );
-  }, [events, styleReady]);
+  }, [groups, styleReady]);
 
   // --- Selezione: alone, volo sul pin e pop-up -----------------------------
   useEffect(() => {
@@ -422,7 +485,7 @@ export default function MapCanvas({
 
     const source = map.getSource(SELECTED_SOURCE) as GeoJSONSource | undefined;
 
-    if (!selectedEvent || !hasCoordinates(selectedEvent)) {
+    if (!selection || !selectionCoordinates) {
       source?.setData(EMPTY_COLLECTION);
       popupRef.current?.remove();
       popupRef.current = null;
@@ -434,7 +497,10 @@ export default function MapCanvas({
       features: [
         {
           type: "Feature",
-          geometry: { type: "Point", coordinates: [selectedEvent.longitude, selectedEvent.latitude] },
+          geometry: {
+            type: "Point",
+            coordinates: [selectionCoordinates.longitude, selectionCoordinates.latitude],
+          },
           properties: {},
         },
       ],
@@ -461,18 +527,18 @@ export default function MapCanvas({
     }
 
     popupRef.current
-      .setLngLat([selectedEvent.longitude, selectedEvent.latitude])
+      .setLngLat([selectionCoordinates.longitude, selectionCoordinates.latitude])
       .setDOMContent(popupNode)
       .addTo(map);
 
     map.easeTo({
-      center: [selectedEvent.longitude, selectedEvent.latitude],
+      center: [selectionCoordinates.longitude, selectionCoordinates.latitude],
       zoom: Math.max(map.getZoom(), 11.5),
       // Il pin resta un po' sopra il centro: il pop-up ha spazio sotto di sé.
       padding: { top: 0, bottom: 150, left: 0, right: 0 },
       duration: 700,
     });
-  }, [selectedEvent, styleReady, popupEnabled, popupNode]);
+  }, [selection, selectionCoordinates, styleReady, popupEnabled, popupNode]);
 
   // --- Posizione dell'utente ("Vicino a me") -------------------------------
   useEffect(() => {
@@ -554,16 +620,20 @@ export default function MapCanvas({
         aria-label={ariaLabel}
       />
 
-      {/* Scheda dell'evento dentro il pop-up di MapLibre (portal React). */}
-      {popupEnabled && popupNode && selectedEvent
+      {/* Scheda dentro il pop-up di MapLibre (portal React). */}
+      {popupEnabled && popupNode && selection
         ? createPortal(
-            <EventCard
-              event={selectedEvent}
-              locale={locale}
-              variant="popup"
-              initiallySaved={savedEventIds.includes(selectedEvent.id)}
-              isAuthenticated={isAuthenticated}
-            />,
+            selection.type === "event" ? (
+              <EventCard
+                event={selection.event}
+                locale={locale}
+                variant="popup"
+                initiallySaved={savedEventIds.includes(selection.event.id)}
+                isAuthenticated={isAuthenticated}
+              />
+            ) : (
+              <VenueEventsCard group={selection.group} locale={locale} variant="popup" />
+            ),
             popupNode
           )
         : null}

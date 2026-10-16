@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import EventCard from "@/components/map/EventCard";
+import VenueEventsCard from "@/components/map/VenueEventsCard";
 import { hasCoordinates, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { groupEventsByVenue, type MapSelection } from "@/lib/map/venues";
 import { cn } from "@/lib/utils";
 
 /**
@@ -76,7 +78,7 @@ export default function GlobeMap({
 
   const [view, setView] = useState<"globe" | "flat">("globe");
   const [mounted, setMounted] = useState(variant === "fullscreen");
-  const [selected, setSelected] = useState<PublicEvent | null>(null);
+  const [selection, setSelection] = useState<MapSelection | null>(null);
   const [userPosition, setUserPosition] = useState<{
     longitude: number;
     latitude: number;
@@ -87,6 +89,24 @@ export default function GlobeMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const locatedEvents = useMemo(() => events.filter(hasCoordinates), [events]);
+
+  // Il raggruppamento è calcolato qui e non solo dentro la mappa: serve anche
+  // al bottom sheet mobile e a capire se la selezione esiste ancora.
+  const groups = useMemo(() => groupEventsByVenue(events), [events]);
+
+  // La selezione è ricavata dai dati correnti: se un filtro fa sparire la
+  // serata (o tutte le serate del locale) la scheda si chiude da sola.
+  const resolved = useMemo<MapSelection | null>(() => {
+    if (!selection) return null;
+
+    if (selection.type === "event") {
+      const event = events.find((item) => item.id === selection.event.id);
+      return event ? { type: "event", event } : null;
+    }
+
+    const group = groups.find((item) => item.key === selection.group.key);
+    return group ? { type: "venue", group } : null;
+  }, [selection, events, groups]);
 
   // Caricamento pigro: la mappa entra in scena solo quando si avvicina alla viewport.
   useEffect(() => {
@@ -113,12 +133,10 @@ export default function GlobeMap({
     return () => observer.disconnect();
   }, [mounted]);
 
-  // Se un filtro fa sparire l'evento selezionato, il pop-up si chiude.
+  // Se la selezione non esiste più nei dati correnti, la dimentichiamo.
   useEffect(() => {
-    if (selected && !events.some((item) => item.id === selected.id)) {
-      setSelected(null);
-    }
-  }, [events, selected]);
+    if (selection && !resolved) setSelection(null);
+  }, [selection, resolved]);
 
   const locate = () => {
     setLocationError(null);
@@ -167,7 +185,7 @@ export default function GlobeMap({
             view={view}
             cooperativeGestures={variant === "home"}
             introSpin={variant === "home" && !isMobile}
-            selectedEventId={selected?.id ?? null}
+            selection={resolved}
             userPosition={userPosition}
             savedEventIds={savedEventIds}
             isAuthenticated={isAuthenticated}
@@ -175,7 +193,7 @@ export default function GlobeMap({
             popupEnabled={!isMobile}
             bottomInset={variant === "fullscreen"}
             ariaLabel={dict.map.title}
-            onSelectEvent={setSelected}
+            onSelect={setSelection}
           />
         ) : (
           <MapSkeleton label={dict.map.loading} />
@@ -225,9 +243,15 @@ export default function GlobeMap({
 
             <Link
               href={variant === "home" ? "/mappa" : "/"}
+              aria-label={variant === "home" ? dict.map.fullscreen : dict.map.backToExplore}
               className={controlClass}
             >
-              {variant === "home" ? dict.map.fullscreen : dict.map.backToExplore}
+              {/* Su mobile il testo non ci sta accanto agli altri controlli:
+                  resta l'icona, con l'etichetta per chi usa un lettore di schermo. */}
+              <span aria-hidden="true">{variant === "home" ? "⤢" : "←"}</span>
+              <span className="hidden sm:inline">
+                {variant === "home" ? dict.map.fullscreen : dict.map.backToExplore}
+              </span>
             </Link>
           </div>
         </div>
@@ -256,16 +280,25 @@ export default function GlobeMap({
       </div>
 
       {/* Mobile: bottom sheet al posto del pop-up */}
-      {isMobile && selected ? (
+      {isMobile && resolved ? (
         <div className="fixed inset-x-0 bottom-0 z-[60] px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
-          <EventCard
-            event={selected}
-            locale={locale}
-            variant="sheet"
-            initiallySaved={savedEventIds.includes(selected.id)}
-            isAuthenticated={isAuthenticated}
-            onClose={() => setSelected(null)}
-          />
+          {resolved.type === "event" ? (
+            <EventCard
+              event={resolved.event}
+              locale={locale}
+              variant="sheet"
+              initiallySaved={savedEventIds.includes(resolved.event.id)}
+              isAuthenticated={isAuthenticated}
+              onClose={() => setSelection(null)}
+            />
+          ) : (
+            <VenueEventsCard
+              group={resolved.group}
+              locale={locale}
+              variant="sheet"
+              onClose={() => setSelection(null)}
+            />
+          )}
         </div>
       ) : null}
     </section>

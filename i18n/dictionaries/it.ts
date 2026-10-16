@@ -187,6 +187,8 @@ export const it: Dictionary = {
     loading: "Carico la mappa…",
     eventOnMap: "evento sulla mappa",
     eventsOnMap: "eventi sulla mappa",
+    eventInProgram: "evento in programma",
+    eventsInProgram: "eventi in programma",
     you: "Sei qui",
     close: "Chiudi",
     emptyTitle: "Ancora nessun evento sulla mappa",
