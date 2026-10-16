@@ -13,7 +13,7 @@ social funzionano sempre e non esiste una "SPA" vuota da riempire nel browser.
 | Animazioni | Framer Motion | *in arrivo* | Scroll-reveal, tilt 3D, parallax (fase design avanzato) |
 | Database + Auth | Supabase (Postgres) | eu-north-1 | RLS nativa sull'`auth.uid()`; un solo fornitore per dati e login |
 | Anti-bot | Cloudflare Turnstile | — | Captcha invisibile su registrazione e login |
-| Mappe | MapLibre GL + MapTiler | *in arrivo* | Mappa degli eventi (Fase 2) |
+| Mappe | MapLibre GL JS + **OpenFreeMap** | 6.14.0 | Mappa e globo degli eventi: **nessuna chiave API, nessun account** (Fase 2) |
 | Email | Resend | *in arrivo* | Email transazionali (fasi successive) |
 | Pagamenti | PayPal | *in arrivo* | Solo funzioni opzionali: il piano base resta gratuito |
 | Hosting | Vercel | Hobby | Deploy continuo da GitHub |
@@ -27,6 +27,8 @@ social funzionano sempre e non esiste una "SPA" vuota da riempire nel browser.
 | Nhost / Appwrite / Firebase | Livello database meno "Postgres puro" (o NoSQL): vincoli, viste e policy SQL perdono potenza |
 | Turso | SQLite distribuito: ottimo per altri casi, ma qui serve Postgres con RLS nativa |
 | Supabase | **Scelto**: Postgres con Row Level Security collegata all'utente loggato, Auth integrata, piano gratuito ampio |
+| MapTiler | **Scartato in Fase 2**: richiede account e chiave API. OpenFreeMap non chiede né l'uno né l'altro, consente l'uso commerciale e si "paga" con l'attribuzione obbligatoria |
+| Globe.gl | **Scartato in Fase 2**: la proiezione "globo" è nativa in MapLibre, quindi una dipendenza in meno da mantenere |
 
 ## Versioni dell'ambiente
 
@@ -34,6 +36,7 @@ social funzionano sempre e non esiste una "SPA" vuota da riempire nel browser.
 - **npm**: 11.x
 - **Regione Supabase**: `eu-north-1` (dati in Europa)
 - **Progetto Supabase (ref)**: `tzdigzvkneonkhkwoeed`
+- **Mappa**: MapLibre GL JS 6.14.0 con lo stile `https://tiles.openfreemap.org/styles/dark`
 
 # Requisiti, comandi e struttura del progetto
 
@@ -53,28 +56,40 @@ Per allineare le variabili d'ambiente locali a quelle di Vercel: `npx vercel env
 ```text
 app/                     Pagine (App Router) e server action
   layout.tsx             Navbar, footer, player, lingua: struttura di ogni pagina
-  page.tsx               Home (Esplora)
-  artisti/ locali/       Elenchi pubblici (leggono dal database, con paginazione)
+  page.tsx               Home (Esplora): mappa, ricerca, filtri, vetrina, contatori
+  mappa/                 Mappa a tutto schermo (stessi filtri della Home)
+  eventi/[id]/           Pagina evento (SSR, dati strutturati, anteprima social)
+  artisti/ locali/       Segnaposto: le schede pubbliche arrivano in Fase 3
   per-gli-artisti/ per-le-venue/ about/ contatti/ privacy/ terms/ cookies/
   login/ register/       Accesso e registrazione
   auth/callback/         Ritorno da Google: crea/aggiorna la sessione
   onboarding/role/       Scelta del ruolo ("Diventa artista o locale")
   onboarding/artist/     Profilo artista
-  events/new/            Creazione evento (segnaposto: arriva in Fase 2)
+  events/new/            Creazione evento (segnaposto: arriva con l'editor)
+  api/suggest/           Endpoint dei suggerimenti di ricerca
   actions/locale.ts      Server action che salva la lingua scelta
 components/
   layout/                Navbar, Footer, SpotifyPlayerDock
   auth/                  RegisterForm, LoginForm, GoogleButton, RolePicker,
                          OnboardingForm, TurnstileWidget, LogoutButton
+  discovery/             SearchBar, QuickFilters, ViewSwitcher, useScrollAnchor
+  map/                   GlobeMap (contenitore), MapCanvas (istanza MapLibre),
+                         EventCard, VenueEventsCard, ShareButton
+  events/                EventTeaser (scheda), EventTable (tabella), SaveButton
+  home/                  BentoGrid, Counters
   ui/                    Pagination, PagePlaceholder
   i18n/                  LanguageSwitcher
 i18n/dictionaries/       it.ts e en.ts: tutti i testi dell'interfaccia
 lib/
   auth.ts                isAdminEmail() per le decisioni di interfaccia
-  auth/roles.ts          Tipo UserRole, etichette, permessi (eventi, profilo artista)
+  auth/roles.ts          Tipo UserRole, etichette, permessi
+  events/                filters (stato in URL), queries (letture), types,
+                         format, timezone (Europe/Rome), saved (server action)
+  map/                   config (URL dello stile), venues (raggruppamento dei pin)
+  pagination.ts          ITEMS_PER_PAGE: costante condivisa (vedi "errori noti")
   i18n/                  config (cookie/lingue), server (lettura), metadata, dictionaries
   supabase/              client, server, admin, env, middleware, session
-supabase/migrations/     0001_init, 0002_role_self_service, 0003_hardening, 0004_role_lock
+supabase/migrations/     0001…0008 (vedi tabella migrazioni)
 docs/                    Piani di fase, review di fase, sorgenti del manuale
 scripts/manuale.mjs      Generatore del PDF (solo locale, non va in produzione)
 ```
@@ -104,6 +119,11 @@ quando ne aggiungi una, impostala su tutti e tre.
 > Due variabili sono marcate **sensitive** su Vercel (`SUPABASE_SERVICE_ROLE_KEY`,
 > `TURNSTILE_SECRET_KEY`): una volta salvate non sono più leggibili, per questo è normale non
 > poterle "rivedere" dalla dashboard.
+
+**La Fase 2 non ha aggiunto nessuna variabile**: la mappa usa OpenFreeMap, che non richiede
+chiavi API né account. Vale la regola generale: quando una fase introduce un servizio nuovo,
+la variabile va impostata su **tutti e tre** gli ambienti Vercel (Production, Preview,
+Development) prima del test in produzione.
 
 # Autenticazione e gestione del ruolo
 
@@ -149,18 +169,27 @@ fatte direttamente in SQL dalla dashboard non vengono bloccate).
 `id` (chiave, uguale a `auth.users.id`), `email`, `full_name`, `role` (**enum**:
 `fan`/`artist`/`venue`/`admin`, predefinito `fan`), `city`, `created_at`, `updated_at`.
 
-**`artists`** — profilo pubblico dell'artista.
-`id`, `profile_id` (unico → un solo profilo artista per utente), `name`, `city`, `genre`,
-`spotify_url`, `bio`, `created_at`, `updated_at`.
+**`artists`** — scheda pubblica dell'artista.
+`id`, `profile_id` (unico, **nullable**: un artista può esistere senza account, come i locali),
+`name`, `city`, `genre`, `spotify_url`, `bio`, `created_at`, `updated_at`.
 
-**`venues`** — profilo pubblico del locale/organizzatore.
-`id`, `profile_id` (unico), `name`, `city`, `address`, `latitude`, `longitude`, `website`,
-`created_at`, `updated_at`.
+**`venues`** — scheda pubblica del locale/organizzatore.
+`id`, `profile_id` (unico, nullable), `name`, `city`, `address`, `latitude`, `longitude`,
+`website`, `created_at`, `updated_at`.
 
 **`events`** — gli eventi.
 `id`, `title`, `description`, `artist_id`, `venue_id`, `starts_at`, `city`, `is_unclaimed`
-(evento inserito da OpenStage e non ancora rivendicato dal locale), `status` (**enum**:
-`draft`/`published`/`cancelled`), `created_by`, `created_at`, `updated_at`.
+(evento inserito dalla redazione e non ancora rivendicato), `status` (**enum**:
+`draft`/`published`/`cancelled`), `created_by`, `created_at`, `updated_at`, più i campi della
+scoperta aggiunti in Fase 2: `latitude`, `longitude`, `location_precision` (**enum**:
+`exact`/`approximate`), `area_radius_m` (raggio mostrato per gli eventi approssimati),
+`genre`, `kind` (**enum**: `concert`/`dj_set`/`festival`/`open_mic`/`acoustic`/`other`),
+`is_free`, `ticket_url`, `cover_image_url`, `is_featured`, `featured_until` (scadenza reale
+della vetrina), `timezone` (predefinito `Europe/Rome`, con controllo sul formato).
+
+**`saved_events`** — gli eventi salvati da un profilo (Fase 2).
+`profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
+dato sensibile, e la RLS lo limita al proprietario.
 
 **`settings`** — parametri interni chiave/valore. Oggi contiene `admin_email` = email dello
 staff. È leggibile solo dall'admin.
@@ -173,14 +202,28 @@ staff. È leggibile solo dall'admin.
 | `prevent_role_escalation()` | Blocca le transizioni di ruolo non ammesse (vedi sopra) |
 | `touch_updated_at()` | Aggiorna `updated_at` a ogni modifica |
 | `is_admin()` | Vero se l'utente loggato è l'email in `settings.admin_email`. Usata dalle policy |
+| `search_events(...)` | Ricerca e filtri di Home e mappa (Fase 2): testo, preset temporali, genere, tipo, ingresso gratuito, distanza e paginazione in **una sola query**. `SECURITY INVOKER`, con `status = 'published'` esplicito |
+| `search_suggestions(...)` | I suggerimenti della barra di ricerca, raggruppati per tipo: città, artisti, locali, eventi, generi |
 | Trigger | `on_auth_user_created` (su `auth.users`), `profiles_guard`, `artists_touch`, `venues_touch`, `events_touch`, `settings_touch` |
 
 ## Indici
 
 Chiavi primarie e unicità su `profiles.id`, `artists.profile_id`, `venues.profile_id`,
-`settings.key`, più gli indici per le ricerche frequenti: `events_starts_at_idx` (ordine per
-data), `events_city_idx` (filtro per città), `events_artist_id_idx`, `events_venue_id_idx`,
-`events_created_by_idx` (i collegamenti tra tabelle).
+`settings.key`, più gli indici per le ricerche frequenti:
+
+| Indice | A cosa serve |
+| --- | --- |
+| `events_starts_at_idx`, `events_published_starts_at_idx` | Ordinare e filtrare per data (il secondo solo sugli eventi pubblicati) |
+| `events_city_idx`, `events_published_geo_idx` | Filtro per città e per posizione (latitudine/longitudine) |
+| `events_artist_id_idx`, `events_venue_id_idx`, `events_created_by_idx` | I collegamenti tra tabelle |
+| `events_featured_idx` | La sezione "In evidenza" |
+| `events_title_trgm_idx`, `events_city_trgm_idx`, `artists_name_trgm_idx`, `venues_name_trgm_idx` | Ricerca testuale "contiene" con l'estensione `pg_trgm`: è ciò che rende veloci i suggerimenti |
+| `saved_events_event_idx` | Gli eventi salvati, letti per evento |
+
+> Gli strumenti di Supabase segnalano alcuni di questi indici come "mai usati". Con poche
+> righe il pianificatore preferisce leggere tutta la tabella, quindi è un artefatto del volume
+> di dati attuale, non un errore di progetto: da rimisurare con `EXPLAIN` quando gli eventi
+> saranno centinaia (backlog B04).
 
 ## Migrazioni
 
@@ -192,9 +235,13 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0002_role_self_service.sql` | Il ruolo `fan`/`artista`/`locale` è autodichiarabile (l'admin no) |
 | `0003_hardening.sql` | Indurimento: `search_path`, revoche, indici, policy riscritte con `(select auth.uid())` |
 | `0004_role_lock.sql` | Blocco delle transizioni di ruolo + coerenza del ruolo nella RLS |
+| `0005_events_discovery.sql` | Campi della scoperta su `events`: coordinate, posizione approssimata, genere, tipo, ingresso gratuito, biglietti, vetrina, fuso orario |
+| `0006_saved_events.sql` | Tabella `saved_events` (eventi salvati) con la sua RLS |
+| `0007_artists_unclaimed.sql` | `artists.profile_id` diventa **nullable**: un artista può esistere senza account, come i locali |
+| `0008_search_rpc.sql` | Funzioni `search_events` e `search_suggestions`: ricerca, filtri, distanza e paginazione nel database |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
-> `0004`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
+> `0008`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
 > `supabase migration list` non la vede.
 
 # Sicurezza: Row Level Security
@@ -213,9 +260,11 @@ di `is_admin()`, mai di valori passati dal browser.
 | `venues` | `venues_select_public` | Le schede locale sono pubbliche |
 | | `venues_insert_own` | Crei la tua riga **solo se il tuo ruolo è `venue`** |
 | | `venues_update_own`, `venues_delete_own` | Gestisci solo la tua riga (o l'admin) |
-| `events` | `events_select_public` | Gli eventi sono pubblici |
+| `events` | `events_select_public` | Vedi gli eventi **pubblicati**; i tuoi li vedi anche in bozza, l'admin li vede tutti |
 | | `events_insert_authenticated` | Crei un evento **solo se sei `artist` o `venue`** e come tuo |
 | | `events_update_own`, `events_delete_own` | Modifichi solo i tuoi eventi (o l'admin) |
+| `saved_events` | `saved_events_select_own` | Vedi solo i **tuoi** preferiti |
+| | `saved_events_insert_own`, `saved_events_delete_own` | Salvi e togli solo i tuoi |
 | `settings` | `settings_select_admin`, `settings_update_admin` | Solo l'admin |
 
 **Perché le policy contano davvero:** un utente malintenzionato può chiamare l'API di Supabase
@@ -232,8 +281,9 @@ motivazione:
 | Avviso | Perché è accettato |
 | --- | --- |
 | `is_admin()` è `SECURITY DEFINER` ed eseguibile da anonymous/authenticated | Le policy RLS la invocano: deve poter leggere `settings` (che è riservata all'admin) senza esporre nient'altro |
-| *Leaked password protection* disattivata | Da attivare in Supabase → Authentication → Settings (può richiedere il piano a pagamento) |
-| Indici "mai usati" su `events` | La tabella è ancora vuota: diventeranno utili con gli eventi reali (Fase 2) |
+| *Leaked password protection* disattivata | **Non è disponibile sul piano gratuito**: è una funzione del piano Pro. Va attivata quando si passerà al piano a pagamento per i pagamenti (backlog B01) |
+| Indici "mai usati" | Con poche righe il pianificatore preferisce leggere tutta la tabella: è un artefatto del volume attuale, non un difetto di progetto (backlog B04) |
+| `npm audit`: segnalazioni su dipendenze di sviluppo e build | Arrivano da `eslint-config-next` e da `next` → `postcss`: servono salti di versione maggiore, da pianificare (backlog B03) |
 
 # Come si collauda la RLS
 
@@ -295,6 +345,62 @@ Regole da non tradire:
 2. **Mobile first**: si progetta prima lo schermo piccolo.
 3. I token del tema stanno in `app/globals.css`: cambiando lì i colori, cambiano ovunque.
 
+# Mappe e tile
+
+La mappa è **MapLibre GL JS** con lo stile di **OpenFreeMap**. La scelta è stata fatta in
+Fase 2 al posto di MapTiler:
+
+| Aspetto | MapTiler | OpenFreeMap (**scelto**) |
+| --- | --- | --- |
+| Chiave API | Obbligatoria | **Nessuna** |
+| Account | Obbligatorio | **Nessuno** |
+| Uso commerciale | Solo nei piani a pagamento | **Consentito** |
+| Costo | A consumo oltre la soglia gratuita | Gratuito |
+| Attribuzione | Richiesta | Richiesta (già presente sulla mappa) |
+| Garanzie | Contratto e SLA | **Nessuna**: è un'istanza finanziata da donazioni |
+
+Il rischio accettato è l'ultima riga: se OpenFreeMap dovesse chiudere, la mappa resterebbe
+senza tile. La mitigazione è che **l'indirizzo dello stile è in un punto solo**,
+`lib/map/config.ts`: cambiare fornitore significa cambiare una riga.
+
+Punti tecnici da ricordare:
+
+1. **Il worker di MapLibre è servito dal nostro dominio** (`public/maplibre-gl-worker.mjs`,
+   copiato da `scripts/copy-maplibre-worker.mjs` durante `prebuild`): così non dipendiamo da
+   una CDN esterna e non serve allentare la Content Security Policy.
+2. **`maplibre-gl` esporta solo nomi** (nessun export predefinito): si importa come
+   `import { Map, Marker, Popup } from "maplibre-gl"`.
+3. **Il pop-up deve restare dentro il riquadro della mappa.** Due accortezze, imparate sul
+   campo: un locale con molte serate mostra **una serata alla volta** con le frecce numerate
+   (altezza costante), e il margine della mappa va **dal lato giusto** (in alto per il pop-up
+   desktop, che sta sopra il pin; in basso per il pannello mobile, che sta sotto). Senza queste
+   due cose la scheda esce dalla mappa e viene tagliata.
+4. **Il globo è una proiezione nativa** di MapLibre: nessuna libreria aggiuntiva (Globe.gl è
+   stato scartato proprio per questo).
+5. **Su mobile le gesture sono "cooperative"** (`cooperativeGestures: true`): un dito scorre la
+   pagina, la mappa si muove solo con due dita o nella modalità a tutto schermo.
+
+# Ricerca, filtri e stato nell'URL
+
+Tutto lo stato della scoperta — testo cercato, filtri, raggio, vista schede/tabella, pagina —
+vive **nell'indirizzo della pagina**, non in memoria:
+
+- un link filtrato è condivisibile e si apre già filtrato;
+- la pagina si compone lato server, quindi funziona anche senza JavaScript;
+- lista e mappa leggono **gli stessi parametri**: non possono mostrare cose diverse.
+
+Scelte da non perdere:
+
+| Scelta | Perché |
+| --- | --- |
+| Ricerca e filtri in **una funzione SQL** (`search_events`) e non nell'app | Ricerca testuale su più tabelle, paginazione corretta **con la distanza**, una sola fonte di verità |
+| `status = 'published'` **esplicito** dentro la funzione | La funzione è `SECURITY INVOKER`: si comporta come l'utente che la chiama, e la regola "solo pubblicati" resta scritta a chiare lettere |
+| Carattere di escape `!` nei confronti `LIKE` | In SQL non si usano i backslash: `!` evita di doverli raddoppiare. Verificato: cercare `%` restituisce 0 righe |
+| Preset temporali calcolati su `Europe/Rome` con `Intl` | Corretti anche al cambio dell'ora legale, senza librerie di date. Il file è uno solo: `lib/events/timezone.ts` |
+| Il **centro** del raggio va nell'URL (`lat`/`lng`) | Un raggio ha senso solo con un centro: così il filtro resta condivisibile. La posizione precisa resta dietro "Vicino a me" |
+| Suggerimenti **dal nostro database**, non da un geocoder esterno | Coerenza con "niente dati finti", nessun costo, nessun servizio da configurare |
+| `scroll: false` su ogni navigazione di filtro | Chi sta filtrando guarda i filtri: la pagina non deve tornare in cima |
+
 # Deploy e rilascio
 
 1. Il codice vive su GitHub (`openstagemusic/openstage`, ramo `main`).
@@ -331,6 +437,40 @@ Regole da non tradire:
 | L'URL di autorizzazione OAuth arriva rotto (`client_id: invalid`) | I parametri `&` vengono corrotti aprendolo da terminale/chat | Incollare l'URL a mano nella barra degli indirizzi |
 | Il selettore di lingua non cambia nulla | La scelta manuale è nel cookie `NEXT_LOCALE` | Svuotare il cookie o usare lo switcher (non l'URL) |
 | L'email di conferma non arriva | In questa fase l'autoconferma è attiva: l'account è già utilizzabile | Nessuna azione: arriverà con Resend |
+| La lista degli eventi in Home è **sempre vuota** | Una costante importata da un modulo `"use client"` dentro un Server Component arriva `undefined` | Tenere le costanti condivise in un file neutro: `lib/pagination.ts`. **Regola**: mai importare valori da un modulo `"use client"` in un componente server |
+| `?page=2` mostra una pagina vuota | Il numero di pagina richiesto supera l'ultima disponibile | Riportare la pagina all'ultimo valore valido invece di mostrare il vuoto |
+| Il pop-up di un locale con più serate esce dalla mappa e si taglia | La scheda cresce con il numero di date, e il pop-up desktop sta **sopra** il pin | Una serata alla volta con le frecce (altezza costante) + margine della mappa dal lato giusto |
+| La pagina torna in cima usando ricerca e filtri | Navigazione senza `scroll: false`; i menu a tendina nativi su mobile possono saltare in cima comunque | `scroll: false` su ogni navigazione + `useScrollAnchor`, che ripristina la posizione solo se il browser ha davvero saltato |
+| Un blocco SQL con `union all` si interrompe | I valori di tipo enum vanno convertiti esplicitamente nelle unioni | Scrivere `'published'::event_status` e simili |
+| La build fallisce con `useSearchParams` | In Next 15 un componente client che legge i parametri va avvolto in `<Suspense>` | Avvolgere il componente (o il suo gruppo) in un confine `<Suspense>` |
+| La mappa resta grigia / il worker non si carica | Il worker di MapLibre non è raggiungibile dal percorso previsto | Servirlo dal nostro dominio: `scripts/copy-maplibre-worker.mjs` lo copia in `public/` durante `prebuild` |
+
+# Come si verifica una pagina (browser headless)
+
+Le fasi si collaudano in un **browser vero**, non solo con la build: si usa il Chrome installato
+sul computer, guidato da `puppeteer-core` (nessun browser da scaricare). Lo script temporaneo si
+crea, si usa e **si cancella**: non resta nel repository.
+
+La ricetta messa a punto nella Fase 2:
+
+1. `puppeteer.launch({ executablePath: "...chrome.exe", headless: true })`.
+2. `page.setViewport()` con **due misure**: desktop 1440×1000 e mobile 390×844 (`isMobile`,
+   `hasTouch`).
+3. `page.goto(..., { waitUntil: "networkidle2" })` e una pausa: la mappa ha bisogno di qualche
+   secondo prima di essere affidabile.
+4. Per cliccare **senza falsare il test**: leggere `getBoundingClientRect()` dell'elemento e
+   usare `page.mouse.click(x, y)` / `page.touchscreen.tap(x, y)`. `elementHandle.click()` fa
+   scorrere l'elemento in vista e nasconde proprio i difetti di scroll che si vogliono trovare.
+5. Misurare i **numeri**, non le impressioni: `window.scrollY` prima e dopo, il rettangolo del
+   pop-up confrontato con quello della mappa, il conteggio dei risultati.
+6. Ascoltare `console` (errori) e `pageerror`: una fase non è chiusa se la console non è pulita.
+7. Provare **in locale e in produzione**, e in **entrambe le lingue**. In locale mancano gli
+   header geografici di Vercel: la lingua parte in inglese e il centro mappa è Roma. È utile per
+   accorgersi di differenze tra i due ambienti.
+
+> I pin della mappa sono disegnati su WebGL e **non esistono come elementi HTML**: per cliccarli
+> si recupera l'istanza di MapLibre dai dati interni di React e si usa `map.project([lng, lat])`
+> per sapere dove si trova sullo schermo.
 
 # Il manuale PDF
 
@@ -350,17 +490,20 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 
 | Fase | Contenuto previsto |
 | --- | --- |
-| 1 | Fondamenta: design system, accesso, ruoli, pagine pubbliche, database, deploy |
-| 1.2 | Indurimento del database (sicurezza, indici, avvisi) |
-| 1.3 | Regole definitive sui ruoli (database, pagine, interfaccia) |
-| 2 | Mappa (MapLibre + MapTiler) ed eventi reali |
-| 3 | Pubblicazione e gestione degli eventi, profili artista e locale completi |
-| 4 | Ricerca, filtri e pagina evento con anteprima social |
-| 5 | Preferiti e community |
+| 1 | ✅ Fondamenta: design system, accesso, ruoli, pagine pubbliche, database, deploy |
+| 1.2 | ✅ Indurimento del database (sicurezza, indici, avvisi) |
+| 1.3 | ✅ Regole definitive sui ruoli (database, pagine, interfaccia) |
+| 2 | ✅ Scoperta degli eventi: mappa con globo e pin, pagine evento, ricerca con suggerimenti, filtri, salvataggio, vetrina e contatori reali |
+| 3 | Schede pubbliche di artisti e locali + **reclamo** della scheda: artista immediato con prova, locale con approvazione dell'admin |
+| 4 | **Editor degli eventi**: pubblicazione e gestione delle proprie date dall'app |
+| 5 | Preferiti: pagina degli eventi salvati |
 | 6 | Email transazionali (Resend) e notifiche |
-| 7 | Rivendicazione dei locali e inserimento eventi non reclamati |
+| 7 | Community e funzioni sociali |
 | 8 | Funzioni opzionali per chi vuole sostenere il progetto (PayPal) |
 | 9 | Rifinitura: prestazioni, accessibilità, contenuti |
 
-> Le fasi dalla 3 in poi sono indicative: si dettagliano una per volta, con un piano scritto
-> prima di scrivere codice.
+> L'ordine delle fasi dalla 3 in poi è **indicativo** e viene dettagliato una fase per volta, con
+> un piano scritto prima di scrivere codice. Rispetto alla prima edizione di questo manuale, il
+> **reclamo delle schede** è stato anticipato alla Fase 3 e l'**editor degli eventi** spostato
+> alla Fase 4: il reclamo è più piccolo, chiude una promessa già visibile nell'interfaccia
+> ("non ancora rivendicato") e costruisce le pagine profilo di cui l'editor avrà bisogno.

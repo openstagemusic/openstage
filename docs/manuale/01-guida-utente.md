@@ -20,12 +20,20 @@ I quattro principi che guidano ogni decisione (anche tecnica) sono:
 ## A che punto siamo
 
 **Fatto e online:** identità e accesso (email e Google), ruoli con regole definitive, design
-system, doppia lingua IT/EN, pagine pubbliche (Home, Artisti, Locali, Per gli Artisti,
-Per le Venue, Chi siamo, Contatti, Privacy, Termini, Cookie), database con sicurezza a livello
-di riga, deploy continuo.
+system, doppia lingua IT/EN, pagine pubbliche di servizio, **mappa interattiva degli eventi**
+con globo 3D e pin, **pagine evento**, **ricerca con suggerimenti**, **filtri rapidi**
+(stasera, weekend, settimana, 30 giorni, distanza, genere, tipo, ingresso gratuito),
+**salvataggio degli eventi**, vetrina con **schede o tabella**, sezione **"In evidenza"**,
+contatori reali in home, database con sicurezza a livello di riga, deploy continuo.
 
-**In arrivo nelle prossime fasi:** mappa interattiva degli eventi, pubblicazione e gestione
-degli eventi, schede artista e locale, ricerca e filtri, notifiche email, pagamenti.
+**In arrivo nelle prossime fasi:** schede pubbliche di artisti e locali con **reclamo della
+scheda**, pubblicazione e gestione degli eventi dall'app, pagina dei preferiti, notifiche
+email, pagamenti opzionali.
+
+**Da sapere oggi:** gli eventi presenti sono **reali ma inseriti dalla redazione di
+OpenStage**, non ancora dagli artisti e dai locali (quella funzione arriva con l'editor degli
+eventi). Un evento inserito da noi resta marcato *"non ancora rivendicato"* finché il locale o
+l'artista non reclamano la propria scheda.
 
 # I ruoli e le loro regole
 
@@ -34,7 +42,7 @@ cosmetica: determina cosa puoi fare e quali pagine vedi.
 
 | Ruolo | Per chi è | Cosa può fare |
 | --- | --- | --- |
-| **Fan** | Chi vuole scoprire concerti | Esplorare artisti, locali ed eventi; salvare i preferiti (prossime fasi) |
+| **Fan** | Chi vuole scoprire concerti | Esplorare mappa ed eventi, cercare, filtrare, salvare i preferiti |
 | **Artista** | Musicisti, band, dj, progetti | Tutto ciò che fa un fan, più: profilo artista e pubblicazione dei propri concerti |
 | **Locale / Organizzatore** | Locali, circoli, festival, promoter | Tutto ciò che fa un fan, più: profilo del locale e programmazione degli eventi |
 | **Admin** | Solo lo staff di OpenStage | Accesso completo per assistenza e correzioni |
@@ -100,20 +108,91 @@ Dopo l'accesso, in alto a destra vedi:
 Se torni su quella pagina dopo la scelta, OpenStage ti mostra **"Il tuo ruolo è già attivo"**
 con il tuo ruolo: è la conferma che il blocco funziona anche lato database.
 
+# Trovare un concerto
+
+Questa è la parte che oggi funziona di più: la Home è una vetrina con **mappa, ricerca,
+filtri e risultati**, e tutto è navigabile anche senza JavaScript (le pagine arrivano già
+composte dal server, così i link sono condivisibili e le anteprime social funzionano).
+
+## La mappa
+
+- La Home apre con un **globo 3D** che ruota una volta sola, come introduzione, e si ferma al
+  primo tocco. Se il tuo sistema chiede "meno animazioni", la rotazione non parte nemmeno.
+- I **pin** sono gli eventi futuri. Più serate nello **stesso locale** diventano **un pin
+  solo** con il numero delle date, per non avere tre puntini sovrapposti.
+- Toccando un pin si apre la **scheda**: data e ora nel fuso dell'evento, titolo, locale,
+  genere, tipo e ingresso gratuito. Se il locale ha più serate, le scorri **una alla volta**
+  con le frecce e il contatore `‹ 1 / 3 ›`.
+- Dalla scheda: **Pagina evento**, **Biglietti** (se ci sono), **Apri in Google Maps**,
+  **Salva** e **Condividi**.
+- Gli eventi che dichiarano una posizione **approssimata** mostrano un'area invece di un
+  punto, e la pagina evento lo spiega.
+- **A tutto schermo** (voce "Mappa" nella barra, oppure il pulsante sulla mappa) la mappa
+  diventa l'intera pagina: è la modalità migliore per esplorare.
+- **Su mobile:** un dito **scorre la pagina** (la mappa non "ruba" il gesto), la mappa si
+  muove solo nella modalità a tutto schermo o con **due dita**. Così non resti mai bloccato
+  dentro la mappa.
+- Il pulsante **Vicino a me** chiede al browser la posizione precisa e centra la mappa lì.
+  Senza il tuo consenso la mappa usa una posizione approssimativa (città), ricavata dalla
+  connessione: non serve alcun permesso.
+
+## La ricerca
+
+Sotto la mappa c'è la **barra di ricerca**. I suggerimenti arrivano **dal database di
+OpenStage**, non da un servizio esterno, e sono raggruppati per tipo: **città, artisti,
+locali, eventi, generi**. Scrivendo "druso" trovi il locale; scrivendo "rock" trovi il genere.
+
+## I filtri rapidi
+
+| Filtro | Cosa fa |
+| --- | --- |
+| **Stasera** | Gli eventi di oggi (la serata italiana, calcolata sul fuso `Europe/Rome`) |
+| **Questo weekend** | Sabato e domenica della settimana corrente |
+| **Questa settimana** | I prossimi sette giorni |
+| **Prossimi 30 giorni** | Il mese che viene |
+| **Distanza** | Raggio in km intorno a un centro: la tua posizione approssimata, o quella scelta |
+| **Genere** | Solo i generi realmente presenti negli eventi pubblicati |
+| **Tipo di evento** | Concerto, dj set, festival, open mic, acustico, altro |
+| **Ingresso gratuito** | Solo le serate a ingresso libero |
+
+Ogni filtro **scrive nell'indirizzo della pagina**: puoi copiare il link e chi lo apre vede
+esattamente la tua stessa lista. La lista e la mappa leggono gli stessi parametri, quindi non
+possono mai mostrarti cose diverse. Filtrando, la pagina **resta dove sei**: non torna in cima.
+
+## Schede, tabella e "In evidenza"
+
+- **Schede** (predefinito): ogni evento con poster, titolo, artista, data, locale e genere.
+- **Tabella**: la stessa lista in forma compatta, per confrontare più serate a colpo d'occhio.
+- Si cambia con l'interruttore sopra la lista, e la scelta resta nell'indirizzo.
+- I risultati sono **paginati a 12** per pagina, e i filtri restano attivi cambiando pagina.
+- **In evidenza**: fino a tre serate scelte a mano dallo staff. **Non si può pagare per
+  comparire**: è una scelta editoriale, non pubblicità. La sezione si vede solo quando c'è
+  almeno una serata scelta e quando non stai filtrando.
+- Se una ricerca non trova nulla, la pagina **non ti lascia a mani vuote**: ti spiega che il
+  database è ancora piccolo e ti invita a segnalare locali e artisti che conosci.
+
+## Salvare un evento
+
+Il pulsante **Salva** scrive davvero nel database, sul tuo profilo (serve l'accesso). Oggi non
+esiste ancora una pagina che raccolga gli eventi salvati: arriva con i preferiti. Il
+salvataggio però è reale e resta lì.
+
 # Navigare il sito
 
 | Voce | Cosa trovi |
 | --- | --- |
-| **Esplora** (Home) | La vetrina: hero animato, artisti e locali in evidenza, invito a cercare |
-| **Artisti** | Elenco dei profili artista pubblicati, con paginazione |
-| **Locali** | Elenco dei locali e degli organizzatori |
-| **Per gli Artisti** | Perché OpenStage conviene a chi suona: visibilità, nessun costo, contatto diretto |
-| **Per le Venue** | Come i locali riempiono la sala e collaborano con gli artisti di zona |
-| **Chi siamo** | La storia e i valori del progetto |
+| **Esplora** (Home) | Mappa, ricerca, filtri, vetrina degli eventi e contatori del progetto |
+| **Mappa** | La mappa a tutto schermo, con gli stessi filtri della Home |
+| **Artisti** | *Segnaposto*: l'elenco pubblico arriva con le schede artista (Fase 3) |
+| **Locali** | *Segnaposto*: l'elenco pubblico arriva con le schede locale (Fase 3) |
+| **Per gli Artisti** | *Segnaposto*: la pagina dedicata arriva con le schede artista |
+| **Per le Venue** | *Segnaposto*: la pagina dedicata arriva con le schede locale |
+| **Chi siamo** | *Segnaposto* |
 | **Accedi / Registrati** | Accesso e creazione account |
 
-In fondo alla pagina trovi il **footer** con contatti, Privacy Policy, Termini di Servizio,
-Cookie Policy e i link social.
+> Le pagine di servizio (Privacy Policy, Termini, Cookie Policy, Chi siamo, Contatti) sono
+> raggiungibili dal **footer** in fondo a ogni pagina. Alcune sono ancora segnaposto: lo
+> dicono loro stesse.
 
 ## Lingua
 
@@ -143,6 +222,26 @@ scelta fatta al momento della registrazione via email.
 **Devo pagare qualcosa?**
 No. Il piano base è gratuito per fan, artisti e locali: è un principio del progetto.
 
-**Non vedo ancora la mappa o la creazione degli eventi: sono rotte?**
-No, non sono ancora state costruite: arrivano nelle prossime fasi. Se provi ad aprire "Crea
+**Perché sulla mappa vedo un pin con più date?**
+Perché quel locale ospita più serate: raggrupparle in un punto solo evita pin sovrapposti e
+rendere illeggibile la mappa. Le date si scorrono con le frecce nella scheda.
+
+**Perché su mobile la mappa non si muove quando trascino?**
+È voluto: un dito serve a **scorrere la pagina**, altrimenti resteresti intrappolato dentro la
+mappa. Per muoverla usa **due dita**, oppure aprila a tutto schermo.
+
+**Perché un evento dice "non ancora rivendicato"?**
+Perché l'ha inserito la redazione di OpenStage e il locale o l'artista non hanno ancora
+reclamato la loro scheda. La funzione di reclamo arriva nella prossima fase.
+
+**Ho salvato un evento: dove lo ritrovo?**
+Oggi il salvataggio è reale ma la pagina che raccoglie i preferiti non esiste ancora: arriva
+con i preferiti (backlog del progetto).
+
+**Non trovo eventi nella mia città: la piattaforma è rotta?**
+No. Il database cresce con i locali e gli artisti che pubblicano: all'inizio ci sono poche
+città. Se conosci un locale o un artista che dovrebbe esserci, segnalalo.
+
+**Non vedo ancora la creazione degli eventi: è rotta?**
+No, non è ancora stata costruita: arriva con l'editor degli eventi. Se provi ad aprire "Crea
 evento" oggi vedi una pagina segnaposto.

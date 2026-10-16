@@ -3,6 +3,7 @@
 | Versione | Data | Fasi coperte | Novità |
 | --- | --- | --- | --- |
 | 1.0 | 16 ottobre 2026 | 1 · 1.2 · 1.3 | Prima edizione: guida utente, manuale tecnico (stack, database, sicurezza, deploy, errori noti), diario delle fasi |
+| 1.1 | 16 ottobre 2026 | 1 · 1.2 · 1.3 · 2 | Fase 2: mappa con globo e pin, pagine evento, ricerca con suggerimenti, filtri, salvataggio, vetrina, contatori. Nuovi capitoli tecnici "Mappe e tile", "Ricerca, filtri e stato nell'URL" e "Come si verifica una pagina". Roadmap rivista: reclamo in Fase 3, editor eventi in Fase 4. Corretta l'indicazione sugli elenchi Artisti/Locali (sono segnaposto, non elenchi) e sugli avvisi di sicurezza (protezione password: funzione del piano Pro) |
 
 ## Come si aggiorna
 
