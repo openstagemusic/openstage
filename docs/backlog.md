@@ -23,6 +23,7 @@ fatta dentro la fase indicata · **🔴 grossa** = da riprendere insieme a fine 
 | B12 | Animazioni Framer Motion (parallax, tilt, scroll-reveal) | 🟢 | Fase 1 | Previste dal design system: da introdurre con criterio, senza pesare su mobile e accessibilità |
 | B13 | Verifica accessibilità (contrasto, focus, navigazione da tastiera) | 🔴 | Fase 1.3 | Il vetro e i testi su sfondo scuro vanno misurati, non stimati |
 | B14 | Dominio definitivo e nome del progetto | 🔴 | Fase 1 | `openstage.vercel.app` è un altro progetto: valutare un dominio proprio (es. `openstage.app`) |
-| B15 | Mappa degli eventi (MapLibre + MapTiler) | 🟢 | Fase 2 | Con i relativi costi/tetti del piano gratuito da verificare prima di partire |
+| B15 | Mappa degli eventi (MapLibre) | ✅ fatta | Fase 2 | Realizzata in Fase 2.1 con **OpenFreeMap** invece di MapTiler: nessuna chiave API, nessun account, uso commerciale consentito. Resta il rischio "fornitore gratuito senza SLA" (vedi review 2.1) |
 | B16 | Pagamenti opzionali (PayPal) e passaggio a Vercel Pro | 🔴 | Fase 8 | Il piano Hobby non è commerciale: da pianificare bene prima di incassare |
 | B17 | Manuale: valutare immagini e impaginazione se il PDF cresce | 🟡 | Fase 1.3 | Oggi è testo e tabelle: sotto controllo |
+| B18 | Più eventi nello stesso locale si sovrappongono in un unico pin | 🟢 | Fase 2 | Caso reale già in produzione: tre concerti al Druso condividono le stesse coordinate, quindi allo zoom massimo i pin coincidono e solo l'ultimo è cliccabile. Serve un raggruppamento per locale (conteggio sul pin + pop-up con l'elenco delle serate) |
