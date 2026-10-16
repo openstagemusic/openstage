@@ -534,8 +534,11 @@ export default function MapCanvas({
     map.easeTo({
       center: [selectionCoordinates.longitude, selectionCoordinates.latitude],
       zoom: Math.max(map.getZoom(), 11.5),
-      // Il pin resta un po' sopra il centro: il pop-up ha spazio sotto di sé.
-      padding: { top: 0, bottom: 150, left: 0, right: 0 },
+      // Il pop-up desktop sta **sopra** il pin, il bottom sheet mobile **sotto**:
+      // il margine va dal lato giusto, altrimenti la scheda esce dalla mappa.
+      padding: popupEnabled
+        ? { top: 220, bottom: 40, left: 0, right: 0 }
+        : { top: 0, bottom: 280, left: 0, right: 0 },
       duration: 700,
     });
   }, [selection, selectionCoordinates, styleReady, popupEnabled, popupNode]);

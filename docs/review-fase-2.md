@@ -67,3 +67,23 @@ segnalare un locale o un artista.
 - Azioni ancora aperte dalle fasi precedenti: attivare *Leaked password
   protection* su Supabase e revocare i token di servizio usati in configurazione
   (backlog B01, B02).
+
+## Correzioni dopo la chiusura della fase
+
+Due segnalazioni arrivate provando la produzione, risolte e verificate in
+browser reale (desktop 1440 px e mobile 390 px):
+
+1. **Il pop-up del locale raggruppato usciva dalla mappa** e veniva tagliato,
+   perché elencava tutte le serate in una scheda alta quanto il numero di date.
+   Ora la scheda mostra **una serata alla volta** con le frecce `‹ 1 / 3 ›`
+   sotto: altezza costante (262 px) qualunque sia il numero di date, quindi non
+   esce più dal riquadro. Il margine della mappa è stato spostato dal lato
+   giusto: in alto per il pop-up desktop (che sta sopra il pin), in basso per il
+   bottom sheet mobile (che sta sotto), e il sheet ha un tetto di `70vh`.
+2. **La pagina tornava in cima** usando ricerca e filtri. La causa era la
+   versione precedente al blocco 2.3 (senza `scroll: false`): in produzione il
+   salto non si riproduce più. Restavano due casi reali, sistemati: il pulsante
+   "Azzera i filtri" navigava senza `scroll: false`, e i menu a tendina nativi
+   su mobile possono comunque riportare in cima — ora `useScrollAnchor` annota
+   la posizione prima di navigare e la ripristina **solo** se il browser ha
+   davvero saltato all'inizio.

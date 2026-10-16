@@ -8,6 +8,8 @@ import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 
+import { useScrollAnchor } from "./useScrollAnchor";
+
 type QuickFiltersProps = {
   locale: Locale;
   /** Generi realmente presenti negli eventi pubblicati. */
@@ -36,6 +38,7 @@ export default function QuickFilters({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const rememberScroll = useScrollAnchor();
 
   const when = searchParams.get("when");
   const genre = searchParams.get("genre") ?? "";
@@ -55,6 +58,7 @@ export default function QuickFilters({
     params.delete("page");
 
     const query = params.toString();
+    rememberScroll();
     // `scroll: false`: la lista è appena sotto i filtri, la pagina non deve saltare.
     router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
@@ -166,7 +170,10 @@ export default function QuickFilters({
         {active ? (
           <button
             type="button"
-            onClick={() => router.push(pathname)}
+            onClick={() => {
+              rememberScroll();
+              router.push(pathname, { scroll: false });
+            }}
             className="ml-auto rounded-full border border-white/15 px-3.5 py-1.5 text-xs font-medium text-muted transition-colors hover:border-white/30 hover:text-white"
           >
             {t.reset}

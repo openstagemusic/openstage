@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { formatEventDate } from "@/lib/events/format";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -16,10 +17,17 @@ type VenueEventsCardProps = {
   onClose?: () => void;
 };
 
+const NAV_BUTTON =
+  "flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-base leading-none text-white transition-colors hover:border-white/30 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35";
+
 /**
- * Scheda di un locale con più serate: il pin è uno solo, qui l'elenco delle
- * date con il link alla pagina di ogni evento. Serve perché un locale che
- * organizza più concerti è il caso normale, non l'eccezione.
+ * Scheda di un locale con più serate: il pin è uno solo, qui le date si
+ * scorrono **una alla volta** con le frecce.
+ *
+ * Mostrarle tutte insieme faceva crescere la scheda oltre la mappa e il pop-up
+ * finiva tagliato (soprattutto con molte date). Una serata per volta tiene la
+ * scheda sempre della stessa altezza, e le frecce numerate dicono subito quante
+ * ce ne sono e a che punto si è.
  */
 export default function VenueEventsCard({
   group,
@@ -31,15 +39,36 @@ export default function VenueEventsCard({
   const t = dict.events;
   const isSheet = variant === "sheet";
 
+  const total = group.events.length;
+  const [index, setIndex] = useState(0);
+
+  // Cambiando locale selezionato, la scheda riparte dalla prima serata.
+  useEffect(() => {
+    setIndex(0);
+  }, [group.key]);
+
+  const last = Math.max(total - 1, 0);
+  const safeIndex = Math.min(Math.max(index, 0), last);
+  const current = group.events[safeIndex];
+
   const where = [group.venueName, group.city].filter(Boolean).join(" · ");
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${group.latitude},${group.longitude}`;
-  const count = group.events.length;
+  const when = current
+    ? formatEventDate(current.startsAt, current.timezone, locale)
+    : null;
+
+  const step = (delta: number) => {
+    setIndex(Math.min(Math.max(safeIndex + delta, 0), last));
+  };
 
   return (
     <article
       className={cn(
-        "glass w-full overflow-hidden border border-white/10 text-left",
-        isSheet ? "rounded-3xl" : "rounded-2xl"
+        "glass w-full border border-white/10 text-left",
+        isSheet
+          ? // Rete di sicurezza: il bottom sheet non può superare lo schermo.
+            "max-h-[70vh] overflow-x-hidden overflow-y-auto rounded-3xl"
+          : "overflow-hidden rounded-2xl"
       )}
     >
       {isSheet ? (
@@ -67,38 +96,69 @@ export default function VenueEventsCard({
           {where || dict.map.title}
         </h3>
         <p className="mt-1 text-xs text-cyan">
-          {count} {count === 1 ? dict.map.eventInProgram : dict.map.eventsInProgram}
+          {total} {total === 1 ? dict.map.eventInProgram : dict.map.eventsInProgram}
         </p>
 
-        <ul className="mt-3 space-y-2">
-          {group.events.map((event) => {
-            const when = formatEventDate(event.startsAt, event.timezone, locale);
-            const kindLabel = t.kinds[event.kind] ?? t.kinds.other;
-            const meta = [kindLabel, event.genre].filter(Boolean).join(" · ");
+        {current ? (
+          <div className="mt-3">
+            <Link
+              href={`/eventi/${current.id}`}
+              className="block rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition-colors hover:border-white/25"
+            >
+              <p className="text-xs text-white/80">
+                {when?.isToday ? `${t.tonight} · ${when.time}` : when?.full}
+              </p>
+              <p className="mt-0.5 font-display text-sm font-semibold leading-tight">
+                {current.title}
+              </p>
+              <p className="mt-0.5 text-xs text-muted">
+                {[t.kinds[current.kind] ?? t.kinds.other, current.genre]
+                  .filter(Boolean)
+                  .join(" · ")}
+                {current.isFree ? ` · ${t.freeEntry}` : ""}
+              </p>
+            </Link>
 
-            return (
-              <li key={event.id}>
-                <Link
-                  href={`/eventi/${event.id}`}
-                  className="block rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition-colors hover:border-white/25"
+            {total > 1 ? (
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => step(-1)}
+                  disabled={safeIndex === 0}
+                  aria-label={t.previousEvent}
+                  className={NAV_BUTTON}
                 >
-                  <p className="text-xs text-white/80">
-                    {when.isToday ? `${t.tonight} · ${when.time}` : when.full}
-                  </p>
-                  <p className="mt-0.5 font-display text-sm font-semibold leading-tight">
-                    {event.title}
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted">
-                    {meta}
-                    {event.isFree ? ` · ${t.freeEntry}` : ""}
-                  </p>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                  ‹
+                </button>
+
+                <span className="text-xs tabular-nums text-muted" aria-live="polite">
+                  {safeIndex + 1} / {total}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => step(1)}
+                  disabled={safeIndex === last}
+                  aria-label={t.nextEvent}
+                  className={NAV_BUTTON}
+                >
+                  ›
+                </button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
+          {current ? (
+            <Link
+              href={`/eventi/${current.id}`}
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet to-cyan px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
+            >
+              {t.viewEvent}
+            </Link>
+          ) : null}
+
           <a
             href={mapsUrl}
             target="_blank"

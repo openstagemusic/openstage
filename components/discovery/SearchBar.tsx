@@ -15,6 +15,8 @@ import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 
+import { useScrollAnchor } from "./useScrollAnchor";
+
 /**
  * Barra di ricerca con suggerimenti live raggruppati.
  *
@@ -31,6 +33,7 @@ export default function SearchBar({ locale }: { locale: Locale }) {
   const searchParams = useSearchParams();
   const listId = useId();
   const boxRef = useRef<HTMLDivElement>(null);
+  const rememberScroll = useScrollAnchor();
 
   const urlQuery = searchParams.get("q") ?? "";
   const [value, setValue] = useState(urlQuery);
@@ -104,6 +107,7 @@ export default function SearchBar({ locale }: { locale: Locale }) {
     params.delete("page");
 
     const query = params.toString();
+    rememberScroll();
     // `scroll: false`: chi filtra sta guardando i filtri, non deve tornare in cima.
     router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
     setOpen(false);
