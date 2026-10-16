@@ -2,13 +2,14 @@ import Link from "next/link";
 
 import EventTeaser from "@/components/events/EventTeaser";
 import GlobeMap from "@/components/map/GlobeMap";
-import Pagination, { ITEMS_PER_PAGE } from "@/components/ui/Pagination";
+import Pagination from "@/components/ui/Pagination";
 import { listEvents, listMapEvents, listSavedEventIds } from "@/lib/events/queries";
 import { getVisitorLocation } from "@/lib/geo/visitor";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getPageMetadata } from "@/lib/i18n/metadata";
 import { getLocale } from "@/lib/i18n/server";
 import { DEFAULT_ZOOM, MAX_MAP_EVENTS, REGION_ZOOM } from "@/lib/map/config";
+import { ITEMS_PER_PAGE } from "@/lib/pagination";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 export const generateMetadata = () => getPageMetadata((dict) => dict.meta);

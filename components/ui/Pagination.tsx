@@ -4,9 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { cn } from "@/lib/utils";
-
-/** Items shown per page across the whole platform. */
-export const ITEMS_PER_PAGE = 12;
+import { ITEMS_PER_PAGE } from "@/lib/pagination";
 
 export type PaginationProps = {
   currentPage: number;

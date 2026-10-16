@@ -61,7 +61,7 @@
 | Voce | Gravità | Nota |
 | --- | --- | --- |
 | Fornitore tile gratuito senza SLA | Media | OpenFreeMap è un'istanza pubblica finanziata da donazioni: nessuna garanzia di servizio. L'indirizzo vive in un solo file (`lib/map/config.ts`), quindi passare a MapTiler o a tile self-hosted è una modifica di poche righe |
-| Pin e pop-up non ancora provati con eventi reali | Media | La scheda e i pin sono stati verificati in browser con una riga temporanea (poi rimossa); manca la prova con dati veri, multipli e con locandine |
+| Pin e pop-up provati con eventi reali | Bassa | Verificati in produzione con 3 eventi reali (pin, pagina evento, fusi orari, locandine). Resta da provare il caso di **più eventi nello stesso punto**: tre concerti nella stessa sala condividono le coordinate esatte e sullo zoom massimo i pin si sovrappongono, quindi serve un raggruppamento per locale (o uno "spiderfy") per poterli scegliere singolarmente |
 | "Salva" senza una pagina dei preferiti | Bassa | Il salvataggio funziona e resta nel database, ma l'utente non ha ancora un posto dove rivedere gli eventi salvati: serve una sezione nel profilo |
 | Rotazione del globo solo in ingresso | Bassa | Scelta deliberata: una rotazione continua allontana la zona dell'utente dallo schermo, consuma batteria e richieste di tile. Se in futuro si vorrà una rotazione continua, va legata a "nessuna interazione da N secondi" e spenta su mobile |
 | Nessun test automatico sulla mappa | Bassa | La verifica è stata fatta con un browser reale e script temporaneo (worker, tile, pop-up, pagina evento, 404, zero errori in console), poi rimosso: va reso ripetibile quando introdurremo i test end-to-end |
@@ -80,6 +80,19 @@
   ("domenica 18 ottobre 2026 · 18:00 — Ora legale dell'Europa centrale"), descrizione ufficiale,
   link biglietti funzionante e nota "non ancora rivendicato". Zero errori in console.
 - **Corretto**: il contatore della mappa scriveva "1 eventi sulla mappa" (mancava il singolare).
+- **Tre eventi reali al Druso** (Ranica BG), tutti non rivendicati e con biglietteria ufficiale:
+  Bobo Rondelli (18/10), Sick Tamburo (30/10), Pierpaolo Capovilla e i Cattivi Maestri (12/11).
+  I titoli restano quelli ufficiali della fonte (spesso il solo nome dell'artista): per non ripeterlo
+  sotto il titolo, la riga artista ora si mostra solo quando aggiunge informazione.
+- **Bug grave trovato solo grazie ai dati reali**: l'elenco "Prossimi eventi" della Home era
+  **sempre vuoto** (mostrava lo stato "ancora nessun evento") mentre la mappa contava correttamente
+  i pin. Causa: `ITEMS_PER_PAGE` era importato da `components/ui/Pagination.tsx`, un modulo
+  `"use client"`, dentro un Server Component. Un export preso da un modulo client non è il valore
+  vero ma un *client reference*: `perPage` diventava `NaN`, la query chiedeva un intervallo vuoto e
+  PostgREST rispondeva **200 con zero righe** (e il `count` giusto), quindi non c'era nessun errore
+  da loggare. Il difetto era invisibile finché il database era vuoto: con zero eventi lo stato
+  vuoto era semplicemente corretto. Ora la costante vive in `lib/pagination.ts`, un modulo neutro
+  che server e client possono leggere.
 
 ## Da riprendere
 
