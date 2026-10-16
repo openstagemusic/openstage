@@ -9,8 +9,8 @@ fatta dentro la fase indicata · **🔴 grossa** = da riprendere insieme a fine 
 
 | # | Voce | Tipo | Origine | Note |
 | --- | --- | --- | --- | --- |
-| B01 | Attivare *Leaked password protection* su Supabase | 🔴 | Fase 1.2 | Può richiedere il piano Pro (che servirà comunque per i pagamenti) |
-| B02 | Revocare i token di servizio usati in configurazione (Vercel, Supabase) | 🟡 | Fase 1.2 | Azione dell'utente, non del codice |
+| B01 | Attivare *Leaked password protection* su Supabase | 🔴 | Fase 1.2 | **Non disponibile sul piano free**: funzione Pro. Si attiva quando si passerà al piano a pagamento per i pagamenti |
+| B02 | Revocare i token di servizio usati in configurazione (Vercel, Supabase) | ✅ | Fase 1.2 | **Fatto**: i due token (`vcp_…` e il PAT Supabase) sono stati revocati dall'utente |
 | B03 | `npm audit`: 7 segnalazioni su dipendenze di sviluppo e build | 🔴 | Fase 1.3 | Da `eslint-config-next` (braces/micromatch) e da `next` → `postcss`: serve un salto di versione maggiore, da pianificare |
 | B04 | Indici su `events` e trigram segnalati come "mai usati" | 🟡 | Fase 1.2 | Verificato a fine Fase 2: con 3 righe il pianificatore fa sempre una scansione completa, quindi gli indici non vengono toccati. Non è un difetto di progetto — da rimisurare con `EXPLAIN` quando gli eventi saranno centinaia |
 | B05 | Test automatici end-to-end sui flussi critici | 🔴 | Fase 1.3 | Primo caso: "registrazione come fan → diventa artista → bloccato"; poi accesso e creazione evento |
