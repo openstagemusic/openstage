@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# anteprima HTML del manuale (rigenerata da `npm run manuale -- --anteprima`)
+docs/manuale/anteprima.html
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

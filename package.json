@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "manuale": "node scripts/manuale.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -23,6 +24,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.28",
+    "marked": "^18.1.1",
+    "pdf-lib": "^1.17.1",
+    "puppeteer-core": "^25.14.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
