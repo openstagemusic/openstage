@@ -38,7 +38,9 @@ assegnabile solo via `settings.admin_email`.
 ## Definition of Done
 
 - [x] Migration 0002 eseguita su Supabase.
-- [x] Iscrizione Google → richiesta ruolo → `profiles.role` corretto in DB.
-- [x] Iscrizione email → nessun passaggio extra (già scelto nel form).
+- [x] Utente senza metadati (caso Google) → ruolo aggiornabile: verificato a livello DB, incluso il blocco della promozione ad `admin`.
+- [x] RLS: un utente non può leggere né modificare il profilo di altri.
+- [x] Iscrizione email → nessun passaggio extra (ruolo già scelto nel form).
 - [x] Un fan può diventare artista in seguito; nessun utente può diventare `admin`.
-- [x] `npm run build` senza errori + commit "Fase 1" e deploy verde.
+- [x] `npm run build` senza errori + commit e deploy verde.
+- [ ] Test browser con Google reale (logout → login con Google → scelta ruolo).
