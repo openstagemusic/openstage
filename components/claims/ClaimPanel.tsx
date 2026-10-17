@@ -16,13 +16,25 @@ const inputClass =
  * - `unclaimed` → la scheda è di OpenStage, si può reclamare;
  * - `pending`   → una richiesta è in attesa di una decisione;
  * - `claimed`   → la scheda è già di qualcun altro;
- * - `owned`     → chi guarda amministra già una scheda dello stesso tipo (il
- *                 database ne permette una sola): nessun invito, sarebbe un
- *                 vicolo cieco;
+ * - `owned`     → chi guarda amministra già una scheda dello stesso tipo **con
+ *                 dei eventi** (il database ne permette una sola): nessun
+ *                 invito, sarebbe un vicolo cieco;
+ * - `wrongRole` → chi guarda non ha il ruolo giusto: gli si spiega come
+ *                 ottenerlo, invece di lasciarlo sbattere contro un errore;
  * - `mine`      → è la scheda di chi guarda: nessun invito, lo stato sta
  *                 nella pagina dell'account.
+ *
+ * Quando chi guarda ha già una scheda **senza eventi** lo stato resta
+ * `unclaimed`: reclamando, quella scheda viene eliminata (lo decide il
+ * database) e lo diciamo prima, con il suo nome.
  */
-export type ClaimState = "unclaimed" | "pending" | "claimed" | "owned" | "mine";
+export type ClaimState =
+  | "unclaimed"
+  | "pending"
+  | "claimed"
+  | "owned"
+  | "wrongRole"
+  | "mine";
 
 type ClaimPanelProps = {
   subjectType: "artist" | "venue";
@@ -30,6 +42,10 @@ type ClaimPanelProps = {
   state: ClaimState;
   isAuthenticated: boolean;
   dict: Dictionary["claims"];
+  /** Chi è ancora fan può scegliere il ruolo: il pulsante giusto è per lui. */
+  canUpgradeRole?: boolean;
+  /** La propria scheda senza eventi che il reclamo eliminerebbe. */
+  replaceName?: string | null;
 };
 
 export default function ClaimPanel({
@@ -38,6 +54,8 @@ export default function ClaimPanel({
   state,
   isAuthenticated,
   dict,
+  canUpgradeRole = false,
+  replaceName = null,
 }: ClaimPanelProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -45,12 +63,14 @@ export default function ClaimPanel({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isArtist = subjectType === "artist";
+
   if (state === "mine") return null;
 
   if (state === "claimed") {
     return (
       <p className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-muted">
-        {subjectType === "artist" ? dict.claimedArtist : dict.claimedVenue}
+        {isArtist ? dict.claimedArtist : dict.claimedVenue}
       </p>
     );
   }
@@ -66,12 +86,33 @@ export default function ClaimPanel({
   if (state === "owned") {
     return (
       <p className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-muted">
-        {subjectType === "artist" ? dict.ownedArtist : dict.ownedVenue}
+        {isArtist ? dict.ownedArtist : dict.ownedVenue}
       </p>
     );
   }
 
-  const isArtist = subjectType === "artist";
+  if (state === "wrongRole") {
+    return (
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
+        <p className="text-xs text-muted">
+          {isArtist ? dict.wrongRoleArtist : dict.wrongRoleVenue}
+        </p>
+        {canUpgradeRole ? (
+          <LocaleLink
+            href="/onboarding/role"
+            className="mt-4 inline-block rounded-full border border-cyan/40 px-4 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+          >
+            {isArtist ? dict.wrongRoleCtaArtist : dict.wrongRoleCtaVenue}
+          </LocaleLink>
+        ) : (
+          <p className="mt-3 text-xs text-muted">
+            {isArtist ? dict.wrongRoleLockedArtist : dict.wrongRoleLockedVenue}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   const intro = isArtist ? dict.artistIntro : dict.venueIntro;
   const note = isArtist ? dict.artistNote : dict.venueNote;
   const actionLabel = isArtist ? dict.artistAction : dict.venueAction;
@@ -99,6 +140,15 @@ export default function ClaimPanel({
   return (
     <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
       <p className="text-xs text-muted">{intro}</p>
+
+      {replaceName ? (
+        <div className="mt-3 rounded-xl border border-pink/40 bg-pink/10 p-3">
+          <p className="text-xs text-white">
+            {isArtist ? dict.replaceArtist : dict.replaceVenue}
+          </p>
+          <p className="mt-1 text-xs text-muted">«{replaceName}»</p>
+        </div>
+      ) : null}
 
       {isAuthenticated ? (
         open ? (

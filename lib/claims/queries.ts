@@ -1,5 +1,6 @@
 import { cache } from "react";
 
+import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -109,6 +110,42 @@ export async function getMyPendingClaim(
   }
 
   return data !== null;
+}
+
+/**
+ * La scheda senza eventi che il visitatore amministra già, se c'è: reclamandone
+ * un'altra quella viene eliminata (lo fa `free_vacant_page` nel database). Qui
+ * la stessa regola serve solo a dirlo prima, con il nome della scheda: se le due
+ * letture non coincidessero, comanda il database e l'errore è chiaro.
+ *
+ * `excludeId` è la scheda che si sta guardando: se è già la sua, non c'è niente
+ * da sostituire.
+ */
+export async function getReplaceablePage(
+  subjectType: SubjectType,
+  profileId: string,
+  excludeId?: string | null
+): Promise<{ id: string; name: string } | null> {
+  const supabase = await createClient();
+
+  const own =
+    subjectType === "artist"
+      ? await getArtistByProfileId(profileId)
+      : await getVenueByProfileId(profileId);
+
+  if (!own || own.id === excludeId) return null;
+
+  const { count, error } = await supabase
+    .from("events")
+    .select("id", { count: "exact", head: true })
+    .eq(subjectType === "artist" ? "artist_id" : "venue_id", own.id);
+
+  if (error) {
+    console.error("[claims] getReplaceablePage:", error.message);
+    return null;
+  }
+
+  return (count ?? 0) === 0 ? { id: own.id, name: own.name } : null;
 }
 
 /** Richieste in attesa di una decisione (solo dalla coda dell'admin). */

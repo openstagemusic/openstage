@@ -111,9 +111,23 @@ export const en = {
     roleError: "We could not save your role. Please try again.",
     artistTitle: "Tell us about your project",
     artistSubtitle: "A few details and you can publish your first event.",
-    artistExisting:
-      "Already on OpenStage? Find your page and claim it instead of creating a second one: a profile can only run one page.",
-    artistExistingCta: "Search artists",
+    pageSearchTitle: "Is your page already on OpenStage?",
+    pageSearchArtistText:
+      "Search your artist name. If the page already exists, open it and claim it: a profile can only run one page, and creating a second one would lock you out of the real one.",
+    pageSearchVenueText:
+      "Search your venue name. If the page already exists, open it and request it: a profile can only run one page, and creating a second one would lock you out of the real one.",
+    pageSearchLabel: "Name",
+    pageSearchArtistPlaceholder: "Your artist or band name",
+    pageSearchVenuePlaceholder: "Your venue name",
+    pageSearchCta: "Search",
+    pageSearchEmpty: "No page found with this name. You can create it below.",
+    pageSearchResultCta: "Open the page",
+    pageSearchArtistOwned:
+      "You already run an artist page with no events. Fill that one in from your account, or find your real page above and claim it: the empty page is removed.",
+    pageSearchVenueOwned:
+      "You already run a venue page with no events. Fill that one in from your account, or find your real page above and request it: the empty page is removed.",
+    createArtistTitle: "Create a new artist page",
+    createVenueTitle: "Create a new venue page",
     name: "Artist or band name",
     city: "City",
     genre: "Main genre",
@@ -139,9 +153,6 @@ export const en = {
     saving: "Saving…",
     venueTitle: "Add your venue",
     venueSubtitle: "A few details and you are ready to publish your events and get found.",
-    venueExisting:
-      "Your venue already on OpenStage? Find it and request the page instead of creating a duplicate: a profile can only run one page.",
-    venueExistingCta: "Search venues",
     venueName: "Venue name",
     address: "Address",
     website: "Website (optional)",
@@ -381,9 +392,23 @@ export const en = {
     loginCta: "Log in to claim",
     pending: "Request sent: waiting for review.",
     ownedArtist:
-      "You already run an artist page: a profile can only run one. If this one is yours, ask the administrator to move it.",
+      "You already run an artist page with your events: a profile can only run one. If this one is yours, ask the administrator to move it.",
     ownedVenue:
-      "You already run a venue page: a profile can only run one. If this one is yours, ask the administrator to move it.",
+      "You already run a venue page with your events: a profile can only run one. If this one is yours, ask the administrator to move it.",
+    wrongRoleArtist:
+      "Claiming an artist page takes an Artist profile. The role is chosen once and never changes: if you pick Artist, it stays.",
+    wrongRoleVenue:
+      "Claiming a venue page takes a Venue profile. The role is chosen once and never changes: if you pick Venue, it stays.",
+    wrongRoleCtaArtist: "Become an artist",
+    wrongRoleCtaVenue: "Become a venue",
+    wrongRoleLockedArtist:
+      "This page takes an artist profile. Yours is another kind and roles are permanent: you need an artist account.",
+    wrongRoleLockedVenue:
+      "This page takes a venue profile. Yours is another kind and roles are permanent: you need a venue account.",
+    replaceArtist:
+      "Claiming this page removes the artist page you run with no events:",
+    replaceVenue:
+      "Requesting this page removes the venue page you run with no events:",
     claimedArtist: "Page claimed by the artist.",
     claimedVenue: "Page claimed by the venue.",
     errorGeneric: "We could not complete the request. Please try again.",

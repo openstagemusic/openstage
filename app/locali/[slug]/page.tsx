@@ -6,7 +6,8 @@ import EventTeaser from "@/components/events/EventTeaser";
 import JsonLd from "@/components/seo/JsonLd";
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
-import { getMyPendingClaim } from "@/lib/claims/queries";
+import { canManageVenueProfile } from "@/lib/auth/roles";
+import { getMyPendingClaim, getReplaceablePage } from "@/lib/claims/queries";
 import { getVenueByProfileId, getVenueBySlug } from "@/lib/directory/queries";
 import { venuePath } from "@/lib/events/paths";
 import { listUpcomingEventsByVenue } from "@/lib/events/queries";
@@ -53,24 +54,36 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
   // La scheda di un locale si prende su richiesta: se una richiesta di questo
   // utente è già in coda, lo diciamo invece di offrirgli di richiedere ancora.
-  // E chi amministra già un locale non può prenderne un altro (vincolo del
-  // database): anche questo lo diciamo prima, non dopo un errore.
+  // Come per gli artisti, chi ha il ruolo sbagliato o amministra già un locale
+  // con eventi riceve una spiegazione; chi ha una scheda senza eventi può
+  // chiedere questa, e la sua viene eliminata (lo fa il database).
   const pending =
     !venue.claimed && session !== null
       ? await getMyPendingClaim("venue", venue.id)
       : false;
 
-  const alreadyOwns =
-    !venue.claimed && session !== null
+  const canManage = session !== null && canManageVenueProfile(session.role);
+
+  const replace =
+    !venue.claimed && canManage && session
+      ? await getReplaceablePage("venue", session.id, venue.id)
+      : null;
+
+  const ownsAnother =
+    !venue.claimed && canManage && session && replace === null
       ? (await getVenueByProfileId(session.id)) !== null
       : false;
 
   const claimState: ClaimState = !venue.claimed
     ? pending
       ? "pending"
-      : alreadyOwns
-        ? "owned"
-        : "unclaimed"
+      : session === null
+        ? "unclaimed"
+        : !canManage
+          ? "wrongRole"
+          : ownsAnother
+            ? "owned"
+            : "unclaimed"
     : venue.profileId === session?.id
       ? "mine"
       : "claimed";
@@ -176,6 +189,8 @@ export default async function VenuePage({ params }: VenuePageProps) {
         subjectId={venue.id}
         state={claimState}
         isAuthenticated={session !== null}
+        canUpgradeRole={session?.role === "fan"}
+        replaceName={replace?.name ?? null}
         dict={dict.claims}
       />
 

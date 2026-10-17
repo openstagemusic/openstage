@@ -110,9 +110,23 @@ export const it: Dictionary = {
     roleError: "Non è stato possibile salvare il ruolo. Riprova.",
     artistTitle: "Raccontaci il tuo progetto",
     artistSubtitle: "Qualche dettaglio e sei pronto a pubblicare il tuo primo evento.",
-    artistExisting:
-      "Sei già su OpenStage? Cerca la tua scheda e reclamala invece di crearne una seconda: un profilo amministra una scheda sola.",
-    artistExistingCta: "Cerca tra gli artisti",
+    pageSearchTitle: "La tua scheda è già su OpenStage?",
+    pageSearchArtistText:
+      "Cerca il tuo nome. Se la scheda esiste già, aprila e reclamala: un profilo amministra una scheda sola, e crearne una seconda ti chiuderebbe fuori da quella vera.",
+    pageSearchVenueText:
+      "Cerca il nome del locale. Se la scheda esiste già, aprila e richiedila: un profilo amministra una scheda sola, e crearne una seconda ti chiuderebbe fuori da quella vera.",
+    pageSearchLabel: "Nome",
+    pageSearchArtistPlaceholder: "Il tuo nome d'artista o della band",
+    pageSearchVenuePlaceholder: "Il nome del locale",
+    pageSearchCta: "Cerca",
+    pageSearchEmpty: "Nessuna scheda trovata con questo nome. Puoi crearla qui sotto.",
+    pageSearchResultCta: "Apri la scheda",
+    pageSearchArtistOwned:
+      "Amministri già una scheda artista senza eventi. Compila quella dall'account, oppure cerca qui sopra la tua scheda vera e reclamala: la scheda vuota viene eliminata.",
+    pageSearchVenueOwned:
+      "Amministri già la scheda di un locale senza eventi. Compila quella dall'account, oppure cerca qui sopra la tua scheda vera e richiedila: la scheda vuota viene eliminata.",
+    createArtistTitle: "Crea una scheda nuova",
+    createVenueTitle: "Crea la scheda del locale",
     name: "Nome artista o band",
     city: "Città",
     genre: "Genere principale",
@@ -138,9 +152,6 @@ export const it: Dictionary = {
     saving: "Salvataggio…",
     venueTitle: "Aggiungi il tuo locale",
     venueSubtitle: "Qualche dettaglio e sei pronto a pubblicare i tuoi eventi e a farti trovare.",
-    venueExisting:
-      "Il tuo locale è già su OpenStage? Cercalo e richiedi la scheda invece di crearne un doppione: un profilo amministra una scheda sola.",
-    venueExistingCta: "Cerca tra i locali",
     venueName: "Nome del locale",
     address: "Indirizzo",
     website: "Sito (opzionale)",
@@ -381,9 +392,23 @@ export const it: Dictionary = {
     loginCta: "Accedi per reclamare",
     pending: "Richiesta inviata: in attesa di verifica.",
     ownedArtist:
-      "Gestisci già una scheda artista: un profilo ne amministra una sola. Se questa è la tua, chiedi all'amministratore di spostarla.",
+      "Amministri già una scheda artista con i tuoi eventi: un profilo ne amministra una sola. Se questa è la tua, chiedi all'amministratore di spostarla.",
     ownedVenue:
-      "Gestisci già la scheda di un locale: un profilo ne amministra una sola. Se questa è la tua, chiedi all'amministratore di spostarla.",
+      "Amministri già la scheda di un locale con i tuoi eventi: un profilo ne amministra una sola. Se questa è la tua, chiedi all'amministratore di spostarla.",
+    wrongRoleArtist:
+      "Per reclamare una scheda artista ti serve un profilo Artista. Il ruolo si sceglie una volta sola e non si cambia più: se scegli Artista, resta così.",
+    wrongRoleVenue:
+      "Per reclamare la scheda di un locale ti serve un profilo Locale. Il ruolo si sceglie una volta sola e non si cambia più: se scegli Locale, resta così.",
+    wrongRoleCtaArtist: "Diventa artista",
+    wrongRoleCtaVenue: "Diventa locale",
+    wrongRoleLockedArtist:
+      "Questa scheda si prende con un profilo artista. Il tuo profilo è di un altro tipo e i ruoli sono definitivi: ti serve un account artista.",
+    wrongRoleLockedVenue:
+      "Questa scheda si prende con un profilo locale. Il tuo profilo è di un altro tipo e i ruoli sono definitivi: ti serve un account locale.",
+    replaceArtist:
+      "Reclamando questa scheda, la tua scheda artista senza eventi viene eliminata:",
+    replaceVenue:
+      "Richiedendo questa scheda, la tua scheda del locale senza eventi viene eliminata:",
     claimedArtist: "Scheda reclamata dall'artista.",
     claimedVenue: "Scheda reclamata dal locale.",
     errorGeneric: "Non è stato possibile completare l'operazione. Riprova.",

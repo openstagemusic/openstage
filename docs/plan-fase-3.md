@@ -2,7 +2,7 @@
 
 > **Stato: divisione approvata il 17 ottobre 2026.** Il prompt ricevuto unisce quattro lavori che
 > nella roadmap vivevano in fasi diverse; la divisione in blocchi è confermata, le decisioni prese
-> sono elencate più sotto. Stato di avanzamento: **3.0, 3.1 e 3.2 fatti**, si prosegue con 3.3.
+> sono elencate più sotto. Stato di avanzamento: **3.0, 3.1, 3.2 e 3.2.1 fatti**, si prosegue con 3.3.
 
 ## Premessa: il prompt contiene quattro progetti
 
@@ -113,6 +113,30 @@ elenca le righe realmente presenti.
 **Test**: artista reclama e diventa proprietario; secondo tentativo bloccato; locale invia la
 richiesta e resta "in attesa" finché l'admin non approva; ruolo sbagliato respinto con spiegazione.
 
+### 3.2.1 — Correzione del reclamo (dopo la prova dell'utente)
+
+> **Fatto.** La prova dell'utente ha bocciato la 3.2: chi si iscriveva come fan, diventava artista e
+> poi reclamava finiva in un vicolo cieco (la scheda creata dal primo passo gli impediva di prendere
+> quella vera), e l'interfaccia prometteva all'admin un permesso che il database negava. Cronaca,
+> trappole e prove in `docs/review-fase-3.2.1.md`.
+
+- **Il primo passo cerca, poi crea**: `/onboarding/artist` e `/onboarding/venue` si aprono con la
+  ricerca tra le schede **reali**; il modulo di creazione è la seconda strada.
+- **Una scheda senza eventi si sostituisce** (`free_vacant_page`): reclamando si elimina la propria
+  scheda vuota, con avviso esplicito che la nomina. Una scheda **con eventi** no: lì decide l'admin.
+- **Chi ha il ruolo sbagliato viene guidato**: il fan riceve l'invito a scegliere il ruolo (con
+  l'avviso che è definitivo), chi ha già un altro ruolo riceve la spiegazione.
+- **L'admin può reclamare** (database allineato all'interfaccia); **verifica e revoca** restano
+  proprietà del **profilo**, non della scheda: sostituendo la scheda la verifica resta.
+- **Corretto un guasto preesistente**: `decide_claim` usava `p_note` invece di `p_nota`, quindi
+  **approvare un reclamo di locale falliva** sempre (i reclami artista non passano di lì, per questo
+  non si era visto). E `revoke … from public` non bastava: Supabase concede `execute` ad `anon` e
+  `authenticated` per conto suo.
+
+**Test**: 43 prove sul database (transazione annullata) e 46 controlli in browser del giro completo
+(fan guidato → artista → ricerca → reclamo → scheda vuota eliminata; locale → richiesta → coda
+admin → approvazione → badge "Verificato").
+
 ### 3.3 — Dashboard e creazione eventi
 
 - Dashboard con sidebar desktop / barra mobile: **I miei eventi, Crea evento, Preferiti, Profilo,
@@ -166,7 +190,7 @@ scarica a 1080×1920 con QR funzionante; incollando il link in una chat compare 
 - **Variabili d'ambiente nuove**: **nessuna** con Photon. Nessuna chiave per `next/og`.
 - **SQL**: una migration per blocco, applicate e verificate prima del test in produzione:
   `0009` slug + capienza + `verified_at` ✅, `0010` funzioni di ricerca con lo slug ✅,
-  `0011` reclamo (3.2), `0012` editor/bozze/limite (3.3).
+  `0011` reclamo (3.2) ✅, `0012` proprietà del reclamo (3.2.1) ✅, `0013` editor/bozze/limite (3.3).
 
 ## Cosa resta fuori
 

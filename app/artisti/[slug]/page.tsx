@@ -6,6 +6,8 @@ import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import EventTeaser from "@/components/events/EventTeaser";
 import JsonLd from "@/components/seo/JsonLd";
+import { canManageArtistProfile } from "@/lib/auth/roles";
+import { getReplaceablePage } from "@/lib/claims/queries";
 import { getArtistByProfileId, getArtistBySlug } from "@/lib/directory/queries";
 import { artistPath } from "@/lib/events/paths";
 import { listUpcomingEventsByArtist } from "@/lib/events/queries";
@@ -52,21 +54,36 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const events = await listUpcomingEventsByArtist(artist.id);
 
   // Il reclamo di una scheda artista è immediato: non esiste uno stato "in
-  // attesa". O è libera, o è di chi guarda, o è di qualcun altro. E chi
-  // amministra già una scheda non può prenderne un'altra (il database lo
-  // impone): meglio dirlo che offrirgli un pulsante che finirebbe in errore.
-  const alreadyOwns =
-    !artist.claimed && session !== null
+  // attesa". O è libera, o è di chi guarda, o è di qualcun altro.
+  //
+  // Due casi meritano una spiegazione al posto di un pulsante che finirebbe in
+  // errore, perché il database è severo: chi non ha il ruolo giusto (e può
+  // ancora sceglierlo o no) e chi amministra già una scheda con eventi (ne
+  // amministra una sola). Chi invece ha una scheda **senza eventi** può
+  // reclamare: il database la elimina e prende questa, e lo diciamo prima.
+  const canManage = session !== null && canManageArtistProfile(session.role);
+
+  const replace =
+    !artist.claimed && canManage && session
+      ? await getReplaceablePage("artist", session.id, artist.id)
+      : null;
+
+  const ownsAnother =
+    !artist.claimed && canManage && session && replace === null
       ? (await getArtistByProfileId(session.id)) !== null
       : false;
 
-  const claimState: ClaimState = alreadyOwns
-    ? "owned"
-    : !artist.claimed
+  const claimState: ClaimState = artist.claimed
+    ? artist.profileId === session?.id
+      ? "mine"
+      : "claimed"
+    : session === null
       ? "unclaimed"
-      : artist.profileId === session?.id
-        ? "mine"
-        : "claimed";
+      : !canManage
+        ? "wrongRole"
+        : ownsAnother
+          ? "owned"
+          : "unclaimed";
 
   const data = {
     "@context": "https://schema.org",
@@ -137,6 +154,8 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         subjectId={artist.id}
         state={claimState}
         isAuthenticated={session !== null}
+        canUpgradeRole={session?.role === "fan"}
+        replaceName={replace?.name ?? null}
         dict={dict.claims}
       />
 
