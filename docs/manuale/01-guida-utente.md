@@ -200,11 +200,14 @@ La piattaforma parte in **italiano** se ti colleghi dall'Italia, in **inglese** 
 altro paese. Puoi cambiarla quando vuoi con il selettore **IT / EN** nella barra in alto:
 la scelta viene ricordata anche alla visita successiva.
 
-## Il player in basso
+## Il player in basso (non ancora attivo)
 
-In fondo allo schermo c'è un **player Spotify** fisso: serve per ascoltare in background le
-playlist di OpenStage mentre navighi, senza interrompere la navigazione (anche su mobile,
-sopra il menu).
+È previsto un **player Spotify fisso** in fondo allo schermo, per ascoltare in background le
+playlist di OpenStage mentre navighi. **Oggi però non si vede**: il player esiste nel codice ma
+compare **solo** quando è configurata una playlist pubblica, e le playlist di OpenStage non sono
+ancora state create. Non c'è niente di rotto: è una funzione **spenta**, non una funzione
+mancante. Quando le playlist esisteranno, il player si accende con una sola impostazione, senza
+modifiche al codice.
 
 # Domande frequenti
 

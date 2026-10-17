@@ -111,7 +111,7 @@ quando ne aggiungi una, impostala su tutti e tre.
 | `TURNSTILE_SECRET_KEY` | Cloudflare → Turnstile | Verifica lato server (Supabase la usa per il captcha) |
 | `ADMIN_EMAIL` | Scelta interna | Email dello staff: deve combaciare con `settings.admin_email` |
 | `NEXT_PUBLIC_SITE_URL` | Dominio di produzione | URL canonico per SEO e link di ritorno |
-| `NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID` | URL della playlist | ID della playlist del player in basso |
+| `NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID` | URL della playlist (la parte dopo `/playlist/`) | Player Spotify in fondo alle pagine. **Oggi è vuota**: senza un id il player non compare affatto (nessun contenuto finto, nessun player vuoto) |
 
 > `.env.local` **non deve mai** finire su Git: il file è già escluso. Il modello da copiare è
 > `.env.example`.

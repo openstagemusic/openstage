@@ -23,7 +23,10 @@ accesso reale, niente dati finti o schermate di esempio.
 - **Ruoli** (fan / artista / locale / admin) scelti in registrazione e memorizzati nel profilo.
 - Pagine: Home, Artisti, Locali, Per gli Artisti, Per le Venue, Chi siamo, Contatti, Privacy,
   Termini, Cookie, più l'elenco di artisti e locali **letto dal database** con paginazione.
-- **Player Spotify** fisso in basso e dock di navigazione mobile.
+- **Player Spotify** predisposto in fondo a ogni pagina: il componente è montato nel layout, ma
+  resta **spento** finché non viene configurata una playlist pubblica
+  (`NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID`), perché non deve mostrare player vuoti o contenuti finti.
+  Navigazione mobile a tendina dalla barra in alto (**non** esiste una barra fissa in basso).
 - Prima migrazione SQL (`0001_init.sql`) con tabelle, RLS e trigger.
 - Repository GitHub + deploy continuo su Vercel.
 
