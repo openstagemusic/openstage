@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 
 type SaveEventButtonProps = {
   eventId: string;
+  /** Indirizzo a cui tornare dopo l'accesso (quello canonico dell'evento). */
+  nextPath?: string;
   initiallySaved: boolean;
   isAuthenticated: boolean;
   labels: { save: string; saved: string; loginToSave: string; pending: string };
@@ -23,6 +25,7 @@ type SaveEventButtonProps = {
  */
 export default function SaveEventButton({
   eventId,
+  nextPath,
   initiallySaved,
   isAuthenticated,
   labels,
@@ -36,7 +39,7 @@ export default function SaveEventButton({
   // Il ritorno al login conserva la lingua e la pagina dell'evento.
   const loginHref = withLocale(
     locale,
-    `/login?next=${encodeURIComponent(withLocale(locale, `/eventi/${eventId}`))}`
+    `/login?next=${encodeURIComponent(withLocale(locale, nextPath ?? `/eventi/${eventId}`))}`
   );
 
   const onClick = () => {

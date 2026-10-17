@@ -2,7 +2,7 @@
 
 > **Stato: divisione approvata il 17 ottobre 2026.** Il prompt ricevuto unisce quattro lavori che
 > nella roadmap vivevano in fasi diverse; la divisione in blocchi è confermata, le decisioni prese
-> sono elencate più sotto. Stato di avanzamento: **3.0 fatto**, si prosegue con 3.1.
+> sono elencate più sotto. Stato di avanzamento: **3.0 e 3.1 fatti**, si prosegue con 3.2.
 
 ## Premessa: il prompt contiene quattro progetti
 
@@ -67,7 +67,11 @@ redirect), `hreflang` + `canonical` su ogni pagina, switcher che cambia lingua *
 indirizzo**, redirect di cortesia per chi arriva senza prefisso. Nessuna funzione nuova visibile:
 è il fondamento su cui la SEO funziona davvero. Dettagli e prove in `docs/review-fase-3.0.md`.
 
-### 3.1 — Fondamenta dati, schede pubbliche e directory
+### 3.1 — Fondamenta dati, schede pubbliche e directory ✅ fatto
+
+> Fatto. Cosa è stato realizzato davvero, le due trappole trovate (tabella accenti disallineata,
+> rotta evento che la build non intercettava) e gli scostamenti da questo piano — reclamo e badge
+> "Verificato" spostati a 3.2, migration divise per blocco — sono in `docs/review-fase-3.1.md`.
 
 - Migration `0009_directory_claims.sql`: `slug` su `artists`, `venues`, `events` (+ backfill
   deterministico, `translate` senza `unaccent`), `venues.capacity`, `profiles.verified_at`,
@@ -152,8 +156,9 @@ scarica a 1080×1920 con QR funzionante; incollando il link in una chat compare 
   scrittura solo al proprietario, limite di dimensione e soli tipi immagine). Lo creo via SQL
   dentro la migration, ma va deciso il limite di spazio (piano gratuito: 1 GB).
 - **Variabili d'ambiente nuove**: **nessuna** con Photon. Nessuna chiave per `next/og`.
-- **SQL**: una migration per blocco (`0009_…` directory/reclamo, `0010_…` editor/bozze/limite),
-  applicate e verificate prima del test in produzione.
+- **SQL**: una migration per blocco, applicate e verificate prima del test in produzione:
+  `0009` slug + capienza + `verified_at` ✅, `0010` funzioni di ricerca con lo slug ✅,
+  `0011` reclamo (3.2), `0012` editor/bozze/limite (3.3).
 
 ## Cosa resta fuori
 

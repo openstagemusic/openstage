@@ -21,12 +21,14 @@ export const EVENT_KINDS: EventKind[] = [
 
 export type EventArtist = {
   id: string;
+  slug: string;
   name: string;
   city: string | null;
 };
 
 export type EventVenue = {
   id: string;
+  slug: string;
   name: string;
   city: string | null;
   address: string | null;
@@ -36,6 +38,8 @@ export type EventVenue = {
 /** Evento pubblico già normalizzato (embed di artista e locale inclusi). */
 export type PublicEvent = {
   id: string;
+  /** Pezzo finale dell'indirizzo pubblico (`/eventi/<citta>/<slug>`). */
+  slug: string;
   title: string;
   description: string | null;
   startsAt: string;

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDate } from "@/lib/events/format";
+import { eventPath } from "@/lib/events/paths";
 import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
@@ -52,7 +53,7 @@ export default function EventCard({
   const isSheet = variant === "sheet";
 
   const share = async () => {
-    const path = `/eventi/${event.id}`;
+    const path = eventPath(event);
     const url = typeof window === "undefined" ? path : `${window.location.origin}${path}`;
 
     try {
@@ -165,7 +166,7 @@ export default function EventCard({
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
-            href={`/eventi/${event.id}`}
+            href={eventPath(event)}
             className="rounded-full bg-gradient-to-r from-violet to-cyan px-3.5 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
           >
             {t.eventPage}

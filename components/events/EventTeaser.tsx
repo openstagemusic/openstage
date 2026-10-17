@@ -2,6 +2,7 @@ import Link from "@/components/i18n/LocaleLink";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { formatEventDate } from "@/lib/events/format";
+import { eventPath } from "@/lib/events/paths";
 import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -23,7 +24,7 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
 
   return (
     <article className="glass h-full overflow-hidden rounded-3xl border border-white/10 transition-colors hover:border-white/25">
-      <Link href={`/eventi/${event.id}`} className="flex h-full flex-col">
+      <Link href={eventPath(event)} className="flex h-full flex-col">
         {event.coverImageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- locandine da URL esterni arbitrari
           <img

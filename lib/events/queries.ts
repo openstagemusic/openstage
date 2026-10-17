@@ -14,6 +14,7 @@ import type { EventKind, LocationPrecision, PublicEvent } from "./types";
 
 const EVENT_SELECT = [
   "id",
+  "slug",
   "title",
   "description",
   "starts_at",
@@ -30,15 +31,16 @@ const EVENT_SELECT = [
   "cover_image_url",
   "is_featured",
   "is_unclaimed",
-  "artists ( id, name, city )",
-  "venues ( id, name, city, address, website )",
+  "artists ( id, slug, name, city )",
+  "venues ( id, slug, name, city, address, website )",
 ].join(", ");
 
 type Embedded<T> = T | T[] | null;
 
-type ArtistRow = { id: string; name: string; city: string | null };
+type ArtistRow = { id: string; slug: string; name: string; city: string | null };
 type VenueRow = {
   id: string;
+  slug: string;
   name: string;
   city: string | null;
   address: string | null;
@@ -47,6 +49,7 @@ type VenueRow = {
 
 type EventRow = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   starts_at: string;
@@ -78,6 +81,7 @@ function toPublicEvent(row: EventRow): PublicEvent {
 
   return {
     id: row.id,
+    slug: row.slug,
     title: row.title,
     description: row.description,
     startsAt: row.starts_at,
@@ -94,10 +98,13 @@ function toPublicEvent(row: EventRow): PublicEvent {
     coverImageUrl: row.cover_image_url,
     isFeatured: row.is_featured ?? false,
     isUnclaimed: row.is_unclaimed ?? false,
-    artist: artist ? { id: artist.id, name: artist.name, city: artist.city } : null,
+    artist: artist
+      ? { id: artist.id, slug: artist.slug, name: artist.name, city: artist.city }
+      : null,
     venue: venue
       ? {
           id: venue.id,
+          slug: venue.slug,
           name: venue.name,
           city: venue.city,
           address: venue.address,
@@ -240,6 +247,62 @@ export const getEventById = cache(async (id: string): Promise<PublicEvent | null
   return toPublicEvent(data as unknown as EventRow);
 });
 
+/** Singolo evento pubblico a partire dall'indirizzo leggibile (`slug`). */
+export const getEventBySlug = cache(async (slug: string): Promise<PublicEvent | null> => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(EVENT_SELECT)
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error || !data) {
+    if (error) console.error("[events] getEventBySlug:", error.message);
+    return null;
+  }
+
+  return toPublicEvent(data as unknown as EventRow);
+});
+
+/**
+ * Prossimi eventi di un artista o in un locale (schede pubbliche).
+ *
+ * Gli eventi passati non si nascondono per censura: semplicemente non fanno
+ * parte di "cosa succede adesso", quindi la scheda mostra il futuro.
+ */
+async function listUpcomingBy(
+  column: "artist_id" | "venue_id",
+  id: string,
+  limit: number
+): Promise<PublicEvent[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(EVENT_SELECT)
+    .eq("status", "published")
+    .eq(column, id)
+    .gte("starts_at", new Date().toISOString())
+    .order("starts_at", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    console.error("[events] listUpcomingBy:", error.message);
+    return [];
+  }
+
+  return (data as unknown as EventRow[]).map(toPublicEvent);
+}
+
+export function listUpcomingEventsByArtist(artistId: string, limit = 24): Promise<PublicEvent[]> {
+  return listUpcomingBy("artist_id", artistId, limit);
+}
+
+export function listUpcomingEventsByVenue(venueId: string, limit = 24): Promise<PublicEvent[]> {
+  return listUpcomingBy("venue_id", venueId, limit);
+}
+
 /** Generi realmente presenti negli eventi pubblicati (per i filtri). */
 export async function listGenres(): Promise<string[]> {
   const supabase = await createClient();
@@ -325,6 +388,10 @@ export type EventSuggestion = {
   detail: string | null;
   /** Quanti eventi in programma porta con sé il suggerimento. */
   hits: number;
+  /** Indirizzo leggibile: valorizzato per artisti, locali ed eventi. */
+  slug: string | null;
+  /** Città dell'evento: serve a comporre l'indirizzo canonico. */
+  city: string | null;
 };
 
 /**

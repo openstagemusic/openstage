@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import type { EventSuggestion } from "@/lib/events/queries";
+import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -117,9 +118,25 @@ export default function SearchBar({ locale }: { locale: Locale }) {
   };
 
   const choose = (item: EventSuggestion) => {
-    if (item.kind === "event" && item.id) {
+    // Artisti e locali hanno una scheda propria: il suggerimento ci porta dritto,
+    // invece di ripetere la ricerca per nome.
+    if (item.kind === "artist" && item.slug) {
       setOpen(false);
-      router.push(withLocale(locale, `/eventi/${item.id}`));
+      router.push(withLocale(locale, artistPath({ slug: item.slug })));
+      return;
+    }
+
+    if (item.kind === "venue" && item.slug) {
+      setOpen(false);
+      router.push(withLocale(locale, venuePath({ slug: item.slug })));
+      return;
+    }
+
+    if (item.kind === "event" && item.id && item.slug) {
+      setOpen(false);
+      router.push(
+        withLocale(locale, eventPath({ id: item.id, slug: item.slug, city: item.city }))
+      );
       return;
     }
 

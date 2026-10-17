@@ -30,3 +30,7 @@ fatta dentro la fase indicata · **🔴 grossa** = da riprendere insieme a fine 
 | B19 | Pagina dei preferiti per gli eventi salvati | 🔴 | Fase 2.2 | "Salva" funziona e scrive nel database, ma non c'è ancora un posto dove rivedere gli eventi salvati: serve una sezione (profilo o pagina dedicata) |
 | B20 | Preset temporali ancorati al fuso `Europe/Rome` | 🟡 | Fase 2.2 | "Stasera / questo weekend…" sono calcolati sulla serata italiana. Se servirà il fuso del visitatore, il punto di modifica è uno solo (`lib/events/timezone.ts`) |
 | B21 | Ricerca: indici trigram non ancora sfruttati da `search_events` | 🟡 | Fase 2.2 | Con pochi eventi è irrilevante; da rivedere quando saranno migliaia (i suggerimenti li usano già) |
+| B22 | Mappa del sito: oltre 500 righe per sezione serve un indice (`sitemap.xml` indicizzato) | 🟡 | Fase 3.1 | Ora sono poche decine di indirizzi; il taglio è in `MAX_PER_SECTION` dentro `app/sitemap.ts` |
+| B23 | Directory: filtro "vicino a me" (per distanza) oltre al filtro per città | 🟡 | Fase 3.1 | Il calcolo della distanza esiste già in `search_events`; nelle directory è solo per città, a valore esatto |
+| B24 | Suggerimenti: includere anche artisti e locali **senza** eventi in programma | 🟡 | Fase 3.1 | Oggi appaiono solo se hanno una data futura (scelta della Fase 2, per non portare a un vicolo cieco). Da quando esistono le schede, l'atterraggio è comunque utile |
+| B25 | `slugify` scritta due volte (database e `lib/slug.ts`) | 🟡 | Fase 3.1 | Stessa idea, due linguaggi: se cambia la normalizzazione va cambiata in entrambi i posti |

@@ -1,56 +1,28 @@
-import type { Metadata } from "next";
 import Link from "@/components/i18n/LocaleLink";
-import { notFound } from "next/navigation";
 
+import JsonLd from "@/components/seo/JsonLd";
 import ShareEventButton from "@/components/events/ShareEventButton";
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDateLong, timeZoneName } from "@/lib/events/format";
-import { artistRepeatsTitle } from "@/lib/events/types";
-import { getEventById, listSavedEventIds } from "@/lib/events/queries";
+import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
+import { listSavedEventIds } from "@/lib/events/queries";
+import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
+import { absoluteUrl } from "@/lib/seo/site";
 import { getSessionProfile } from "@/lib/supabase/session";
 
-type EventPageProps = {
-  params: Promise<{ id: string }>;
-};
-
-export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
-  const { id } = await params;
-  const event = await getEventById(id);
-
-  if (!event) {
-    return { title: "Event" };
-  }
-
-  const description =
-    event.description?.slice(0, 160) ??
-    [event.artist?.name, event.venue?.name, event.city].filter(Boolean).join(" · ");
-
-  return {
-    title: event.title,
-    description,
-    openGraph: {
-      title: event.title,
-      description,
-      images: event.coverImageUrl ? [event.coverImageUrl] : undefined,
-    },
-  };
-}
-
 /**
- * Pagina pubblica dell'evento: renderizzata dal server, con dati reali e i
- * pulsanti "Salva" e "Condividi" funzionanti (nessun link morto).
+ * Corpo della scheda evento.
+ *
+ * Vive in un componente (e non nella pagina) perché lo usano **due** rotte:
+ * quella canonica `/eventi/<citta>/<slug>` e quella storica `/eventi/<id>`, che
+ * reindirizza qui. Un solo posto da mantenere, nessuna pagina duplicata.
  */
-export default async function EventPage({ params }: EventPageProps) {
-  const { id } = await params;
-
+export default async function EventPageView({ event }: { event: PublicEvent }) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const t = dict.events;
-
-  const event = await getEventById(id);
-  if (!event) notFound();
 
   const [session, savedIds] = await Promise.all([getSessionProfile(), listSavedEventIds()]);
 
@@ -61,9 +33,52 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const where = [event.venue?.name, event.city].filter(Boolean).join(" · ");
   const kindLabel = t.kinds[event.kind] ?? t.kinds.other;
+  const canonicalPath = eventPath(event);
+
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "MusicEvent",
+    name: event.title,
+    startDate: event.startsAt,
+    url: absoluteUrl(`/${locale}${canonicalPath}`),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    image: event.coverImageUrl ?? undefined,
+    description: event.description?.slice(0, 300) ?? undefined,
+    isAccessibleForFree: event.isFree || undefined,
+    performer: event.artist
+      ? {
+          "@type": "MusicGroup",
+          name: event.artist.name,
+          url: absoluteUrl(`/${locale}${artistPath(event.artist)}`),
+        }
+      : undefined,
+    location: event.venue
+      ? {
+          "@type": "MusicVenue",
+          name: event.venue.name,
+          url: absoluteUrl(`/${locale}${venuePath(event.venue)}`),
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: event.venue.address ?? undefined,
+            addressLocality: event.venue.city ?? undefined,
+          },
+          geo: hasPosition
+            ? { "@type": "GeoCoordinates", latitude: event.latitude, longitude: event.longitude }
+            : undefined,
+        }
+      : event.city
+        ? { "@type": "Place", name: event.city }
+        : undefined,
+    offers: event.ticketUrl
+      ? { "@type": "Offer", url: event.ticketUrl, availability: "https://schema.org/InStock" }
+      : undefined,
+  };
 
   return (
     <article className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
+      <JsonLd data={data} />
+
       <Link href="/" className="text-sm text-muted transition-colors hover:text-white">
         ← {t.backToExplore}
       </Link>
@@ -105,7 +120,11 @@ export default async function EventPage({ params }: EventPageProps) {
       </h1>
 
       {event.artist && !artistRepeatsTitle(event) ? (
-        <p className="mt-3 text-lg text-white/80">{event.artist.name}</p>
+        <p className="mt-3 text-lg text-white/80">
+          <Link href={artistPath(event.artist)} className="transition-colors hover:text-white">
+            {event.artist.name}
+          </Link>
+        </p>
       ) : null}
 
       <dl className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -114,14 +133,21 @@ export default async function EventPage({ params }: EventPageProps) {
           <dd className="mt-1 text-sm text-white">
             {formatEventDateLong(event.startsAt, event.timezone, locale)}
           </dd>
-          <dd className="mt-1 text-xs text-muted">
-            {timeZoneName(event.timezone, locale)}
-          </dd>
+          <dd className="mt-1 text-xs text-muted">{timeZoneName(event.timezone, locale)}</dd>
         </div>
 
         <div className="glass rounded-2xl border border-white/10 p-5">
           <dt className="text-xs uppercase tracking-wide text-muted">{t.where}</dt>
-          <dd className="mt-1 text-sm text-white">{where || "—"}</dd>
+          <dd className="mt-1 text-sm text-white">
+            {event.venue ? (
+              <Link href={venuePath(event.venue)} className="transition-colors hover:text-cyan">
+                {event.venue.name}
+              </Link>
+            ) : (
+              (event.city ?? "—")
+            )}
+            {event.venue && event.city ? ` · ${event.city}` : ""}
+          </dd>
           {event.venue?.address ? (
             <dd className="mt-1 text-xs text-muted">{event.venue.address}</dd>
           ) : null}
@@ -184,6 +210,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
         <SaveEventButton
           eventId={event.id}
+          nextPath={canonicalPath}
           initiallySaved={savedIds.has(event.id)}
           isAuthenticated={Boolean(session)}
           labels={{ save: t.save, saved: t.saved, loginToSave: t.loginToSave, pending: t.saving }}
@@ -191,7 +218,7 @@ export default async function EventPage({ params }: EventPageProps) {
         />
 
         <ShareEventButton
-          path={`/eventi/${event.id}`}
+          path={canonicalPath}
           title={event.title}
           text={where}
           labels={{ share: t.share, copied: t.shareCopied }}

@@ -2,6 +2,7 @@ import Link from "@/components/i18n/LocaleLink";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { formatEventDate } from "@/lib/events/format";
+import { eventPath } from "@/lib/events/paths";
 import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -66,7 +67,7 @@ export default function EventTable({ events, locale, dict }: EventTableProps) {
                 <td className="whitespace-nowrap px-4 py-3 text-white/80">{when.full}</td>
 
                 <td className="px-4 py-3">
-                  <Link href={`/eventi/${event.id}`} className="font-medium hover:text-cyan">
+                  <Link href={eventPath(event)} className="font-medium hover:text-cyan">
                     {event.title}
                   </Link>
                   {/* Su schermo stretto locale e città stanno sotto il titolo. */}

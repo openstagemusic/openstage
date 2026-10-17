@@ -4,6 +4,7 @@ import Link from "@/components/i18n/LocaleLink";
 import { useEffect, useState } from "react";
 
 import { formatEventDate } from "@/lib/events/format";
+import { eventPath } from "@/lib/events/paths";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import type { VenueGroup } from "@/lib/map/venues";
@@ -102,7 +103,7 @@ export default function VenueEventsCard({
         {current ? (
           <div className="mt-3">
             <Link
-              href={`/eventi/${current.id}`}
+              href={eventPath(current)}
               className="block rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition-colors hover:border-white/25"
             >
               <p className="text-xs text-white/80">
@@ -152,7 +153,7 @@ export default function VenueEventsCard({
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {current ? (
             <Link
-              href={`/eventi/${current.id}`}
+              href={eventPath(current)}
               className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet to-cyan px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
             >
               {t.viewEvent}
