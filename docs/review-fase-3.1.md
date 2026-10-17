@@ -18,11 +18,14 @@
 3. **Schede `/artisti/[slug]` e `/locali/[slug]`**: dati reali, prossimi concerti presi dagli
    eventi pubblicati, link a Spotify / sito / Google Maps, `MusicGroup` e `MusicVenue` JSON-LD,
    e la dichiarazione esplicita quando la scheda **non è ancora reclamata**.
-4. **Indirizzo evento canonico `/eventi/<citta>/<slug>`** con reindirizzamento permanente (301)
-   da ogni altra forma (identificativo storico, città sbagliata, indirizzo più corto). Un evento,
-   un indirizzo solo. `MusicEvent` JSON-LD con locale, artista, offerte e posizione.
-5. **`app/sitemap.ts` e `app/robots.ts`** costruiti dal database: dentro entrambe le lingue
-   (`/it/…`, `/en/…`) collegate da `alternates`; fuori accesso, registrazione, onboarding,
+4. **Indirizzo evento canonico `/eventi/<citta>/<slug>`** con reindirizzamento permanente da ogni
+   altra forma (identificativo storico, città sbagliata, indirizzo più corto). Un evento, un
+   indirizzo solo. `MusicEvent` JSON-LD con locale, artista, offerte e posizione.
+   Next risponde **308**: per i motori di ricerca vale come il 301 (consolidano tutti
+   sull'indirizzo definitivo) ed è più corretto perché conserva il metodo della richiesta. Il
+   reindirizzamento **rimette il prefisso di lingua**, altrimenti il secondo salto lo faceva il
+   middleware e chi arrivava su `/it/…` poteva atterrare su `/en/…`.
+5. **`app/sitemap.ts` e `app/robots.ts`** costruiti dal database: dentro entrambe le lingue   (`/it/…`, `/en/…`) collegate da `alternates`; fuori accesso, registrazione, onboarding,
    creazione evento e API.
 6. **Pagina 404 vera** (`app/not-found.tsx`): prima un indirizzo invecchiato mostrava l'errore
    grezzo del framework.
@@ -50,6 +53,12 @@ segnala**: elenca serenamente entrambe le rotte e solo all'avvio del server ogni
 rotta** `app/eventi/[...percorso]` che gestisce tutte le forme dell'indirizzo: è anche il punto in
 cui la regola "un evento, un indirizzo" sta in tre righe.
 
+**3. Il reindirizzamento perdeva la lingua.** Trovato **solo in produzione**: la prima versione
+rimandava a `/eventi/ranica/sick-tamburo` senza prefisso, quindi ci voleva un secondo salto
+(middleware) per rimettere `/it` o `/en` — e la lingua del secondo salto la decideva il cookie,
+non l'indirizzo di partenza. Ora il reindirizzamento nasce già localizzato: un salto solo, lingua
+conservata.
+
 ## Scostamenti dal piano (dichiarati)
 
 | Piano | Fatto | Perché |
@@ -71,8 +80,8 @@ cui la regola "un evento, un indirizzo" sta in tre righe.
 | Scheda locale: titolo, 3 eventi, JSON-LD `MusicVenue` | OK |
 | Evento: `canonical` corretto, JSON-LD `MusicEvent` con link a artista e locale | OK |
 | Nessun link interno al vecchio `/eventi/<uuid>` nella pagina evento | OK |
-| `/eventi/<uuid>` → 301 all'indirizzo canonico | OK |
-| `/eventi/livorno/sick-tamburo` (città sbagliata) → 301 a Ranica | OK |
+| `/eventi/<uuid>` → reindirizzamento permanente all'indirizzo canonico | OK |
+| `/eventi/livorno/sick-tamburo` (città sbagliata) → reindirizzamento a Ranica | OK |
 | Slug inesistente, artista inesistente, indirizzo troppo lungo → 404 vera con pagina dedicata | OK |
 | Telefono 390 px: nessuno scorrimento orizzontale, filtri dentro lo schermo | OK |
 | `sitemap.xml`: 200, schede reali, entrambe le lingue | OK |
@@ -88,6 +97,31 @@ cui la regola "un evento, un indirizzo" sta in tre righe.
   nella ricerca eventi, nelle directory arriverà con la rifinitura finale.
 - B24: i suggerimenti propongono solo artisti e locali **con un evento in programma** (scelta
   della Fase 2): ora che le schede esistono, si può valutare di allargare a tutti.
+
+## Verifica in produzione
+
+Dopo il primo push (`c21a96c`) la prova su `https://openstage-alpha.vercel.app` ha dato:
+
+| Prova | Esito |
+| --- | --- |
+| `/it/artisti`, `/it/locali` | 200 |
+| `/it/artisti/sick-tamburo` (`MusicGroup`), `/it/locali/druso` (`MusicVenue`) | 200 |
+| `/it/eventi/ranica/sick-tamburo` con `canonical` sul dominio di produzione | 200 |
+| `/it/eventi/<uuid>` e `/it/eventi/livorno/sick-tamburo` | reindirizzamento permanente |
+| `/sitemap.xml` (artisti, locali, eventi, versione inglese), `/robots.txt` | 200 |
+| Slug inesistente | 404 |
+
+È **solo in produzione** che è emerso il terzo problema della lista qui sopra: il reindirizzamento
+perdeva il prefisso di lingua. Corretto e riverificato in locale — ora un salto solo, che conserva
+`/it` o `/en`:
+
+```
+/it/eventi/<uuid>                 -> 308 /it/eventi/ranica/sick-tamburo
+/it/eventi/livorno/sick-tamburo   -> 308 /it/eventi/ranica/sick-tamburo
+/it/eventi/sick-tamburo           -> 308 /it/eventi/ranica/sick-tamburo
+/en/eventi/<uuid>                 -> 308 /en/eventi/ranica/sick-tamburo
+/it/eventi/ranica/sick-tamburo    -> 200
+```
 
 ## Rischi
 
