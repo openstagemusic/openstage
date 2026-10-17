@@ -55,6 +55,7 @@ export type PublicEvent = {
   ticketUrl: string | null;
   coverImageUrl: string | null;
   isFeatured: boolean;
+  /** L'ha inserito OpenStage e nessuna delle schede collegate è stata reclamata. */
   isUnclaimed: boolean;
   artist: EventArtist | null;
   venue: EventVenue | null;

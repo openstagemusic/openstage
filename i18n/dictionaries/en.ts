@@ -182,7 +182,8 @@ export const en = {
     tomorrow: "Tomorrow",
     approximateNote:
       "Approximate position: this event shows an area, not a single point.",
-    unclaimedNote: "Event added by OpenStage, not yet claimed by the venue.",
+    unclaimedNote:
+      "Event added by OpenStage: the venue and the artist have not claimed their page yet.",
     when: "When",
     where: "Where",
     emptyTitle: "No events scheduled yet",

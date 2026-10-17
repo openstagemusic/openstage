@@ -77,7 +77,9 @@ indirizzo**, redirect di cortesia per chi arriva senza prefisso. Nessuna funzion
   deterministico, `translate` senza `unaccent`), `venues.capacity`, `profiles.verified_at`,
   tabella `claims` + RLS, funzioni `claim_artist` / `request_venue_claim` / `review_claim`,
   estensione delle policy `events_*` alla proprietà via `venue_id` / `artist_id`, ridefinizione
-  di `is_unclaimed` come "nessuno dei soggetti collegati ha reclamato".
+  di `is_unclaimed` come "nessuno dei soggetti collegati ha reclamato" — **promessa non mantenuta
+  qui**: la colonna salvata è rimasta quella della Fase 1, e si è corretta solo nella 3.2.2
+  (dove è stata tolta del tutto, perché il valore si calcola).
 - Directory `/artisti` e `/locali`: griglia reale, filtri (nome, genere, città / città, capienza,
   "solo non reclamati"), paginazione, **link veri** (crawlable), `ItemList` JSON-LD.
 - Schede `/artisti/[slug]` e `/locali/[slug]`: dati reali, eventi futuri collegati, link
@@ -137,6 +139,26 @@ richiesta e resta "in attesa" finché l'admin non approva; ruolo sbagliato respi
 (fan guidato → artista → ricerca → reclamo → scheda vuota eliminata; locale → richiesta → coda
 admin → approvazione → badge "Verificato").
 
+### 3.2.2 — "Non reclamato" non è più un campo salvato (dopo la prova dell'utente)
+
+> **Fatto.** L'utente ha notato che l'evento di Bobo Rondelli aveva ancora `is_unclaimed = true`
+> dopo il reclamo della scheda. La colonna era un residuo della Fase 1: scritta all'inserimento e
+> **mai più aggiornata** (nessun trigger, nessuna scrittura dell'app). Cronaca e prove in
+> `docs/review-fase-3.2.2.md`.
+
+- **La colonna è stata eliminata** (`alter table public.events drop column is_unclaimed`): era una
+  seconda verità, e non seguiva la realtà.
+- **Il valore si calcola dalle schede**: un evento è "inserito da OpenStage" quando artista **e**
+  locale non hanno ancora reclamato (`profile_id is null`). Basta **un** reclamo e la nota sparisce.
+  Un evento senza né artista né locale non ha schede da reclamare: nessuna nota.
+- **Regola in un posto solo**: `toPublicEvent` (elenco, mappa, home, pagina evento). La ricerca
+  `search_events` restituisce i due `profile_id` per poterlo fare anche lì.
+- **Testo della nota** aggiornato: nomina entrambi i soggetti, non più solo il locale.
+
+**Test**: l'evento di un artista reclamato non porta più la nota; quello con entrambe le schede
+libere sì; reclamando l'una o l'altra la nota sparisce (prove su schede reali + due eventi di prova
+creati e rimossi).
+
 ### 3.3 — Dashboard e creazione eventi
 
 - Dashboard con sidebar desktop / barra mobile: **I miei eventi, Crea evento, Preferiti, Profilo,
@@ -190,7 +212,8 @@ scarica a 1080×1920 con QR funzionante; incollando il link in una chat compare 
 - **Variabili d'ambiente nuove**: **nessuna** con Photon. Nessuna chiave per `next/og`.
 - **SQL**: una migration per blocco, applicate e verificate prima del test in produzione:
   `0009` slug + capienza + `verified_at` ✅, `0010` funzioni di ricerca con lo slug ✅,
-  `0011` reclamo (3.2) ✅, `0012` proprietà del reclamo (3.2.1) ✅, `0013` editor/bozze/limite (3.3).
+  `0011` reclamo (3.2) ✅, `0012` proprietà del reclamo (3.2.1) ✅,
+  `0013` "non reclamato" calcolato (3.2.2) ✅, `0014` editor/bozze/limite (3.3).
 
 ## Cosa resta fuori
 

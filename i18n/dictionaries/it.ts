@@ -181,7 +181,8 @@ export const it: Dictionary = {
     tomorrow: "Domani",
     approximateNote:
       "Posizione approssimativa: l'evento è indicato come area, non come punto preciso.",
-    unclaimedNote: "Evento inserito da OpenStage, non ancora rivendicato dal locale.",
+    unclaimedNote:
+      "Evento inserito da OpenStage: il locale e l'artista non hanno ancora reclamato la scheda.",
     when: "Quando",
     where: "Dove",
     emptyTitle: "Ancora nessun evento in programma",

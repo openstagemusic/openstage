@@ -30,14 +30,20 @@ const EVENT_SELECT = [
   "ticket_url",
   "cover_image_url",
   "is_featured",
-  "is_unclaimed",
-  "artists ( id, slug, name, city )",
-  "venues ( id, slug, name, city, address, website )",
+  "artists ( id, slug, name, city, profile_id )",
+  "venues ( id, slug, name, city, address, website, profile_id )",
 ].join(", ");
 
 type Embedded<T> = T | T[] | null;
 
-type ArtistRow = { id: string; slug: string; name: string; city: string | null };
+type ArtistRow = {
+  id: string;
+  slug: string;
+  name: string;
+  city: string | null;
+  /** Chi amministra la scheda: serve a dire se è ancora "non reclamata". */
+  profile_id: string | null;
+};
 type VenueRow = {
   id: string;
   slug: string;
@@ -45,6 +51,7 @@ type VenueRow = {
   city: string | null;
   address: string | null;
   website: string | null;
+  profile_id: string | null;
 };
 
 type EventRow = {
@@ -65,7 +72,6 @@ type EventRow = {
   ticket_url: string | null;
   cover_image_url: string | null;
   is_featured: boolean | null;
-  is_unclaimed: boolean | null;
   artists: Embedded<ArtistRow>;
   venues: Embedded<VenueRow>;
 };
@@ -78,6 +84,13 @@ function first<T>(value: Embedded<T>): T | null {
 function toPublicEvent(row: EventRow): PublicEvent {
   const artist = first(row.artists);
   const venue = first(row.venues);
+
+  // "Non reclamato" non è un campo salvato: è un fatto delle schede collegate.
+  // L'evento l'ha messo OpenStage se **almeno una** delle due esiste e
+  // **nessuna** è stata reclamata. Senza artista né locale non c'è nessuna
+  // scheda da reclamare, quindi la nota non ha senso e non compare.
+  const hasPage = artist !== null || venue !== null;
+  const isUnclaimed = hasPage && !artist?.profile_id && !venue?.profile_id;
 
   return {
     id: row.id,
@@ -97,7 +110,7 @@ function toPublicEvent(row: EventRow): PublicEvent {
     ticketUrl: row.ticket_url,
     coverImageUrl: row.cover_image_url,
     isFeatured: row.is_featured ?? false,
-    isUnclaimed: row.is_unclaimed ?? false,
+    isUnclaimed,
     artist: artist
       ? { id: artist.id, slug: artist.slug, name: artist.name, city: artist.city }
       : null,
