@@ -8,8 +8,20 @@ export const defaultLocale: Locale = "it";
 /** Cookie that stores the visitor's language choice. */
 export const LOCALE_COOKIE = "NEXT_LOCALE";
 
+/** Opzioni del cookie di lingua: preferenza, non dato di sessione. */
+export const LOCALE_COOKIE_OPTIONS = {
+  path: "/",
+  maxAge: 60 * 60 * 24 * 365,
+  sameSite: "lax",
+} as const;
+
 export function isLocale(value: string | null | undefined): value is Locale {
   return value === "it" || value === "en";
+}
+
+/** L'altra lingua rispetto a quella indicata. */
+export function otherLocale(locale: Locale): Locale {
+  return locale === "it" ? "en" : "it";
 }
 
 /**

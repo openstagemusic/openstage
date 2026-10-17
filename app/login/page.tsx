@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/i18n/LocaleLink";
 
 import LoginForm from "@/components/auth/LoginForm";
 import { getDictionary } from "@/lib/i18n/dictionaries";

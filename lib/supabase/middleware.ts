@@ -1,21 +1,44 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { LOCALE_COOKIE, localeFromCountry } from "@/lib/i18n/config";
-
 import { isSupabaseConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "./env";
 
 /**
  * Runs on every request:
  *  1. refreshes the Supabase auth session (cookie based);
- *  2. resolves the visitor's language from their country (free Vercel edge geo),
- *     storing the choice in a cookie so it survives navigation.
+ *  2. forwards to the app the headers prepared by the middleware (lingua e
+ *     percorso corrente), prendendoli **al momento** in cui costruisce la
+ *     risposta, così i cookie aggiornati da Supabase non vengono persi.
  *
  * The Supabase part is intentionally defensive: a misconfigured or unreachable
  * project must never take the whole site down with a 500.
  */
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+export type MiddlewareHttpOptions = {
+  /** Percorso interno su cui servire la richiesta, mantenendo l'indirizzo visibile. */
+  rewriteTo?: string;
+  /** Header da aggiungere alla richiesta inoltrata all'applicazione. */
+  extraHeaders?: Record<string, string>;
+};
+
+export async function updateSession(request: NextRequest, options: MiddlewareHttpOptions = {}) {
+  // I cookie di sessione aggiornati vivono in `request.headers`: la copia va
+  // fatta a ogni risposta, non una volta sola all'inizio.
+  const build = () => {
+    const headers = new Headers(request.headers);
+    for (const [name, value] of Object.entries(options.extraHeaders ?? {})) {
+      headers.set(name, value);
+    }
+
+    if (options.rewriteTo) {
+      const url = request.nextUrl.clone();
+      url.pathname = options.rewriteTo;
+      return NextResponse.rewrite(url, { request: { headers } });
+    }
+
+    return NextResponse.next({ request: { headers } });
+  };
+
+  let response = build();
 
   if (isSupabaseConfigured()) {
     try {
@@ -26,7 +49,7 @@ export async function updateSession(request: NextRequest) {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-            response = NextResponse.next({ request });
+            response = build();
             cookiesToSet.forEach(({ name, value, options }) =>
               response.cookies.set(name, value, options)
             );
@@ -39,15 +62,6 @@ export async function updateSession(request: NextRequest) {
     } catch (error) {
       console.error("[middleware] Supabase session refresh failed:", error);
     }
-  }
-
-  if (!request.cookies.get(LOCALE_COOKIE)) {
-    const locale = localeFromCountry(request.headers.get("x-vercel-ip-country"));
-    response.cookies.set(LOCALE_COOKIE, locale, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: "lax",
-    });
   }
 
   return response;

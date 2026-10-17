@@ -1,134 +1,169 @@
-# Fase 3 — Profili pubblici e reclamo delle schede
+# Fase 3 — Directory, profili, reclamo, editor eventi e condivisione
 
-## Obiettivo
+> **Stato: divisione approvata il 17 ottobre 2026.** Il prompt ricevuto unisce quattro lavori che
+> nella roadmap vivevano in fasi diverse; la divisione in blocchi è confermata, le decisioni prese
+> sono elencate più sotto. Stato di avanzamento: **3.0 fatto**, si prosegue con 3.1.
 
-Trasformare `artists` e `venues` da semplici anagrafiche (oggi `profile_id = NULL`,
-righe inserite dalla redazione) in **schede pubbliche con un proprietario reale**.
-Il reclamo è il pezzo che manca: senza di esso un locale o un artista non ha modo di
-prendere in mano la propria pagina né, in futuro, i propri eventi.
+## Premessa: il prompt contiene quattro progetti
 
-## La decisione: due strade diverse per artista e locale
+| Lavoro | Dove viveva nella roadmap | Peso |
+| --- | --- | --- |
+| Schede pubbliche + reclamo | Fase 3 (prima stesura) | medio |
+| Directory `/artisti` e `/locali` con filtri | non prevista | medio |
+| Dashboard + editor eventi (crea/modifica, locandine, bozze) | Fase 4 | **grande** |
+| Condivisione: calendario, Share Cards, QR | Fase 5/7 | medio |
+| Richiesta trasversale: SEO e immagini social | — | medio |
 
-Non esiste una risposta unica buona per entrambi, perché il rischio è diverso.
+Tenerli in un blocco unico significherebbe una fase non verificabile a pezzi: la Fase 2 è stata
+divisa in tre e ha funzionato. Qui servono **quattro blocchi** (più uno di fondamento, vedi sotto).
 
-**Locale → richiesta + approvazione dell'admin.**
-Il locale è un luogo fisico con un nome, un indirizzo e una reputazione. Se qualcuno lo
-reclama e poi pubblica eventi falsi o cambia indirizzo e sito, il danno è pubblico e
-ricade su chi quel locale lo gestisce davvero. I locali sono pochi (oggi 1): la revisione
-manuale costa zero e alza la qualità percepita. Coerente con *Autenticità prima dell'Hype*.
+## Terreno verificato (fatti, non stime)
 
-**Artista → immediato, con prova obbligatoria e revocabile.**
-La ragione d'essere di OpenStage è dare visibilità agli emergenti: far aspettare un
-musicista giorni per reclamare la propria scheda uccide esattamente la cosa che dobbiamo
-fare, e contraddice *UX Senza Attrito* e *Gratuito per sempre*. Il rischio è più basso
-(la scheda artista è identità, non un luogo) e il danno è reversibile: si chiede un link
-di prova (Spotify, Bandcamp, Instagram, sito) che resta registrato, e l'admin può revocare.
+Letto direttamente dal database e dal codice:
 
-**Controindicazione accettata:** un artista può "occupare" un nome che non è suo. Con la
-prova registrata e la revoca dell'admin il caso è gestibile, e non vale il prezzo di
-bloccare tutti gli altri.
+- Nessuno `slug` su `artists`, `venues`, `events`. Nessuna `capacity` sui locali. Nessuna
+  tabella notifiche. **Nessun bucket di Storage** (verificato: `storage.buckets` è vuoto):
+  caricare una locandina richiede di crearne uno, con le sue policy.
+- `profiles` non ha nessun concetto di "verificato". La regola richiesta ("gli utenti non
+  verificati restano in bozza") **non ha oggi un dato su cui appoggiarsi** (la conferma email è
+  spenta). Va definita: vedi decisioni.
+- La posizione approssimativa **esiste già**: `events.location_precision` (`exact | approximate`)
+  e `events.area_radius_m`. Non va inventata, va solo usata.
+- `events.status` ha già `draft | published | cancelled`.
+- `events_insert_authenticated` oggi consente a qualunque artista o locale di inserire un evento
+  **direttamente pubblicato e senza alcun limite**: il tetto anti-spam va messo nel database,
+  non nel form (un limite solo lato interfaccia si aggira).
+- La propria scheda si crea **solo per gli artisti** (onboarding artista). **Non esiste** alcun
+  modo per un locale di creare la propria scheda: oggi i locali si inseriscono a mano. Senza
+  questo pezzo, un locale nuovo non può pubblicare nulla.
+- Il sito non ha `sitemap.xml`, `robots.txt`, `canonical`, `hreflang` né immagine Open Graph:
+  `getPageMetadata` scrive **solo** titolo e descrizione.
+- `/artisti` e `/locali` sono segnaposto; `/events/new` è una pagina vuota che rimanda alla home.
 
-### Regole che valgono per entrambi
+## Il punto SEO più importante (e scomodo)
 
-- Il reclamo si fa **solo dal proprio profilo**, con ruolo coerente: `artist` per una
-  scheda artista, `venue` per una scheda locale. Un fan che vuole reclamare deve prima
-  scegliere il ruolo (scelta irreversibile, regola già in vigore): va detto chiaramente
-  nella conferma, è il punto di attrito più delicato della fase.
-- **Un profilo reclama una sola riga** (il vincolo `UNIQUE` su `profile_id` esiste già).
-- Un locale che è anche musicista **non può reclamare entrambi** con lo stesso account.
-- Chi ha già una propria scheda creata dall'onboarding non può reclamarne un'altra.
-- Se due persone chiedono lo stesso locale, **vince la prima approvata**: le altre
-  richieste pendenti su quella scheda vengono chiuse automaticamente.
+La lingua **non sta nell'URL**: è un cookie deciso dal paese (`middleware` →
+`x-vercel-ip-country` → `localeFromCountry`). Conseguenze misurate sul codice:
 
-### Cosa succede agli eventi collegati
+1. Lo stesso URL serve italiano **o** inglese → `hreflang` è impossibile.
+2. Googlebot arriva da IP statunitensi e senza cookie → riceve **la versione inglese**. La
+   directory italiana, per Google, semplicemente non esiste.
+3. `canonical` non esiste su nessuna pagina.
 
-- `created_by` **non si tocca**: significa "chi ha materialmente inserito la riga"
-  (oggi `NULL` = redazione). Sovrascriverlo con chi reclama sarebbe falso.
-- La proprietà degli eventi si ricava dal collegamento: si estendono le policy
-  `events_update_own` / `events_delete_own` perché chi possiede il locale collegato
-  (`venue_id`) o l'artista collegato (`artist_id`) possa gestire l'evento.
-- `is_unclaimed` viene ridefinito una volta per tutte: **"nessuno dei soggetti collegati
-  ha ancora reclamato la scheda"**. Diventa `false` quando il locale **o** l'artista
-  collegato viene reclamato. Il testo attuale ("non ancora rivendicato dal locale") è
-  già quasi giusto e va reso neutro rispetto ai due casi.
+Costruire le directory "per la SEO" sopra questo impianto ne sfrutta **metà**. Due strade:
 
-## Modello dati — migration `0009_claims.sql`
+- **(A) lingua negli URL** (`/it/...`, `/en/...`) con `hreflang` + `canonical`: unico modo perché
+  il contenuto italiano sia indicizzabile. Costa un blocco a sé (tocca tutti i link interni) e va
+  fatto **prima** delle directory, altrimenti gli URL cambiano due volte.
+- **(B) rimandare**: più veloce oggi, ma la SEO di questa fase resta in gran parte sprecata e la
+  correzione costerà di più (tutti gli URL di nuovo, più redirect).
 
-- Enum `claim_status`: `pending | approved | rejected`.
-- Enum `claim_target`: `artist | venue`.
-- Tabella `claims`: `profile_id`, `target`, `artist_id`, `venue_id`, `proof_url`,
-  `message`, `status`, `reviewed_by`, `reviewed_at`, `created_at`, con un `CHECK` che
-  impone coerenza tra `target` e la colonna valorizzata, e un indice unico parziale per
-  impedire due richieste pendenti sullo stesso profilo/bersaglio.
-- RLS su `claims`: il profilo vede e crea solo le proprie richieste; l'admin vede tutto.
-  Nessun `UPDATE`/`DELETE` dal client: si passa solo dalle funzioni.
-- Colonna `slug` su `artists` e `venues` (`UNIQUE`), con backfill deterministico
-  (minuscole, accenti normalizzati con `translate`, spazi → `-`, suffisso `-2`, `-3`…
-  in caso di collisione). L'estensione `unaccent` non è installata e non serve.
-- Colonna `claimed_at` su `artists` e `venues`.
-- Funzioni (`SECURITY DEFINER`, `search_path` fissato):
-  - `claim_artist(artist_id, proof_url)` — verifica ruolo `artist`, scheda non reclamata,
-    nessun'altra scheda già posseduta; assegna `profile_id`, scrive la riga in `claims`
-    con stato `approved` (traccia della prova), aggiorna `is_unclaimed` sugli eventi
-    collegati.
-  - `request_venue_claim(venue_id, proof_url, message)` — verifica ruolo `venue`, scheda
-    non reclamata, nessuna richiesta pendente; crea la richiesta `pending`.
-  - `review_claim(claim_id, approve)` — riservata all'admin (`is_admin()`): approva
-    assegnando `profile_id` (solo se ancora `NULL`), o rifiuta; in entrambi i casi chiude
-    le altre richieste pendenti sulla stessa scheda e aggiorna `is_unclaimed`.
-- Policy estese su `events` per la proprietà via `venue_id` / `artist_id`.
+## Blocchi proposti
 
-## Blocchi di lavoro
+### 3.0 — Lingua e URL ✅ fatto
 
-### 3.1 — Profili pubblici
-- `/artisti/[slug]` e `/locali/[slug]`: dati reali, eventi futuri collegati, link
-  (Spotify, sito, mappa), SEO e anteprime social via `getPageMetadata`.
-- Le liste `/artisti` e `/locali` (oggi segnaposto) mostrano le schede reali e portano
-  al profilo: sono anche il modo in cui un proprietario trova la propria scheda.
-- Stato "non reclamato" visibile, con l'invito a reclamare.
+`/it/...` e `/en/...`, scelta lingua dall'URL (il cookie resta solo come preferenza per il primo
+redirect), `hreflang` + `canonical` su ogni pagina, switcher che cambia lingua **cambiando
+indirizzo**, redirect di cortesia per chi arriva senza prefisso. Nessuna funzione nuova visibile:
+è il fondamento su cui la SEO funziona davvero. Dettagli e prove in `docs/review-fase-3.0.md`.
 
-### 3.2 — Reclamo
-- Scheda artista non reclamata → bottone "Sono io" → conferma + link di prova → immediato.
-- Scheda locale non reclamata → "Sono il gestore" → conferma + prova + messaggio → richiesta.
-- Chi non ha il ruolo giusto viene guidato a sceglierlo, spiegando che è irreversibile.
-- `/admin` minimale: elenco richieste in attesa, approva / rifiuta.
+### 3.1 — Fondamenta dati, schede pubbliche e directory
 
-### 3.3 — Dopo il reclamo
-- Modifica del proprio profilo: nome, città, bio, link, e per i locali indirizzo e
-  coordinate sulla mappa.
-- Feedback chiaro all'utente: "questa scheda è tua", stato della richiesta in attesa.
+- Migration `0009_directory_claims.sql`: `slug` su `artists`, `venues`, `events` (+ backfill
+  deterministico, `translate` senza `unaccent`), `venues.capacity`, `profiles.verified_at`,
+  tabella `claims` + RLS, funzioni `claim_artist` / `request_venue_claim` / `review_claim`,
+  estensione delle policy `events_*` alla proprietà via `venue_id` / `artist_id`, ridefinizione
+  di `is_unclaimed` come "nessuno dei soggetti collegati ha reclamato".
+- Directory `/artisti` e `/locali`: griglia reale, filtri (nome, genere, città / città, capienza,
+  "solo non reclamati"), paginazione, **link veri** (crawlable), `ItemList` JSON-LD.
+- Schede `/artisti/[slug]` e `/locali/[slug]`: dati reali, eventi futuri collegati, link
+  (Spotify, sito, mappa), `MusicGroup` / `MusicVenue` JSON-LD, stato "non reclamato" con invito.
+- Pagina evento: URL `/eventi/[citta]/[slug]` con **301** dal vecchio `/eventi/[id]`,
+  `canonical`, `MusicEvent` JSON-LD. Gli eventi passati restano raggiungibili (200, non 404):
+  si perdono link solo se la pagina sparisce.
+- `app/sitemap.ts` (eventi, artisti, locali dal database) e `app/robots.ts`.
 
-## Cosa NON entra in questa fase
+**Test**: `/artisti` mostra le schede vere e i filtri aggiornano l'URL; la scheda di un artista
+carica i suoi concerti; il vecchio link `/eventi/<uuid>` porta al nuovo indirizzo; `sitemap.xml`
+elenca le righe realmente presenti.
 
-- **Editor degli eventi** (creazione e modifica dall'app): è la fase successiva. Qui il
-  reclamo dà la proprietà della scheda, non ancora la gestione degli eventi.
-- Email transazionali (Resend): nessuna notifica via email, lo stato si legge in app
-  (resta il backlog B08).
-- Pagina dei preferiti (B19) e cancellazione account (B07).
+### 3.2 — Reclamo, area personale e revisione
+
+- Scheda artista non reclamata → "Sono io" → conferma + link di prova → **immediato** (`claimed_at`,
+  prova registrata, revoca possibile dall'admin).
+- Scheda locale non reclamata → "Sono il gestore" → prova + messaggio → **richiesta**; l'admin
+  approva o rifiuta. Prima approvata vince, le altre richieste pendenti si chiudono da sole.
+- Chi non ha il ruolo giusto viene guidato a sceglierlo, con avviso esplicito che è irreversibile.
+- **Creazione della propria scheda locale** ("Aggiungi il tuo locale"): nome, città, indirizzo,
+  coordinate dal pin, sito — la riga nasce già propria. Senza questo un locale nuovo non parte.
+- `/admin` minimale: coda delle richieste, approva / rifiuta; da qui anche `verified_at`.
+
+**Test**: artista reclama e diventa proprietario; secondo tentativo bloccato; locale invia la
+richiesta e resta "in attesa" finché l'admin non approva; ruolo sbagliato respinto con spiegazione.
+
+### 3.3 — Dashboard e creazione eventi
+
+- Dashboard con sidebar desktop / barra mobile: **I miei eventi, Crea evento, Preferiti, Profilo,
+  Impostazioni** (vedi decisioni su "Notifiche").
+- "I miei eventi": bozze, pubblicati, annullati; azioni pubblica / annulla / modifica.
+- `/dashboard/events/new`: form con **anteprima live della scheda**; titolo, artista, data/ora,
+  locale, indirizzo con autocomplete + mini mappa con pin trascinabile, genere, tipo, locandina,
+  link biglietti, prezzo o ingresso gratuito, link Spotify; **posizione approssimativa**.
+- Locandina: upload su Storage **e** generatore canvas 1-click dai dati inseriti (stessa
+  libreria di disegno delle Share Cards).
+- Anti-spam: **massimo 10 eventi per account nelle 24 ore, imposto nel database**; gli account non
+  ancora verificati restano in bozza (regola applicata dal database, non dal form).
+
+**Test**: si crea un evento reale, appare in "I miei eventi" e — se pubblicato — nella ricerca;
+l'11° evento della giornata viene rifiutato; l'account non verificato resta in bozza.
+
+### 3.4 — Pagina evento completa e condivisione
+
+- Hero con locandina, **countdown**, azioni: Salva, Aggiungi al calendario, Condividi, Biglietti,
+  Indicazioni Google Maps.
+- `.ics` (route handler, nessuna dipendenza) + link Google Calendar.
+- Modale di condivisione con **Share Cards generate nel browser**: Storie 1080×1920 e Quadrato
+  1080×1080, con QR code del link canonico; su mobile condivisione nativa via Web Share API,
+  altrimenti download del PNG.
+- Immagine Open Graph **generata dal server** (`next/og`, incluso in Next: nessuna dipendenza
+  nuova) per la pagina evento e le schede: i crawler social non eseguono il canvas.
+
+**Test**: il countdown scorre; il `.ics` si apre nel calendario del telefono; la Share Card si
+scarica a 1080×1920 con QR funzionante; incollando il link in una chat compare l'anteprima giusta.
+
+## Decisioni prese (17 ottobre 2026)
+
+| # | Domanda | Decisione |
+| --- | --- | --- |
+| 1 | Lingua negli URL | **Blocco 3.0**, fatto → `docs/review-fase-3.0.md` |
+| 2 | "Badge Pro" nella directory | Diventa **"Verificato"** (`profiles.verified_at`, dato reale). "Pro" collide con "gratis per sempre" e non esiste alcun piano a pagamento |
+| 3 | Voce "Notifiche" nella dashboard | Sostituita da **"Preferiti"** (B19: i salvataggi esistono già, mancava la pagina) |
+| 4 | Autocomplete indirizzi | **Photon (komoot)**: nessuna chiave, nessun account. MapTiler richiede una chiave e il piano gratuito è solo non commerciale |
+| 5 | "Utenti non verificati restano in bozza" | **Primo evento in revisione, poi pubblicazione automatica** (`profiles.verified_at` impostato dall'admin) |
+| 6 | "Ricordamelo" | **Solo "Aggiungi al calendario"** (`.ics` + Google Calendar). Il promemoria via email arriva con Resend (Fase 6) |
+| 7 | URL evento | **`/eventi/[citta]/[slug]`**, coerente con `/artisti` e `/locali`; 301 dal vecchio `/eventi/[id]` |
+| 8 | Widget player Spotify nella griglia artisti | **Fuori dalla griglia** (un iframe per scheda è pesante e le playlist non esistono ancora): pulsante "Ascolta" per riga, player solo sulla scheda del singolo artista |
 
 ## Servizi esterni, variabili e SQL
 
-- **Nessun servizio esterno nuovo**, nessun account, nessuna chiave.
-- **Nessuna variabile d'ambiente nuova** su Vercel.
-- **SQL**: una sola migration, `0009_claims.sql` (enum, tabella `claims`, RLS, slug,
-  funzioni, policy eventi), applicata e verificata prima del test in produzione.
+- **Servizi nuovi**: nessuno, se si sceglie Photon. Con MapTiler servirebbe un account, una chiave
+  e un piano a pagamento per l'uso commerciale.
+- **Da configurare su Supabase (una volta)**: bucket di Storage `covers` (pubblico in lettura,
+  scrittura solo al proprietario, limite di dimensione e soli tipi immagine). Lo creo via SQL
+  dentro la migration, ma va deciso il limite di spazio (piano gratuito: 1 GB).
+- **Variabili d'ambiente nuove**: **nessuna** con Photon. Nessuna chiave per `next/og`.
+- **SQL**: una migration per blocco (`0009_…` directory/reclamo, `0010_…` editor/bozze/limite),
+  applicate e verificate prima del test in produzione.
 
-## Rischi e punti aperti
+## Cosa resta fuori
 
-| Voce | Gravità | Nota |
-| --- | --- | --- |
-| Artista che "occupa" un nome non suo | Bassa | Prova registrata + revoca admin |
-| Fan costretto a scegliere il ruolo per reclamare | Media | Irreversibile per tua regola: va spiegato bene nella conferma |
-| Un musicista che gestisce un locale non può reclamare entrambi | Media | Conseguenza della regola "un solo ruolo": da rivedere solo se diventa un caso reale |
-| Nessuna notifica email sulle richieste | Bassa | L'admin vede la coda in `/admin`; l'utente vede lo stato in app |
-| `slug` che cambia se cambia il nome | Bassa | Da decidere: slug stabile (consigliato) o aggiornato al rename |
+- Email transazionali (Resend) e quindi notifiche email → Fase 6 (B08).
+- Pagamenti, PayPal e qualsiasi "piano Pro" → Fase 8 (B16). Vercel Hobby resta non commerciale.
+- Cancellazione account (B07) e rifinitura estetica (B12: è la fase finale, come deciso).
 
 ## Verifiche di fine fase
 
-- `npm run build` verde, prova in browser reale in locale e in produzione, in italiano e
-  in inglese, desktop e mobile.
-- Reclamo artista: immediato, con prova, `is_unclaimed` aggiornato, seconda richiesta
-  bloccata, ruolo sbagliato respinto.
-- Reclamo locale: richiesta in attesa, approvazione admin, `profile_id` assegnato,
-  doppia richiesta chiusa, revoca possibile.
-- Profili pubblici: dati reali, eventi collegati, SEO/OG, stato non reclamato.
+- `npm run build` verde; prova in browser reale in locale e in produzione, italiano e inglese,
+  desktop e mobile; nessun errore in console.
+- Ogni blocco verifica il proprio pezzo **senza** dipendere dal successivo.
+- Solo dati reali: nessun evento, artista o locale finto, in nessun blocco.

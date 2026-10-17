@@ -6,6 +6,7 @@ import { RADIUS_OPTIONS, WHEN_PRESETS, type Center } from "@/lib/events/filters"
 import { EVENT_KINDS } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
 
 import { useScrollAnchor } from "./useScrollAnchor";
@@ -60,7 +61,9 @@ export default function QuickFilters({
     const query = params.toString();
     rememberScroll();
     // `scroll: false`: la lista è appena sotto i filtri, la pagina non deve saltare.
-    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    router.push(query ? `${withLocale(locale, pathname)}?${query}` : withLocale(locale, pathname), {
+      scroll: false,
+    });
   };
 
   const chipClass = (isActive: boolean) =>
@@ -172,7 +175,7 @@ export default function QuickFilters({
             type="button"
             onClick={() => {
               rememberScroll();
-              router.push(pathname, { scroll: false });
+              router.push(withLocale(locale, pathname), { scroll: false });
             }}
             className="ml-auto rounded-full border border-white/15 px-3.5 py-1.5 text-xs font-medium text-muted transition-colors hover:border-white/30 hover:text-white"
           >

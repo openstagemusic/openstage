@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
 
@@ -17,6 +19,7 @@ const inputClass =
 
 export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   const router = useRouter();
+  const locale = useLocale();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -71,7 +74,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       return;
     }
 
-    router.push(role === "artist" ? "/onboarding/artist" : "/");
+    router.push(withLocale(locale, role === "artist" ? "/onboarding/artist" : "/"));
     router.refresh();
   }
 

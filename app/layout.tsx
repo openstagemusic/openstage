@@ -6,8 +6,9 @@ import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import SpotifyPlayerDock from "@/components/layout/SpotifyPlayerDock";
+import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { getLocale } from "@/lib/i18n/server";
+import { getCurrentPath, getLocale } from "@/lib/i18n/server";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 // Every public page is server-rendered (SSR) — never a client-only SPA.
@@ -39,15 +40,31 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const base = resolveSiteUrl();
+  const path = await getCurrentPath();
+
+  // Ogni lingua ha il suo indirizzo: il canonical dice qual è, `hreflang`
+  // collega le due versioni. Senza, Google vedrebbe una sola lingua.
+  const localized = (target: "it" | "en") =>
+    new URL(`/${target}${path === "/" ? "" : path}`, base).toString();
+  const canonical = localized(locale);
 
   return {
     metadataBase: base,
     title: { default: dict.meta.title, template: "%s · OpenStage" },
     description: dict.meta.description,
+    alternates: {
+      canonical,
+      languages: {
+        it: localized("it"),
+        en: localized("en"),
+        "x-default": localized("it"),
+      },
+    },
     openGraph: {
       type: "website",
       siteName: "OpenStage",
-      url: base,
+      url: canonical,
+      locale: locale === "it" ? "it_IT" : "en_US",
       title: dict.meta.title,
       description: dict.meta.description,
     },
@@ -66,15 +83,17 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <Navbar
-          locale={locale}
-          dict={dict.nav}
-          userEmail={session?.email ?? null}
-          userRole={session?.role ?? null}
-        />
-        <main className="flex-1 pt-16">{children}</main>
-        <Footer dict={dict.footer} />
-        <SpotifyPlayerDock />
+        <LocaleProvider locale={locale}>
+          <Navbar
+            locale={locale}
+            dict={dict.nav}
+            userEmail={session?.email ?? null}
+            userRole={session?.role ?? null}
+          />
+          <main className="flex-1 pt-16">{children}</main>
+          <Footer dict={dict.footer} />
+          <SpotifyPlayerDock />
+        </LocaleProvider>
       </body>
     </html>
   );

@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
 const inputClass =
@@ -11,6 +13,7 @@ const inputClass =
 
 export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"] }) {
   const router = useRouter();
+  const locale = useLocale();
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [genre, setGenre] = useState("");
@@ -48,7 +51,7 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
       return;
     }
 
-    router.push("/events/new");
+    router.push(withLocale(locale, "/events/new"));
     router.refresh();
   }
 

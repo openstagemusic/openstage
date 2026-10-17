@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,6 +24,7 @@ export default function LoginForm({
   nextPath?: string | null;
 }) {
   const router = useRouter();
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
@@ -62,7 +65,7 @@ export default function LoginForm({
       return;
     }
 
-    router.push(nextPath ?? "/");
+    router.push(withLocale(locale, nextPath ?? "/"));
     router.refresh();
   }
 

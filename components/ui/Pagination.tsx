@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/i18n/LocaleLink";
 import { useMemo } from "react";
 
 import { cn } from "@/lib/utils";

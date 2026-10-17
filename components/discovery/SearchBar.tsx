@@ -13,6 +13,7 @@ import {
 import type { EventSuggestion } from "@/lib/events/queries";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
 
 import { useScrollAnchor } from "./useScrollAnchor";
@@ -109,14 +110,16 @@ export default function SearchBar({ locale }: { locale: Locale }) {
     const query = params.toString();
     rememberScroll();
     // `scroll: false`: chi filtra sta guardando i filtri, non deve tornare in cima.
-    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    // Il percorso può arrivare senza prefisso di lingua: lo aggiungiamo qui.
+    const base = withLocale(locale, pathname);
+    router.push(query ? `${base}?${query}` : base, { scroll: false });
     setOpen(false);
   };
 
   const choose = (item: EventSuggestion) => {
     if (item.kind === "event" && item.id) {
       setOpen(false);
-      router.push(`/eventi/${item.id}`);
+      router.push(withLocale(locale, `/eventi/${item.id}`));
       return;
     }
 

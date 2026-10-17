@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import OnboardingForm from "@/components/auth/OnboardingForm";
 import { canManageArtistProfile } from "@/lib/auth/roles";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { getPageMetadata } from "@/lib/i18n/metadata";
 import { getLocale } from "@/lib/i18n/server";
 import { getSessionProfile } from "@/lib/supabase/session";
@@ -14,18 +15,18 @@ export const generateMetadata = () =>
   }));
 
 export default async function ArtistOnboardingPage() {
+  const locale = await getLocale();
   const session = await getSessionProfile();
 
   if (!session) {
-    redirect("/login");
+    redirect(withLocale(locale, "/login"));
   }
 
   // Il profilo artista appartiene agli artisti (la RLS lo impone anche sul database).
   if (!canManageArtistProfile(session.role)) {
-    redirect(session.role === "venue" ? "/" : "/onboarding/role");
+    redirect(withLocale(locale, session.role === "venue" ? "/" : "/onboarding/role"));
   }
 
-  const locale = await getLocale();
   const dict = getDictionary(locale);
 
   return (

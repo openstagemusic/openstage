@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { toggleSavedEvent } from "@/app/actions/saved";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
 
 type SaveEventButtonProps = {
@@ -29,17 +31,24 @@ export default function SaveEventButton({
   const [saved, setSaved] = useState(initiallySaved);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const locale = useLocale();
+
+  // Il ritorno al login conserva la lingua e la pagina dell'evento.
+  const loginHref = withLocale(
+    locale,
+    `/login?next=${encodeURIComponent(withLocale(locale, `/eventi/${eventId}`))}`
+  );
 
   const onClick = () => {
     if (!isAuthenticated) {
-      router.push(`/login?next=${encodeURIComponent(`/eventi/${eventId}`)}`);
+      router.push(loginHref);
       return;
     }
 
     startTransition(async () => {
       const result = await toggleSavedEvent(eventId);
       if (result.requiresAuth) {
-        router.push(`/login?next=${encodeURIComponent(`/eventi/${eventId}`)}`);
+        router.push(loginHref);
         return;
       }
       if (result.ok) setSaved(result.saved);

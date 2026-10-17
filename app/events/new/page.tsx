@@ -1,8 +1,9 @@
-import Link from "next/link";
+import Link from "@/components/i18n/LocaleLink";
 import { redirect } from "next/navigation";
 
 import { canManageEvents } from "@/lib/auth/roles";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { getPageMetadata } from "@/lib/i18n/metadata";
 import { getLocale } from "@/lib/i18n/server";
 import { getSessionProfile } from "@/lib/supabase/session";
@@ -14,19 +15,19 @@ export const generateMetadata = () =>
   }));
 
 export default async function NewEventPage() {
+  const locale = await getLocale();
   const session = await getSessionProfile();
 
   if (!session) {
-    redirect("/login");
+    redirect(withLocale(locale, "/login"));
   }
 
   // Pubblicano eventi solo artisti e locali: la stessa regola vive nella RLS,
   // qui evitiamo solo di mostrare una pagina che il database rifiuterebbe.
   if (!canManageEvents(session.role)) {
-    redirect("/onboarding/role");
+    redirect(withLocale(locale, "/onboarding/role"));
   }
 
-  const locale = await getLocale();
   const dict = getDictionary(locale);
 
   return (

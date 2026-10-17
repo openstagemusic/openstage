@@ -3,17 +3,19 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LogoutButton({ label }: { label: string }) {
   const router = useRouter();
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
     setLoading(true);
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/");
+    router.push(`/${locale}`);
     router.refresh();
   }
 

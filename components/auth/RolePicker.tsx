@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
 type Role = "fan" | "artist" | "venue";
@@ -18,6 +20,7 @@ type Role = "fan" | "artist" | "venue";
  */
 export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] }) {
   const router = useRouter();
+  const locale = useLocale();
   const [role, setRole] = useState<Role | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +47,7 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
 
     if (!user) {
       setLoading(false);
-      router.push("/login");
+      router.push(withLocale(locale, "/login"));
       return;
     }
 
@@ -73,7 +76,7 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
       return;
     }
 
-    router.push(role === "artist" ? "/onboarding/artist" : "/");
+    router.push(withLocale(locale, role === "artist" ? "/onboarding/artist" : "/"));
     router.refresh();
   }
 

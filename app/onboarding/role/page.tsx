@@ -1,9 +1,10 @@
-import Link from "next/link";
+import Link from "@/components/i18n/LocaleLink";
 import { redirect } from "next/navigation";
 
 import RolePicker from "@/components/auth/RolePicker";
 import { canChooseRole, ROLE_LABEL_KEY } from "@/lib/auth/roles";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { getPageMetadata } from "@/lib/i18n/metadata";
 import { getLocale } from "@/lib/i18n/server";
 import { getSessionProfile } from "@/lib/supabase/session";
@@ -15,13 +16,13 @@ export const generateMetadata = () =>
   }));
 
 export default async function RoleOnboardingPage() {
+  const locale = await getLocale();
   const session = await getSessionProfile();
 
   if (!session) {
-    redirect("/login");
+    redirect(withLocale(locale, "/login"));
   }
 
-  const locale = await getLocale();
   const dict = getDictionary(locale);
 
   // Artista e locale sono definitivi: chi li ha già scelti non può più cambiare.

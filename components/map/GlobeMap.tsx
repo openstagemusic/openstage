@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
+import Link from "@/components/i18n/LocaleLink";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import EventCard from "@/components/map/EventCard";

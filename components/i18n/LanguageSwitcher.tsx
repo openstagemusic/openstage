@@ -1,22 +1,30 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
-import { setLocale } from "@/app/actions/locale";
 import { locales, type Locale } from "@/lib/i18n/config";
+import { stripLocale, withLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
 
+/**
+ * Cambio lingua.
+ *
+ * La lingua è un prefisso di indirizzo (`/it/...`, `/en/...`): cambiarla cambia
+ * l'indirizzo, e serve una navigazione completa, non una di quelle interne.
+ * `<html lang>`, `canonical` e `hreflang` appartengono al documento: con una
+ * navigazione interna resterebbero quelli della lingua precedente (provato), e
+ * il titolo nella scheda del browser sarebbe sbagliato.
+ *
+ * Il cookie della preferenza lo riallinea il middleware all'indirizzo nuovo.
+ */
 export default function LanguageSwitcher({ locale }: { locale: Locale }) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const pathname = usePathname();
 
   function change(next: Locale) {
     if (next === locale) return;
-    startTransition(async () => {
-      await setLocale(next);
-      router.refresh();
-    });
+
+    const search = typeof window === "undefined" ? "" : window.location.search;
+    window.location.assign(`${withLocale(next, stripLocale(pathname))}${search}`);
   }
 
   return (
@@ -31,7 +39,6 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
           type="button"
           onClick={() => change(item)}
           aria-pressed={item === locale}
-          disabled={pending}
           className={cn(
             "rounded-full px-2 py-1 font-medium uppercase transition-colors",
             item === locale ? "bg-white/10 text-white" : "text-muted hover:text-white"

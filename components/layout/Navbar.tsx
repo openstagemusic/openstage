@@ -1,14 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import LogoutButton from "@/components/auth/LogoutButton";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import Link from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { canManageEvents, ROLE_LABEL_KEY, type UserRole } from "@/lib/auth/roles";
 import type { Locale } from "@/lib/i18n/config";
+import { stripLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
 
 type NavbarProps = {
@@ -27,7 +28,9 @@ const roleBadgeClass: Record<UserRole, string> = {
 
 export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProps) {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
+  // Il percorso può mostrare il prefisso di lingua (`/it/locali`): per capire
+  // quale voce è attiva serve la parte che viene dopo.
+  const pathname = stripLocale(usePathname());
 
   const links = [
     { href: "/", label: dict.explore },
