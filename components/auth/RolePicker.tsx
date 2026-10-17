@@ -76,7 +76,12 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
       return;
     }
 
-    router.push(withLocale(locale, role === "artist" ? "/onboarding/artist" : "/"));
+    router.push(
+      withLocale(
+        locale,
+        role === "artist" ? "/onboarding/artist" : role === "venue" ? "/onboarding/venue" : "/"
+      )
+    );
     router.refresh();
   }
 

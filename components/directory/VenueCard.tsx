@@ -1,4 +1,5 @@
 import Link from "@/components/i18n/LocaleLink";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import type { PublicVenue } from "@/lib/directory/queries";
 import { venuePath } from "@/lib/events/paths";
 import type { Locale } from "@/lib/i18n/config";
@@ -22,7 +23,9 @@ export default function VenueCard({ venue, locale }: { venue: PublicVenue; local
         />
 
         <div className="flex flex-1 flex-col p-5">
-          {venue.claimed ? null : (
+          {venue.verified ? (
+            <VerifiedBadge dict={t} className="self-start" />
+          ) : venue.claimed ? null : (
             <span className="self-start rounded-full border border-white/10 px-2.5 py-1 text-xs text-muted">
               {t.badgeUnclaimed}
             </span>

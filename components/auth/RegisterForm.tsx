@@ -74,7 +74,12 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       return;
     }
 
-    router.push(withLocale(locale, role === "artist" ? "/onboarding/artist" : "/"));
+    router.push(
+      withLocale(
+        locale,
+        role === "artist" ? "/onboarding/artist" : role === "venue" ? "/onboarding/venue" : "/"
+      )
+    );
     router.refresh();
   }
 

@@ -28,6 +28,10 @@ export type PublicArtist = {
   bio: string | null;
   /** Nessuno ha ancora reclamato la scheda. */
   claimed: boolean;
+  /** Il profilo che l'ha reclamata: serve solo a riconoscere la propria. */
+  profileId: string | null;
+  /** La scheda è di un profilo che OpenStage ha verificato. */
+  verified: boolean;
 };
 
 export type PublicVenue = {
@@ -41,6 +45,8 @@ export type PublicVenue = {
   longitude: number | null;
   capacity: number | null;
   claimed: boolean;
+  profileId: string | null;
+  verified: boolean;
 };
 
 type ArtistRow = {
@@ -67,7 +73,27 @@ type VenueRow = {
   profile_id: string | null;
 };
 
-function toArtist(row: ArtistRow): PublicArtist {
+/**
+ * I profili verificati, per il badge pubblico "Verificato".
+ *
+ * `profiles` è leggibile solo da sé stessi o dall'admin (contiene l'email), ma
+ * la verifica è un fatto pubblico: arriva da una funzione dedicata che espone
+ * solo gli identificativi. `cache()` la esegue una volta per richiesta.
+ */
+export const verifiedProfileIds = cache(async (): Promise<Set<string>> => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("verified_profile_ids");
+
+  if (error) {
+    console.error("[directory] verifiedProfileIds:", error.message);
+    return new Set();
+  }
+
+  return new Set((data ?? []) as string[]);
+});
+
+function toArtist(row: ArtistRow, verified: Set<string>): PublicArtist {
   return {
     id: row.id,
     slug: row.slug,
@@ -77,10 +103,12 @@ function toArtist(row: ArtistRow): PublicArtist {
     spotifyUrl: row.spotify_url,
     bio: row.bio,
     claimed: row.profile_id !== null,
+    profileId: row.profile_id,
+    verified: row.profile_id !== null && verified.has(row.profile_id),
   };
 }
 
-function toVenue(row: VenueRow): PublicVenue {
+function toVenue(row: VenueRow, verified: Set<string>): PublicVenue {
   return {
     id: row.id,
     slug: row.slug,
@@ -92,6 +120,8 @@ function toVenue(row: VenueRow): PublicVenue {
     longitude: row.longitude,
     capacity: row.capacity,
     claimed: row.profile_id !== null,
+    profileId: row.profile_id,
+    verified: row.profile_id !== null && verified.has(row.profile_id),
   };
 }
 
@@ -150,7 +180,10 @@ export async function listArtists({
     return { items: [], total: 0 };
   }
 
-  return { items: (data as unknown as ArtistRow[]).map(toArtist), total: count ?? 0 };
+  const verified = await verifiedProfileIds();
+  const rows = data as unknown as ArtistRow[];
+
+  return { items: rows.map((row) => toArtist(row, verified)), total: count ?? 0 };
 }
 
 export async function listVenues({
@@ -177,7 +210,10 @@ export async function listVenues({
     return { items: [], total: 0 };
   }
 
-  return { items: (data as unknown as VenueRow[]).map(toVenue), total: count ?? 0 };
+  const verified = await verifiedProfileIds();
+  const rows = data as unknown as VenueRow[];
+
+  return { items: rows.map((row) => toVenue(row, verified)), total: count ?? 0 };
 }
 
 /** Valori realmente presenti in tabella, per riempire i menu dei filtri. */
@@ -235,7 +271,7 @@ export const getArtistBySlug = cache(async (slug: string): Promise<PublicArtist 
     return null;
   }
 
-  return toArtist(data as unknown as ArtistRow);
+  return toArtist(data as unknown as ArtistRow, await verifiedProfileIds());
 });
 
 /** Scheda pubblica di un locale. `null` se l'indirizzo non esiste. */
@@ -253,5 +289,47 @@ export const getVenueBySlug = cache(async (slug: string): Promise<PublicVenue | 
     return null;
   }
 
-  return toVenue(data as unknown as VenueRow);
+  return toVenue(data as unknown as VenueRow, await verifiedProfileIds());
 });
+
+/**
+ * La propria scheda, cercata per profilo. Serve alla pagina dell'account, dove
+ * la RLS lascia comunque leggere solo ciò che è proprio o già pubblico.
+ */
+export const getArtistByProfileId = cache(
+  async (profileId: string): Promise<PublicArtist | null> => {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("artists")
+      .select(ARTIST_SELECT)
+      .eq("profile_id", profileId)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (error) console.error("[directory] getArtistByProfileId:", error.message);
+      return null;
+    }
+
+    return toArtist(data as unknown as ArtistRow, await verifiedProfileIds());
+  }
+);
+
+export const getVenueByProfileId = cache(
+  async (profileId: string): Promise<PublicVenue | null> => {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("venues")
+      .select(VENUE_SELECT)
+      .eq("profile_id", profileId)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (error) console.error("[directory] getVenueByProfileId:", error.message);
+      return null;
+    }
+
+    return toVenue(data as unknown as VenueRow, await verifiedProfileIds());
+  }
+);

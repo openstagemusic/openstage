@@ -21,6 +21,11 @@ export function canManageArtistProfile(role: UserRole | null): boolean {
   return role === "artist" || role === "admin";
 }
 
+/** Il profilo del locale lo completa solo un locale (o l'admin). */
+export function canManageVenueProfile(role: UserRole | null): boolean {
+  return role === "venue" || role === "admin";
+}
+
 /**
  * Solo un fan può ancora scegliere un ruolo: artist e venue sono definitivi
  * per sempre (vedi `prevent_role_escalation` nella migration 0004).

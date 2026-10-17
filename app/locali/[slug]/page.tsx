@@ -4,12 +4,16 @@ import { notFound } from "next/navigation";
 
 import EventTeaser from "@/components/events/EventTeaser";
 import JsonLd from "@/components/seo/JsonLd";
-import { getVenueBySlug } from "@/lib/directory/queries";
+import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
+import { getMyPendingClaim } from "@/lib/claims/queries";
+import { getVenueByProfileId, getVenueBySlug } from "@/lib/directory/queries";
 import { venuePath } from "@/lib/events/paths";
 import { listUpcomingEventsByVenue } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
+import { getSessionProfile } from "@/lib/supabase/session";
 
 type VenuePageProps = {
   params: Promise<{ slug: string }>;
@@ -44,7 +48,32 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
   const dict = getDictionary(locale);
   const t = dict.directory;
+  const session = await getSessionProfile();
   const events = await listUpcomingEventsByVenue(venue.id);
+
+  // La scheda di un locale si prende su richiesta: se una richiesta di questo
+  // utente è già in coda, lo diciamo invece di offrirgli di richiedere ancora.
+  // E chi amministra già un locale non può prenderne un altro (vincolo del
+  // database): anche questo lo diciamo prima, non dopo un errore.
+  const pending =
+    !venue.claimed && session !== null
+      ? await getMyPendingClaim("venue", venue.id)
+      : false;
+
+  const alreadyOwns =
+    !venue.claimed && session !== null
+      ? (await getVenueByProfileId(session.id)) !== null
+      : false;
+
+  const claimState: ClaimState = !venue.claimed
+    ? pending
+      ? "pending"
+      : alreadyOwns
+        ? "owned"
+        : "unclaimed"
+    : venue.profileId === session?.id
+      ? "mine"
+      : "claimed";
 
   const hasPosition = venue.latitude !== null && venue.longitude !== null;
   const mapsUrl = hasPosition
@@ -92,7 +121,9 @@ export default async function VenuePage({ params }: VenuePageProps) {
             {t.capacity}: {venue.capacity} {t.capacityPeople}
           </span>
         ) : null}
-        {venue.claimed ? null : (
+        {venue.verified ? (
+          <VerifiedBadge dict={t} />
+        ) : venue.claimed ? null : (
           <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
             {t.badgeUnclaimed}
           </span>
@@ -140,11 +171,13 @@ export default async function VenuePage({ params }: VenuePageProps) {
         ) : null}
       </dl>
 
-      {venue.claimed ? null : (
-        <p className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-muted">
-          {t.unclaimedVenue}
-        </p>
-      )}
+      <ClaimPanel
+        subjectType="venue"
+        subjectId={venue.id}
+        state={claimState}
+        isAuthenticated={session !== null}
+        dict={dict.claims}
+      />
 
       <h2 className="mt-12 font-display text-xl font-semibold">{t.upcomingTitle}</h2>
 

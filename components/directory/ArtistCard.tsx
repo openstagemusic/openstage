@@ -1,4 +1,5 @@
 import Link from "@/components/i18n/LocaleLink";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import type { PublicArtist } from "@/lib/directory/queries";
 import { artistPath } from "@/lib/events/paths";
 import type { Locale } from "@/lib/i18n/config";
@@ -21,7 +22,9 @@ export default function ArtistCard({ artist, locale }: { artist: PublicArtist; l
         />
 
         <div className="flex flex-1 flex-col p-5">
-          {artist.claimed ? null : (
+          {artist.verified ? (
+            <VerifiedBadge dict={dict.directory} className="self-start" />
+          ) : artist.claimed ? null : (
             <span className="self-start rounded-full border border-white/10 px-2.5 py-1 text-xs text-muted">
               {dict.directory.badgeUnclaimed}
             </span>

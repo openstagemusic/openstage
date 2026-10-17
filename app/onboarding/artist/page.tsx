@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 
 import OnboardingForm from "@/components/auth/OnboardingForm";
+import LocaleLink from "@/components/i18n/LocaleLink";
 import { canManageArtistProfile } from "@/lib/auth/roles";
+import { getArtistByProfileId } from "@/lib/directory/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getPageMetadata } from "@/lib/i18n/metadata";
@@ -27,6 +29,12 @@ export default async function ArtistOnboardingPage() {
     redirect(withLocale(locale, session.role === "venue" ? "/" : "/onboarding/role"));
   }
 
+  // Un profilo amministra una scheda sola (`artists_profile_id_key`): chi ne ha
+  // già una la modifica dall'account, non ne crea una seconda.
+  if (await getArtistByProfileId(session.id)) {
+    redirect(withLocale(locale, "/account"));
+  }
+
   const dict = getDictionary(locale);
 
   return (
@@ -35,6 +43,12 @@ export default async function ArtistOnboardingPage() {
         {dict.onboarding.artistTitle}
       </h1>
       <p className="mt-2 text-sm text-muted">{dict.onboarding.artistSubtitle}</p>
+      <p className="mt-3 text-xs text-muted">
+        {dict.onboarding.artistExisting}{" "}
+        <LocaleLink href="/artisti" className="text-cyan transition-opacity hover:opacity-80">
+          {dict.onboarding.artistExistingCta} →
+        </LocaleLink>
+      </p>
 
       <OnboardingForm dict={dict.onboarding} />
     </section>

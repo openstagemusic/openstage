@@ -9,6 +9,11 @@ export type SessionProfile = {
   id: string;
   email: string | null;
   role: UserRole | null;
+  /**
+   * Profilo verificato da OpenStage: è il permesso di pubblicare senza
+   * revisione (vedi `events_require_review` nella migration 0011).
+   */
+  verified: boolean;
 };
 
 /**
@@ -34,7 +39,7 @@ export const getSessionProfile = cache(async (): Promise<SessionProfile | null> 
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, verified_at")
     .eq("id", user.id)
     .single();
 
@@ -42,5 +47,6 @@ export const getSessionProfile = cache(async (): Promise<SessionProfile | null> 
     id: user.id,
     email: user.email ?? null,
     role: (profile?.role as UserRole | undefined) ?? null,
+    verified: profile?.verified_at != null,
   };
 });

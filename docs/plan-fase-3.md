@@ -2,7 +2,7 @@
 
 > **Stato: divisione approvata il 17 ottobre 2026.** Il prompt ricevuto unisce quattro lavori che
 > nella roadmap vivevano in fasi diverse; la divisione in blocchi è confermata, le decisioni prese
-> sono elencate più sotto. Stato di avanzamento: **3.0 e 3.1 fatti**, si prosegue con 3.2.
+> sono elencate più sotto. Stato di avanzamento: **3.0, 3.1 e 3.2 fatti**, si prosegue con 3.3.
 
 ## Premessa: il prompt contiene quattro progetti
 
@@ -93,6 +93,11 @@ elenca le righe realmente presenti.
 
 ### 3.2 — Reclamo, area personale e revisione
 
+> **Fatto.** Cosa è stato realizzato davvero, le quattro trappole trovate (il reclamo non può
+> passare dalla RLS, l'ambiguità dei collegamenti in `claims`, le tre condizioni del trigger sulla
+> pubblicazione, la verifica reversibile) e gli scostamenti dichiarati sono in
+> `docs/review-fase-3.2.md`.
+
 - Scheda artista non reclamata → "Sono io" → conferma + link di prova → **immediato** (`claimed_at`,
   prova registrata, revoca possibile dall'admin).
 - Scheda locale non reclamata → "Sono il gestore" → prova + messaggio → **richiesta**; l'admin
@@ -101,6 +106,9 @@ elenca le righe realmente presenti.
 - **Creazione della propria scheda locale** ("Aggiungi il tuo locale"): nome, città, indirizzo,
   coordinate dal pin, sito — la riga nasce già propria. Senza questo un locale nuovo non parte.
 - `/admin` minimale: coda delle richieste, approva / rifiuta; da qui anche `verified_at`.
+- **Una scheda per profilo** (vincolo `UNIQUE (profile_id)` che esiste dalla Fase 1): chi ne ha già
+  una non ne prende un'altra. L'interfaccia lo dice e non offre il pulsante, invece di far arrivare
+  un errore del database (trovato dalla prova del giro completo, vedi `docs/review-fase-3.2.md`).
 
 **Test**: artista reclama e diventa proprietario; secondo tentativo bloccato; locale invia la
 richiesta e resta "in attesa" finché l'admin non approva; ruolo sbagliato respinto con spiegazione.

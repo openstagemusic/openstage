@@ -33,7 +33,7 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
 
     if (!user) {
       setLoading(false);
-      setError("Session expired. Please log in again.");
+      setError(dict.sessionExpired);
       return;
     }
 

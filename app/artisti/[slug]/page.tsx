@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import Link from "@/components/i18n/LocaleLink";
 import { notFound } from "next/navigation";
 
+import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import EventTeaser from "@/components/events/EventTeaser";
 import JsonLd from "@/components/seo/JsonLd";
-import { getArtistBySlug } from "@/lib/directory/queries";
+import { getArtistByProfileId, getArtistBySlug } from "@/lib/directory/queries";
 import { artistPath } from "@/lib/events/paths";
 import { listUpcomingEventsByArtist } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
+import { getSessionProfile } from "@/lib/supabase/session";
 
 type ArtistPageProps = {
   params: Promise<{ slug: string }>;
@@ -45,7 +48,25 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
   const dict = getDictionary(locale);
   const t = dict.directory;
+  const session = await getSessionProfile();
   const events = await listUpcomingEventsByArtist(artist.id);
+
+  // Il reclamo di una scheda artista è immediato: non esiste uno stato "in
+  // attesa". O è libera, o è di chi guarda, o è di qualcun altro. E chi
+  // amministra già una scheda non può prenderne un'altra (il database lo
+  // impone): meglio dirlo che offrirgli un pulsante che finirebbe in errore.
+  const alreadyOwns =
+    !artist.claimed && session !== null
+      ? (await getArtistByProfileId(session.id)) !== null
+      : false;
+
+  const claimState: ClaimState = alreadyOwns
+    ? "owned"
+    : !artist.claimed
+      ? "unclaimed"
+      : artist.profileId === session?.id
+        ? "mine"
+        : "claimed";
 
   const data = {
     "@context": "https://schema.org",
@@ -81,7 +102,9 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             {artist.city}
           </span>
         ) : null}
-        {artist.claimed ? null : (
+        {artist.verified ? (
+          <VerifiedBadge dict={t} />
+        ) : artist.claimed ? null : (
           <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
             {t.badgeUnclaimed}
           </span>
@@ -109,11 +132,13 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-muted">{artist.bio}</p>
       ) : null}
 
-      {artist.claimed ? null : (
-        <p className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-muted">
-          {t.unclaimedArtist}
-        </p>
-      )}
+      <ClaimPanel
+        subjectType="artist"
+        subjectId={artist.id}
+        state={claimState}
+        isAuthenticated={session !== null}
+        dict={dict.claims}
+      />
 
       <h2 className="mt-12 font-display text-xl font-semibold">{t.upcomingTitle}</h2>
 

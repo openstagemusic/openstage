@@ -85,6 +85,12 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                   {dict[ROLE_LABEL_KEY[userRole]]}
                 </span>
               ) : null}
+              <Link
+                href="/account"
+                className="rounded-full border border-white/10 px-3 py-2 text-sm text-muted transition-colors hover:text-white"
+              >
+                {dict.account}
+              </Link>
               {canManageEvents(userRole) ? (
                 <Link
                   href="/events/new"
@@ -167,6 +173,13 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                     {dict[ROLE_LABEL_KEY[userRole]]}
                   </span>
                 ) : null}
+                <Link
+                  href="/account"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full border border-white/10 px-4 py-2 text-sm text-muted"
+                >
+                  {dict.account}
+                </Link>
                 <Link
                   href={canManageEvents(userRole) ? "/events/new" : "/onboarding/role"}
                   onClick={() => setOpen(false)}
