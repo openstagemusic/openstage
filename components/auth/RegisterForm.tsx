@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { authErrorMessage } from "@/lib/auth/error-messages";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
@@ -64,11 +65,20 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
     setLoading(false);
 
     if (signUpError) {
-      setError(signUpError.message);
+      setError(authErrorMessage(signUpError.message, dict));
       return;
     }
 
     if (!data.session) {
+      // Quando l'email esiste già, Supabase risponde "a vuoto" per non rivelare chi è
+      // iscritto: nessun errore, nessuna email inviata e nessuna identità collegata.
+      // Senza questo controllo si direbbe "controlla la tua email" a chi aspetta un'email
+      // che non arriverà mai.
+      if ((data.user?.identities?.length ?? 0) === 0) {
+        setError(dict.errors.alreadyRegistered);
+        return;
+      }
+
       setNotice(dict.checkEmail);
       return;
     }

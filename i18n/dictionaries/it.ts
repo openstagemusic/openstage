@@ -82,6 +82,15 @@ export const it: Dictionary = {
     haveAccount: "Hai già un account?",
     noAccount: "Non hai un account?",
     checkEmail: "Controlla la tua email per confermare l'account, poi accedi.",
+    errors: {
+      alreadyRegistered:
+        "Questa email è già registrata. Accedi — se ti sei iscritto con Google, usa «Continua con Google».",
+      invalidCredentials:
+        "Email o password non corretti. Se ti sei iscritto con Google, usa «Continua con Google».",
+      emailNotConfirmed: "Prima devi confermare la tua email: controlla la casella di posta.",
+      tooManyAttempts: "Troppi tentativi in poco tempo. Aspetta qualche minuto e riprova.",
+      captcha: "Verifica anti-bot non riuscita. Ricarica la pagina e riprova.",
+    },
     captchaRequired: "Completa la verifica anti-bot.",
     genericError: "Qualcosa è andato storto. Riprova.",
     notConfigured:

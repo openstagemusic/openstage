@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { authErrorMessage } from "@/lib/auth/error-messages";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
@@ -61,7 +62,7 @@ export default function LoginForm({
     setLoading(false);
 
     if (signInError) {
-      setError(signInError.message);
+      setError(authErrorMessage(signInError.message, dict));
       return;
     }
 

@@ -2,7 +2,7 @@
 
 > **Stato: divisione approvata il 17 ottobre 2026.** Il prompt ricevuto unisce quattro lavori che
 > nella roadmap vivevano in fasi diverse; la divisione in blocchi è confermata, le decisioni prese
-> sono elencate più sotto. Stato di avanzamento: **3.0, 3.1, 3.2, 3.2.1, 3.2.2 e 3.2.3 fatti**, si
+> sono elencate più sotto. Stato di avanzamento: **3.0, 3.1, 3.2, 3.2.1, 3.2.2, 3.2.3 e 3.2.4 fatti**, si
 > prosegue con 3.3.
 
 ## Premessa: il prompt contiene quattro progetti
@@ -187,6 +187,24 @@ creati e rimossi).
 con una sessione vera (19 controlli): richiesta dalla pagina → riquadro in `/account` → modulo di
 creazione assente → spiegazione sull'altra scheda → creazione **rifiutata dal database** anche
 chiamando l'API con il token vero → ritiro → creazione di nuovo permessa. Console pulita.
+
+### 3.2.4 — Domanda dell'utente sull'accesso: messaggi in italiano e una voce di sicurezza
+
+> **Fatto.** L'utente ha notato che iscriversi via Google con un'email già registrata fa partire
+> l'accesso, mentre la registrazione con email e password viene rifiutata. Il comportamento è
+> corretto (unione automatica delle identità, Supabase), ma la verifica ha fatto emergere due cose:
+> i messaggi di errore di Supabase arrivano **in inglese**, e sul progetto la **conferma dell'email è
+> disattivata**. Cronaca e prove in `docs/review-fase-3.2.4.md`.
+
+- **Messaggi tradotti** (`lib/auth/error-messages.ts`, usato dall'accesso e dalla registrazione):
+  email già registrata, credenziali errate, email da confermare, troppi tentativi, verifica anti-bot.
+  Nei primi due il messaggio indica la via d'uscita: «Continua con Google».
+- **Niente più "controlla la tua email" a vuoto**: quando l'email esiste già, Supabase risponde senza
+  errore e senza sessione, per non rivelare chi è iscritto. Il modulo riconosce quella risposta
+  (nessuna identità collegata) e dice invece che l'email è già registrata.
+- **Due voci nel backlog, nessun cambio di comportamento**: **B35** (la conferma dell'email va accesa
+  insieme a Resend: con l'auto-conferma si può *ereditare* l'account di un altro passando da Google) e
+  **B36** (manca il flusso "password dimenticata").
 
 ### 3.3 — Dashboard e creazione eventi
 

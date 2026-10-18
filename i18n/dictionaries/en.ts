@@ -84,6 +84,15 @@ export const en = {
     haveAccount: "Already have an account?",
     noAccount: "Don't have an account?",
     checkEmail: "Check your email to confirm your account, then log in.",
+    errors: {
+      alreadyRegistered:
+        "This email is already registered. Log in — if you signed up with Google, use “Continue with Google”.",
+      invalidCredentials:
+        "Wrong email or password. If you signed up with Google, use “Continue with Google”.",
+      emailNotConfirmed: "Confirm your email first: check your inbox.",
+      tooManyAttempts: "Too many attempts in a short time. Wait a few minutes and try again.",
+      captcha: "Anti-bot check failed. Reload the page and try again.",
+    },
     captchaRequired: "Please complete the anti-bot verification.",
     genericError: "Something went wrong. Please try again.",
     notConfigured:
