@@ -78,3 +78,95 @@ export const listSavedEvents = cache(async (): Promise<PublicEvent[]> => {
     .filter((row): row is EventRow => row !== null)
     .map(toPublicEvent);
 });
+
+/**
+ * Un proprio evento, per la pagina di modifica.
+ *
+ * Il filtro su `created_by` è esplicito: senza di esso un admin potrebbe aprire
+ * dal proprio pannello l'evento di un altro, e la modifica diventerebbe un
+ * effetto collaterale di un indirizzo scritto a mano.
+ */
+export const getMyEvent = cache(
+  async (id: string, profileId: string): Promise<DashboardEvent | null> => {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("events")
+      .select(`${EVENT_SELECT}, status`)
+      .eq("id", id)
+      .eq("created_by", profileId)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (error) console.error("[dashboard] getMyEvent:", error.message);
+      return null;
+    }
+
+    const row = data as unknown as DashboardRow;
+
+    return { ...toPublicEvent(row), status: row.status };
+  }
+);
+
+/** Un locale già su OpenStage: serve a collegare l'evento senza riscriverlo. */
+export type VenueOption = {
+  id: string;
+  name: string;
+  city: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+};
+
+/**
+ * Ricerca fra i locali già presenti.
+ *
+ * Nessun servizio esterno: la fonte è il nostro database, quindi quello che si
+ * collega esiste davvero. Se un locale non c'è, l'evento porta il suo nome
+ * scritto a mano (`events.venue_name`).
+ */
+export async function searchVenues(query: string, limit = 6): Promise<VenueOption[]> {
+  const term = query.replace(/[%_]/g, "").trim();
+  if (term.length < 2) return [];
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("venues")
+    .select("id, name, city, address, latitude, longitude")
+    .or(`name.ilike.%${term}%,city.ilike.%${term}%`)
+    .order("name", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    console.error("[dashboard] searchVenues:", error.message);
+    return [];
+  }
+
+  return (data ?? []) as VenueOption[];
+}
+
+/**
+ * Le città che usiamo già: servono a scrivere "Livorno" come lo scrive la
+ * piattaforma, invece di "livorno" (che non troverebbe nessuno).
+ */
+export async function listCityOptions(limit = 200): Promise<string[]> {
+  const supabase = await createClient();
+
+  const [venues, events] = await Promise.all([
+    supabase.from("venues").select("city").not("city", "is", null).limit(500),
+    supabase.from("events").select("city").not("city", "is", null).limit(500),
+  ]);
+
+  if (venues.error) console.error("[dashboard] listCityOptions (venues):", venues.error.message);
+  if (events.error) console.error("[dashboard] listCityOptions (events):", events.error.message);
+
+  const cities = new Set<string>();
+
+  for (const row of [...(venues.data ?? []), ...(events.data ?? [])] as Array<{ city: string | null }>) {
+    const city = row.city?.trim();
+    if (city) cities.add(city);
+  }
+
+  return [...cities].sort((a, b) => a.localeCompare(b, "it")).slice(0, limit);
+}

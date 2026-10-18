@@ -6,7 +6,7 @@ import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDateLong, timeZoneName } from "@/lib/events/format";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listSavedEventIds } from "@/lib/events/queries";
-import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, placeName, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
@@ -31,7 +31,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
     ? `https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}`
     : null;
 
-  const where = [event.venue?.name, event.city].filter(Boolean).join(" · ");
+  const where = [placeName(event), event.city].filter(Boolean).join(" · ");
   const kindLabel = t.kinds[event.kind] ?? t.kinds.other;
   const canonicalPath = eventPath(event);
 
@@ -108,9 +108,9 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             {event.genre}
           </span>
         ) : null}
-        {event.isFree ? (
+        {event.isFree || event.priceText ? (
           <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-white">
-            {t.freeEntry}
+            {event.isFree ? t.freeEntry : event.priceText}
           </span>
         ) : null}
       </div>

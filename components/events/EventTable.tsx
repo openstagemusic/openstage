@@ -3,7 +3,7 @@ import Link from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
-import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, placeName, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 
 type EventTableProps = {
@@ -56,7 +56,7 @@ export default function EventTable({ events, locale, dict }: EventTableProps) {
         <tbody>
           {events.map((event) => {
             const when = formatEventDate(event.startsAt, event.timezone, locale);
-            const where = [event.venue?.name, event.city].filter(Boolean).join(" · ");
+            const where = [placeName(event), event.city].filter(Boolean).join(" · ");
             const artist = event.artist && !artistRepeatsTitle(event) ? event.artist.name : "—";
 
             return (
@@ -85,7 +85,7 @@ export default function EventTable({ events, locale, dict }: EventTableProps) {
                   {dict.events.kinds[event.kind] ?? dict.events.kinds.other}
                 </td>
                 <td className="hidden px-4 py-3 text-muted md:table-cell">
-                  {event.isFree ? dict.events.freeEntry : dict.showcase.paid}
+                  {event.isFree ? dict.events.freeEntry : (event.priceText ?? dict.showcase.paid)}
                 </td>
               </tr>
             );

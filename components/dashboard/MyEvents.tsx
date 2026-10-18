@@ -14,6 +14,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { DashboardEvent, DashboardStatus } from "@/lib/dashboard/queries";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
+import { placeName } from "@/lib/events/types";
 import { cn } from "@/lib/utils";
 
 type MyEventsProps = {
@@ -109,7 +110,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
             <div className="mt-4 space-y-3">
               {list.map((event) => {
                 const when = formatEventDate(event.startsAt, event.timezone, locale);
-                const where = [event.venue?.name, event.city].filter(Boolean).join(" · ");
+                const where = [placeName(event), event.city].filter(Boolean).join(" · ");
 
                 return (
                   <article key={event.id} className="glass rounded-2xl border border-white/10 p-4">
@@ -137,6 +138,10 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                     ) : null}
 
                     <div className="mt-3 flex flex-wrap gap-2">
+                      <LocaleLink href={`/dashboard/events/${event.id}`} className={ghostButton}>
+                        {dict.edit}
+                      </LocaleLink>
+
                       {event.status !== "published" && verified ? (
                         <button
                           type="button"

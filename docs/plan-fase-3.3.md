@@ -10,10 +10,10 @@
 
 | Blocco | Cosa contiene | Migration |
 | --- | --- | --- |
-| **3.3.1** | Guscio della dashboard (barra laterale su desktop, hamburger + pannello su mobile), **I miei eventi** con bozze/pubblicati/annullati e le azioni *pubblica / annulla / elimina bozza*, **Preferiti**, panoramica con i numeri | nessuna |
-| **3.3.2** | Editor: `/dashboard/events/new` e `/dashboard/events/[id]` con anteprima dal vivo della scheda, indirizzo con suggerimenti e mini mappa con pin trascinabile, tutti i campi | `0015` (campi mancanti: prezzo, Spotify) |
-| **3.3.3** | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas | `0015` (bucket + policy) |
-| **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita, **B33** (l'admin vede tutti i profili non verificati, non solo chi passa da un reclamo) | `0015` (trigger) |
+| **3.3.1** ✅ | Guscio della dashboard (barra laterale su desktop, hamburger + pannello su mobile), **I miei eventi** con bozze/pubblicati/annullati e le azioni *pubblica / annulla / elimina bozza*, **Preferiti**, panoramica con i numeri | nessuna |
+| **3.3.2** ✅ | Editor: `/dashboard/events/new` e `/dashboard/events/[id]` con anteprima dal vivo della scheda, locale collegato o scritto a mano, mini mappa con pin trascinabile, tutti i campi | `0015` (colonne `price_text` e `venue_name`), `0016` (la ricerca restituisce i nuovi campi) |
+| **3.3.3** | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas | `0017` (bucket + policy) |
+| **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita, **B33** (l'admin vede tutti i profili non verificati, non solo chi passa da un reclamo) | `0018` (trigger) |
 
 ## Decisioni prese
 
@@ -33,6 +33,28 @@
 - **Profilo / Impostazioni**: per ora puntano a `/account` (l'unica pagina di profilo esistente).
   Una voce "Impostazioni" a sé arriva con **B36** (cambio password / email), per non mettere un
   collegamento che non porta a niente.
+
+## 3.3.2 — scelte fatte costruendo
+
+- **Niente geocodificatore esterno.** L'indirizzo non si digita: il locale si **cerca fra quelli già
+  su OpenStage** (`/api/venues`, solo con sessione) e, se non c'è, si scrive il nome a mano
+  (`events.venue_name`) e si mette il pin sulla mini mappa. Zero servizi nuovi, zero chiavi API:
+  quello che si collega esiste davvero e non si paga a richiesta.
+- **Il pin lo mette chi organizza.** Trascinandolo o cliccando sulla mappa; la mappa si apre sulla
+  posizione del locale (o su quella di chi sta scrivendo). Verificato che il click sposta il pin e
+  che le coordinate finiscono nel database.
+- **Il prezzo è testo libero** (`price_text`): in un locale piccolo è "10 €", "offerta libera" o
+  "8 € + tessera". Il campo compare solo se l'ingresso non è gratuito.
+- **Artista e locale non si scelgono dal modulo**: l'artista della serata è chi la crea, il locale è
+  quello collegato. `created_by` e `artist_id` li decide il server, così nessuno attribuisce una
+  serata a un altro.
+- **Le regole di validità stanno in `lib/events/editor.ts`**, fuori dal modulo: stesse regole per
+  qualunque strada scriva un evento. Gli errori sono **codici** tradotti dai dizionari (il tipo
+  `Record<EditorErrorCode, string>` impedisce di dimenticare una traduzione).
+- **L'elenco pubblico passa da `search_events`**, che ha colonne fisse: senza la `0016` prezzo e
+  nome del locale sarebbero comparsi solo aprendo la scheda dell'evento.
+- La ricerca libera ora guarda anche `venue_name`: scrivere il nome di un locale senza scheda trova
+  la serata.
 
 ## Test di fine fase (come da piano generale)
 

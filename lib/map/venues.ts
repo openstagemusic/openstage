@@ -53,7 +53,7 @@ export function groupEventsByVenue(events: PublicEvent[]): VenueGroup[] {
       longitude: event.longitude,
       latitude: event.latitude,
       venueId: event.venue?.id ?? null,
-      venueName: event.venue?.name ?? null,
+      venueName: event.venue?.name ?? event.venueName ?? null,
       city: event.city ?? event.venue?.city ?? null,
       events: [event],
     });

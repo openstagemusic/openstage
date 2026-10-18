@@ -44,10 +44,16 @@ function offsetMinutes(instant: Date, timeZone: string): number {
 
 /** Istante UTC corrispondente a una data/ora **locale** del fuso indicato. */
 export function zonedInstant(
-  date: CalendarDate & { hour?: number },
+  date: CalendarDate & { hour?: number; minute?: number },
   timeZone = FILTER_TIMEZONE
 ): Date {
-  const guess = Date.UTC(date.year, date.month - 1, date.day, date.hour ?? 0);
+  const guess = Date.UTC(
+    date.year,
+    date.month - 1,
+    date.day,
+    date.hour ?? 0,
+    date.minute ?? 0
+  );
   const firstTry = new Date(guess - offsetMinutes(new Date(guess), timeZone) * 60_000);
 
   // Il secondo passaggio sistema i giorni in cui cambia l'ora legale.
@@ -60,6 +66,28 @@ export function calendarDate(instant: Date, timeZone = FILTER_TIMEZONE): Calenda
   const read = (type: string) => Number(list.find((part) => part.type === type)?.value ?? "0");
 
   return { year: read("year"), month: read("month"), day: read("day") };
+}
+
+/**
+ * Data ("2026-10-24") e ora ("21:30") **locali** di un istante, nel fuso
+ * indicato: è la forma che serve a un modulo, che ragiona di orologio e non di
+ * istanti.
+ */
+export function zonedDateTime(
+  instant: Date,
+  timeZone: string
+): { date: string; time: string } {
+  const list = parts(instant, timeZone);
+  const read = (type: string) =>
+    (list.find((part) => part.type === type)?.value ?? "00").padStart(2, "0");
+
+  // `hourCycle: h24` non basta: a mezzanotte `Intl` può restituire "24".
+  const hour = Number(read("hour")) % 24;
+
+  return {
+    date: `${list.find((p) => p.type === "year")?.value}-${read("month")}-${read("day")}`,
+    time: `${String(hour).padStart(2, "0")}:${read("minute")}`,
+  };
 }
 
 /** Aggiunge giorni a una data di calendario: solo aritmetica, nessun fuso. */

@@ -28,6 +28,8 @@ export const EVENT_SELECT = [
   "kind",
   "is_free",
   "ticket_url",
+  "price_text",
+  "venue_name",
   "cover_image_url",
   "is_featured",
   "artists ( id, slug, name, city, profile_id )",
@@ -70,6 +72,8 @@ export type EventRow = {
   kind: EventKind | null;
   is_free: boolean | null;
   ticket_url: string | null;
+  price_text: string | null;
+  venue_name: string | null;
   cover_image_url: string | null;
   is_featured: boolean | null;
   artists: Embedded<ArtistRow>;
@@ -108,6 +112,8 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     kind: row.kind ?? "concert",
     isFree: row.is_free ?? false,
     ticketUrl: row.ticket_url,
+    priceText: row.price_text,
+    venueName: row.venue_name,
     coverImageUrl: row.cover_image_url,
     isFeatured: row.is_featured ?? false,
     isUnclaimed,

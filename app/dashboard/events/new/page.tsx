@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import LocaleLink from "@/components/i18n/LocaleLink";
+import EventEditor from "@/components/dashboard/EventEditor";
 import { canManageEvents } from "@/lib/auth/roles";
+import { isProfileVerified, listCityOptions } from "@/lib/dashboard/queries";
+import { getVenueByProfileId } from "@/lib/directory/queries";
+import { initialEditorState } from "@/lib/events/editor";
+import { listGenres } from "@/lib/events/queries";
+import { getVisitorLocation } from "@/lib/geo/visitor";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -12,37 +17,61 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const dict = getDictionary(locale);
 
-  return { title: dict.events.newTitle, description: dict.events.newSubtitle };
+  return { title: dict.editor.newTitle, description: dict.editor.newSubtitle };
 }
 
-/**
- * Creazione di un evento. L'editor vero e proprio arriva nel blocco successivo
- * della fase (3.3.2): qui la pagina esiste già, con il percorso definitivo, così
- * i collegamenti non cambiano più.
- */
+/** Creazione di un evento: il modulo completo, con anteprima e mini mappa. */
 export default async function NewEventPage() {
   const locale = await getLocale();
   const session = await getSessionProfile();
 
   if (!session) redirect(withLocale(locale, "/login"));
 
+  // Pubblicano eventi solo artisti e locali: la stessa regola vive nella RLS.
   if (!canManageEvents(session.role)) redirect(withLocale(locale, "/onboarding/role"));
 
   const dict = getDictionary(locale);
 
-  return (
-    <section className="glass rounded-3xl border border-white/10 p-6">
-      <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-        {dict.events.newTitle}
-      </h1>
-      <p className="mt-2 text-sm text-muted">{dict.events.newSubtitle}</p>
+  const [venue, verified, cities, genres, visitor] = await Promise.all([
+    getVenueByProfileId(session.id),
+    isProfileVerified(session.id),
+    listCityOptions(),
+    listGenres(),
+    getVisitorLocation(),
+  ]);
 
-      <LocaleLink
-        href="/dashboard/events"
-        className="mt-6 inline-flex rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:bg-white/5"
-      >
-        {dict.dashboard.navEvents}
-      </LocaleLink>
-    </section>
+  const initial = initialEditorState();
+
+  // Un locale crea le sue serate: scheda e posizione sono già le sue.
+  if (venue) {
+    initial.venueId = venue.id;
+    initial.city = venue.city ?? "";
+    initial.latitude = venue.latitude;
+    initial.longitude = venue.longitude;
+  }
+
+  return (
+    <div>
+      <h1 className="font-display text-3xl font-bold tracking-tight">{dict.editor.newTitle}</h1>
+      <p className="mt-2 text-sm text-muted">{dict.editor.newSubtitle}</p>
+
+      <div className="mt-8">
+        <EventEditor
+          mode="create"
+          eventId={null}
+          initial={initial}
+          linkedVenueName={venue?.name ?? null}
+          cities={cities}
+          genres={genres}
+          mapCenter={{
+            latitude: visitor.center.latitude,
+            longitude: visitor.center.longitude,
+          }}
+          verified={verified}
+          currentStatus="draft"
+          dict={dict}
+        />
+      </div>
+    </div>
   );
 }

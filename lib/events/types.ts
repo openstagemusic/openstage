@@ -53,6 +53,10 @@ export type PublicEvent = {
   kind: EventKind;
   isFree: boolean;
   ticketUrl: string | null;
+  /** Prezzo in testo libero: si mostra solo quando `isFree` è falso. */
+  priceText: string | null;
+  /** Nome del locale senza scheda su OpenStage (quando `venue` è nullo). */
+  venueName: string | null;
   coverImageUrl: string | null;
   isFeatured: boolean;
   /** L'ha inserito OpenStage e nessuna delle schede collegate è stata reclamata. */
@@ -60,6 +64,15 @@ export type PublicEvent = {
   artist: EventArtist | null;
   venue: EventVenue | null;
 };
+
+/**
+ * Il nome del posto dove si tiene la serata: la scheda del locale se esiste,
+ * altrimenti quello che ha scritto chi ha creato l'evento. Serve a non ripetere
+ * la stessa scelta in ogni elenco.
+ */
+export function placeName(event: PublicEvent): string | null {
+  return event.venue?.name ?? event.venueName ?? null;
+}
 
 /** Un evento è posizionabile sulla mappa solo se ha coordinate reali. */
 export function hasCoordinates(

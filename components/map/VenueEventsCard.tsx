@@ -116,7 +116,11 @@ export default function VenueEventsCard({
                 {[t.kinds[current.kind] ?? t.kinds.other, current.genre]
                   .filter(Boolean)
                   .join(" · ")}
-                {current.isFree ? ` · ${t.freeEntry}` : ""}
+                {current.isFree
+                  ? ` · ${t.freeEntry}`
+                  : current.priceText
+                    ? ` · ${current.priceText}`
+                    : ""}
               </p>
             </Link>
 

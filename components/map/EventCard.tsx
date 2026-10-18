@@ -6,7 +6,7 @@ import { useState } from "react";
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
-import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, placeName, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
@@ -47,7 +47,7 @@ export default function EventCard({
     ? `https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}`
     : null;
 
-  const where = [event.venue?.name, event.city].filter(Boolean).join(" · ");
+  const where = [placeName(event), event.city].filter(Boolean).join(" · ");
   const kindLabel = t.kinds[event.kind] ?? t.kinds.other;
   const whenLabel = when.isToday ? t.tonight : when.isTomorrow ? t.tomorrow : null;
   const isSheet = variant === "sheet";
@@ -129,9 +129,9 @@ export default function EventCard({
                   {whenLabel}
                 </span>
               ) : null}
-              {event.isFree ? (
+              {event.isFree || event.priceText ? (
                 <span className="rounded-full border border-white/15 px-2 py-0.5 text-muted">
-                  {t.freeEntry}
+                  {event.isFree ? t.freeEntry : event.priceText}
                 </span>
               ) : null}
               {event.genre ? (

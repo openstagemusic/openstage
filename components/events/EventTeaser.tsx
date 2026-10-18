@@ -3,7 +3,7 @@ import Link from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
-import { artistRepeatsTitle, type PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, placeName, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 
 type EventTeaserProps = {
@@ -18,7 +18,7 @@ type EventTeaserProps = {
  */
 export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
   const when = formatEventDate(event.startsAt, event.timezone, locale);
-  const where = [event.venue?.name, event.city].filter(Boolean).join(" · ");
+  const where = [placeName(event), event.city].filter(Boolean).join(" · ");
   const kindLabel = dict.events.kinds[event.kind] ?? dict.events.kinds.other;
   const whenLabel = when.isToday ? dict.events.tonight : when.isTomorrow ? dict.events.tomorrow : null;
 
@@ -52,9 +52,9 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
                 {whenLabel}
               </span>
             ) : null}
-            {event.isFree ? (
+            {event.isFree || event.priceText ? (
               <span className="rounded-full border border-white/15 px-2.5 py-1 text-muted">
-                {dict.events.freeEntry}
+                {event.isFree ? dict.events.freeEntry : event.priceText}
               </span>
             ) : null}
           </div>

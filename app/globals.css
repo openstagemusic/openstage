@@ -153,6 +153,24 @@ textarea {
   }
 }
 
+/* Pin dell'editor: si trascina per dire dove si tiene la serata. */
+.openstage-edit-pin {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px 9999px 9999px 0;
+  transform: rotate(-45deg);
+  background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 0 4px rgba(139, 92, 246, 0.25),
+    0 6px 18px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+}
+
+.openstage-edit-pin:active {
+  cursor: grabbing;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .openstage-user-dot {
     animation: none;
