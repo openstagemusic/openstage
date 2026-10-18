@@ -86,14 +86,14 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                 </span>
               ) : null}
               <Link
-                href="/account"
+                href="/dashboard"
                 className="rounded-full border border-white/10 px-3 py-2 text-sm text-muted transition-colors hover:text-white"
               >
-                {dict.account}
+                {dict.dashboard}
               </Link>
               {canManageEvents(userRole) ? (
                 <Link
-                  href="/events/new"
+                  href="/dashboard/events/new"
                   className="rounded-full border border-violet/40 px-3 py-2 text-sm text-white transition-colors hover:bg-violet/10"
                 >
                   {dict.createEvent}
@@ -174,14 +174,14 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                   </span>
                 ) : null}
                 <Link
-                  href="/account"
+                  href="/dashboard"
                   onClick={() => setOpen(false)}
                   className="rounded-full border border-white/10 px-4 py-2 text-sm text-muted"
                 >
-                  {dict.account}
+                  {dict.dashboard}
                 </Link>
                 <Link
-                  href={canManageEvents(userRole) ? "/events/new" : "/onboarding/role"}
+                  href={canManageEvents(userRole) ? "/dashboard/events/new" : "/onboarding/role"}
                   onClick={() => setOpen(false)}
                   className="rounded-full border border-violet/40 px-4 py-2 text-sm text-white"
                 >

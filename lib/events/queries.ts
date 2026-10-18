@@ -12,7 +12,7 @@ import type { EventKind, LocationPrecision, PublicEvent } from "./types";
  * `status = 'published'` — così il piano di esecuzione usa gli indici parziali.
  */
 
-const EVENT_SELECT = [
+export const EVENT_SELECT = [
   "id",
   "slug",
   "title",
@@ -54,7 +54,7 @@ type VenueRow = {
   profile_id: string | null;
 };
 
-type EventRow = {
+export type EventRow = {
   id: string;
   slug: string;
   title: string;
@@ -81,7 +81,7 @@ function first<T>(value: Embedded<T>): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
-function toPublicEvent(row: EventRow): PublicEvent {
+export function toPublicEvent(row: EventRow): PublicEvent {
   const artist = first(row.artists);
   const venue = first(row.venues);
 
