@@ -7,7 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import { canManageVenueProfile } from "@/lib/auth/roles";
-import { getMyPendingClaim, getReplaceablePage } from "@/lib/claims/queries";
+import { getMyPendingRequest, getReplaceablePage } from "@/lib/claims/queries";
 import { getVenueByProfileId, getVenueBySlug } from "@/lib/directory/queries";
 import { venuePath } from "@/lib/events/paths";
 import { listUpcomingEventsByVenue } from "@/lib/events/queries";
@@ -52,15 +52,16 @@ export default async function VenuePage({ params }: VenuePageProps) {
   const session = await getSessionProfile();
   const events = await listUpcomingEventsByVenue(venue.id);
 
-  // La scheda di un locale si prende su richiesta: se una richiesta di questo
-  // utente è già in coda, lo diciamo invece di offrirgli di richiedere ancora.
+  // La scheda di un locale si prende su richiesta. Il database permette una
+  // sola richiesta in attesa per profilo (0014): se è per questa scheda lo
+  // diciamo; se è per un'altra, non si offre un pulsante che fallirebbe.
   // Come per gli artisti, chi ha il ruolo sbagliato o amministra già un locale
   // con eventi riceve una spiegazione; chi ha una scheda senza eventi può
-  // chiedere questa, e la sua viene eliminata (lo fa il database).
-  const pending =
-    !venue.claimed && session !== null
-      ? await getMyPendingClaim("venue", venue.id)
-      : false;
+  // chiedere questa, e la sua viene eliminata all'approvazione (lo fa il database).
+  const myRequest =
+    !venue.claimed && session !== null ? await getMyPendingRequest() : null;
+  const pending = myRequest !== null && myRequest.subjectId === venue.id;
+  const pendingElsewhere = myRequest !== null && myRequest.subjectId !== venue.id;
 
   const canManage = session !== null && canManageVenueProfile(session.role);
 
@@ -81,9 +82,11 @@ export default async function VenuePage({ params }: VenuePageProps) {
         ? "unclaimed"
         : !canManage
           ? "wrongRole"
-          : ownsAnother
-            ? "owned"
-            : "unclaimed"
+          : pendingElsewhere
+            ? "pendingElsewhere"
+            : ownsAnother
+              ? "owned"
+              : "unclaimed"
     : venue.profileId === session?.id
       ? "mine"
       : "claimed";

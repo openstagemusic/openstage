@@ -76,7 +76,6 @@ export const en = {
     roleFan: "Fan",
     roleArtist: "Artist",
     roleVenue: "Venue / Organizer",
-    city: "City (optional)",
     loginSubmit: "Log in",
     registerSubmit: "Create account",
     loading: "Please wait…",
@@ -392,6 +391,16 @@ export const en = {
     cancel: "Cancel",
     loginCta: "Log in to claim",
     pending: "Request sent: waiting for review.",
+    pendingTitle: "Request under review",
+    pendingText:
+      "An administrator is reviewing your request. While it is pending you cannot create other pages: if you made a mistake, you can withdraw it.",
+    pendingSince: "Sent on",
+    withdraw: "Withdraw request",
+    withdrawing: "Withdrawing…",
+    withdrawn: "Request withdrawn. You can now create your page.",
+    pendingElsewhere:
+      "You already have a pending request for another page: only one can be pending at a time. You can withdraw it from your account.",
+    pendingElsewhereCta: "Go to your account",
     ownedArtist:
       "You already run an artist page with your events: a profile can only run one. If this one is yours, ask the administrator to move it.",
     ownedVenue:
@@ -409,7 +418,7 @@ export const en = {
     replaceArtist:
       "Claiming this page removes the artist page you run with no events:",
     replaceVenue:
-      "Requesting this page removes the venue page you run with no events:",
+      "If you request this page, once an administrator approves, the venue page you run with no events is removed:",
     claimedArtist: "Page claimed by the artist.",
     claimedVenue: "Page claimed by the venue.",
     errorGeneric: "We could not complete the request. Please try again.",

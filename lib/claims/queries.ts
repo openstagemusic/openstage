@@ -89,27 +89,35 @@ export const isCurrentUserAdmin = cache(async (): Promise<boolean> => {
   return data === true;
 });
 
-/** C'è una richiesta di questo utente, ancora in attesa, su questa scheda? */
-export async function getMyPendingClaim(
-  subjectType: SubjectType,
-  subjectId: string
-): Promise<boolean> {
+/**
+ * La richiesta in attesa di chi sta guardando, con la scheda che riguarda.
+ *
+ * Il database ne permette **una sola** per profilo (0014), quindi non è un
+ * elenco: serve all'account per dire "stiamo valutando" e per fermare la
+ * creazione di altre schede, che il database blocca comunque.
+ */
+export async function getMyPendingRequest(): Promise<ClaimRecord | null> {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
 
   const { data, error } = await supabase
     .from("claims")
-    .select("id")
-    .eq("subject_type", subjectType)
-    .eq(subjectType === "artist" ? "artist_id" : "venue_id", subjectId)
+    .select(CLAIM_SELECT)
+    .eq("profile_id", user.id)
     .eq("status", "pending")
     .maybeSingle();
 
   if (error) {
-    console.error("[claims] getMyPendingClaim:", error.message);
-    return false;
+    console.error("[claims] getMyPendingRequest:", error.message);
+    return null;
   }
 
-  return data !== null;
+  return data ? toRecord(data as unknown as ClaimRow) : null;
 }
 
 /**

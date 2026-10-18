@@ -2,7 +2,8 @@
 
 > **Stato: divisione approvata il 17 ottobre 2026.** Il prompt ricevuto unisce quattro lavori che
 > nella roadmap vivevano in fasi diverse; la divisione in blocchi è confermata, le decisioni prese
-> sono elencate più sotto. Stato di avanzamento: **3.0, 3.1, 3.2 e 3.2.1 fatti**, si prosegue con 3.3.
+> sono elencate più sotto. Stato di avanzamento: **3.0, 3.1, 3.2, 3.2.1, 3.2.2 e 3.2.3 fatti**, si
+> prosegue con 3.3.
 
 ## Premessa: il prompt contiene quattro progetti
 
@@ -159,6 +160,34 @@ admin → approvazione → badge "Verificato").
 libere sì; reclamando l'una o l'altra la nota sparisce (prove su schede reali + due eventi di prova
 creati e rimossi).
 
+### 3.2.3 — La richiesta in attesa si vede, blocca e si può ritirare (B34, prima della 3.3)
+
+> **Fatto.** L'utente ha chiesto di sistemare la richiesta di reclamo in attesa. Cronaca e prove in
+> `docs/review-fase-3.2.3.md`.
+
+- **Una richiesta in attesa alla volta** per profilo: `request_venue_claim` rifiuta la seconda con un
+  messaggio chiaro. Così il blocco ha un solo caso da spiegare e l'account una sola riga da mostrare.
+- **Finché è in attesa non si creano schede**: un trigger (`block_page_with_pending_claim`) su
+  `artists` e `venues`, non solo il modulo nascosto. La RLS da sola darebbe un errore generico.
+- **Si può ritirare**: `withdraw_claim`, per il richiedente stesso (prima poteva solo l'admin, con
+  `revoke_claim`). Nuovo esito `withdrawn` in `claims.status`.
+- **La propria scheda non si tocca all'invio**: `request_venue_claim` non elimina più la scheda vuota
+  di chi chiede; la elimina `decide_claim` **all'approvazione**. Prima bastava premere "Richiedi
+  questa scheda" per perdere la propria scheda con i dati dentro, anche se la richiesta veniva poi
+  rifiutata: è la spiegazione dell'utente che "la città è diventata null".
+- **Dov'è il riquadro**: `/account` (scheda richiesta, data, pulsante di ritiro) e, per il locale,
+  il primo passo `/onboarding/venue`. Sulla scheda di un **altro** locale il pannello del reclamo
+  spiega la richiesta in attesa invece di offrire un pulsante che fallirebbe (`pendingElsewhere`).
+- **Città del profilo**: il campo "Città (opzionale)" **esce dalla registrazione**. `profiles.city`
+  era un campo morto: scritto solo all'iscrizione con email, mai letto, mai modificabile, e per gli
+  accessi con Google nemmeno raccolto. La città vive dove serve — sulla scheda dell'artista e del
+  locale. La colonna resta inutilizzata (nessuna migrazione dei dati: era già vuota ovunque).
+
+**Test**: batteria sul database (20 controlli in transazione annullata) + giro completo in browser
+con una sessione vera (19 controlli): richiesta dalla pagina → riquadro in `/account` → modulo di
+creazione assente → spiegazione sull'altra scheda → creazione **rifiutata dal database** anche
+chiamando l'API con il token vero → ritiro → creazione di nuovo permessa. Console pulita.
+
 ### 3.3 — Dashboard e creazione eventi
 
 - Dashboard con sidebar desktop / barra mobile: **I miei eventi, Crea evento, Preferiti, Profilo,
@@ -213,7 +242,8 @@ scarica a 1080×1920 con QR funzionante; incollando il link in una chat compare 
 - **SQL**: una migration per blocco, applicate e verificate prima del test in produzione:
   `0009` slug + capienza + `verified_at` ✅, `0010` funzioni di ricerca con lo slug ✅,
   `0011` reclamo (3.2) ✅, `0012` proprietà del reclamo (3.2.1) ✅,
-  `0013` "non reclamato" calcolato (3.2.2) ✅, `0014` editor/bozze/limite (3.3).
+  `0013` "non reclamato" calcolato (3.2.2) ✅, `0014` richiesta in attesa: blocco e ritiro (3.2.3) ✅,
+  `0015` editor/bozze/limite (3.3).
 
 ## Cosa resta fuori
 

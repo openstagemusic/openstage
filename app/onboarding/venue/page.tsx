@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 
 import VenueOnboardingForm from "@/components/auth/VenueOnboardingForm";
+import PendingRequestPanel from "@/components/claims/PendingRequestPanel";
 import PageSearch from "@/components/claims/PageSearch";
 import { canManageVenueProfile } from "@/lib/auth/roles";
-import { getReplaceablePage } from "@/lib/claims/queries";
+import { getMyPendingRequest, getReplaceablePage } from "@/lib/claims/queries";
 import { getVenueByProfileId, listVenues } from "@/lib/directory/queries";
 import { venuePath } from "@/lib/events/paths";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -55,6 +56,11 @@ export default async function VenueOnboardingPage({ searchParams }: VenueOnboard
   const term = (q ?? "").trim();
   const found = term ? await listVenues({ filters: { query: term }, perPage: 8 }) : null;
 
+  // Richiesta in attesa: la ricerca resta, il modulo di creazione no. Il
+  // database bloccherebbe comunque l'inserimento (0014), ma qui si vede prima,
+  // e da qui si può ritirare la richiesta.
+  const pendingRequest = await getMyPendingRequest();
+
   const dict = getDictionary(locale);
 
   return (
@@ -77,7 +83,17 @@ export default async function VenueOnboardingPage({ searchParams }: VenueOnboard
         dict={dict.onboarding}
       />
 
-      {replaceable ? null : (
+      {pendingRequest ? (
+        // Da questa pagina si chiedono solo schede di locali: l'indirizzo è
+        // sempre quello del locale.
+        <PendingRequestPanel
+          claimId={pendingRequest.id}
+          subjectName={pendingRequest.subjectName}
+          subjectHref={venuePath({ slug: pendingRequest.subjectSlug })}
+          createdAt={pendingRequest.createdAt}
+          dict={dict.claims}
+        />
+      ) : replaceable ? null : (
         <>
           <h2 className="mt-10 font-display text-xl font-semibold">
             {dict.onboarding.createVenueTitle}

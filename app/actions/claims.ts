@@ -72,6 +72,19 @@ export async function decideClaimAction(input: {
   return result(error);
 }
 
+/** Ritiro della propria richiesta in attesa: prima poteva farlo solo l'admin. */
+export async function withdrawClaimAction(input: {
+  claimId: string;
+}): Promise<ClaimActionResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("withdraw_claim", {
+    p_claim_id: input.claimId,
+  });
+
+  return result(error);
+}
+
 /** Revoca di un reclamo: la scheda torna a OpenStage (solo admin). */
 export async function revokeClaimAction(input: {
   claimId: string;

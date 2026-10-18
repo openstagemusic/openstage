@@ -74,7 +74,6 @@ export const it: Dictionary = {
     roleFan: "Fan",
     roleArtist: "Artista",
     roleVenue: "Locale / Organizzatore",
-    city: "Città (opzionale)",
     loginSubmit: "Accedi",
     registerSubmit: "Crea account",
     loading: "Attendi…",
@@ -392,6 +391,16 @@ export const it: Dictionary = {
     cancel: "Annulla",
     loginCta: "Accedi per reclamare",
     pending: "Richiesta inviata: in attesa di verifica.",
+    pendingTitle: "Richiesta in valutazione",
+    pendingText:
+      "Un amministratore sta valutando la tua richiesta. Finché è in attesa non puoi creare altre schede: se hai sbagliato, puoi annullarla.",
+    pendingSince: "Inviata il",
+    withdraw: "Annulla richiesta",
+    withdrawing: "Annullo…",
+    withdrawn: "Richiesta annullata. Ora puoi creare la tua scheda.",
+    pendingElsewhere:
+      "Hai già una richiesta in attesa per un'altra scheda: se ne può chiedere una sola alla volta. Puoi annullarla dal tuo account.",
+    pendingElsewhereCta: "Vai al tuo account",
     ownedArtist:
       "Amministri già una scheda artista con i tuoi eventi: un profilo ne amministra una sola. Se questa è la tua, chiedi all'amministratore di spostarla.",
     ownedVenue:
@@ -409,7 +418,7 @@ export const it: Dictionary = {
     replaceArtist:
       "Reclamando questa scheda, la tua scheda artista senza eventi viene eliminata:",
     replaceVenue:
-      "Richiedendo questa scheda, la tua scheda del locale senza eventi viene eliminata:",
+      "Richiedendo questa scheda, quando un amministratore approva la tua scheda del locale senza eventi viene eliminata:",
     claimedArtist: "Scheda reclamata dall'artista.",
     claimedVenue: "Scheda reclamata dal locale.",
     errorGeneric: "Non è stato possibile completare l'operazione. Riprova.",

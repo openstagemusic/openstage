@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import AccountForm, { type AccountSubject } from "@/components/account/AccountForm";
+import PendingRequestPanel from "@/components/claims/PendingRequestPanel";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { canManageArtistProfile, canManageVenueProfile } from "@/lib/auth/roles";
+import { getMyPendingRequest } from "@/lib/claims/queries";
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { artistPath, venuePath } from "@/lib/events/paths";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -40,6 +42,10 @@ export default async function AccountPage() {
     ? await getArtistByProfileId(session.id)
     : null;
   const venue = canManageVenueProfile(session.role) ? await getVenueByProfileId(session.id) : null;
+
+  // Una richiesta in attesa: finché non è decisa, il database non lascia creare
+  // altre schede. Qui lo diciamo, con il modo per ritirarla.
+  const pendingRequest = await getMyPendingRequest();
 
   const subject: AccountSubject | null = artist
     ? {
@@ -80,6 +86,20 @@ export default async function AccountPage() {
       <h1 className="mt-6 font-display text-3xl font-bold tracking-tight sm:text-4xl">{t.title}</h1>
       <p className="mt-2 text-sm text-muted">{t.subtitle}</p>
       <p className="mt-1 text-xs text-muted">{session.email}</p>
+
+      {pendingRequest ? (
+        <PendingRequestPanel
+          claimId={pendingRequest.id}
+          subjectName={pendingRequest.subjectName}
+          subjectHref={
+            pendingRequest.subjectType === "artist"
+              ? artistPath({ slug: pendingRequest.subjectSlug })
+              : venuePath({ slug: pendingRequest.subjectSlug })
+          }
+          createdAt={pendingRequest.createdAt}
+          dict={dict.claims}
+        />
+      ) : null}
 
       {session.role === "admin" ? (
         <section className="glass mt-8 rounded-3xl border border-white/10 p-6">
@@ -153,7 +173,7 @@ export default async function AccountPage() {
         </section>
       ) : null}
 
-      {venue ? null : session.role === "venue" ? (
+      {venue ? null : session.role === "venue" && !pendingRequest ? (
         <section className="glass mt-8 rounded-3xl border border-white/10 p-6">
           <h2 className="font-display text-xl font-semibold">{t.noVenueTitle}</h2>
           <p className="mt-2 text-sm text-muted">{t.noVenueText}</p>

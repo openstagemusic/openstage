@@ -21,6 +21,9 @@ const inputClass =
  *                 invito, sarebbe un vicolo cieco;
  * - `wrongRole` → chi guarda non ha il ruolo giusto: gli si spiega come
  *                 ottenerlo, invece di lasciarlo sbattere contro un errore;
+ * - `pendingElsewhere` → chi guarda ha già una richiesta in attesa per un'altra
+ *                 scheda: il database ne permette una sola, quindi non gli si
+ *                 offre un pulsante che fallirebbe;
  * - `mine`      → è la scheda di chi guarda: nessun invito, lo stato sta
  *                 nella pagina dell'account.
  *
@@ -31,6 +34,7 @@ const inputClass =
 export type ClaimState =
   | "unclaimed"
   | "pending"
+  | "pendingElsewhere"
   | "claimed"
   | "owned"
   | "wrongRole"
@@ -80,6 +84,20 @@ export default function ClaimPanel({
       <p className="mt-6 rounded-2xl border border-cyan/30 bg-cyan/5 p-4 text-xs text-white">
         {dict.pending}
       </p>
+    );
+  }
+
+  if (state === "pendingElsewhere") {
+    return (
+      <div className="mt-6 rounded-2xl border border-cyan/30 bg-cyan/5 p-4">
+        <p className="text-xs text-white">{dict.pendingElsewhere}</p>
+        <LocaleLink
+          href="/account"
+          className="mt-4 inline-block rounded-full border border-cyan/40 px-4 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+        >
+          {dict.pendingElsewhereCta}
+        </LocaleLink>
+      </div>
     );
   }
 

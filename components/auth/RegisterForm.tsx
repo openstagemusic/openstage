@@ -24,7 +24,6 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("fan");
-  const [city, setCity] = useState("");
   const [token, setToken] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -58,7 +57,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: { full_name: fullName, role, city },
+        data: { full_name: fullName, role },
         captchaToken: token || undefined,
       },
     });
@@ -145,20 +144,6 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
           <option value="artist">{dict.roleArtist}</option>
           <option value="venue">{dict.roleVenue}</option>
         </select>
-      </div>
-
-      <div>
-        <label htmlFor="city" className="mb-1 block text-sm text-muted">
-          {dict.city}
-        </label>
-        <input
-          id="city"
-          type="text"
-          autoComplete="address-level2"
-          value={city}
-          onChange={(event) => setCity(event.target.value)}
-          className={inputClass}
-        />
       </div>
 
       {siteKey ? <TurnstileWidget siteKey={siteKey} onToken={setToken} /> : null}
