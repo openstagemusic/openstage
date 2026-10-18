@@ -118,16 +118,17 @@ export async function setProfileVerifiedAction(input: {
 /**
  * Pubblica un evento in bozza dalla coda (solo admin).
  *
- * La RLS permette all'admin di modificare qualsiasi evento, e
- * `events_require_review` non tocca le sue scritture: qui non serve altro.
+ * Pubblicare la prima serata di un profilo **è** la sua verifica: la funzione
+ * `admin_publish_event` fa le due cose in una sola transazione, così nessuno
+ * resta "in attesa" dopo che l'admin ha guardato il suo evento. Anche qui i
+ * controlli stanno nel database: l'azione si limita a chiamarla.
  */
 export async function publishEventAction(eventId: string): Promise<ClaimActionResult> {
   const supabase = await createClient();
 
-  const { error } = await supabase
-    .from("events")
-    .update({ status: "published" })
-    .eq("id", eventId);
+  const { error } = await supabase.rpc("admin_publish_event", {
+    p_event_id: eventId,
+  });
 
   return result(error);
 }

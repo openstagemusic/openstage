@@ -275,3 +275,80 @@ export async function listVerifiedProfiles(): Promise<VerifiedProfile[]> {
 
   return (data as unknown as VerifiedProfile[]) ?? [];
 }
+
+export type UnverifiedProfile = {
+  id: string;
+  email: string | null;
+  role: SubjectType;
+  /** La scheda collegata, se il profilo ne ha una. */
+  subjectType: SubjectType | null;
+  subjectName: string | null;
+  subjectSlug: string | null;
+};
+
+type PageRef = { type: SubjectType; name: string; slug: string };
+
+/**
+ * **Tutti** i profili non verificati che hanno qualcosa da pubblicare (B33).
+ *
+ * La coda delle schede da verificare conosce solo chi ha reclamato una scheda
+ * già esistente. Chi nasce creando la **propria** scheda (primo passo
+ * dell'onboarding) non ha nessun reclamo: senza questa lettura l'admin non lo
+ * vede e non potrebbe verificarlo, e i suoi eventi resterebbero in bozza uno
+ * dopo l'altro. Il ruolo `fan` resta fuori: non ha scheda né eventi.
+ *
+ * La scheda si cerca a parte (`artists` e `venues` hanno `profile_id`): un
+ * profilo può esistere senza scheda, se l'ha persa, e va mostrato lo stesso.
+ */
+export async function listUnverifiedProfiles(): Promise<UnverifiedProfile[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email, role")
+    .is("verified_at", null)
+    .in("role", ["artist", "venue"])
+    .order("email", { ascending: true });
+
+  if (error) {
+    console.error("[claims] listUnverifiedProfiles:", error.message);
+    return [];
+  }
+
+  const profiles =
+    (data as unknown as { id: string; email: string | null; role: SubjectType }[]) ?? [];
+
+  if (profiles.length === 0) return [];
+
+  const ids = profiles.map((profile) => profile.id);
+
+  const [artists, venues] = await Promise.all([
+    supabase.from("artists").select("name, slug, profile_id").in("profile_id", ids),
+    supabase.from("venues").select("name, slug, profile_id").in("profile_id", ids),
+  ]);
+
+  if (artists.error) console.error("[claims] listUnverifiedProfiles/artists:", artists.error.message);
+  if (venues.error) console.error("[claims] listUnverifiedProfiles/venues:", venues.error.message);
+
+  const pages = new Map<string, PageRef>();
+
+  for (const row of (artists.data as unknown as (PageRef & { profile_id: string })[]) ?? []) {
+    pages.set(row.profile_id, { type: "artist", name: row.name, slug: row.slug });
+  }
+  for (const row of (venues.data as unknown as (PageRef & { profile_id: string })[]) ?? []) {
+    pages.set(row.profile_id, { type: "venue", name: row.name, slug: row.slug });
+  }
+
+  return profiles.map((profile) => {
+    const page = pages.get(profile.id) ?? null;
+
+    return {
+      id: profile.id,
+      email: profile.email,
+      role: profile.role,
+      subjectType: page?.type ?? null,
+      subjectName: page?.name ?? null,
+      subjectSlug: page?.slug ?? null,
+    };
+  });
+}

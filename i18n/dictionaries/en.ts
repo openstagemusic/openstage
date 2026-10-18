@@ -443,9 +443,13 @@ export const en = {
     verifyTitle: "Pages to verify",
     verifyText:
       "These pages are linked to a profile but not verified yet: until you verify them their events stay in draft.",
+    unverifiedTitle: "Profiles to verify",
+    unverifiedText:
+      "Artist or venue accounts that are not verified yet, even without a claim (whoever creates their own page has none). Until you verify them, their events stay in draft.",
+    noCard: "No linked page.",
     draftsTitle: "Draft events",
     draftsText:
-      "Written by profiles that are not verified yet (or by unclaimed pages). Publishing here does not verify anyone.",
+      "Written by profiles that are not verified yet (or by unclaimed pages). Publishing here also verifies whoever wrote the event: from their first event on they publish on their own.",
     verifiedTitle: "Verified profiles",
     verifiedText: "Verified profiles publish on their own. You can remove the verification here.",
     kindArtist: "Artist",

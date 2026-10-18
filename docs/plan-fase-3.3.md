@@ -9,8 +9,15 @@
 > **Aggiornamento (blocco 3.3.2b)**: dopo aver provato l'editor, l'utente ha chiesto che cercare una
 > città o un locale **muovesse la mappa** (senza geocodifica il campo città riempiva solo del testo).
 > Approvata quindi la geocodifica **Photon (komoot)**: nessuna chiave, nessun account, nessun costo.
-> Le migration della fase slittano di uno: `0017` cache delle ricerche, `0018` locandine,
-> `0019` limite nel database.
+> Le migration della fase slittano di uno: `0017` cache delle ricerche.
+>
+> **Aggiornamento (blocco 3.3.2c)**: provando la 3.3 l'utente ha trovato un vicolo cieco. Creati due
+> eventi con profili non verificati, li ha pubblicati dalla coda delle bozze dell'admin: gli eventi
+> sono andati online, ma i **profili sono rimasti "in attesa di verifica"**, perché pubblicare un
+> evento non sfiorava `profiles.verified_at` e quei profili — nati creando la propria scheda — non
+> avevano nessun reclamo da cui farsi vedere in coda (è il **B33**). Da qui il blocco 3.3.2c, che
+> chiude anche B33. Le migration slittano ancora di uno: `0018` pubblicazione che verifica,
+> `0019` locandine, `0020` limite nel database.
 
 ## Divisione in blocchi (uno per volta, con build e commit)
 
@@ -19,8 +26,9 @@
 | **3.3.1** ✅ | Guscio della dashboard (barra laterale su desktop, hamburger + pannello su mobile), **I miei eventi** con bozze/pubblicati/annullati e le azioni *pubblica / annulla / elimina bozza*, **Preferiti**, panoramica con i numeri | nessuna |
 | **3.3.2** ✅ | Editor: `/dashboard/events/new` e `/dashboard/events/[id]` con anteprima dal vivo della scheda, locale collegato o scritto a mano, mini mappa con pin trascinabile, tutti i campi | `0015` (colonne `price_text` e `venue_name`), `0016` (la ricerca restituisce i nuovi campi) |
 | **3.3.2b** ✅ | **Geocodifica**: cercando una città o un indirizzo la mappa vola lì e il pin si posa sul posto; il locale collegato si vede subito; trascinando il pin la città si riempie da sola | `0017` (cache delle ricerche di luoghi) |
-| **3.3.3** | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas | `0018` (bucket + policy) |
-| **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita, **B33** (l'admin vede tutti i profili non verificati, non solo chi passa da un reclamo) | `0019` (trigger) |
+| **3.3.2c** ✅ | **Pubblicare il primo evento verifica il profilo**: l'admin pubblica la bozza e, nello stesso gesto, chi l'ha scritta diventa verificato; l'admin vede **tutti** i profili non verificati, anche senza reclamo (**B33**) | `0018` (funzione `admin_publish_event`) |
+| **3.3.3** | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas | `0019` (bucket + policy) |
+| **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita | `0020` (trigger) |
 
 ## Decisioni prese
 
@@ -98,6 +106,33 @@ scriveva. Chi suona in un paese che non sa collocare restava bloccato.
   test: decine di richieste in pochi minuti). Con l'uso normale non succede, e la cache assorbe le
   ricerche ripetute; se un domani diventasse un fastidio, `GEOCODER_URL` punta a un Photon
   self-hosted **senza toccare il codice**.
+
+## 3.3.2c — Pubblicare il primo evento verifica il profilo
+
+Difetto visto dall'utente provando la dashboard. La decisione 5 del piano (`docs/plan-fase-3.md`)
+diceva "**primo evento in revisione, poi pubblicazione automatica**", ma nel costruire le due cose
+erano rimaste separate: la coda delle bozze pubblicava l'evento, la verifica del profilo era un
+pulsante a parte nella coda dei reclami. Risultato: chi si iscrive creando la **propria** scheda
+non ha nessun reclamo, quindi non compare mai fra le "schede da verificare"; i suoi eventi restano
+in bozza, e una volta pubblicati il profilo resta "in attesa di verifica" per sempre — e il suo
+evento successivo ricade di nuovo in bozza.
+
+- **Pubblicare la prima serata è la verifica.** `admin_publish_event` (migration `0018`) fa le due
+  cose in una sola transazione: mette l'evento `published` e scrive `verified_at` sul `created_by`.
+  L'admin ha appena guardato la serata: se è pubblicabile, quel profilo è credibile, e da lì in poi
+  pubblica da solo (lo decide `events_require_review`, invariato). Il testo della coda lo dice.
+- **Schede senza padrone**: con `created_by` vuoto non c'è nessuno da verificare, e la funzione non
+  tocca `profiles`. `coalesce` conserva la prima verifica: ripremere il pulsante non la rinnova.
+- **La regola sta nel database**, non nell'azione: `publishEventAction` si limita a chiamare la
+  funzione, che rifà da capo il controllo `is_admin()`. Stessa forma delle funzioni di reclamo.
+- **B33 chiuso qui** (era in 3.3.4): nel pannello c'è la sezione **"Profili da verificare"** con
+  *tutti* i profili non verificati di ruolo artista o locale — email, ruolo e scheda collegata —
+  indipendente dai reclami. Serve anche a **sbloccare i profili già pubblicati a mano** prima di
+  questa correzione, che non ripassano più dalla coda delle bozze. Il ruolo `fan` resta fuori: non
+  ha scheda né eventi.
+- **Perché entrambe le strade**: pubblicare un evento non è una prova d'identità forte (chiunque può
+  scrivere una serata), quindi la scorciatoia non basta da sola. Resta il pulsante manuale, per
+  verificare — o togliere la verifica — quando l'evento non c'è.
 
 ## Test di fine fase (come da piano generale)
 

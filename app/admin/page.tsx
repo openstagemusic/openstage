@@ -7,6 +7,7 @@ import {
   listClaimsToVerify,
   listDraftEvents,
   listPendingClaims,
+  listUnverifiedProfiles,
   listVerifiedProfiles,
 } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -36,9 +37,10 @@ export default async function AdminPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
 
-  const [pending, toVerify, verified, drafts] = await Promise.all([
+  const [pending, toVerify, unverified, verified, drafts] = await Promise.all([
     listPendingClaims(),
     listClaimsToVerify(),
+    listUnverifiedProfiles(),
     listVerifiedProfiles(),
     listDraftEvents(),
   ]);
@@ -59,6 +61,7 @@ export default async function AdminPage() {
         <AdminQueue
           pending={pending}
           toVerify={toVerify}
+          unverified={unverified}
           verified={verified}
           drafts={drafts}
           dict={dict.admin}

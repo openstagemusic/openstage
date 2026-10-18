@@ -443,9 +443,13 @@ export const it: Dictionary = {
     verifyTitle: "Schede da verificare",
     verifyText:
       "Queste schede sono collegate a un profilo ma non ancora verificate: finché non le verifichi, i loro eventi restano in bozza.",
+    unverifiedTitle: "Profili da verificare",
+    unverifiedText:
+      "Account con ruolo artista o locale che non hanno ancora la verifica, anche senza un reclamo (chi crea la propria scheda non ne ha uno). Finché non li verifichi, i loro eventi restano in bozza.",
+    noCard: "Nessuna scheda collegata.",
     draftsTitle: "Eventi in bozza",
     draftsText:
-      "Scritti da profili non ancora verificati (o da schede non reclamate). Pubblicare da qui non verifica nessuno.",
+      "Scritti da profili non ancora verificati (o da schede non reclamate). Pubblicare da qui verifica chi ha scritto l'evento: dal primo evento in poi pubblica da solo.",
     verifiedTitle: "Profili verificati",
     verifiedText: "I profili verificati pubblicano da soli. Da qui puoi togliere la verifica.",
     kindArtist: "Artista",

@@ -13,12 +13,13 @@ import {
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import type { ClaimRecord, DraftEvent, VerifiedProfile } from "@/lib/claims/queries";
+import type { ClaimRecord, DraftEvent, UnverifiedProfile, VerifiedProfile } from "@/lib/claims/queries";
 import { eventPath, artistPath, venuePath } from "@/lib/events/paths";
 
 type AdminQueueProps = {
   pending: ClaimRecord[];
   toVerify: ClaimRecord[];
+  unverified: UnverifiedProfile[];
   verified: VerifiedProfile[];
   drafts: DraftEvent[];
   dict: Dictionary["admin"];
@@ -36,6 +37,7 @@ const ghostButton =
 export default function AdminQueue({
   pending,
   toVerify,
+  unverified,
   verified,
   drafts,
   dict,
@@ -208,6 +210,64 @@ export default function AdminQueue({
                 </article>
               );
             })}
+      </section>
+
+      {/* Profili non verificati, anche senza reclamo */}
+      <section>
+        <h2 className="font-display text-xl font-semibold">
+          {dict.unverifiedTitle} <span className="text-muted">({unverified.length})</span>
+        </h2>
+        <p className="mt-1 text-sm text-muted">{dict.unverifiedText}</p>
+
+        {unverified.length === 0 ? (
+          empty
+        ) : (
+          <ul className="mt-4 space-y-2">
+            {unverified.map((profile) => (
+              <li
+                key={profile.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm">
+                    <span className="rounded-full border border-white/15 px-2 py-0.5 text-xs text-muted">
+                      {profile.role === "artist" ? dict.kindArtist : dict.kindVenue}
+                    </span>{" "}
+                    {profile.email ?? dict.unknownEmail}
+                  </p>
+                  <p className="mt-1 text-xs text-muted">
+                    {profile.subjectSlug ? (
+                      <LocaleLink
+                        href={
+                          profile.subjectType === "artist"
+                            ? artistPath({ slug: profile.subjectSlug })
+                            : venuePath({ slug: profile.subjectSlug })
+                        }
+                        className="text-cyan hover:opacity-80"
+                      >
+                        {profile.subjectName}
+                      </LocaleLink>
+                    ) : (
+                      dict.noCard
+                    )}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={busy !== null}
+                  onClick={() =>
+                    run(`profile-verify-${profile.id}`, () =>
+                      setProfileVerifiedAction({ profileId: profile.id, verified: true })
+                    )
+                  }
+                  className={primaryButton}
+                >
+                  {busy === `profile-verify-${profile.id}` ? dict.working : dict.verify}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* Eventi in bozza */}
