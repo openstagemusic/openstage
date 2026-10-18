@@ -10,7 +10,6 @@ import {
   Popup,
   setWorkerUrl,
   type GeoJSONSource,
-  type MapEventType,
   type MapLayerMouseEvent,
   type MapMouseEvent,
 } from "maplibre-gl";
@@ -592,21 +591,13 @@ export default function MapCanvas({
       essential: true,
     });
 
-    // Qualsiasi gesto dell'utente interrompe l'animazione.
-    const stopEvents: Array<keyof MapEventType> = [
-      "dragstart",
-      "zoomstart",
-      "rotatestart",
-      "touchstart",
-      "wheel",
-      "mousedown",
-    ];
-    const stop = () => map.stop();
-    stopEvents.forEach((name) => map.on(name, stop));
-
-    return () => {
-      stopEvents.forEach((name) => map.off(name, stop));
-    };
+    // Nessun listener di interruzione: quando parte un gesto la libreria ferma
+    // da sola l'animazione in corso (`camera.stop(true)`) senza toccare i
+    // gestori. Chiamare `map.stop()` da qui era un difetto: `stop()` azzera
+    // **tutti** i gestori (`handlers.stop()`), quindi a ogni mousedown, rotella
+    // o zoomstart il trascinamento veniva annullato appena partiva e la
+    // rotellina faceva passi minimi. Era la differenza fra la Home e /mappa,
+    // dove l'ingresso rotante non c'è.
   }, [introSpin, styleReady, initialCenter.longitude, initialCenter.latitude, initialZoom]);
 
   return (

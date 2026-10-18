@@ -62,6 +62,18 @@ textarea {
   color-scheme: dark;
 }
 
+/*
+  Voci dei menu a tendina: il popup nativo (Chrome/Edge su Windows) si colora
+  con lo sfondo del campo. I nostri campi sono traslucidi (`bg-white/5`), e la
+  tendina non sa comporli: restava bianca con il testo bianco. Qui le voci
+  ricevono uno sfondo pieno, quindi si leggono.
+*/
+select option,
+select optgroup {
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+}
+
 /* ---------------------------------------------------------------------------
    Mappa (MapLibre + OpenFreeMap): pop-up e controlli in tema scuro.
    --------------------------------------------------------------------------- */
