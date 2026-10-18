@@ -220,6 +220,8 @@ export const it: Dictionary = {
     locating: "Cerco la tua posizione…",
     locateError:
       "Non riusciamo a leggere la posizione del browser. Puoi comunque esplorare la mappa.",
+    locateCoarse:
+      "Posizione approssimativa (±{km} km): il browser non sa dirti il punto esatto. Su un computer aiuta avere la posizione di sistema attiva.",
     globe: "Globo 3D",
     flat: "Mappa 2D",
     fullscreen: "Apri a schermo intero",

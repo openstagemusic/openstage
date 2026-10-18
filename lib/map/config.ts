@@ -40,6 +40,33 @@ export const REGION_ZOOM = 5.6;
 /** Zoom usato quando centriamo sulla posizione reale del visitatore. */
 export const LOCAL_ZOOM = 10.5;
 
+/**
+ * Sotto questo errore (in metri) la posizione del browser è considerata
+ * precisa: il segnaposto vale da solo. Sopra, si disegna l'area di incertezza e
+ * lo si dice, invece di far passare per esatto un punto che non lo è.
+ */
+export const USER_ACCURATE_METERS = 200;
+
+/**
+ * Zoom che fa stare un cerchio di `radiusMeters` in una porzione leggibile
+ * dello schermo. Calcolato a mano invece di usare `fitBounds`: con la
+ * proiezione a globo MapLibre può rinunciare a inquadrare un riquadro piccolo
+ * (avvisa solo in console) e la mappa resterebbe ferma.
+ */
+export function zoomForRadius(
+  latitude: number,
+  radiusMeters: number,
+  viewportHeight: number
+): number {
+  // Metri per pixel a zoom 0, alla latitudine data.
+  const metersPerPixelAtZoomZero =
+    156543.03392 * Math.cos((latitude * Math.PI) / 180);
+  // Il raggio deve occupare circa un sesto dell'altezza visibile.
+  const targetPixels = Math.max(60, viewportHeight / 6);
+
+  return Math.log2((metersPerPixelAtZoomZero * targetPixels) / radiusMeters);
+}
+
 /** Massimo numero di eventi caricati sulla mappa (protegge il client). */
 export const MAX_MAP_EVENTS = 400;
 

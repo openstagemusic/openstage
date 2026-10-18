@@ -9,6 +9,7 @@ import VenueEventsCard from "@/components/map/VenueEventsCard";
 import { hasCoordinates, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { USER_ACCURATE_METERS } from "@/lib/map/config";
 import { groupEventsByVenue, type MapSelection } from "@/lib/map/venues";
 import { cn } from "@/lib/utils";
 
@@ -92,9 +93,12 @@ export default function GlobeMap({
   const [userPosition, setUserPosition] = useState<{
     longitude: number;
     latitude: number;
+    /** Errore dichiarato dal browser, in metri. */
+    accuracy: number;
   } | null>(null);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationNote, setLocationNote] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -150,6 +154,7 @@ export default function GlobeMap({
 
   const locate = () => {
     setLocationError(null);
+    setLocationNote(null);
 
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
       setLocationError(dict.map.locateError);
@@ -157,19 +162,54 @@ export default function GlobeMap({
     }
 
     setLocating(true);
+
+    /** Il browser dichiara quanto è preciso: se è grossolano lo diciamo. */
+    const accept = (position: GeolocationPosition) => {
+      const { latitude, longitude, accuracy } = position.coords;
+
+      setLocating(false);
+      setUserPosition({
+        latitude,
+        longitude,
+        accuracy: Number.isFinite(accuracy) ? accuracy : 0,
+      });
+
+      if (accuracy > USER_ACCURATE_METERS) {
+        const format = new Intl.NumberFormat(locale === "it" ? "it-IT" : "en-GB", {
+          maximumFractionDigits: accuracy < 10_000 ? 1 : 0,
+        });
+        setLocationNote(
+          dict.map.locateCoarse.replace("{km}", format.format(accuracy / 1000))
+        );
+      }
+    };
+
+    const fail = () => {
+      setLocating(false);
+      setLocationError(dict.map.locateError);
+    };
+
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocating(false);
-        setUserPosition({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+      accept,
+      (error) => {
+        // "Permesso negato" non si ritenta: l'utente ha già risposto e il
+        // browser non chiederebbe di nuovo.
+        if (error.code === error.PERMISSION_DENIED) {
+          fail();
+          return;
+        }
+
+        // Un computer senza posizione di sistema attiva può non rispondere a
+        // una richiesta precisa: il secondo tentativo, più grossolano, almeno
+        // dà la zona. `maximumAge` resta alto solo qui, dove serve una risposta.
+        navigator.geolocation.getCurrentPosition(accept, fail, {
+          enableHighAccuracy: false,
+          timeout: 8_000,
+          maximumAge: 300_000,
         });
       },
-      () => {
-        setLocating(false);
-        setLocationError(dict.map.locateError);
-      },
-      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 }
+      // Niente posizione in cache: "Vicino a me" deve dire dove sei **adesso**.
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 }
     );
   };
 
@@ -290,8 +330,14 @@ export default function GlobeMap({
         ) : null}
 
         {locationError ? (
-          <p className="absolute inset-x-0 bottom-0 p-3 text-center text-xs text-pink">
+          <p className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-center text-xs text-pink">
             {locationError}
+          </p>
+        ) : null}
+
+        {locationNote ? (
+          <p className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-center text-xs text-muted">
+            {locationNote}
           </p>
         ) : null}
       </div>

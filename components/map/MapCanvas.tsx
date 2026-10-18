@@ -32,6 +32,8 @@ import {
   MAP_STYLE_URL,
   MAP_WORKER_URL,
   MIN_ZOOM,
+  USER_ACCURATE_METERS,
+  zoomForRadius,
 } from "@/lib/map/config";
 import { circlePolygon } from "@/lib/map/geo";
 import { groupEventsByVenue, type MapSelection, type VenueGroup } from "@/lib/map/venues";
@@ -45,9 +47,12 @@ if (typeof window !== "undefined") {
 const EVENTS_SOURCE = "openstage-events";
 const AREAS_SOURCE = "openstage-areas";
 const SELECTED_SOURCE = "openstage-selected";
+const USER_AREA_SOURCE = "openstage-user-area";
 
 const AREAS_FILL_LAYER = "openstage-areas-fill";
 const AREAS_LINE_LAYER = "openstage-areas-line";
+const USER_AREA_FILL_LAYER = "openstage-user-area-fill";
+const USER_AREA_LINE_LAYER = "openstage-user-area-line";
 const CLUSTERS_LAYER = "openstage-clusters";
 const CLUSTER_COUNT_LAYER = "openstage-cluster-count";
 const POINTS_LAYER = "openstage-points";
@@ -172,6 +177,7 @@ function addLayers(map: MapLibreMap, groups: VenueGroup[]) {
 
   map.addSource(AREAS_SOURCE, { type: "geojson", data: buildAreasCollection(groups.flatMap((g) => g.events)) });
   map.addSource(SELECTED_SOURCE, { type: "geojson", data: EMPTY_COLLECTION });
+  map.addSource(USER_AREA_SOURCE, { type: "geojson", data: EMPTY_COLLECTION });
 
   map.addLayer({
     id: AREAS_FILL_LAYER,
@@ -188,6 +194,27 @@ function addLayers(map: MapLibreMap, groups: VenueGroup[]) {
       "line-color": MAP_COLORS.cyan,
       "line-width": 1.2,
       "line-opacity": 0.6,
+      "line-dasharray": [2, 2],
+    },
+  });
+
+  // Incertezza della posizione di chi guarda: quando il browser non sa dire il
+  // punto esatto, questo è il posto in cui si trova **davvero**.
+  map.addLayer({
+    id: USER_AREA_FILL_LAYER,
+    type: "fill",
+    source: USER_AREA_SOURCE,
+    paint: { "fill-color": MAP_COLORS.cyan, "fill-opacity": 0.08 },
+  });
+
+  map.addLayer({
+    id: USER_AREA_LINE_LAYER,
+    type: "line",
+    source: USER_AREA_SOURCE,
+    paint: {
+      "line-color": MAP_COLORS.cyan,
+      "line-width": 1,
+      "line-opacity": 0.45,
       "line-dasharray": [2, 2],
     },
   });
@@ -290,7 +317,7 @@ export type MapCanvasProps = {
   introSpin: boolean;
   /** Serata selezionata, oppure tutte le serate di un locale. */
   selection: MapSelection | null;
-  userPosition: { longitude: number; latitude: number } | null;
+  userPosition: { longitude: number; latitude: number; accuracy: number } | null;
   savedEventIds: string[];
   isAuthenticated: boolean;
   locale: Locale;
@@ -547,27 +574,85 @@ export default function MapCanvas({
     const map = mapRef.current;
     if (!map || !userPosition) return;
 
+    const center: [number, number] = [userPosition.longitude, userPosition.latitude];
+
     if (markerRef.current) markerRef.current.remove();
 
     const element = document.createElement("div");
     element.className = "openstage-user-dot";
 
-    markerRef.current = new Marker({ element, anchor: "center" })
-      .setLngLat([userPosition.longitude, userPosition.latitude])
-      .addTo(map);
+    markerRef.current = new Marker({ element, anchor: "center" }).setLngLat(center).addTo(map);
 
-    map.flyTo({
-      center: [userPosition.longitude, userPosition.latitude],
-      zoom: LOCAL_ZOOM,
-      duration: 1200,
+    // Se il browser dichiara un errore grosso, non fingere di sapere il punto:
+    // inquadra l'area in cui ti trovi davvero. Su un telefono, dove il dato è
+    // preciso, si comporta come prima.
+    if (userPosition.accuracy > USER_ACCURATE_METERS) {
+      map.flyTo({
+        center,
+        zoom: Math.max(
+          MIN_ZOOM,
+          Math.min(
+            LOCAL_ZOOM,
+            zoomForRadius(
+              userPosition.latitude,
+              userPosition.accuracy,
+              map.getContainer().clientHeight
+            )
+          )
+        ),
+        duration: 1200,
+      });
+      return;
+    }
+
+    map.flyTo({ center, zoom: LOCAL_ZOOM, duration: 1200 });
+    // `styleReady` fra le dipendenze: se si clicca prima che lo stile sia
+    // caricato, l'inquadratura si ripete appena è pronto.
+  }, [userPosition, styleReady]);
+
+  // --- Area di incertezza della posizione ----------------------------------
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReady) return;
+
+    const source = map.getSource(USER_AREA_SOURCE) as GeoJSONSource | undefined;
+    if (!source) return;
+
+    if (!userPosition || userPosition.accuracy <= USER_ACCURATE_METERS) {
+      source.setData(EMPTY_COLLECTION);
+      return;
+    }
+
+    source.setData({
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [
+              circlePolygon(
+                { longitude: userPosition.longitude, latitude: userPosition.latitude },
+                userPosition.accuracy
+              ),
+            ],
+          },
+          properties: {},
+        },
+      ],
     });
-  }, [userPosition]);
+  }, [userPosition, styleReady]);
 
   // --- Ingresso rotante del globo ------------------------------------------
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !styleReady || !introSpin) return;
     if (typeof window === "undefined") return;
+    // Chi ha già chiesto la sua posizione non deve vedersi portare via la
+    // camera dall'ingresso: succedeva cliccando "Vicino a me" nei primi
+    // secondi, ed è la ragione per cui sulla Home (ingresso presente) il
+    // pulsante sembrava non funzionare.
+    if (userPosition) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const target = {
@@ -598,7 +683,7 @@ export default function MapCanvas({
     // o zoomstart il trascinamento veniva annullato appena partiva e la
     // rotellina faceva passi minimi. Era la differenza fra la Home e /mappa,
     // dove l'ingresso rotante non c'è.
-  }, [introSpin, styleReady, initialCenter.longitude, initialCenter.latitude, initialZoom]);
+  }, [introSpin, styleReady, userPosition, initialCenter.longitude, initialCenter.latitude, initialZoom]);
 
   return (
     <div className={`absolute inset-0 ${bottomInset ? "openstage-map-inset" : ""}`}>

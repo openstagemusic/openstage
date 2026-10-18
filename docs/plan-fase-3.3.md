@@ -27,6 +27,8 @@
 | **3.3.2** ✅ | Editor: `/dashboard/events/new` e `/dashboard/events/[id]` con anteprima dal vivo della scheda, locale collegato o scritto a mano, mini mappa con pin trascinabile, tutti i campi | `0015` (colonne `price_text` e `venue_name`), `0016` (la ricerca restituisce i nuovi campi) |
 | **3.3.2b** ✅ | **Geocodifica**: cercando una città o un indirizzo la mappa vola lì e il pin si posa sul posto; il locale collegato si vede subito; trascinando il pin la città si riempie da sola | `0017` (cache delle ricerche di luoghi) |
 | **3.3.2c** ✅ | **Pubblicare il primo evento verifica il profilo**: l'admin pubblica la bozza e, nello stesso gesto, chi l'ha scritta diventa verificato; l'admin vede **tutti** i profili non verificati, anche senza reclamo (**B33**) | `0018` (funzione `admin_publish_event`) |
+| **3.3.2d** ✅ | **Correzioni sulla mappa**: sulla Home il trascinamento col mouse non muoveva la mappa e la rotellina faceva passi minimi (l'ingresso rotante azzerava i gestori); i menu a tendina avevano voci illeggibili (sfondo bianco su testo bianco) | nessuna |
+| **3.3.2e** ✅ | **"Vicino a me" sulla Home**: l'ingresso rotante rubava la camera a chi cliccava nei primi secondi (e la posizione era chiesta grossolana, senza dire quanto fosse incerta) | nessuna |
 | **3.3.3** | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas | `0019` (bucket + policy) |
 | **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita | `0020` (trigger) |
 
@@ -133,6 +135,38 @@ evento successivo ricade di nuovo in bozza.
 - **Perché entrambe le strade**: pubblicare un evento non è una prova d'identità forte (chiunque può
   scrivere una serata), quindi la scorciatoia non basta da sola. Resta il pulsante manuale, per
   verificare — o togliere la verifica — quando l'evento non c'è.
+
+## 3.3.2e — "Vicino a me" sulla Home
+
+Segnalazione dell'utente: **su desktop il pulsante non portava dove si è**, mentre su un telefono
+funzionava ("si vede che usa la posizione del telefono"). Provando la Home da computer il difetto si
+riproduce: chi clicca **nei primi secondi** finisce sulla vista di regione, non sulla propria
+posizione.
+
+- **La causa è l'ingresso rotante**, che vive **solo sulla Home e solo su desktop** (`introSpin`),
+  mentre su mobile non c'è: cliccando durante i suoi 4,2 secondi il volo verso la posizione partiva e
+  subito dopo l'ingresso **riscriveva la camera** sulla zona iniziale. Il segnaposto restava dov'era,
+  la mappa no: da qui l'impressione che il pulsante non funzionasse o portasse "in un punto non esatto".
+  Ora l'ingresso **cede il passo**: chi ha già chiesto la sua posizione non se la vede portare via, e
+  se il clic arriva prima del caricamento dello stile l'inquadratura si ripete appena è pronto.
+- **La posizione era chiesta grossolana**: `enableHighAccuracy: false` con `maximumAge: 300000`, cioè
+  il browser poteva rispondere con una posizione **in cache fino a cinque minuti** e presa dal
+  provider di rete. Su un computer senza GPS è così che ci si ritrova sulla città del provider. Ora:
+  posizione **precisa** (`enableHighAccuracy: true`), **mai in cache** (`maximumAge: 0`) — "Vicino a
+  me" deve dire dove sei adesso.
+- **Se il computer non ha la posizione di sistema attiva** una richiesta precisa può fallire: si
+  riprova una volta, più grossolana, invece di lasciare il pulsante muto. Il "permesso negato" **non**
+  si ritenta (l'utente ha già risposto).
+- **Il browser dichiara il proprio errore** (`coords.accuracy`): sotto i 200 m il segnaposto vale da
+  solo, come sempre; sopra, **non si finge precisione** — si disegna sulla mappa l'area in cui
+  davvero ci si trova (lo stesso linguaggio grafico delle aree approssimative degli eventi) e lo si
+  scrive ("Posizione approssimativa (±20 km): su un computer aiuta avere la posizione di sistema
+  attiva"). Coerente con *Autenticità prima dell'Hype*: meglio dire "non lo so con precisione" che
+  mostrare un punto falso.
+- **Niente `fitBounds`** per inquadrare quell'area: con la proiezione a globo MapLibre può rinunciare
+  a inquadrare un riquadro piccolo **in silenzio** (avvisa solo in console) e la mappa resterebbe
+  ferma — osservato nei test. Lo zoom si calcola a mano (`zoomForRadius`) e si vola con `flyTo`,
+  la stessa strada del caso preciso.
 
 ## Test di fine fase (come da piano generale)
 

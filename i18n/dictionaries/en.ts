@@ -220,6 +220,8 @@ export const en = {
     nearMe: "Near me",
     locating: "Finding your position…",
     locateError: "We could not read your browser position. You can still explore the map.",
+    locateCoarse:
+      "Approximate location (±{km} km): the browser cannot pinpoint you. On a computer it helps to have the system location service on.",
     globe: "3D globe",
     flat: "Flat map",
     fullscreen: "Open full screen",
