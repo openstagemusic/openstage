@@ -94,6 +94,10 @@ scriveva. Chi suona in un paese che non sa collocare restava bloccato.
 - **Se Photon non risponde**, l'elenco resta vuoto e lo si dice: la città si scrive a mano e il pin si
   mette sulla mappa. Le città già usate su OpenStage restano come ripiego quando la ricerca non trova
   nulla. L'editor non ha vicoli ciechi.
+- **Osservato durante i test**: il servizio pubblico risponde `503` se lo si chiama a raffica (nei
+  test: decine di richieste in pochi minuti). Con l'uso normale non succede, e la cache assorbe le
+  ricerche ripetute; se un domani diventasse un fastidio, `GEOCODER_URL` punta a un Photon
+  self-hosted **senza toccare il codice**.
 
 ## Test di fine fase (come da piano generale)
 
