@@ -2,10 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { saveEventAction } from "@/app/actions/events";
 import EventPreviewCard from "@/components/dashboard/EventPreviewCard";
+import type { MapFocus } from "@/components/dashboard/LocationPicker";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -18,6 +19,7 @@ import {
   type EventEditorState,
 } from "@/lib/events/editor";
 import { EVENT_KINDS } from "@/lib/events/types";
+import type { GeocodePlace } from "@/lib/geo/geocoder";
 
 // MapLibre ha bisogno del browser: la mini mappa entra solo nel client.
 const LocationPicker = dynamic(() => import("@/components/dashboard/LocationPicker"), {
@@ -110,6 +112,17 @@ export default function EventEditor({
   const [errors, setErrors] = useState<Partial<Record<EditorField, EditorErrorCode>>>({});
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState<"draft" | "published" | "cancelled" | null>(null);
+  // Ricerca dei posti (città, indirizzi, locali): scegliendone uno la mappa vola lì.
+  const [placeQuery, setPlaceQuery] = useState("");
+  const [places, setPlaces] = useState<GeocodePlace[]>([]);
+  const [searchingPlaces, setSearchingPlaces] = useState(false);
+  const [placesFailed, setPlacesFailed] = useState(false);
+  const [focus, setFocus] = useState<MapFocus | null>(null);
+  const focusCounter = useRef(0);
+
+  // Città e pin si scambiano informazioni (chi cerca un posto muove il pin, chi
+  // trascina il pin riempie la città): letti una volta sola, con un nome chiaro.
+  const { city, latitude, longitude } = values;
 
   function set<K extends keyof EventEditorState>(field: K, value: EventEditorState[K]) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -148,6 +161,13 @@ export default function EventEditor({
     };
   }, [query]);
 
+  // La mappa vola su un posto scelto fuori dalla mappa (locale collegato o città
+  // cercata): il pin deve vedersi, non essere cercato a mano.
+  function flyTo(point: { latitude: number; longitude: number; zoom: number }) {
+    focusCounter.current += 1;
+    setFocus({ ...point, token: focusCounter.current });
+  }
+
   function linkVenue(venue: VenueOption) {
     setLinkedVenue({ id: venue.id, name: venue.name });
     setValues((current) => ({
@@ -162,7 +182,109 @@ export default function EventEditor({
     setResults([]);
     setErrors({});
     setMessage(null);
+
+    // Un locale su OpenStage porta con sé le sue coordinate: la mappa ci va.
+    if (venue.latitude !== null && venue.longitude !== null) {
+      flyTo({ latitude: venue.latitude, longitude: venue.longitude, zoom: 15 });
+    }
   }
+
+  /**
+   * Un posto scelto fra i suggerimenti.
+   *
+   * La città si prende dal risultato (per un indirizzo è il comune, non la via):
+   * è quella che finisce nell'anteprima, nei filtri e nell'indirizzo della
+   * scheda. Il pin si posa lì, e da lì si trascina per precisare.
+   */
+  function choosePlace(place: GeocodePlace) {
+    setValues((current) => ({
+      ...current,
+      city: place.city ?? current.city,
+      latitude: place.latitude,
+      longitude: place.longitude,
+    }));
+    setPlaceQuery("");
+    setPlaces([]);
+    setPlacesFailed(false);
+    setErrors({});
+    setMessage(null);
+    flyTo({ latitude: place.latitude, longitude: place.longitude, zoom: place.zoom });
+  }
+
+  /** Una città che usiamo già: la scriviamo come la scrive OpenStage. */
+  function chooseKnownCity(city: string) {
+    set("city", city);
+    setPlaceQuery("");
+    setPlaces([]);
+    setPlacesFailed(false);
+  }
+
+  // Ricerca dei posti, con lo stesso piccolo ritardo della ricerca dei locali.
+  useEffect(() => {
+    const term = placeQuery.trim();
+
+    if (term.length < 3) {
+      setPlaces([]);
+      setPlacesFailed(false);
+      setSearchingPlaces(false);
+      return;
+    }
+
+    // Da qui la ricerca è in corso anche durante il ritardo sulla battitura:
+    // così il ripiego con le città già su OpenStage non compare e sparisce.
+    setSearchingPlaces(true);
+
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/geocode?q=${encodeURIComponent(term)}&lang=${locale}`);
+        const payload = (await response.json()) as { places?: GeocodePlace[] };
+        if (cancelled) return;
+        setPlaces(payload.places ?? []);
+        setPlacesFailed(!response.ok);
+      } catch {
+        if (cancelled) return;
+        setPlaces([]);
+        setPlacesFailed(true);
+      } finally {
+        if (!cancelled) setSearchingPlaces(false);
+      }
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [placeQuery, locale]);
+
+  // Il pin si trascina dove si tiene la serata: se la città è ancora vuota, la
+  // chiediamo al geocodificatore inverso invece di lasciare il campo da riempire.
+  useEffect(() => {
+    if (city.trim() !== "") return;
+    if (latitude === null || longitude === null) return;
+
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/geocode?lat=${latitude}&lon=${longitude}&lang=${locale}`);
+        const payload = (await response.json()) as { places?: GeocodePlace[] };
+        const found = payload.places?.[0]?.city ?? null;
+
+        if (cancelled || !found) return;
+
+        setValues((current) => (current.city.trim() === "" ? { ...current, city: found } : current));
+      } catch {
+        // La città resta vuota: si può sempre scrivere a mano.
+      }
+    }, 600);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [city, latitude, longitude, locale]);
 
   function unlinkVenue() {
     setLinkedVenue(null);
@@ -223,6 +345,16 @@ export default function EventEditor({
   };
 
   const errorCount = Object.keys(errors).length;
+
+  // Sotto la città: prima i posti trovati dal geocodificatore e, solo se non ne
+  // ha trovato nessuno, le città che OpenStage usa già. Un servizio lento o
+  // irraggiungibile non deve lasciare il campo senza nessun aiuto.
+  const placeTerm = placeQuery.trim().toLowerCase();
+  const knownCities =
+    placeTerm.length >= 2 && !searchingPlaces && places.length === 0
+      ? cities.filter((city) => city.toLowerCase().includes(placeTerm)).slice(0, 3)
+      : [];
+  const showCitySuggestions = places.length > 0 || knownCities.length > 0;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -430,21 +562,64 @@ export default function EventEditor({
             </Field>
           ) : null}
 
-          <Field id="event-city" label={t.city} error={errors.city ? t.errors[errors.city] : null}>
-            <input
-              id="event-city"
-              className={inputClass}
-              value={values.city}
-              onChange={(event) => set("city", event.target.value)}
-              placeholder={t.cityPlaceholder}
-              list="event-cities"
-              maxLength={80}
-            />
-            <datalist id="event-cities">
-              {cities.map((city) => (
-                <option key={city} value={city} />
-              ))}
-            </datalist>
+          <Field
+            id="event-city"
+            label={t.city}
+            hint={t.cityHint}
+            error={errors.city ? t.errors[errors.city] : null}
+          >
+            <div className="relative">
+              <input
+                id="event-city"
+                className={inputClass}
+                value={values.city}
+                onChange={(event) => {
+                  set("city", event.target.value);
+                  setPlaceQuery(event.target.value);
+                }}
+                // Il tempo di un clic su un suggerimento, poi la tendina si chiude.
+                onBlur={() => window.setTimeout(() => setPlaceQuery(""), 150)}
+                placeholder={t.cityPlaceholder}
+                autoComplete="off"
+                maxLength={80}
+              />
+
+              {showCitySuggestions ? (
+                <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0d0d1a] shadow-xl">
+                  {places.map((place) => (
+                    <li key={place.id}>
+                      <button
+                        type="button"
+                        onClick={() => choosePlace(place)}
+                        className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/5"
+                      >
+                        <span className="text-white">{place.name}</span>
+                        <span className="block text-xs text-muted">{place.detail}</span>
+                      </button>
+                    </li>
+                  ))}
+
+                  {knownCities.map((city) => (
+                    <li key={`city-${city}`}>
+                      <button
+                        type="button"
+                        onClick={() => chooseKnownCity(city)}
+                        className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/5"
+                      >
+                        <span className="text-white">{city}</span>
+                        <span className="block text-xs text-muted">{t.cityKnown}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
+              {placeQuery.trim().length >= 3 && !searchingPlaces && !showCitySuggestions ? (
+                <p className="mt-1 text-xs text-muted">
+                  {placesFailed ? t.placeSearchError : t.placeSearchEmpty}
+                </p>
+              ) : null}
+            </div>
           </Field>
         </div>
 
@@ -454,6 +629,7 @@ export default function EventEditor({
             latitude={values.latitude}
             longitude={values.longitude}
             center={mapCenter}
+            focus={focus}
             ariaLabel={t.mapTitle}
             onChange={(point) => {
               setValues((current) => ({

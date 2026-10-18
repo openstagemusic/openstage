@@ -12,11 +12,25 @@ if (typeof window !== "undefined") {
   setWorkerUrl(MAP_WORKER_URL);
 }
 
+/** Un posto scelto fuori dalla mappa (locale collegato, città cercata). */
+export type MapFocus = {
+  latitude: number;
+  longitude: number;
+  zoom: number;
+  /** Cambia a ogni scelta: è il segnale che si deve volare. */
+  token: number;
+};
+
 type LocationPickerProps = {
   latitude: number | null;
   longitude: number | null;
   /** Dove aprire la mappa quando il pin non c'è ancora. */
   center: { latitude: number; longitude: number };
+  /**
+   * Coordinate da mostrare quando il posto è stato scelto altrove. La mappa ci
+   * vola sopra: il pin non deve mai finire fuori dallo schermo, a cercarselo.
+   */
+  focus: MapFocus | null;
   ariaLabel: string;
   onChange: (point: { latitude: number; longitude: number }) => void;
 };
@@ -24,14 +38,17 @@ type LocationPickerProps = {
 /**
  * Mini mappa dell'editor: il pin si trascina (o si sposta cliccando).
  *
- * Non c'è nessun geocodificatore dietro: la posizione la mette la persona che
- * organizza la serata, che è l'unica a sapere dove si tiene davvero. Il locale,
- * se è già su OpenStage, porta con sé le sue coordinate.
+ * La posizione finale la mette la persona che organizza la serata, che è
+ * l'unica a sapere dove si tiene davvero: qui si arriva già col posto giusto
+ * (il locale collegato, o la città cercata nel campo qui sopra) e il pin serve
+ * a precisare. Volare sul posto scelto è parte del patto: chi sceglie "Druso"
+ * deve **vedere** il pin, non andarlo a cercare.
  */
 export default function LocationPicker({
   latitude,
   longitude,
   center,
+  focus,
   ariaLabel,
   onChange,
 }: LocationPickerProps) {
@@ -39,6 +56,7 @@ export default function LocationPicker({
   const mapRef = useRef<MapLibreMap | null>(null);
   const markerRef = useRef<Marker | null>(null);
   const changeRef = useRef(onChange);
+  const flownRef = useRef(0);
   changeRef.current = onChange;
 
   const hasPin = typeof latitude === "number" && typeof longitude === "number";
@@ -106,6 +124,17 @@ export default function LocationPicker({
 
     markerRef.current.setLngLat([longitude, latitude]);
   }, [latitude, longitude]);
+
+  // La mappa vola sul posto scelto altrove. Solo su una scelta nuova (`token`):
+  // volare a ogni movimento del pin sarebbe una lotta con chi lo trascina.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !focus || focus.token === flownRef.current) return;
+
+    flownRef.current = focus.token;
+
+    map.flyTo({ center: [focus.longitude, focus.latitude], zoom: focus.zoom, duration: 900 });
+  }, [focus]);
 
   return (
     <div

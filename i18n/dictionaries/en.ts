@@ -572,6 +572,12 @@ export const en = {
     venueNameHint: "If the venue is not on OpenStage yet, we show the name you write here.",
     city: "City",
     cityPlaceholder: "e.g. Livorno",
+    cityHint:
+      "Write the city, or an address to find the place: picking a suggestion moves the map and drops the pin there.",
+    cityKnown: "city already on OpenStage",
+    placeSearchEmpty: "No place found: place the pin on the map by hand.",
+    placeSearchError:
+      "Place search is not answering right now: place the pin on the map by hand.",
     mapTitle: "Location",
     mapHint: "Drag the pin where the night happens, or click on the map.",
     mapNoPin: "No pin yet: click on the map to place it.",

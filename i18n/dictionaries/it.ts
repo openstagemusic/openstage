@@ -573,6 +573,12 @@ export const it: Dictionary = {
       "Se il locale non è ancora su OpenStage, lo mostriamo con il nome che scrivi qui.",
     city: "Città",
     cityPlaceholder: "Es. Livorno",
+    cityHint:
+      "Scrivi la città, o un indirizzo per trovare il posto: scegliendo un suggerimento la mappa si sposta e il pin si posa lì.",
+    cityKnown: "città già su OpenStage",
+    placeSearchEmpty: "Nessun posto trovato: metti il pin sulla mappa a mano.",
+    placeSearchError:
+      "La ricerca dei posti non risponde adesso: metti il pin sulla mappa a mano.",
     mapTitle: "Posizione",
     mapHint: "Trascina il pin dove si tiene la serata, oppure clicca sulla mappa.",
     mapNoPin: "Nessun pin: clicca sulla mappa per metterlo.",
