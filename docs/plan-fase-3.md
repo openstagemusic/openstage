@@ -275,3 +275,76 @@ scarica a 1080×1920 con QR funzionante; incollando il link in una chat compare 
   desktop e mobile; nessun errore in console.
 - Ogni blocco verifica il proprio pezzo **senza** dipendere dal successivo.
 - Solo dati reali: nessun evento, artista o locale finto, in nessun blocco.
+
+## 3.4 — Pagina evento completa e condivisione (fatta il 19 ottobre 2026)
+
+**Cosa c'è adesso sulla scheda.** La locandina si vede **intera** in una colonna a sinistra (su
+desktop) con accanto tipo, titolo, artista e **countdown**; sotto, "Quando" e "Dove" come prima,
+e la fila di azioni: Biglietti, Salva, **Aggiungi al calendario**, **Condividi**.
+
+**Decisioni prese costruendo:**
+
+1. **Countdown nel browser, non sul server.** L'ora del server e quella del telefono non coincidono
+   e un conto fatto una volta invecchia subito: il numero si calcola al montaggio e si aggiorna ogni
+   30 secondi (`components/events/EventCountdown.tsx`). Prima del montaggio non si mostra niente
+   (niente schermata che cambia sotto gli occhi). Sparisce quando la serata è cominciata: non
+   sappiamo a che ora finisce, e "è iniziata" non serve a chi legge.
+2. **Il calendario è un `<details>`, non un menu JavaScript.** Due link veri — Google Calendar e il
+   file `.ics` — funzionano anche se lo script non parte (`components/events/AddToCalendar.tsx`).
+   Il file lo costruisce il server (`lib/events/calendar.ts`, `app/api/events/[id]/ical/route.ts`):
+   date in **UTC** (l'ora legale la risolve il calendario di chi legge), durata presunta di **3 ore**
+   quando l'ora di fine non esiste, `UID` uguale per sempre (`<id>@openstage`), righe spezzate a 75
+   byte, virgole e a capo protetti. Su una serata **annullata** il file dice `STATUS:CANCELLED` con
+   lo stesso `UID`: chi l'aveva in calendario e riscarica il file la vede sparire, invece di
+   presentarsi davanti a un portone chiuso. La città non si ripete quando l'indirizzo la contiene già.
+3. **Il pannello di condivisione disegna le card nel browser.** Un `<dialog>` nativo
+   (`components/events/ShareEventPanel.tsx`): **Storia 1080×1920** e **Quadrato 1080×1080**, con la
+   locandina intera, titolo, quando, dove e un **QR** che porta all'indirizzo canonico **con la
+   lingua**. Il disegno parte all'apertura e si rifà solo se si cambia formato: chi non condivide
+   non paga niente. Uscita: foglio di sistema con l'immagine (dove esiste), download del PNG, o
+   copia del link.
+4. **Le matite sono le stesse della locandina.** Foto, aloni, titolo che si rimpicciolisce, testo
+   andato a capo: estratti in `lib/covers/canvas.ts` e usati sia da `flyer.ts` (1080×1350) sia da
+   `share.ts`. Una sola implementazione da correggere. La libreria `qrcode` (npm, ~15 kB, disegno
+   locale) è l'unica dipendenza nuova di tutto il blocco.
+5. **Una serata annullata si annuncia.** Nella card il prezzo lascia il posto a un badge rosa
+   "Annullato" e a una riga che dice di condividere l'annuncio, non un invito; nel pannello compare
+   lo stesso avviso. Niente countdown, niente "Salva", niente "Biglietti", niente calendario:
+   Condividi resta, perché è l'unico gesto utile.
+6. **Un approssimativo non manda a un punto finto.** Il link "Apri in Google Maps" cerca
+   `Locale, Città` invece delle coordinate: chi va decide l'ultimo tratto, con le indicazioni scritte
+   a mano ("Come arrivare") accanto.
+7. **L'anteprima social è una card disegnata dal server**, non la locandina grezza:
+   `app/api/og/event/[id]/route.ts` + `lib/seo/og-card.tsx` (1200×630, fondo scuro, neon, locandina
+   intera, tipo, titolo, data, luogo, firma). La lingua viaggia nell'indirizzo (`?lang=`) e la
+   risposta si mette in cache un'ora. La locandina si scarica **dentro la rotta** con un tetto di
+   2,5 secondi: se l'archivio non risponde, la card esce lo stesso senza foto. Non è un
+   `opengraph-image.tsx` accanto alla pagina perché la scheda sta su una cattura multipla
+   (`/eventi/[...percorso]`) e Next rifiuta i file di metadati lì dentro: il server si avviava e ogni
+   richiesta moriva con *Catch-all must be the last part of the URL*. Aggiunta anche
+   `twitter: { card: "summary_large_image" }` nel layout: WhatsApp e X usano la card grande.
+
+**Prove fatte** (server di produzione locale, dati reali, nessun mock):
+
+- **17 prove browser** sulla scheda "Sick Tamburo": countdown ("Fra 11 giorni"), menu calendario,
+  `.ics` valido, pannello di condivisione, **Storia 1080×1920**, **Quadrato 1080×1080**, QR presente
+  in entrambe, PNG scaricato davvero su disco (1080×1080), chiusura con Esc, nessun countdown su una
+  serata passata, zero errori in console.
+- **Il QR è stato verificato modulo per modulo**: la matrice da 33×33 moduli campionata dentro
+  l'immagine disegnata è **identica** a quella che la libreria produce per
+  `http://localhost:3101/it/eventi/ranica/sick-tamburo` (0 moduli diversi). Non "c'è un QR": dice
+  l'indirizzo giusto.
+- **13 + 18 prove** su una serata di prova **approssimativa** (inserita e poi cancellata, per non
+  lasciare righe finte): prima e dopo l'annullamento. Prima: indicazioni per zona, countdown,
+  calendario, `.ics` `CONFIRMED`. Dopo: avviso in pagina, niente countdown/calendario/Salva/Biglietti,
+  `.ics` `CANCELLED`, card con badge rosa (975 pixel rosa nella zona del badge) e avviso nel pannello,
+  `noindex` sulla scheda, card Open Graph 1200×630 con l'etichetta rosa (619 pixel) e senza
+  (0 pixel) quando la serata si tiene.
+- Rotte: `.ics` 404 su un identificativo inesistente, card Open Graph 404, `/eventi/<id>` → **308**
+  verso l'indirizzo canonico, scheda in inglese con i testi nuovi.
+- Database lasciato com'era: 5 eventi, 0 annullati, 0 `event_creations`.
+
+**Copertura onesta.** Il QR non è stato provato con una fotocamera vera (la prova confronta i
+moduli, non l'inquadratura); il `.ics` è stato letto come testo e non aperto in Outlook o su iPhone;
+le card non sono state viste a occhio su Instagram. L'endpoint dell'anteprima è pubblico e senza
+contatore: la cache di un'ora lo tiene a bada, se crescerà servirà un tetto (vedi B45).

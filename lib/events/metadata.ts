@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 
+import type { Locale } from "@/lib/i18n/config";
+
 import { isCancelled, type PublicEvent } from "./types";
 
-/** Titolo e descrizione di una scheda evento, condivisi fra le due rotte. */
-export function eventMetadata(event: PublicEvent): Metadata {
+/** Titolo, descrizione e anteprima di una scheda evento (una rotta sola). */
+export function eventMetadata(event: PublicEvent, locale: Locale): Metadata {
   const cancelled = isCancelled(event);
 
   const description =
@@ -13,10 +15,22 @@ export function eventMetadata(event: PublicEvent): Metadata {
   return {
     title: event.title,
     description,
+    // L'anteprima non è la locandina grezza: è una card 1200×630 disegnata dal
+    // server (`/api/og/event/<id>`), con titolo, data e luogo sopra la
+    // locandina intera. La lingua viaggia nell'indirizzo, così la stessa
+    // immagine non cambia sotto i piedi a chi la mette in cache.
     openGraph: {
+      type: "article",
       title: event.title,
       description,
-      images: event.coverImageUrl ? [event.coverImageUrl] : undefined,
+      images: [
+        {
+          url: `/api/og/event/${event.id}?lang=${locale}`,
+          width: 1200,
+          height: 630,
+          alt: event.title,
+        },
+      ],
     },
     // Un annullato resta raggiungibile per chi ha il link (la pagina lo spiega),
     // ma i motori di ricerca devono smettere di pubblicizzare un concerto che

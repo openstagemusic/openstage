@@ -4,8 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import EventPageView from "@/components/events/EventPageView";
 import { eventMetadata } from "@/lib/events/metadata";
 import { eventPath } from "@/lib/events/paths";
-import { getEventById, getEventBySlug } from "@/lib/events/queries";
-import type { PublicEvent } from "@/lib/events/types";
+import { findEventByPath } from "@/lib/events/resolve";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
 
@@ -28,33 +27,18 @@ type EventPageProps = {
   params: Promise<{ percorso: string[] }>;
 };
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-async function findEvent(percorso: string[]): Promise<PublicEvent | null> {
-  if (percorso.length === 1) {
-    const [segmento] = percorso;
-    // Identificativo oppure indirizzo leggibile: si accettano entrambi, così
-    // anche chi digita `/eventi/sick-tamburo` arriva alla scheda giusta.
-    return UUID.test(segmento) ? getEventById(segmento) : getEventBySlug(segmento);
-  }
-
-  if (percorso.length === 2) {
-    return getEventBySlug(percorso[1]);
-  }
-
-  return null;
-}
-
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   const { percorso } = await params;
-  const event = await findEvent(percorso);
+  const event = await findEventByPath(percorso);
 
-  return event ? eventMetadata(event) : {};
+  if (!event) return {};
+
+  return eventMetadata(event, await getLocale());
 }
 
 export default async function EventPage({ params }: EventPageProps) {
   const { percorso } = await params;
-  const event = await findEvent(percorso);
+  const event = await findEventByPath(percorso);
 
   if (!event) notFound();
 

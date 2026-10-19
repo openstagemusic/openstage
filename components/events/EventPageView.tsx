@@ -1,14 +1,18 @@
 import Link from "@/components/i18n/LocaleLink";
 
 import JsonLd from "@/components/seo/JsonLd";
+import AddToCalendar from "@/components/events/AddToCalendar";
+import EventCountdown from "@/components/events/EventCountdown";
 import EventCover from "@/components/events/EventCover";
-import ShareEventButton from "@/components/events/ShareEventButton";
+import ShareEventPanel from "@/components/events/ShareEventPanel";
 import SaveEventButton from "@/components/map/SaveEventButton";
-import { formatEventDateLong, timeZoneName } from "@/lib/events/format";
+import { googleCalendarUrl } from "@/lib/events/calendar";
+import { formatEventDate, formatEventDateLong, timeZoneName } from "@/lib/events/format";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listSavedEventIds } from "@/lib/events/queries";
 import { artistRepeatsTitle, isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
 import { getSessionProfile } from "@/lib/supabase/session";
@@ -32,20 +36,39 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
   const cancelled = isCancelled(event);
 
   const hasPosition = event.latitude !== null && event.longitude !== null;
-  const mapsUrl = hasPosition
-    ? `https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}`
+  const place = placeName(event);
+  const where = [place, event.city].filter(Boolean).join(" · ");
+
+  // Su una posizione approssimativa il pin non esiste: portare a un punto
+  // preciso sarebbe una bugia. Si cerca il locale e la città, e chi va decide
+  // l'ultimo tratto.
+  const mapsQuery =
+    event.locationPrecision === "approximate"
+      ? [place, event.city].filter(Boolean).join(", ")
+      : hasPosition
+        ? `${event.latitude},${event.longitude}`
+        : "";
+
+  const mapsUrl = mapsQuery
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery)}`
     : null;
 
-  const where = [placeName(event), event.city].filter(Boolean).join(" · ");
   const kindLabel = t.kinds[event.kind] ?? t.kinds.other;
   const canonicalPath = eventPath(event);
+  const localizedPath = withLocale(locale, canonicalPath);
+  const pageUrl = absoluteUrl(localizedPath);
+
+  // Niente biglietti, niente calendario e niente "Salva" su una serata annullata:
+  // si può solo leggerla e condividerla come annuncio.
+  const priceLabel = event.isFree ? t.freeEntry : event.priceText;
+  const shortWhen = formatEventDate(event.startsAt, event.timezone, locale).full;
 
   const data = {
     "@context": "https://schema.org",
     "@type": "MusicEvent",
     name: event.title,
     startDate: event.startsAt,
-    url: absoluteUrl(`/${locale}${canonicalPath}`),
+    url: pageUrl,
     eventStatus: cancelled
       ? "https://schema.org/EventCancelled"
       : "https://schema.org/EventScheduled",
@@ -57,14 +80,14 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       ? {
           "@type": "MusicGroup",
           name: event.artist.name,
-          url: absoluteUrl(`/${locale}${artistPath(event.artist)}`),
+          url: absoluteUrl(withLocale(locale, artistPath(event.artist))),
         }
       : undefined,
     location: event.venue
       ? {
           "@type": "MusicVenue",
           name: event.venue.name,
-          url: absoluteUrl(`/${locale}${venuePath(event.venue)}`),
+          url: absoluteUrl(withLocale(locale, venuePath(event.venue))),
           address: {
             "@type": "PostalAddress",
             streetAddress: event.venue.address ?? undefined,
@@ -91,18 +114,8 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
         ← {t.backToExplore}
       </Link>
 
-      {event.coverImageUrl ? (
-        <EventCover
-          src={event.coverImageUrl}
-          className="mt-6 aspect-[16/10] w-full rounded-3xl border border-white/10 sm:aspect-[16/9]"
-        />
-      ) : (
-        <div
-          className="mt-6 h-1.5 w-full rounded-full bg-gradient-to-r from-violet via-cyan to-pink"
-          aria-hidden="true"
-        />
-      )}
-
+      {/* La notizia prima della locandina: chi apre il link deve sapere subito
+          che la serata non si tiene, senza leggere il poster per intero. */}
       {cancelled ? (
         <section className="mt-6 rounded-2xl border border-pink/40 bg-pink/10 p-5">
           <p className="font-display text-sm font-semibold uppercase tracking-wide text-white">
@@ -120,33 +133,73 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
         </section>
       ) : null}
 
-      <div className="mt-6 flex flex-wrap items-center gap-2 text-xs">
-        <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
-          {kindLabel}
-        </span>
-        {event.genre ? (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
-            {event.genre}
-          </span>
+      <header
+        className={
+          event.coverImageUrl
+            ? "mt-6 grid gap-6 md:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] md:items-start"
+            : "mt-6"
+        }
+      >
+        {event.coverImageUrl ? (
+          // La locandina si vede **intera**, nella sua forma di poster: il resto
+          // del riquadro lo riempie la stessa foto sfocata.
+          <EventCover
+            src={event.coverImageUrl}
+            className="aspect-[4/5] w-full rounded-3xl border border-white/10"
+          />
         ) : null}
-        {event.isFree || event.priceText ? (
-          <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-white">
-            {event.isFree ? t.freeEntry : event.priceText}
-          </span>
-        ) : null}
-      </div>
 
-      <h1 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-        {event.title}
-      </h1>
+        <div>
+          {event.coverImageUrl ? null : (
+            <div
+              className="mb-6 h-1.5 w-full rounded-full bg-gradient-to-r from-violet via-cyan to-pink"
+              aria-hidden="true"
+            />
+          )}
 
-      {event.artist && !artistRepeatsTitle(event) ? (
-        <p className="mt-3 text-lg text-white/80">
-          <Link href={artistPath(event.artist)} className="transition-colors hover:text-white">
-            {event.artist.name}
-          </Link>
-        </p>
-      ) : null}
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
+              {kindLabel}
+            </span>
+            {event.genre ? (
+              <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
+                {event.genre}
+              </span>
+            ) : null}
+            {priceLabel ? (
+              <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-white">
+                {priceLabel}
+              </span>
+            ) : null}
+          </div>
+
+          <h1 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+            {event.title}
+          </h1>
+
+          {event.artist && !artistRepeatsTitle(event) ? (
+            <p className="mt-3 text-lg text-white/80">
+              <Link href={artistPath(event.artist)} className="transition-colors hover:text-white">
+                {event.artist.name}
+              </Link>
+            </p>
+          ) : null}
+
+          {cancelled ? null : (
+            <EventCountdown
+              startsAt={event.startsAt}
+              className="mt-4"
+              labels={{
+                in: t.countdownIn,
+                days: t.countdownDays,
+                hours: t.countdownHours,
+                minutes: t.countdownMinutes,
+                soon: t.countdownSoon,
+              }}
+            />
+          )}
+        </div>
+      </header>
 
       <dl className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="glass rounded-2xl border border-white/10 p-5">
@@ -252,11 +305,40 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           />
         )}
 
-        <ShareEventButton
-          path={canonicalPath}
+        {cancelled ? null : (
+          <AddToCalendar
+            googleUrl={googleCalendarUrl(event, pageUrl, { free: t.freeEntry })}
+            icsUrl={`/api/events/${event.id}/ical`}
+            labels={{ add: t.addToCalendar, google: t.googleCalendar, apple: t.appleCalendar }}
+          />
+        )}
+
+        <ShareEventPanel
+          path={localizedPath}
+          slug={event.slug || event.id}
           title={event.title}
-          text={where}
-          labels={{ share: t.share, copied: t.shareCopied }}
+          when={shortWhen}
+          where={where}
+          kind={kindLabel}
+          price={cancelled ? null : priceLabel}
+          photoUrl={event.coverImageUrl}
+          cancelled={cancelled}
+          labels={{
+            share: t.share,
+            title: t.shareTitle,
+            story: t.shareStory,
+            square: t.shareSquare,
+            download: t.shareDownload,
+            native: t.shareNative,
+            copy: t.shareCopyLink,
+            copied: t.shareCopied,
+            generating: t.shareGenerating,
+            failed: t.shareCardFailed,
+            hint: t.shareCardHint,
+            cancelledBadge: t.cancelledBadge,
+            cancelledNote: t.shareCancelledNote,
+            close: t.shareClose,
+          }}
         />
       </div>
     </article>

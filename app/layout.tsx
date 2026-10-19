@@ -68,6 +68,11 @@ export async function generateMetadata(): Promise<Metadata> {
       title: dict.meta.title,
       description: dict.meta.description,
     },
+    // Le anteprime nelle chat (WhatsApp, Telegram, X) usano la card grande:
+    // l'immagine arriva da `opengraph-image` quando la pagina ne ha una.
+    twitter: {
+      card: "summary_large_image",
+    },
   };
 }
 
