@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   deleteDraftAction,
   setEventStatusAction,
+  type EventActionError,
   type EventActionResult,
 } from "@/app/actions/events";
 import LocaleLink from "@/components/i18n/LocaleLink";
@@ -36,6 +37,14 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Il database risponde con codici: qui diventano frasi. Nessun messaggio
+  // grezzo di Postgres arriva a chi usa il sito.
+  const errorText: Record<EventActionError, string> = {
+    generic: dict.errorGeneric,
+    rateLimited: dict.tooManyEvents,
+    suspended: dict.suspendedAccount,
+  };
+
   async function run(key: string, action: () => Promise<EventActionResult>) {
     setBusy(key);
     setError(null);
@@ -45,7 +54,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
     setBusy(null);
 
     if (!outcome.ok) {
-      setError(outcome.error ?? dict.errorGeneric);
+      setError(outcome.error ? errorText[outcome.error] : dict.errorGeneric);
       return;
     }
 

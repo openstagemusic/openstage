@@ -12,15 +12,33 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { getSessionProfile } from "@/lib/supabase/session";
 
-export type EventActionResult = { ok: boolean; error: string | null };
+/**
+ * Gli errori che l'interfaccia sa tradurre.
+ *
+ * Sono **codici**, non messaggi: il testo del database non deve mai arrivare a
+ * chi usa il sito (prima ci arrivava). I dizionari fanno la traduzione.
+ */
+export type EventActionError = "generic" | "rateLimited" | "suspended";
 
-function result(error: { message: string } | null): EventActionResult {
-  if (error) {
-    console.error("[events]", error.message);
-    return { ok: false, error: error.message };
-  }
+export type EventActionResult = { ok: boolean; error: EventActionError | null };
 
-  return { ok: true, error: null };
+/**
+ * Come si legge un errore del database.
+ *
+ * Il database parla per codici SQLSTATE: `OS429` è il tetto anti-spam, `OS403`
+ * l'account sospeso (migration `0020`). Tutto il resto è un errore generico.
+ */
+const SQLSTATE_TO_ERROR: Record<string, EventActionError> = {
+  OS429: "rateLimited",
+  OS403: "suspended",
+};
+
+function result(error: { code?: string; message: string } | null): EventActionResult {
+  if (!error) return { ok: true, error: null };
+
+  console.error("[events]", error.message);
+
+  return { ok: false, error: (error.code && SQLSTATE_TO_ERROR[error.code]) || "generic" };
 }
 
 /**
@@ -68,8 +86,15 @@ export type SaveEventResult = {
   status?: "draft" | "published" | "cancelled";
   fieldErrors?: EditorErrors;
   /** Codice da tradurre con i dizionari (mai il messaggio grezzo del database). */
-  error?: "unauthorized" | "notFound" | "saveFailed";
+  error?: "unauthorized" | "notFound" | "rateLimited" | "suspended" | "saveFailed";
 };
+
+/** Il salvataggio non è riuscito: si traduce il codice del database. */
+function saveErrorCode(error: { code?: string }): NonNullable<SaveEventResult["error"]> {
+  const mapped = error.code ? SQLSTATE_TO_ERROR[error.code] : undefined;
+
+  return mapped === "rateLimited" || mapped === "suspended" ? mapped : "saveFailed";
+}
 
 /**
  * Crea o aggiorna un evento.
@@ -130,7 +155,7 @@ export async function saveEventAction(input: {
 
     if (error) {
       console.error("[events] saveEventAction (modifica):", error.message);
-      return { ok: false, error: "saveFailed" };
+      return { ok: false, error: saveErrorCode(error) };
     }
 
     if (!data) return { ok: false, error: "notFound" };
@@ -151,7 +176,7 @@ export async function saveEventAction(input: {
 
   if (error) {
     console.error("[events] saveEventAction (creazione):", error.message);
-    return { ok: false, error: "saveFailed" };
+    return { ok: false, error: saveErrorCode(error) };
   }
 
   if (!data) return { ok: false, error: "saveFailed" };

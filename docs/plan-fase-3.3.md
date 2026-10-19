@@ -24,6 +24,15 @@
 > Nessun servizio nuovo e nessuna variabile d'ambiente: **Supabase Storage** era già nel progetto, si
 > aggiunge solo il bucket `event-covers` (migration `0019`) con tetto **3 MB** e soli **JPEG/PNG/WebP**,
 > più le politiche di lettura pubblica e scrittura nella propria cartella.
+>
+> **Aggiornamento (19 ottobre 2026)**: prima di chiudere la fase l'utente ha chiesto un'analisi critica
+> dell'inserimento degli eventi (spam, proprietà, annullamenti, qualità dei dati). Dalla lettura del
+> database e del codice sono emersi **due difetti reali** — il limite anti-spam della `0020` era
+> **aggirabile** cancellando la bozza, e un evento annullato **spariva del tutto** (pagina 404,
+> preferiti vuoti) — e alcune decisioni di forma che conviene fissare **prima della 3.4**, che
+> ricostruisce la pagina evento. Da qui i blocchi **3.3.4, 3.3.5 e 3.3.6**, e la lista delle cose
+> rimandate (backlog **B38–B42**). Le otto decisioni prese sono in fondo a questo file e sono
+> **congelate**: nessun blocco successivo deve contraddirle.
 
 ## Divisione in blocchi (uno per volta, con build e commit)
 
@@ -37,7 +46,9 @@
 | **3.3.2e** ✅ | **"Vicino a me" sulla Home**: l'ingresso rotante rubava la camera a chi cliccava nei primi secondi (e la posizione era chiesta grossolana, senza dire quanto fosse incerta) | nessuna |
 | **3.3.3** ✅ | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas; la foto si vede **intera** su schede, mappa e pagina evento | `0019` (bucket + policy) |
 | **3.3.3b** ✅ | Correzione: **l'immagine della scheda** e **la locandina da condividere** diventano due cose separate — il poster generato non finisce più sulla card (non si carica da nessuna parte, si scarica) | nessuna |
-| **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita | `0020` (trigger) |
+| **3.3.4** ✅ | **Anti-spam vero**: tetto di serate per account nelle 24 ore contato sui **tentativi** (non sulle righe, così cancellare la bozza non restituisce quota), tetto per account (`profiles.events_daily_limit`), **sospensione** di un profilo rispettata dal database; **e il buco trovato preparando i test: un profilo poteva verificarsi da solo** | `0020` (registro `event_creations`, trigger), `0021` (campi del profilo non modificabili da soli) |
+| **3.3.5** | **Eventi annullati**: la pagina resta viva con l'etichetta "Annullato" (`noindex`, fuori dalla sitemap), restano nei Preferiti marcati, `cancelled_at` e `cancel_reason`, rimessa in programma come azione distinta | `0022` |
+| **3.3.6** | **Igiene del salvataggio**: doppio invio (chiave di idempotenza), data nel passato, concorrenza su `updated_at`, `ticket_url` verificato, campo **"come arrivare"** per gli spazi temporanei | `0023` |
 
 ## Decisioni prese
 
@@ -244,6 +255,89 @@ titolo ripetuto sotto. La causa era che il generatore finiva nello stesso campo 
   il nuovo disegno non serve più. Il caricamento resta uno solo, quello del file scelto.
 - **Nessun dato duplicato**: la scheda mostra solo la foto scelta; il poster è un'immagine a parte.
   Le locandine esterne dei tre eventi già online restano intatte e modificabili.
+
+## 3.3.4 — L'anti-spam vero: tentativi, non righe
+
+Difetto trovato leggendo il database: il limite anti-spam come era stato pensato contava le **righe**
+di `events` create nelle 24 ore. Ma `events_delete_own` permette al proprietario di **cancellare la
+propria bozza**: elimina-e-ricrea riporta il conteggio a zero, e il tetto non esiste. In più, nel
+database non c'era **nessun modo di fermare un account**: l'unico rimedio dell'admin era cancellare
+il profilo, cioè distruggere i dati.
+
+- **Il conteggio sta in un registro a parte** (`event_creations`), scritto solo dal database: una riga
+  per ogni serata **davvero creata**. Cancellare l'evento non tocca il registro, quindi la quota non
+  torna. Il registro è in sola lettura per tutti (nessuna politica di scrittura: ci scrive il trigger).
+- **Finestra mobile di 24 ore** sul `now()` del server, non sull'orologio di chi scrive.
+- **Il tetto è un valore, non una costante nel codice**: `profiles.events_daily_limit` (vuoto = 10).
+  Così l'admin alza o abbassa un singolo account senza deploy, e la futura "fiducia a scalini" (B40)
+  è solo un altro valore in quel campo.
+- **`profiles.suspended_at`**: un account sospeso non crea e non modifica più serate. Il controllo è
+  nel database, quindi vale anche per chi parla direttamente con l'API. L'interfaccia per sospendere
+  arriva con la moderazione (**B40**); il database è già pronto.
+- **Chi è fuori dal tetto**: l'admin e le operazioni di servizio (migrazioni, manutenzione). Un
+  intervento dell'amministratore non deve mai essere bloccato da una quota.
+- **Errori come codici**: `OS429` (troppe serate nelle 24 ore) e `OS403` (account sospeso). L'app li
+  traduce con i dizionari; il messaggio grezzo del database **non** arriva più all'utente (prima
+  `MyEvents` stampava il testo di Postgres: corretto anche quello).
+- **Le serate già esistenti non consumano quota**: il registro nasce vuoto e conta da qui in avanti.
+- **Mentre si preparavano i test è saltato fuori un buco più grave del tetto** (migration `0021`): il
+  trigger sul profilo proteggeva **solo il ruolo**. Il proprietario poteva quindi scrivere
+  `verified_at` sulla propria riga e **verificarsi da solo** — cioè pubblicare senza revisione,
+  annullando la regola "primo evento in revisione", e con la 3.3.4 avrebbe potuto togliersi la
+  sospensione e **alzarsi il tetto anti-spam**. Un altro campo era falsificabile allo stesso modo:
+  l'**email** mostrata nella coda dell'admin (bastava copiare quella di un altro per passare un
+  controllo a mano). Ora quei campi si **ignorano** quando a scrivere non è l'admin — la stessa forma
+  già usata per il ruolo, senza errori da leggere e senza dati che cambiano.
+- **Test**: l'11ª serata viene rifiutata **dal database**; cancellando una delle dieci precedenti la
+  quota **non** torna (prova che il buco è chiuso); l'account sospeso non scrive e non modifica mentre
+  l'admin sì; togliendo la sospensione si torna a scrivere; il profilo **non riesce a verificarsi da
+  solo** né ad alzarsi il tetto; i testi tradotti compaiono nell'editor e in "I miei eventi".
+
+## 3.3.5 — Eventi annullati: la pagina resta viva (pianificato)
+
+Oggi un evento annullato **sparisce da tutto**: dalla ricerca, dalla Home, dalla mappa, dai Preferiti
+e anche dalla sua pagina, che risponde **404** a chiunque non sia l'autore. Il link condiviso in chat
+muore e chi aveva segnato la serata non trova nessuna spiegazione: è *ghosting*, l'esatto contrario di
+*Autenticità prima dell'Hype*.
+
+- Un annullato **non è più una destinazione**: fuori da ricerca, Home e mappa.
+- Ma **esiste ancora**: la pagina resta raggiungibile con l'etichetta "Annullato", l'ora
+  dell'annullamento e il motivo (`cancelled_at`, `cancel_reason`), e i collegamenti all'artista e al
+  locale. `noindex` e fuori dalla sitemap: chi ha il link lo trova, i motori di ricerca smettono di
+  pubblicizzare un concerto che non c'è.
+- **Nei Preferiti resta**, marcato: chi l'aveva salvato deve saperlo. Fino a che le email non esistono
+  (Fase 6) la pagina è l'unico posto dove la notizia può arrivare.
+- **Rimettere in programma è un'azione distinta**, non un effetto collaterale del "Salva".
+- Nessun punteggio pubblico di affidabilità: le disdette si vedono solo nel pannello dell'admin.
+
+## 3.3.6 — Igiene del salvataggio (pianificato)
+
+Cose piccole che però producono **dati falsi subito**:
+
+- **Doppio invio**: senza chiave di idempotenza un ritentativo di rete crea due righe identiche (il
+  pulsante disabilitato non protegge dalla rete). Una chiave generata dal modulo, unica nel database,
+  rende il secondo invio innocuo.
+- **Data nel passato**: oggi si può salvare una serata del 2020 e resta pubblicata. Avviso, e blocco
+  oltre un limite ragionevole.
+- **Concorrenza**: due schede aperte, l'ultima che scrive vince. Con `updated_at` la seconda riceve
+  "questo evento è stato modificato altrove: ricarica".
+- **`ticket_url`**: oggi si controlla solo che inizi con `https://`. Un controllo di raggiungibilità
+  al salvataggio evita un link morto nella chiamata all'azione più importante.
+- **"Come arrivare"**: un campo breve per gli spazi che un indirizzo non ce l'hanno (centri sociali,
+  loft, cortili, spiagge) — da mostrare nella pagina che la 3.4 costruisce.
+
+## Le otto decisioni congelate (19 ottobre 2026)
+
+| # | Domanda | Decisione |
+| --- | --- | --- |
+| 1 | Abuso sistematico | Fiducia a scalini: tetto per account (`events_daily_limit`), contatore di **tentativi**, `suspended_at`, moderazione dopo la pubblicazione (B40). **Nessun punteggio pubblico di affidabilità** |
+| 2 | Doppioni | **Avviso**, mai blocco: due set la stessa sera nello stesso locale sono legittimi ("esiste già questa serata: [Vedi] [Crea comunque]") |
+| 3 | Unione eventi | Solo gesto dell'**admin** (`merged_into`, reversibile), mai automatica |
+| 4 | Annullati | Pagina viva con etichetta "Annullato" (`noindex`, fuori sitemap), presenti nei Preferiti, fuori da ricerca/mappa/Home. Le bozze restano private |
+| 5 | Locale chiuso | `venues.closed_at`: la pagina dice "chiuso", le serate **future** si annullano in un gesto con un motivo. **Nessuna cascata** |
+| 6 | Artista e locale | Il modulo del **locale** collega una scheda artista esistente: è la causa del doppione |
+| 7 | Geolocalizzazione | Filtro di distanza onesto sugli approssimativi, città derivata dal pin con chiave normalizzata, pin impossibile rifiutato, "come arrivare" per gli spazi temporanei |
+| 8 | Ordine | Igiene e anti-spam **prima della 3.4**; geo, serate collegate e moderazione subito dopo (B38–B40); il resto nelle fasi giuste |
 
 ## Test di fine fase (come da piano generale)
 

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { saveEventAction } from "@/app/actions/events";
+import { saveEventAction, type SaveEventResult } from "@/app/actions/events";
 import CoverField, { type PosterSource } from "@/components/dashboard/CoverField";
 import EventPreviewCard from "@/components/dashboard/EventPreviewCard";
 import type { MapFocus } from "@/components/dashboard/LocationPicker";
@@ -321,6 +321,21 @@ export default function EventEditor({
     });
   }
 
+  /**
+   * Gli errori del salvataggio, tradotti.
+   *
+   * L'azione risponde con un **codice** (`rateLimited`, `suspended`, …): qui
+   * diventa una frase. Il database parla per codici SQLSTATE, la traduzione sta
+   * in un posto solo.
+   */
+  const saveErrorText: Record<NonNullable<SaveEventResult["error"]>, string> = {
+    unauthorized: t.saveFailed,
+    notFound: t.notFound,
+    rateLimited: t.tooManyEvents,
+    suspended: t.suspendedAccount,
+    saveFailed: t.saveFailed,
+  };
+
   async function submit(status: "draft" | "published" | "cancelled") {
     setBusy(status);
     setErrors({});
@@ -343,7 +358,7 @@ export default function EventEditor({
 
       setMessage({
         tone: "error",
-        text: outcome.error === "notFound" ? t.notFound : t.saveFailed,
+        text: outcome.error ? saveErrorText[outcome.error] : t.saveFailed,
       });
       return;
     }

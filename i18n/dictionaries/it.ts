@@ -550,6 +550,9 @@ export const it: Dictionary = {
     emptySavedTitle: "Nessun evento salvato",
     emptySavedText: "Tocca «Salva» su un evento e lo ritrovi qui.",
     errorGeneric: "L'operazione non è andata a buon fine. Riprova.",
+    tooManyEvents: "Hai raggiunto il tetto di serate nelle 24 ore. Riprova più tardi.",
+    suspendedAccount:
+      "Il tuo account è sospeso: non puoi modificare le serate. Scrivici se pensi sia un errore.",
   },
   editor: {
     newTitle: "Crea un evento",
@@ -644,6 +647,10 @@ export const it: Dictionary = {
     backToList: "Torna ai miei eventi",
     notFound: "Questo evento non esiste o non è tuo.",
     saveFailed: "Non siamo riusciti a salvare. Riprova.",
+    tooManyEvents:
+      "Hai raggiunto il tetto di serate per account nelle 24 ore: potrai crearne un'altra quando la più vecchia esce dalla finestra.",
+    suspendedAccount:
+      "Il tuo account è sospeso: non puoi creare né modificare serate. Scrivici se pensi sia un errore.",
     errorsSummary: "Controlla i campi segnalati.",
     errors: {
       titleRequired: "Scrivi un titolo di almeno 3 caratteri.",

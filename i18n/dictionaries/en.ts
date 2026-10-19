@@ -550,6 +550,9 @@ export const en = {
     emptySavedTitle: "No saved events",
     emptySavedText: "Tap “Save” on an event and you will find it here.",
     errorGeneric: "That did not work. Please try again.",
+    tooManyEvents: "You have reached the 24-hour event limit. Try again later.",
+    suspendedAccount:
+      "Your account is suspended: you cannot edit events. Write to us if you think this is a mistake.",
   },
   editor: {
     newTitle: "Create an event",
@@ -642,6 +645,10 @@ export const en = {
     backToList: "Back to my events",
     notFound: "This event does not exist or is not yours.",
     saveFailed: "We could not save it. Please try again.",
+    tooManyEvents:
+      "You have reached the per-account limit of events in 24 hours: you can create the next one once the oldest leaves the window.",
+    suspendedAccount:
+      "Your account is suspended: you cannot create or edit events. Write to us if you think this is a mistake.",
     errorsSummary: "Check the highlighted fields.",
     errors: {
       titleRequired: "Write a title of at least 3 characters.",
