@@ -1,3 +1,4 @@
+import EventCover from "@/components/events/EventCover";
 import Link from "@/components/i18n/LocaleLink";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -25,22 +26,7 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
   return (
     <article className="glass h-full overflow-hidden rounded-3xl border border-white/10 transition-colors hover:border-white/25">
       <Link href={eventPath(event)} className="flex h-full flex-col">
-        {event.coverImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- locandine da URL esterni arbitrari
-          <img
-            src={event.coverImageUrl}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            referrerPolicy="no-referrer"
-            className="h-36 w-full object-cover"
-          />
-        ) : (
-          <div
-            className="h-1.5 w-full bg-gradient-to-r from-violet via-cyan to-pink"
-            aria-hidden="true"
-          />
-        )}
+        <EventCover src={event.coverImageUrl} className="aspect-square w-full" />
 
         <div className="flex flex-1 flex-col p-4">
           <div className="flex flex-wrap items-center gap-2 text-xs">

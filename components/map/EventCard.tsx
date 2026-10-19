@@ -3,6 +3,7 @@
 import Link from "@/components/i18n/LocaleLink";
 import { useState } from "react";
 
+import EventCover from "@/components/events/EventCover";
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
@@ -92,15 +93,7 @@ export default function EventCard({
       ) : null}
 
       {isSheet && event.coverImageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element -- le locandine arrivano da URL esterni arbitrari
-        <img
-          src={event.coverImageUrl}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          className="mt-3 h-40 w-full object-cover"
-        />
+        <EventCover src={event.coverImageUrl} className="mt-3 aspect-[4/3] w-full" />
       ) : (
         <div className="h-1 w-full bg-gradient-to-r from-violet via-cyan to-pink" aria-hidden="true" />
       )}
@@ -108,14 +101,9 @@ export default function EventCard({
       <div className="p-4">
         <div className="flex gap-3">
           {!isSheet && event.coverImageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- locandine da URL esterni arbitrari
-            <img
+            <EventCover
               src={event.coverImageUrl}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              referrerPolicy="no-referrer"
-              className="h-14 w-14 shrink-0 rounded-xl border border-white/10 object-cover"
+              className="h-14 w-14 shrink-0 rounded-xl border border-white/10"
             />
           ) : null}
 

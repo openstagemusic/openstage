@@ -2,6 +2,7 @@
  * English is the reference dictionary: its shape defines the `Dictionary` type
  * that every other locale must satisfy, so translations can never go out of sync.
  */
+import type { CoverErrorCode } from "@/lib/covers/errors";
 import type { EditorErrorCode } from "@/lib/events/editor";
 
 export const en = {
@@ -599,6 +600,25 @@ export const en = {
     pricePlaceholder: "e.g. 10 € or pay what you want",
     ticketUrl: "Ticket link",
     ticketUrlPlaceholder: "https://…",
+    sectionCover: "Poster",
+    coverEmpty: "No poster yet: the card shows the OpenStage colour stripe.",
+    coverChoose: "Choose an image",
+    coverReplace: "Replace",
+    coverRemove: "Remove",
+    coverUploading: "Uploading the poster…",
+    coverGenerate: "Generate the poster",
+    coverGenerating: "Drawing the poster…",
+    coverGenerateHint:
+      "Drawn from what you wrote: event type, title, when and where. If you picked a photo, it goes inside.",
+    coverHint:
+      "Any shape works: the poster shows in full, never cropped. Up to 3 MB (JPEG, PNG or WebP); bigger images are resized on their own.",
+    coverErrors: {
+      type: "Posters can be JPEG, PNG or WebP.",
+      tooBig: "This poster is too heavy: 3 MB is the maximum.",
+      unreadable: "We cannot read this file as an image: try another one.",
+      generateFailed: "We could not draw the poster. Please try again.",
+      uploadFailed: "The upload did not go through. Please try again in a moment.",
+    } satisfies Record<CoverErrorCode, string>,
     description: "Description",
     descriptionPlaceholder: "Who plays, with whom, when doors open…",
     previewTitle: "Preview",
@@ -636,6 +656,7 @@ export const en = {
       locationRequired: "Place the pin on the map: that is how people find the night.",
       priceTooLong: "The price is too long (40 characters max).",
       ticketInvalid: "The ticket link must start with https://",
+      coverInvalid: "That poster address is not valid: upload the image again.",
       descriptionTooLong: "The description is too long (2000 characters max).",
     } satisfies Record<EditorErrorCode, string>,
   },

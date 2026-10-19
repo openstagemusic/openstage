@@ -20,6 +20,12 @@ export const CITY_MAX = 80;
 export const VENUE_NAME_MAX = 120;
 export const PRICE_MAX = 40;
 export const URL_MAX = 300;
+/**
+ * La locandina è più larga degli altri indirizzi: quelle caricate da noi stanno
+ * in Supabase Storage e portano dietro il nome del file, e restano valide anche
+ * le locandine esterne già presenti nei primi eventi inseriti.
+ */
+export const COVER_URL_MAX = 500;
 
 /** Fusi orari proposti dal modulo (l'ora legale la calcola `Intl`). */
 export const TIMEZONE_OPTIONS = [
@@ -50,6 +56,7 @@ export const EDITOR_FIELDS = [
   "location",
   "priceText",
   "ticketUrl",
+  "coverImageUrl",
   "description",
 ] as const;
 
@@ -72,6 +79,7 @@ export type EditorErrorCode =
   | "locationRequired"
   | "priceTooLong"
   | "ticketInvalid"
+  | "coverInvalid"
   | "descriptionTooLong";
 
 export type EditorErrors = Partial<Record<EditorField, EditorErrorCode>>;
@@ -97,6 +105,8 @@ export type EventEditorState = {
   isFree: boolean;
   priceText: string;
   ticketUrl: string;
+  /** Indirizzo della locandina: si riempie caricando un file, non si incolla. */
+  coverImageUrl: string;
 };
 
 /** Cosa si scrive davvero nella tabella `events`. */
@@ -117,6 +127,7 @@ export type EventEditorValues = {
   isFree: boolean;
   priceText: string | null;
   ticketUrl: string | null;
+  coverImageUrl: string | null;
 };
 
 export type ValidationResult =
@@ -240,6 +251,14 @@ export function validateEventInput(input: EventEditorState): ValidationResult {
   const description = input.description.trim();
   if (description.length > DESCRIPTION_MAX) errors.description = "descriptionTooLong";
 
+  // La locandina deve essere un indirizzo vero. Accettiamo anche quelli esterni:
+  // i primi eventi inseriti da OpenStage hanno locandine che vivono altrove, e
+  // devono restare modificabili.
+  const coverImageUrl = input.coverImageUrl.trim();
+  if (coverImageUrl.length > COVER_URL_MAX || (coverImageUrl !== "" && !isHttpUrl(coverImageUrl))) {
+    errors.coverImageUrl = "coverInvalid";
+  }
+
   if (!startsAt || Object.keys(errors).length > 0) {
     if (!startsAt && !errors.date && !errors.time && !errors.timezone) errors.date = "dateInvalid";
     return { ok: false, errors };
@@ -275,6 +294,7 @@ export function validateEventInput(input: EventEditorState): ValidationResult {
       isFree: input.isFree,
       priceText: input.isFree || priceText === "" ? null : priceText,
       ticketUrl: ticketUrl || null,
+      coverImageUrl: coverImageUrl || null,
     },
   };
 }
@@ -320,6 +340,7 @@ export function initialEditorState(timezone = FILTER_TIMEZONE): EventEditorState
     isFree: false,
     priceText: "",
     ticketUrl: "",
+    coverImageUrl: "",
   };
 }
 
@@ -341,6 +362,7 @@ export type EditableEvent = {
   isFree: boolean;
   priceText: string | null;
   ticketUrl: string | null;
+  coverImageUrl: string | null;
 };
 
 export function editorStateFromEvent(event: EditableEvent): EventEditorState {
@@ -364,5 +386,6 @@ export function editorStateFromEvent(event: EditableEvent): EventEditorState {
     isFree: event.isFree,
     priceText: event.priceText ?? "",
     ticketUrl: event.ticketUrl ?? "",
+    coverImageUrl: event.coverImageUrl ?? "",
   };
 }

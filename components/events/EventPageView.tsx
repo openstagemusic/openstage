@@ -1,6 +1,7 @@
 import Link from "@/components/i18n/LocaleLink";
 
 import JsonLd from "@/components/seo/JsonLd";
+import EventCover from "@/components/events/EventCover";
 import ShareEventButton from "@/components/events/ShareEventButton";
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDateLong, timeZoneName } from "@/lib/events/format";
@@ -84,13 +85,9 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       </Link>
 
       {event.coverImageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element -- locandine da URL esterni arbitrari
-        <img
+        <EventCover
           src={event.coverImageUrl}
-          alt=""
-          decoding="async"
-          referrerPolicy="no-referrer"
-          className="mt-6 h-64 w-full rounded-3xl border border-white/10 object-cover sm:h-80"
+          className="mt-6 aspect-[16/10] w-full rounded-3xl border border-white/10 sm:aspect-[16/9]"
         />
       ) : (
         <div

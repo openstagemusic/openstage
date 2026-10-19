@@ -116,6 +116,7 @@ export async function saveEventAction(input: {
     is_free: values.isFree,
     price_text: values.priceText,
     ticket_url: values.ticketUrl,
+    cover_image_url: values.coverImageUrl,
     status: input.status,
   };
 

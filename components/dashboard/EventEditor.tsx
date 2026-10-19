@@ -5,19 +5,23 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { saveEventAction } from "@/app/actions/events";
+import CoverField from "@/components/dashboard/CoverField";
 import EventPreviewCard from "@/components/dashboard/EventPreviewCard";
 import type { MapFocus } from "@/components/dashboard/LocationPicker";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { renderFlyer } from "@/lib/covers/flyer";
 import type { VenueOption } from "@/lib/dashboard/queries";
 import {
+  editorInstant,
   RADIUS_OPTIONS_M,
   TIMEZONE_OPTIONS,
   type EditorErrorCode,
   type EditorField,
   type EventEditorState,
 } from "@/lib/events/editor";
+import { formatEventDate } from "@/lib/events/format";
 import { EVENT_KINDS } from "@/lib/events/types";
 import type { GeocodePlace } from "@/lib/geo/geocoder";
 
@@ -112,6 +116,9 @@ export default function EventEditor({
   const [errors, setErrors] = useState<Partial<Record<EditorField, EditorErrorCode>>>({});
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState<"draft" | "published" | "cancelled" | null>(null);
+  // La foto scelta per la locandina, tenuta in memoria: con quella si disegna la
+  // locandina generata, senza doverla scaricare da un altro sito.
+  const [photo, setPhoto] = useState<Blob | null>(null);
   // Ricerca dei posti (città, indirizzi, locali): scegliendone uno la mappa vola lì.
   const [placeQuery, setPlaceQuery] = useState("");
   const [places, setPlaces] = useState<GeocodePlace[]>([]);
@@ -290,6 +297,29 @@ export default function EventEditor({
     setLinkedVenue(null);
     setValues((current) => ({ ...current, venueId: "" }));
     setMessage(null);
+  }
+
+  /**
+   * Disegna la locandina dai dati già scritti.
+   *
+   * La foto arriva da `CoverField`: è quella scelta un attimo prima e tenuta in
+   * memoria, quindi non c'è niente da scaricare e la locandina si disegna sempre.
+   * Senza titolo non si disegna: la locandina deve dire almeno di cosa si tratta.
+   */
+  async function buildFlyer(currentPhoto: Blob | null): Promise<Blob | null> {
+    const instant = editorInstant(values);
+    const when = instant ? formatEventDate(instant, values.timezone, locale).full : null;
+
+    return renderFlyer({
+      kind: dict.events.kinds[values.kind] ?? dict.events.kinds.other,
+      title: values.title,
+      venue: linkedVenue?.name ?? (values.venueName.trim() || null),
+      city: values.city.trim() || null,
+      when,
+      price: values.isFree ? null : values.priceText.trim() || null,
+      freeLabel: dict.events.freeEntry,
+      photo: currentPhoto,
+    });
   }
 
   async function submit(status: "draft" | "published" | "cancelled") {
@@ -722,6 +752,35 @@ export default function EventEditor({
               inputMode="url"
             />
           </Field>
+        </div>
+
+        {/* --- Locandina --------------------------------------------------- */}
+        <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionCover}</h2>
+
+        <div className="mt-3">
+          <CoverField
+            value={values.coverImageUrl}
+            onChange={(url) => set("coverImageUrl", url)}
+            photo={photo}
+            onPhoto={setPhoto}
+            buildFlyer={buildFlyer}
+            canGenerate={values.title.trim() !== ""}
+            labels={{
+              empty: t.coverEmpty,
+              choose: t.coverChoose,
+              replace: t.coverReplace,
+              remove: t.coverRemove,
+              uploading: t.coverUploading,
+              generate: t.coverGenerate,
+              generating: t.coverGenerating,
+              generateHint: t.coverGenerateHint,
+              hint: t.coverHint,
+              errors: t.coverErrors,
+            }}
+          />
+          {errors.coverImageUrl ? (
+            <p className="mt-1 text-xs text-pink">{t.errors[errors.coverImageUrl]}</p>
+          ) : null}
         </div>
 
         {/* --- Descrizione ----------------------------------------------- */}

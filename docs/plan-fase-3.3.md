@@ -18,6 +18,12 @@
 > avevano nessun reclamo da cui farsi vedere in coda (è il **B33**). Da qui il blocco 3.3.2c, che
 > chiude anche B33. Le migration slittano ancora di uno: `0018` pubblicazione che verifica,
 > `0019` locandine, `0020` limite nel database.
+>
+> **Aggiornamento (blocco 3.3.3)**: dato il via libera alle locandine con due richieste dell'utente —
+> la foto deve vedersi **intera** su scheda e locandina, e si carica un **file**, non un indirizzo web.
+> Nessun servizio nuovo e nessuna variabile d'ambiente: **Supabase Storage** era già nel progetto, si
+> aggiunge solo il bucket `event-covers` (migration `0019`) con tetto **3 MB** e soli **JPEG/PNG/WebP**,
+> più le politiche di lettura pubblica e scrittura nella propria cartella.
 
 ## Divisione in blocchi (uno per volta, con build e commit)
 
@@ -29,7 +35,7 @@
 | **3.3.2c** ✅ | **Pubblicare il primo evento verifica il profilo**: l'admin pubblica la bozza e, nello stesso gesto, chi l'ha scritta diventa verificato; l'admin vede **tutti** i profili non verificati, anche senza reclamo (**B33**) | `0018` (funzione `admin_publish_event`) |
 | **3.3.2d** ✅ | **Correzioni sulla mappa**: sulla Home il trascinamento col mouse non muoveva la mappa e la rotellina faceva passi minimi (l'ingresso rotante azzerava i gestori); i menu a tendina avevano voci illeggibili (sfondo bianco su testo bianco) | nessuna |
 | **3.3.2e** ✅ | **"Vicino a me" sulla Home**: l'ingresso rotante rubava la camera a chi cliccava nei primi secondi (e la posizione era chiesta grossolana, senza dire quanto fosse incerta) | nessuna |
-| **3.3.3** | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas | `0019` (bucket + policy) |
+| **3.3.3** ✅ | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas; la foto si vede **intera** su schede, mappa e pagina evento | `0019` (bucket + policy) |
 | **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita | `0020` (trigger) |
 
 ## Decisioni prese
@@ -167,6 +173,50 @@ posizione.
   a inquadrare un riquadro piccolo **in silenzio** (avvisa solo in console) e la mappa resterebbe
   ferma — osservato nei test. Lo zoom si calcola a mano (`zoomForRadius`) e si vola con `flyTo`,
   la stessa strada del caso preciso.
+
+## 3.3.3 — Locandine
+
+L'utente ha dato il via libera con due richieste precise: **la foto deve vedersi intera** (sulla scheda
+e sulla locandina generata) e **si carica un file, non si incolla un indirizzo**.
+
+- **Il formato del riquadro non si impone: si toglie il taglio.** Chiedere un quadrato all'origine
+  avrebbe tagliato i poster verticali (la forma più comune) o li avrebbe rimpiccioliti. La regola è
+  una sola: dentro il riquadro la foto si adatta (`object-contain`) e **i bordi che restano si
+  riempiono con la stessa foto sfocata**. Il riquadro resta della forma giusta per il suo contesto:
+  **quadrato** negli elenchi, nella scheda e nella miniatura della mappa (1:1 regge sia i poster
+  verticali sia le foto quadrate degli eventi già inseriti), **4:3** nel pannello mobile della mappa,
+  **16:10 / 16:9** nella pagina evento. Vale anche per le locandine **esterne** già presenti (i tre
+  eventi inseriti da OpenStage): nessuna di quelle schede è più tagliata.
+- **Senza locandina il riquadro resta**, con il fondo sfumato di OpenStage: con le schede quadrate una
+  card vuota avrebbe lasciato un buco alto quanto il poster accanto.
+- **Il file si carica dal browser** (`lib/covers/upload.ts`) e va dritto a Supabase Storage: le azioni
+  del server hanno un tetto sul corpo della richiesta e la foto di un telefono lo supera al primo
+  scatto. I limiti veri — **3 MB, solo JPEG/PNG/WebP** — sono impostati **sul bucket**, quindi li
+  applica il servizio di archiviazione anche a chi non passa dal modulo; la stessa scelta fatta per il
+  limite anti-spam: nel database, non nell'interfaccia. Verificato: file di testo rifiutato (415),
+  file da 4 MB rifiutato (413), caricamento nella cartella di un altro rifiutato (403).
+- **La cartella è il profilo** (`{profilo}/{uuid}.{ext}`): la prima parte deve essere il proprio
+  `auth.uid()`, lo impone la politica di scrittura. Nessuno può sovrascrivere la locandina di un altro.
+- **La foto si tocca solo quando serve**: se è già leggera e sotto i 1600 px parte **così com'è**
+  (nessuna ricodifica). Solo se è più grande viene ridimensionata (lato lungo 1600 px) — una locandina
+  si guarda sullo schermo, e un file leggero si carica anche con la linea debole di un locale. Il PNG
+  resta PNG (la trasparenza non si butta per principio).
+- **Il generatore è a un clic** (`lib/covers/flyer.ts`): dai dati già scritti (tipo di evento, titolo,
+  quando, dove, prezzo) nasce una **locandina 1080×1350** in canvas, senza librerie: fondo scuro con
+  aloni neon, la foto **intera** in un riquadro arrotondato (sfocata dietro, nitida davanti), tipo di
+  evento e prezzo, titolo che si rimpicciolisce finché sta in tre righe, firma con la striscia
+  viola-ciano-rosa. I caratteri sono quelli del sito, chiesti al documento (`next/font` genera nomi
+  propri): senza aspettarli il canvas disegnerebbe un ripiego. La foto usata è quella **scelta un
+  attimo prima e tenuta in memoria**, quindi non c'è niente da scaricare e nessun permesso da chiedere.
+- **La locandina caricata non si cancella** quando si preme "Rimuovi" dal modulo: l'evento già
+  pubblicato la sta mostrando, e toglierla prima di salvare lascerebbe la pagina pubblica rotta. Il
+  file resta, il collegamento no; la pulizia dei file orfani è materia da amministratore.
+- **Il database resta l'autorità anche sull'indirizzo**: la locandina si accetta solo se è un
+  indirizzo http(s) vero e non più lungo di 500 caratteri. Non si chiude ai soli indirizzi del nostro
+  archivio perché i tre eventi già online hanno locandine che vivono altrove e devono restare
+  modificabili.
+- La nota **B37** (posizione sbagliata al primo clic) resta in backlog e non è stata toccata, come
+  deciso con l'utente.
 
 ## Test di fine fase (come da piano generale)
 

@@ -1,3 +1,4 @@
+import type { CoverErrorCode } from "@/lib/covers/errors";
 import type { EditorErrorCode } from "@/lib/events/editor";
 
 import type { Dictionary } from "./en";
@@ -600,6 +601,25 @@ export const it: Dictionary = {
     pricePlaceholder: "Es. 10 € oppure offerta libera",
     ticketUrl: "Link ai biglietti",
     ticketUrlPlaceholder: "https://…",
+    sectionCover: "Locandina",
+    coverEmpty: "Ancora nessuna locandina: la scheda mostra la striscia colorata di OpenStage.",
+    coverChoose: "Scegli un'immagine",
+    coverReplace: "Sostituisci",
+    coverRemove: "Rimuovi",
+    coverUploading: "Carico la locandina…",
+    coverGenerate: "Genera la locandina",
+    coverGenerating: "Disegno la locandina…",
+    coverGenerateHint:
+      "Disegnata da quello che hai scritto: tipo di evento, titolo, quando e dove. Se hai scelto una foto, ci finisce dentro.",
+    coverHint:
+      "Va bene qualsiasi formato: la locandina si vede intera, mai tagliata. Fino a 3 MB (JPEG, PNG o WebP); le immagini più grandi vengono ridimensionate da sole.",
+    coverErrors: {
+      type: "Le locandine possono essere JPEG, PNG o WebP.",
+      tooBig: "Questa locandina pesa troppo: il massimo è 3 MB.",
+      unreadable: "Questo file non si riesce a leggere come immagine: provane un altro.",
+      generateFailed: "Non siamo riusciti a disegnare la locandina. Riprova.",
+      uploadFailed: "Il caricamento non è andato a buon fine. Riprova tra un momento.",
+    } satisfies Record<CoverErrorCode, string>,
     description: "Descrizione",
     descriptionPlaceholder: "Chi suona, con chi, a che ora si apre…",
     previewTitle: "Anteprima",
@@ -638,6 +658,7 @@ export const it: Dictionary = {
       locationRequired: "Metti il pin sulla mappa: serve a far trovare la serata.",
       priceTooLong: "Il prezzo è troppo lungo (massimo 40 caratteri).",
       ticketInvalid: "Il link ai biglietti deve iniziare con https://",
+      coverInvalid: "L'indirizzo della locandina non è valido: carica di nuovo l'immagine.",
       descriptionTooLong: "La descrizione è troppo lunga (massimo 2000 caratteri).",
     } satisfies Record<EditorErrorCode, string>,
   },

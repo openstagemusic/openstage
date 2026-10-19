@@ -1,5 +1,6 @@
 "use client";
 
+import EventCover from "@/components/events/EventCover";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { editorInstant, type EventEditorState } from "@/lib/events/editor";
 import { formatEventDate } from "@/lib/events/format";
@@ -35,10 +36,14 @@ export default function EventPreviewCard({ values, locale, dict }: EventPreviewC
 
   return (
     <div className="glass overflow-hidden rounded-3xl border border-white/10">
-      <div
-        className="h-1.5 w-full bg-gradient-to-r from-violet via-cyan to-pink"
-        aria-hidden="true"
-      />
+      {values.coverImageUrl ? (
+        <EventCover src={values.coverImageUrl} className="aspect-square w-full" />
+      ) : (
+        <div
+          className="h-1.5 w-full bg-gradient-to-r from-violet via-cyan to-pink"
+          aria-hidden="true"
+        />
+      )}
 
       <div className="p-5">
         <div className="flex flex-wrap items-center gap-2 text-xs">
