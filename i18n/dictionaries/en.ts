@@ -197,6 +197,7 @@ export const en = {
     cancelledBadge: "Cancelled",
     cancelledText: "This event is not happening: the organiser cancelled it.",
     cancelledOn: "Cancelled on",
+    howToGetThere: "How to get there",
     unclaimedNote:
       "Event added by OpenStage: the venue and the artist have not claimed their page yet.",
     when: "When",
@@ -607,6 +608,11 @@ export const en = {
     radius500: "500 metres",
     radius1500: "1.5 km",
     radius3000: "3 km",
+    directions: "How to get there",
+    directionsPlaceholder:
+      "e.g. Inside courtyard: buzz «Sala Studio», there is no sign outside.",
+    directionsHint:
+      "For places without a real address (social centres, lofts, beaches). Two lines, optional: they show on the event page.",
     free: "Free entry",
     price: "Price",
     pricePlaceholder: "e.g. 10 € or pay what you want",
@@ -654,6 +660,8 @@ export const en = {
     backToList: "Back to my events",
     notFound: "This event does not exist or is not yours.",
     saveFailed: "We could not save it. Please try again.",
+    conflict:
+      "Someone edited this night in the meantime (maybe another open tab). Reload the page before saving, so you do not overwrite their changes.",
     tooManyEvents:
       "You have reached the per-account limit of events in 24 hours: you can create the next one once the oldest leaves the window.",
     suspendedAccount:
@@ -666,6 +674,8 @@ export const en = {
       genreTooLong: "The genre is too long (60 characters max).",
       dateRequired: "Pick a date.",
       dateInvalid: "That date does not exist.",
+      dateInPast:
+        "That date has already passed: check the year (and the time). A new night must still be ahead.",
       timeRequired: "Write the start time.",
       timeInvalid: "That time is not valid (e.g. 21:30).",
       timezoneInvalid: "That time zone is not valid.",
@@ -673,9 +683,12 @@ export const en = {
       venueNameTooLong: "The venue name is too long (120 characters max).",
       cityRequired: "Write the city.",
       cityTooLong: "The city name is too long (80 characters max).",
+      directionsTooLong: "The directions are too long (400 characters max): keep them to the point.",
       locationRequired: "Place the pin on the map: that is how people find the night.",
       priceTooLong: "The price is too long (40 characters max).",
       ticketInvalid: "The ticket link must start with https://",
+      ticketUnreachable:
+        "That ticket link answers «not found»: check it (or remove it and write the door price instead).",
       coverInvalid: "That image address is not valid: upload it again from your device.",
       descriptionTooLong: "The description is too long (2000 characters max).",
     } satisfies Record<EditorErrorCode, string>,

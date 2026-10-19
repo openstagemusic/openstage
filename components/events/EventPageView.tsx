@@ -172,6 +172,16 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           {event.venue?.address ? (
             <dd className="mt-1 text-xs text-muted">{event.venue.address}</dd>
           ) : null}
+          {event.directionsText ? (
+            <dd className="mt-3 border-t border-white/10 pt-3">
+              <span className="block text-xs uppercase tracking-wide text-muted">
+                {t.howToGetThere}
+              </span>
+              <span className="mt-1 block whitespace-pre-line text-sm text-white/90">
+                {event.directionsText}
+              </span>
+            </dd>
+          ) : null}
           {mapsUrl || event.venue?.website ? (
             <dd className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
               {mapsUrl ? (

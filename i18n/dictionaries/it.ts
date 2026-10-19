@@ -196,6 +196,7 @@ export const it: Dictionary = {
     cancelledBadge: "Annullato",
     cancelledText: "Questa serata non si tiene: chi l'ha organizzata l'ha annullata.",
     cancelledOn: "Annullato il",
+    howToGetThere: "Come arrivare",
     unclaimedNote:
       "Evento inserito da OpenStage: il locale e l'artista non hanno ancora reclamato la scheda.",
     when: "Quando",
@@ -608,6 +609,10 @@ export const it: Dictionary = {
     radius500: "500 metri",
     radius1500: "1,5 km",
     radius3000: "3 km",
+    directions: "Come arrivare",
+    directionsPlaceholder: "Es. Cortile interno: citofono «Sala Studio», non c'è insegna.",
+    directionsHint:
+      "Per i posti senza indirizzo vero (centri sociali, loft, spiagge). Due righe, facoltative: si leggono sulla pagina della serata.",
     free: "Ingresso gratuito",
     price: "Prezzo",
     pricePlaceholder: "Es. 10 € oppure offerta libera",
@@ -656,6 +661,8 @@ export const it: Dictionary = {
     backToList: "Torna ai miei eventi",
     notFound: "Questo evento non esiste o non è tuo.",
     saveFailed: "Non siamo riusciti a salvare. Riprova.",
+    conflict:
+      "Qualcuno ha modificato questa serata nel frattempo (forse un'altra scheda aperta). Ricarica la pagina prima di salvare, così non cancelli quelle modifiche.",
     tooManyEvents:
       "Hai raggiunto il tetto di serate per account nelle 24 ore: potrai crearne un'altra quando la più vecchia esce dalla finestra.",
     suspendedAccount:
@@ -668,6 +675,8 @@ export const it: Dictionary = {
       genreTooLong: "Il genere è troppo lungo (massimo 60 caratteri).",
       dateRequired: "Scegli la data.",
       dateInvalid: "Questa data non esiste.",
+      dateInPast:
+        "Questa data è già passata: controlla l'anno (e l'ora). Una serata nuova deve essere in programma.",
       timeRequired: "Scrivi l'ora di inizio.",
       timeInvalid: "L'ora non è valida (es. 21:30).",
       timezoneInvalid: "Il fuso orario non è valido.",
@@ -675,9 +684,13 @@ export const it: Dictionary = {
       venueNameTooLong: "Il nome del locale è troppo lungo (massimo 120 caratteri).",
       cityRequired: "Scrivi la città.",
       cityTooLong: "Il nome della città è troppo lungo (massimo 80 caratteri).",
+      directionsTooLong:
+        "Le indicazioni sono troppo lunghe (massimo 400 caratteri): vanno dritte al punto.",
       locationRequired: "Metti il pin sulla mappa: serve a far trovare la serata.",
       priceTooLong: "Il prezzo è troppo lungo (massimo 40 caratteri).",
       ticketInvalid: "Il link ai biglietti deve iniziare con https://",
+      ticketUnreachable:
+        "Quel link ai biglietti risponde «non trovato»: controllalo (o toglilo e scrivi il prezzo all'ingresso).",
       coverInvalid: "L'indirizzo dell'immagine non è valido: caricala di nuovo dal tuo dispositivo.",
       descriptionTooLong: "La descrizione è troppo lunga (massimo 2000 caratteri).",
     } satisfies Record<EditorErrorCode, string>,

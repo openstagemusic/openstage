@@ -45,6 +45,8 @@ export type PublicEvent = {
   startsAt: string;
   timezone: string;
   city: string | null;
+  /** Come arrivare, per gli spazi che un indirizzo non ce l'hanno. */
+  directionsText: string | null;
   latitude: number | null;
   longitude: number | null;
   locationPrecision: LocationPrecision;

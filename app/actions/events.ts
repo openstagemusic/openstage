@@ -6,10 +6,12 @@ import { canManageEvents } from "@/lib/auth/roles";
 import { getArtistByProfileId } from "@/lib/directory/queries";
 import {
   CANCEL_REASON_MAX,
+  CLIENT_KEY_MAX,
   validateEventInput,
   type EditorErrors,
   type EventEditorState,
 } from "@/lib/events/editor";
+import { isTicketUrlReachable } from "@/lib/events/links";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionProfile } from "@/lib/supabase/session";
 
@@ -95,9 +97,17 @@ export type SaveEventResult = {
   eventId?: string;
   /** Lo stato **reale** dopo il salvataggio: il database può aver corretto il tiro. */
   status?: "draft" | "published" | "cancelled";
+  /** Quando è stata salvata: il modulo lo rimanda al salvataggio successivo. */
+  updatedAt?: string;
   fieldErrors?: EditorErrors;
   /** Codice da tradurre con i dizionari (mai il messaggio grezzo del database). */
-  error?: "unauthorized" | "notFound" | "rateLimited" | "suspended" | "saveFailed";
+  error?:
+    | "unauthorized"
+    | "notFound"
+    | "conflict"
+    | "rateLimited"
+    | "suspended"
+    | "saveFailed";
 };
 
 /** Il salvataggio non è riuscito: si traduce il codice del database. */
@@ -107,6 +117,13 @@ function saveErrorCode(error: { code?: string }): NonNullable<SaveEventResult["e
   return mapped === "rateLimited" || mapped === "suspended" ? mapped : "saveFailed";
 }
 
+/** La chiave del modulo, ripulita: o è una chiave vera, o non c'è. */
+function cleanClientKey(value: string | null | undefined): string | null {
+  const key = value?.trim() ?? "";
+
+  return key === "" ? null : key.slice(0, CLIENT_KEY_MAX);
+}
+
 /**
  * Crea o aggiorna un evento.
  *
@@ -114,11 +131,19 @@ function saveErrorCode(error: { code?: string }): NonNullable<SaveEventResult["e
  * (`created_by`) e l'artista della serata (`artist_id`) li decide il server, così
  * nessuno può attribuire un concerto a un altro. Le regole di validità stanno in
  * `lib/events/editor.ts`, le autorizzazioni nella RLS: qui si mettono insieme.
+ *
+ * Tre difese contro i dati sbagliati che nascono *dal salvataggio stesso*:
+ * la chiave del modulo (un invio ripetuto non crea una seconda serata), la data
+ * di lettura (due schede aperte non si sovrascrivono) e il link dei biglietti.
  */
 export async function saveEventAction(input: {
   eventId: string | null;
   status: "draft" | "published" | "cancelled";
   values: EventEditorState;
+  /** Chiave del modulo aperto: rende innocuo un invio ripetuto. */
+  clientKey?: string | null;
+  /** Quando l'evento è stato letto: se qualcuno l'ha toccato, non si sovrascrive. */
+  expectedUpdatedAt?: string | null;
 }): Promise<SaveEventResult> {
   const session = await getSessionProfile();
 
@@ -126,14 +151,25 @@ export async function saveEventAction(input: {
     return { ok: false, error: "unauthorized" };
   }
 
-  const validated = validateEventInput(input.values);
+  // Una serata **nuova** non può stare nel passato (tranne le ultime ore: un
+  // concerto appena cominciato è ancora "stasera"). Una che esiste già sì:
+  // correggere una riga vecchia non deve obbligare a spostarla.
+  const validated = validateEventInput(input.values, { allowPast: input.eventId !== null });
 
   if (!validated.ok) {
     return { ok: false, fieldErrors: validated.errors };
   }
 
-  const supabase = await createClient();
   const values = validated.values;
+
+  // Il link dei biglietti si prova **prima** di salvare: un link morto nella
+  // chiamata più importante della serata è peggio di mezzo secondo d'attesa.
+  // Un sito che non risponde al controllo, però, non è un link morto.
+  if (values.ticketUrl && !(await isTicketUrlReachable(values.ticketUrl))) {
+    return { ok: false, fieldErrors: { ticketUrl: "ticketUnreachable" } };
+  }
+
+  const supabase = await createClient();
 
   const payload = {
     title: values.title,
@@ -145,6 +181,7 @@ export async function saveEventAction(input: {
     venue_id: values.venueId,
     venue_name: values.venueName,
     city: values.city,
+    directions_text: values.directionsText,
     latitude: values.latitude,
     longitude: values.longitude,
     location_precision: values.locationPrecision,
@@ -157,35 +194,95 @@ export async function saveEventAction(input: {
   };
 
   if (input.eventId) {
-    const { data, error } = await supabase
-      .from("events")
-      .update(payload)
-      .eq("id", input.eventId)
-      .select("id, status")
-      .maybeSingle();
+    let update = supabase.from("events").update(payload).eq("id", input.eventId);
+
+    // Se il modulo sa **da quando** sta lavorando, il salvataggio vale solo se
+    // nel frattempo nessuno ha toccato la riga: due schede aperte sullo stesso
+    // evento non si sovrascrivono a vicenda in silenzio.
+    if (input.expectedUpdatedAt) {
+      update = update.eq("updated_at", input.expectedUpdatedAt);
+    }
+
+    const { data, error } = await update.select("id, status, updated_at").maybeSingle();
 
     if (error) {
       console.error("[events] saveEventAction (modifica):", error.message);
       return { ok: false, error: saveErrorCode(error) };
     }
 
-    if (!data) return { ok: false, error: "notFound" };
+    if (!data) {
+      // Distinguere "non è tua" da "l'ha cambiata qualcun altro": la prima è
+      // un indirizzo sbagliato, la seconda è una scheda vecchia da ricaricare.
+      const { data: existing } = await supabase
+        .from("events")
+        .select("id")
+        .eq("id", input.eventId)
+        .maybeSingle();
+
+      return { ok: false, error: existing ? "conflict" : "notFound" };
+    }
 
     revalidatePath("/dashboard");
 
-    return { ok: true, eventId: data.id, status: data.status as SaveEventResult["status"] };
+    return {
+      ok: true,
+      eventId: data.id,
+      status: data.status as SaveEventResult["status"],
+      updatedAt: data.updated_at,
+    };
   }
 
   // L'artista della serata è chi la crea: non si sceglie dal modulo.
   const artist = await getArtistByProfileId(session.id);
+  const clientKey = cleanClientKey(input.clientKey);
+
+  // Stessa chiave, stessa serata: la rete ha ripetuto l'invio, o il dito è
+  // scivolato due volte. La seconda volta si restituisce quella già creata.
+  if (clientKey) {
+    const { data: existing } = await supabase
+      .from("events")
+      .select("id, status, updated_at")
+      .eq("created_by", session.id)
+      .eq("client_key", clientKey)
+      .maybeSingle();
+
+    if (existing) {
+      return {
+        ok: true,
+        eventId: existing.id,
+        status: existing.status as SaveEventResult["status"],
+        updatedAt: existing.updated_at,
+      };
+    }
+  }
 
   const { data, error } = await supabase
     .from("events")
-    .insert({ ...payload, created_by: session.id, artist_id: artist?.id ?? null })
-    .select("id, status")
+    .insert({ ...payload, created_by: session.id, artist_id: artist?.id ?? null, client_key: clientKey })
+    .select("id, status, updated_at")
     .maybeSingle();
 
   if (error) {
+    // Corsa vera: due invii davvero simultanei. L'indice unico ferma il secondo,
+    // e qui si restituisce la serata che il primo ha creato.
+    if (clientKey && error.code === "23505") {
+      const { data: existing } = await supabase
+        .from("events")
+        .select("id, status, updated_at")
+        .eq("created_by", session.id)
+        .eq("client_key", clientKey)
+        .maybeSingle();
+
+      if (existing) {
+        return {
+          ok: true,
+          eventId: existing.id,
+          status: existing.status as SaveEventResult["status"],
+          updatedAt: existing.updated_at,
+        };
+      }
+    }
+
     console.error("[events] saveEventAction (creazione):", error.message);
     return { ok: false, error: saveErrorCode(error) };
   }
@@ -194,5 +291,10 @@ export async function saveEventAction(input: {
 
   revalidatePath("/dashboard");
 
-  return { ok: true, eventId: data.id, status: data.status as SaveEventResult["status"] };
+  return {
+    ok: true,
+    eventId: data.id,
+    status: data.status as SaveEventResult["status"],
+    updatedAt: data.updated_at,
+  };
 }

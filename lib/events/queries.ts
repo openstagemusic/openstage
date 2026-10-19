@@ -35,6 +35,7 @@ export const EVENT_SELECT = [
   "venue_name",
   "cover_image_url",
   "is_featured",
+  "directions_text",
   // Stato e annullamento servono alla **pagina** dell'evento (che resta viva
   // anche per un annullato) e ai Preferiti, che lo mostrano marcato. Gli elenchi
   // pubblici non li mostrano: leggono solo `published`.
@@ -86,6 +87,11 @@ export type EventRow = {
   cover_image_url: string | null;
   is_featured: boolean | null;
   /**
+   * «Come arrivare». Facoltativo come `status`: la ricerca (`search_events`)
+   * restituisce solo le colonne che le servono.
+   */
+  directions_text?: string | null;
+  /**
    * Lo stato della riga.
    *
    * Facoltativo perché la ricerca (`search_events`) legge **solo** i pubblicati e
@@ -132,6 +138,7 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     ticketUrl: row.ticket_url,
     priceText: row.price_text,
     venueName: row.venue_name,
+    directionsText: row.directions_text ?? null,
     coverImageUrl: row.cover_image_url,
     isFeatured: row.is_featured ?? false,
     isUnclaimed,

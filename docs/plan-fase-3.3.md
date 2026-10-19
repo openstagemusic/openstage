@@ -48,7 +48,7 @@
 | **3.3.3b** ✅ | Correzione: **l'immagine della scheda** e **la locandina da condividere** diventano due cose separate — il poster generato non finisce più sulla card (non si carica da nessuna parte, si scarica) | nessuna |
 | **3.3.4** ✅ | **Anti-spam vero**: tetto di serate per account nelle 24 ore contato sui **tentativi** (non sulle righe, così cancellare la bozza non restituisce quota), tetto per account (`profiles.events_daily_limit`), **sospensione** di un profilo rispettata dal database; **e il buco trovato preparando i test: un profilo poteva verificarsi da solo** | `0020` (registro `event_creations`, trigger), `0021` (campi del profilo non modificabili da soli) |
 | **3.3.5** ✅ | **Eventi annullati**: la pagina resta viva con l'etichetta "Annullato" (`noindex`, fuori dalla sitemap), restano nei Preferiti marcati, `cancelled_at` e `cancel_reason`, rimessa in programma come azione distinta | `0022` |
-| **3.3.6** | **Igiene del salvataggio**: doppio invio (chiave di idempotenza), data nel passato, concorrenza su `updated_at`, `ticket_url` verificato, campo **"come arrivare"** per gli spazi temporanei | `0023` |
+| **3.3.6** ✅ | **Igiene del salvataggio**: doppio invio (chiave di idempotenza), data nel passato, concorrenza su `updated_at`, `ticket_url` verificato, campo **"come arrivare"** per gli spazi temporanei | `0023` |
 
 ## Decisioni prese
 
@@ -325,21 +325,42 @@ aveva segnato la serata non trovava nessuna spiegazione: è *ghosting*, l'esatto
   viva con etichetta/data/motivo/`noindex`, i Preferiti marcati, Home e sitemap senza la serata,
   **0 errori in console**).
 
-## 3.3.6 — Igiene del salvataggio (pianificato)
+## 3.3.6 — Igiene del salvataggio
 
-Cose piccole che però producono **dati falsi subito**:
+Cinque cose piccole che però producono **dati falsi subito** — e che nessun test di "funziona"
+avrebbe mai trovato, perché sono i casi in cui il modulo *fa la cosa sbagliata senza lamentarsi*.
 
-- **Doppio invio**: senza chiave di idempotenza un ritentativo di rete crea due righe identiche (il
-  pulsante disabilitato non protegge dalla rete). Una chiave generata dal modulo, unica nel database,
-  rende il secondo invio innocuo.
-- **Data nel passato**: oggi si può salvare una serata del 2020 e resta pubblicata. Avviso, e blocco
-  oltre un limite ragionevole.
-- **Concorrenza**: due schede aperte, l'ultima che scrive vince. Con `updated_at` la seconda riceve
-  "questo evento è stato modificato altrove: ricarica".
-- **`ticket_url`**: oggi si controlla solo che inizi con `https://`. Un controllo di raggiungibilità
-  al salvataggio evita un link morto nella chiamata all'azione più importante.
-- **"Come arrivare"**: un campo breve per gli spazi che un indirizzo non ce l'hanno (centri sociali,
-  loft, cortili, spiagge) — da mostrare nella pagina che la 3.4 costruisce.
+- **Doppio invio.** Un ritentativo di rete (o due clic contemporanei) creava **due serate
+  identiche**: il pulsante disabilitato non protegge dalla rete. Ora il modulo genera una chiave
+  (`client_key`) al primo invio e la riusa; il database ha un indice unico su
+  `(created_by, client_key)` e l'azione, se la ritrova, restituisce **la serata che c'è già**.
+  Se la corsa è vera (due invii simultanei) è l'indice a fermare il secondo (23505) e l'azione
+  rilegge la riga. Dettaglio che conta: il tetto anti-spam della `0020` ora riconosce la chiave e
+  **non consuma una seconda quota** per un invio che non ha creato niente — altrimenti, a quota
+  esaurita, il ritentativo avrebbe risposto "troppe serate" invece della serata già creata.
+- **Data nel passato.** Un anno sbagliato produceva una serata che entra e non compare in nessun
+  elenco: chi l'ha scritta non capisce perché. Ora la data si rifiuta (`dateInPast`) se è più
+  vecchia di **3 ore** — un concerto appena cominciato è ancora "stasera", un 2024 no. La regola
+  vale **solo sulle serate nuove**: correggere una riga vecchia non deve obbligare a spostarla.
+- **Concorrenza.** Due schede aperte: l'ultima che scriveva vinceva, in silenzio. Ora il modulo
+  manda la `updated_at` da cui è partito e l'aggiornamento vale solo se la riga è ancora quella;
+  altrimenti torna `conflict` — "qualcuno ha modificato questa serata nel frattempo, ricarica" — e
+  nessun campo viene sovrascritto. Dopo un salvataggio riuscito il modulo si aggiorna la versione
+  da solo, così salvare due volte di fila non produce un falso conflitto.
+- **Link ai biglietti.** Si salvava qualsiasi cosa iniziasse con `https://`. Ora si fa una `HEAD`
+  prima di salvare, ma la regola è **volutamente asimmetrica**: bloccano solo **404 e 410** (il
+  link è morto), mentre 403/405/429, redirect, timeout e host che non risponde **passano** — un
+  sito che protegge i bot non è un sito chiuso, e rifiutare un salvataggio legittimo è peggio di
+  un link forse rotto.
+- **"Come arrivare"** (`directions_text`, 400 caratteri): per i posti che un indirizzo non ce
+  l'hanno — centri sociali, loft, cortili, spiagge. Si scrive nel modulo, si legge nella pagina
+  della serata sotto il dove (e la 3.4 lo userà nelle indicazioni).
+- **Test**: 11 prove sulle API (chiave ripetuta → 409 e **una sola** serata, quota consumata una
+  volta sola, chiave oltre 64 caratteri rifiutata, salvataggio da scheda aggiornata sì / da scheda
+  vecchia no, «come arrivare» salvato e oltre 400 caratteri rifiutato) e 12 in browser (data
+  passata fermata con una frase chiara, link morto fermato, link vivo salvato, «come arrivare» in
+  pagina pubblica, avviso di concorrenza, salvataggio dopo il ricaricamento e **secondo** salvataggio
+  senza falsi conflitti, **0 errori in console**).
 
 ## Le otto decisioni congelate (19 ottobre 2026)
 

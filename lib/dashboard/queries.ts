@@ -16,9 +16,13 @@ import { createClient } from "@/lib/supabase/server";
 
 export type DashboardStatus = "draft" | "published" | "cancelled";
 
-export type DashboardEvent = PublicEvent & { status: DashboardStatus };
+export type DashboardEvent = PublicEvent & {
+  status: DashboardStatus;
+  /** Quando è stata salvata l'ultima volta: serve a non sovrascriversi a vicenda. */
+  updatedAt: string;
+};
 
-type DashboardRow = EventRow & { status: DashboardStatus };
+type DashboardRow = EventRow & { status: DashboardStatus; updated_at: string };
 
 /** Gli eventi creati da questo profilo, in ordine di data (i prossimi per primi). */
 export const listMyEvents = cache(async (profileId: string): Promise<DashboardEvent[]> => {
@@ -26,7 +30,7 @@ export const listMyEvents = cache(async (profileId: string): Promise<DashboardEv
 
   const { data, error } = await supabase
     .from("events")
-    .select(EVENT_SELECT)
+    .select(`${EVENT_SELECT}, updated_at`)
     .eq("created_by", profileId)
     .order("starts_at", { ascending: true });
 
@@ -38,6 +42,7 @@ export const listMyEvents = cache(async (profileId: string): Promise<DashboardEv
   return (data as unknown as DashboardRow[]).map((row) => ({
     ...toPublicEvent(row),
     status: row.status,
+    updatedAt: row.updated_at,
   }));
 });
 
@@ -98,7 +103,7 @@ export const getMyEvent = cache(
 
     const { data, error } = await supabase
       .from("events")
-      .select(EVENT_SELECT)
+      .select(`${EVENT_SELECT}, updated_at`)
       .eq("id", id)
       .eq("created_by", profileId)
       .maybeSingle();
@@ -110,7 +115,7 @@ export const getMyEvent = cache(
 
     const row = data as unknown as DashboardRow;
 
-    return { ...toPublicEvent(row), status: row.status };
+    return { ...toPublicEvent(row), status: row.status, updatedAt: row.updated_at };
   }
 );
 

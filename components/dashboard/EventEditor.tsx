@@ -14,6 +14,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import { renderFlyer } from "@/lib/covers/flyer";
 import type { VenueOption } from "@/lib/dashboard/queries";
 import {
+  DIRECTIONS_MAX,
   editorInstant,
   RADIUS_OPTIONS_M,
   TIMEZONE_OPTIONS,
@@ -54,6 +55,8 @@ type EventEditorProps = {
   mapCenter: { latitude: number; longitude: number };
   verified: boolean;
   currentStatus: "draft" | "published" | "cancelled";
+  /** Quando l'evento è stato letto (`null` quando si crea): serve a non sovrascrivere. */
+  updatedAt: string | null;
   dict: Dictionary;
 };
 
@@ -83,6 +86,20 @@ function Field({
 }
 
 /**
+ * Una chiave nuova per questa compilazione.
+ *
+ * Non è un segreto: serve solo a riconoscere «lo stesso invio». `randomUUID` c'è
+ * nei browser moderni; dove manca, due numeri casuali bastano allo scopo.
+ */
+function createClientKey(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+/**
  * Il modulo di creazione e modifica di un evento.
  *
  * Scrive passando da un'azione del server, non direttamente dal browser, per due
@@ -100,6 +117,7 @@ export default function EventEditor({
   mapCenter,
   verified,
   currentStatus,
+  updatedAt: initialUpdatedAt,
   dict,
 }: EventEditorProps) {
   const router = useRouter();
@@ -107,6 +125,21 @@ export default function EventEditor({
   const t = dict.editor;
 
   const [values, setValues] = useState<EventEditorState>(initial);
+  /**
+   * Quando il server ha salvato l'evento l'ultima volta.
+   *
+   * Si aggiorna a ogni salvataggio riuscito: il secondo salvataggio della stessa
+   * sessione deve riconoscere la propria scrittura, non crederla di un altro.
+   */
+  const [updatedAt, setUpdatedAt] = useState<string | null>(initialUpdatedAt);
+  /**
+   * La chiave di questa compilazione.
+   *
+   * Nasce al primo invio e resta la stessa finché il modulo è aperto: se la
+   * rete ripete l'invio (o il dito scivola due volte) il database riconosce la
+   * serata già creata e non ne fa una seconda.
+   */
+  const clientKey = useRef<string | null>(null);
   const [linkedVenue, setLinkedVenue] = useState<{ id: string; name: string } | null>(
     initial.venueId && linkedVenueName ? { id: initial.venueId, name: linkedVenueName } : null
   );
@@ -331,6 +364,7 @@ export default function EventEditor({
   const saveErrorText: Record<NonNullable<SaveEventResult["error"]>, string> = {
     unauthorized: t.saveFailed,
     notFound: t.notFound,
+    conflict: t.conflict,
     rateLimited: t.tooManyEvents,
     suspended: t.suspendedAccount,
     saveFailed: t.saveFailed,
@@ -341,10 +375,15 @@ export default function EventEditor({
     setErrors({});
     setMessage(null);
 
+    if (!clientKey.current) clientKey.current = createClientKey();
+
     const outcome = await saveEventAction({
       eventId: mode === "edit" ? eventId : null,
       status,
       values,
+      clientKey: clientKey.current,
+      // In creazione non c'è niente da proteggere: la riga non esiste ancora.
+      expectedUpdatedAt: mode === "edit" ? updatedAt : null,
     });
 
     setBusy(null);
@@ -362,6 +401,9 @@ export default function EventEditor({
       });
       return;
     }
+
+    // La riga è cambiata: il prossimo salvataggio parte da questa versione.
+    if (outcome.updatedAt) setUpdatedAt(outcome.updatedAt);
 
     if (mode === "create") {
       router.push("/dashboard/events");
@@ -724,9 +766,30 @@ export default function EventEditor({
           ) : null}
         </div>
 
+        {/* Per i posti che un indirizzo non ce l'hanno: centri sociali, loft,
+            cortili, spiagge. Due righe, che la pagina evento mostra accanto
+            al dove. */}
+        <div className="mt-4">
+          <Field
+            id="event-directions"
+            label={t.directions}
+            hint={t.directionsHint}
+            error={errors.directions ? t.errors[errors.directions] : null}
+          >
+            <textarea
+              id="event-directions"
+              className={inputClass}
+              rows={2}
+              value={values.directions}
+              onChange={(event) => set("directions", event.target.value)}
+              placeholder={t.directionsPlaceholder}
+              maxLength={DIRECTIONS_MAX}
+            />
+          </Field>
+        </div>
+
         {/* --- Ingresso -------------------------------------------------- */}
         <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionMoney}</h2>
-
         <div className="mt-3 grid gap-4">
           <label className="flex items-center gap-3 text-sm text-white">
             <input

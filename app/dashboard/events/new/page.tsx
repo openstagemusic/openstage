@@ -69,6 +69,7 @@ export default async function NewEventPage() {
           }}
           verified={verified}
           currentStatus="draft"
+          updatedAt={null}
           dict={dict}
         />
       </div>

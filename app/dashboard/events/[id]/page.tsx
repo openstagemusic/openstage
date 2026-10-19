@@ -84,6 +84,7 @@ export default async function EditEventPage({
           }}
           verified={verified}
           currentStatus={event.status}
+          updatedAt={event.updatedAt}
           dict={dict}
         />
       </div>

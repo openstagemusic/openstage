@@ -35,6 +35,28 @@ export const COVER_URL_MAX = 500;
  */
 export const CANCEL_REASON_MAX = 300;
 
+/** Quanto può essere lungo il campo «come arrivare». */
+export const DIRECTIONS_MAX = 400;
+
+/**
+ * La chiave che identifica un modulo di creazione.
+ *
+ * La genera il modulo e la manda col salvataggio: se lo stesso invio arriva due
+ * volte, il database riconosce la seconda e non crea una serata doppia. Il
+ * limite è anche nel database (`events_client_key_len`, migration `0023`).
+ */
+export const CLIENT_KEY_MAX = 64;
+
+/**
+ * Quanto indietro nel tempo può stare una serata **nuova**.
+ *
+ * Tre ore: un concerto cominciato poco fa è ancora "stasera" e va segnato
+ * (succede davvero: si pubblica mentre si suona). Un anno sbagliato, invece,
+ * non deve entrare: sarebbe una serata che non comparirà mai in nessun elenco,
+ * e chi l'ha scritta non capirebbe perché.
+ */
+export const PAST_GRACE_MS = 3 * 60 * 60 * 1000;
+
 /** Fusi orari proposti dal modulo (l'ora legale la calcola `Intl`). */
 export const TIMEZONE_OPTIONS = [
   "Europe/Rome",
@@ -61,6 +83,7 @@ export const EDITOR_FIELDS = [
   "venueId",
   "venueName",
   "city",
+  "directions",
   "location",
   "priceText",
   "ticketUrl",
@@ -77,6 +100,7 @@ export type EditorErrorCode =
   | "genreTooLong"
   | "dateRequired"
   | "dateInvalid"
+  | "dateInPast"
   | "timeRequired"
   | "timeInvalid"
   | "timezoneInvalid"
@@ -84,9 +108,11 @@ export type EditorErrorCode =
   | "venueNameTooLong"
   | "cityRequired"
   | "cityTooLong"
+  | "directionsTooLong"
   | "locationRequired"
   | "priceTooLong"
   | "ticketInvalid"
+  | "ticketUnreachable"
   | "coverInvalid"
   | "descriptionTooLong";
 
@@ -106,6 +132,8 @@ export type EventEditorState = {
   venueId: string;
   venueName: string;
   city: string;
+  /** Come arrivare, per gli spazi che un indirizzo non ce l'hanno. */
+  directions: string;
   latitude: number | null;
   longitude: number | null;
   locationPrecision: LocationPrecision;
@@ -128,6 +156,7 @@ export type EventEditorValues = {
   venueId: string | null;
   venueName: string | null;
   city: string | null;
+  directionsText: string | null;
   latitude: number | null;
   longitude: number | null;
   locationPrecision: LocationPrecision;
@@ -201,8 +230,22 @@ function isCoordinate(value: number | null, limit: number): value is number {
   return typeof value === "number" && Number.isFinite(value) && Math.abs(value) <= limit;
 }
 
+export type ValidationOptions = {
+  /**
+   * Una serata **già esistente** può avere una data passata: è storia, e
+   * correggerne una riga non deve obbligare a spostarla di un anno. Una serata
+   * nuova no.
+   */
+  allowPast?: boolean;
+  /** Il momento del controllo. Si passa dall'azione, così le prove sono fisse. */
+  now?: Date;
+};
+
 /** Un evento è valido se ha un titolo, un quando e un dove. Tutto il resto è di contorno. */
-export function validateEventInput(input: EventEditorState): ValidationResult {
+export function validateEventInput(
+  input: EventEditorState,
+  options: ValidationOptions = {}
+): ValidationResult {
   const errors: EditorErrors = {};
 
   const title = input.title.trim();
@@ -230,6 +273,13 @@ export function validateEventInput(input: EventEditorState): ValidationResult {
     if (!startsAt) errors.date = "dateInvalid";
   }
 
+  // Una data nel passato è quasi sempre un anno sbagliato: la serata entrerebbe
+  // e non comparirebbe in nessun elenco, senza che nessuno capisca perché.
+  if (startsAt && !options.allowPast && !errors.date) {
+    const earliest = (options.now ?? new Date()).getTime() - PAST_GRACE_MS;
+    if (new Date(startsAt).getTime() < earliest) errors.date = "dateInPast";
+  }
+
   const venueId = input.venueId.trim();
   const hasVenue = venueId !== "";
   if (hasVenue && !isUuid(venueId)) errors.venueId = "venueInvalid";
@@ -247,6 +297,10 @@ export function validateEventInput(input: EventEditorState): ValidationResult {
   const longitude = input.longitude;
   const hasPoint = isCoordinate(latitude, 90) && isCoordinate(longitude, 180);
   if (!hasPoint) errors.location = "locationRequired";
+
+  // «Come arrivare»: due righe per gli spazi che un indirizzo non ce l'hanno.
+  const directions = input.directions.trim();
+  if (directions.length > DIRECTIONS_MAX) errors.directions = "directionsTooLong";
 
   const priceText = input.priceText.trim();
   if (priceText.length > PRICE_MAX) errors.priceText = "priceTooLong";
@@ -295,6 +349,7 @@ export function validateEventInput(input: EventEditorState): ValidationResult {
       // collegata: altrimenti conterebbe due volte la stessa cosa.
       venueName: hasVenue ? null : venueName || null,
       city: city || null,
+      directionsText: directions || null,
       latitude: hasPoint ? latitude : null,
       longitude: hasPoint ? longitude : null,
       locationPrecision,
@@ -341,6 +396,7 @@ export function initialEditorState(timezone = FILTER_TIMEZONE): EventEditorState
     venueId: "",
     venueName: "",
     city: "",
+    directions: "",
     latitude: null,
     longitude: null,
     locationPrecision: "exact",
@@ -363,6 +419,7 @@ export type EditableEvent = {
   venueId: string | null;
   venueName: string | null;
   city: string | null;
+  directionsText: string | null;
   latitude: number | null;
   longitude: number | null;
   locationPrecision: LocationPrecision;
@@ -387,6 +444,7 @@ export function editorStateFromEvent(event: EditableEvent): EventEditorState {
     venueId: event.venueId ?? "",
     venueName: event.venueName ?? "",
     city: event.city ?? "",
+    directions: event.directionsText ?? "",
     latitude: event.latitude,
     longitude: event.longitude,
     locationPrecision: event.locationPrecision,
