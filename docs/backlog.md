@@ -7,6 +7,9 @@ fine delle nove fasi.
 Legenda tipo: **🟡 micro** = piccola, si può fare in qualsiasi momento · **🟢 in fase** = va
 fatta dentro la fase indicata · **🔴 grossa** = da riprendere insieme a fine progetto.
 
+> **Dove finisce ogni voce**: la roadmap approvata il 19 ottobre 2026 (Fase 4 → Fase 10, con i
+> cancelli prima dell'apertura al pubblico) è in `docs/plan-fase-4.md`.
+
 | # | Voce | Tipo | Origine | Note |
 | --- | --- | --- | --- | --- |
 | B01 | Attivare *Leaked password protection* su Supabase | 🔴 | Fase 1.2 | **Non disponibile sul piano free**: funzione Pro. Si attiva quando si passerà al piano a pagamento per i pagamenti |
