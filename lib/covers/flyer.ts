@@ -10,6 +10,10 @@
  * La foto scelta si disegna **intera**, mai tagliata: riempie la parte alta con
  * la stessa immagine sfocata dietro, esattamente come sulle schede del sito.
  *
+ * Quello che esce da qui **non finisce sulla scheda dell'evento**: è un'immagine
+ * da scaricare e condividere, e si disegna al momento. La foto che si vede sulla
+ * scheda è un'altra cosa, e la carica chi organizza (vedi `lib/covers/upload.ts`).
+ *
  * Nessuna libreria: il disegno è canvas del browser, come previsto dal piano.
  * I tipi di carattere sono quelli del sito, letti dalle variabili CSS (con
  * `next/font` i nomi sono generati, quindi vanno chiesti al documento).
@@ -26,6 +30,15 @@ const CYAN = "#22d3ee";
 const PAD = 64;
 const PHOTO = { x: PAD, y: PAD, width: FLYER_WIDTH - PAD * 2, height: 640 };
 
+/**
+ * La foto della locandina.
+ *
+ * Un `Blob` è il file scelto adesso nel modulo (sta in memoria, si disegna
+ * subito); una stringa è l'indirizzo dell'immagine già salvata, che si rilegge
+ * dall'archivio quando si genera la locandina in un secondo momento.
+ */
+export type FlyerPhoto = Blob | string;
+
 export type FlyerInput = {
   /** Tipo di evento, già tradotto ("Concerto"). */
   kind: string;
@@ -37,8 +50,7 @@ export type FlyerInput = {
   price: string | null;
   /** Testo per l'ingresso gratuito ("Ingresso gratuito"). */
   freeLabel: string;
-  /** La foto scelta nel modulo: sta in memoria, quindi si può disegnare. */
-  photo: Blob | null;
+  photo: FlyerPhoto | null;
 };
 
 function cssValue(name: string, fallback: string): string {
@@ -49,17 +61,28 @@ function cssValue(name: string, fallback: string): string {
   return value || fallback;
 }
 
-function loadPhoto(photo: Blob): Promise<HTMLImageElement | null> {
+/**
+ * Prepara la foto per il disegno.
+ *
+ * Le immagini che vivono sul nostro archivio si possono usare in canvas; quelle
+ * esterne (le locandine degli eventi inseriti prima dei file) si chiedono con
+ * `crossOrigin`: se il sito di partenza non lo concede il caricamento fallisce e
+ * la locandina si disegna **senza** foto, invece di rompersi.
+ */
+function loadPhoto(source: Blob | string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
-    const url = URL.createObjectURL(photo);
+    const local = typeof source !== "string";
+    const url = local ? URL.createObjectURL(source as Blob) : source;
+
     const image = new Image();
+    if (!local) image.crossOrigin = "anonymous";
 
     image.onload = () => {
-      URL.revokeObjectURL(url);
+      if (local) URL.revokeObjectURL(url);
       resolve(image);
     };
     image.onerror = () => {
-      URL.revokeObjectURL(url);
+      if (local) URL.revokeObjectURL(url);
       resolve(null);
     };
     image.src = url;

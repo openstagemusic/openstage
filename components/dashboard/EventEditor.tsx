@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { saveEventAction } from "@/app/actions/events";
-import CoverField from "@/components/dashboard/CoverField";
+import CoverField, { type PosterSource } from "@/components/dashboard/CoverField";
 import EventPreviewCard from "@/components/dashboard/EventPreviewCard";
 import type { MapFocus } from "@/components/dashboard/LocationPicker";
 import LocaleLink from "@/components/i18n/LocaleLink";
@@ -116,9 +116,6 @@ export default function EventEditor({
   const [errors, setErrors] = useState<Partial<Record<EditorField, EditorErrorCode>>>({});
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState<"draft" | "published" | "cancelled" | null>(null);
-  // La foto scelta per la locandina, tenuta in memoria: con quella si disegna la
-  // locandina generata, senza doverla scaricare da un altro sito.
-  const [photo, setPhoto] = useState<Blob | null>(null);
   // Ricerca dei posti (città, indirizzi, locali): scegliendone uno la mappa vola lì.
   const [placeQuery, setPlaceQuery] = useState("");
   const [places, setPlaces] = useState<GeocodePlace[]>([]);
@@ -300,13 +297,15 @@ export default function EventEditor({
   }
 
   /**
-   * Disegna la locandina dai dati già scritti.
+   * Disegna la locandina da condividere, dai dati già scritti.
    *
-   * La foto arriva da `CoverField`: è quella scelta un attimo prima e tenuta in
-   * memoria, quindi non c'è niente da scaricare e la locandina si disegna sempre.
+   * La sorgente della foto la decide `CoverField`: il file scelto adesso, oppure
+   * l'immagine già salvata riletta dall'indirizzo. Quello che esce non si carica
+   * e non tocca la scheda: si scarica soltanto.
+   *
    * Senza titolo non si disegna: la locandina deve dire almeno di cosa si tratta.
    */
-  async function buildFlyer(currentPhoto: Blob | null): Promise<Blob | null> {
+  async function buildFlyer(source: PosterSource): Promise<Blob | null> {
     const instant = editorInstant(values);
     const when = instant ? formatEventDate(instant, values.timezone, locale).full : null;
 
@@ -318,7 +317,7 @@ export default function EventEditor({
       when,
       price: values.isFree ? null : values.priceText.trim() || null,
       freeLabel: dict.events.freeEntry,
-      photo: currentPhoto,
+      photo: source,
     });
   }
 
@@ -754,28 +753,30 @@ export default function EventEditor({
           </Field>
         </div>
 
-        {/* --- Locandina --------------------------------------------------- */}
+        {/* --- Immagine e locandina ---------------------------------------- */}
         <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionCover}</h2>
 
         <div className="mt-3">
           <CoverField
             value={values.coverImageUrl}
             onChange={(url) => set("coverImageUrl", url)}
-            photo={photo}
-            onPhoto={setPhoto}
+            title={values.title}
             buildFlyer={buildFlyer}
-            canGenerate={values.title.trim() !== ""}
             labels={{
               empty: t.coverEmpty,
               choose: t.coverChoose,
               replace: t.coverReplace,
               remove: t.coverRemove,
               uploading: t.coverUploading,
-              generate: t.coverGenerate,
-              generating: t.coverGenerating,
-              generateHint: t.coverGenerateHint,
               hint: t.coverHint,
               errors: t.coverErrors,
+              posterTitle: t.posterTitle,
+              posterHint: t.posterHint,
+              posterGenerate: t.posterGenerate,
+              posterGenerating: t.posterGenerating,
+              posterAgain: t.posterAgain,
+              posterDownload: t.posterDownload,
+              posterNeedsTitle: t.posterNeedsTitle,
             }}
           />
           {errors.coverImageUrl ? (

@@ -36,6 +36,7 @@
 | **3.3.2d** ✅ | **Correzioni sulla mappa**: sulla Home il trascinamento col mouse non muoveva la mappa e la rotellina faceva passi minimi (l'ingresso rotante azzerava i gestori); i menu a tendina avevano voci illeggibili (sfondo bianco su testo bianco) | nessuna |
 | **3.3.2e** ✅ | **"Vicino a me" sulla Home**: l'ingresso rotante rubava la camera a chi cliccava nei primi secondi (e la posizione era chiesta grossolana, senza dire quanto fosse incerta) | nessuna |
 | **3.3.3** ✅ | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas; la foto si vede **intera** su schede, mappa e pagina evento | `0019` (bucket + policy) |
+| **3.3.3b** ✅ | Correzione: **l'immagine della scheda** e **la locandina da condividere** diventano due cose separate — il poster generato non finisce più sulla card (non si carica da nessuna parte, si scarica) | nessuna |
 | **3.3.4** | Limite **10 eventi per account nelle 24 ore imposto nel database**, regola bozza per i profili non verificati resa esplicita | `0020` (trigger) |
 
 ## Decisioni prese
@@ -217,6 +218,32 @@ e sulla locandina generata) e **si carica un file, non si incolla un indirizzo**
   modificabili.
 - La nota **B37** (posizione sbagliata al primo clic) resta in backlog e non è stata toccata, come
   deciso con l'utente.
+
+## 3.3.3b — L'immagine della scheda e la locandina da condividere
+
+Difetto visto dall'utente provando la 3.3.3: generando la locandina, **il poster diventava anche
+l'immagine della scheda**. Effetto collaterale immediato: sulla card dell'evento la stessa foto
+compariva due volte (una come poster caricato, una come locandina disegnata), e per giunta con il
+titolo ripetuto sotto. La causa era che il generatore finiva nello stesso campo dell'immagine scelta
+(`cover_image_url`), quindi il poster era insieme "grafica da condividere" e "foto dell'evento".
+
+- **Due ruoli, due posti.** La sezione si chiama ora **"Immagine"** e contiene solo il caricamento
+  del file (quello che si vede su scheda, mappa e pagina evento). Sotto c'è il blocco **"Locandina da
+  condividere"**: anteprima del poster con **"Scarica"** e **"Rifai"**. La locandina generata **non
+  viene caricata da nessuna parte** e non tocca `cover_image_url`: il poster è un file che si scarica,
+  la card resta com'era. Il testo lo dice esplicitamente ("Non finisce sulla scheda — i dati sono già
+  lì sotto").
+- **Il poster si usa anche su un evento già salvato**: la sorgente della foto è il file scelto in
+  questa sessione, oppure — se non ce n'è uno — **l'immagine già salvata**, riletta dal suo indirizzo
+  (`crossOrigin`), così il generatore funziona anche aprendo un evento di ieri. Le immagini esterne
+  che non concedono l'uso in canvas non rompono niente: il poster si disegna **senza** foto.
+- **Il nome del file** è `openstage-<titolo>.jpg`: quello che serve per ritrovarlo fra i download.
+- **Il poster invecchia**: cambiando titolo o immagine la vecchia anteprima si toglie (si scaricherebbe
+  una locandina che parla di un'altra serata) e si rifà con un clic.
+- **`uploadCoverBlob` è stato rimosso**: era la strada che faceva finire il poster nell'archivio, e con
+  il nuovo disegno non serve più. Il caricamento resta uno solo, quello del file scelto.
+- **Nessun dato duplicato**: la scheda mostra solo la foto scelta; il poster è un'immagine a parte.
+  Le locandine esterne dei tre eventi già online restano intatte e modificabili.
 
 ## Test di fine fase (come da piano generale)
 

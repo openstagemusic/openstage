@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { CoverErrorCode } from "./errors";
 
 /**
- * Caricamento delle locandine su Supabase Storage.
+ * Caricamento dell'immagine dell'evento su Supabase Storage.
  *
  * Perché il file parte dal browser e non dall'azione del server: le azioni del
  * server hanno un tetto sul corpo della richiesta, e la foto di un telefono lo
@@ -154,11 +154,4 @@ export async function uploadCoverFile(file: File): Promise<CoverUploadResult> {
   if (shrunk.blob.size > COVER_MAX_BYTES) return { ok: false, error: "tooBig" };
 
   return put(shrunk.blob, shrunk.type);
-}
-
-/** Carica un'immagine disegnata da noi: la locandina generata dai dati. */
-export async function uploadCoverBlob(blob: Blob, type = "image/jpeg"): Promise<CoverUploadResult> {
-  if (blob.size > COVER_MAX_BYTES) return { ok: false, error: "tooBig" };
-
-  return put(blob, type);
 }
