@@ -4,7 +4,7 @@ import Link from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
-import { artistRepeatsTitle, placeName, type PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
 
 type EventTeaserProps = {
@@ -23,6 +23,10 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
   const kindLabel = dict.events.kinds[event.kind] ?? dict.events.kinds.other;
   const whenLabel = when.isToday ? dict.events.tonight : when.isTomorrow ? dict.events.tomorrow : null;
 
+  // Negli elenchi pubblici un annullato non c'è; qui resta solo il caso dei
+  // **Preferiti**, dove chi l'aveva salvato deve vedere che non si tiene.
+  const cancelled = isCancelled(event);
+
   return (
     <article className="glass h-full overflow-hidden rounded-3xl border border-white/10 transition-colors hover:border-white/25">
       <Link href={eventPath(event)} className="flex h-full flex-col">
@@ -30,9 +34,15 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
 
         <div className="flex flex-1 flex-col p-4">
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
-              {kindLabel}
-            </span>
+            {cancelled ? (
+              <span className="rounded-full border border-pink/40 bg-pink/10 px-2.5 py-1 text-white">
+                {dict.events.cancelledBadge}
+              </span>
+            ) : (
+              <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
+                {kindLabel}
+              </span>
+            )}
             {whenLabel ? (
               <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-white">
                 {whenLabel}

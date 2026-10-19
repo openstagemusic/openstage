@@ -13,6 +13,7 @@ import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { DashboardEvent, DashboardStatus } from "@/lib/dashboard/queries";
+import { CANCEL_REASON_MAX } from "@/lib/events/editor";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
 import { placeName } from "@/lib/events/types";
@@ -36,6 +37,9 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
   const locale = useLocale();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /** L'evento di cui si sta scrivendo il motivo dell'annullamento. */
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
 
   // Il database risponde con codici: qui diventano frasi. Nessun messaggio
   // grezzo di Postgres arriva a chi usa il sito.
@@ -59,6 +63,18 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
     }
 
     router.refresh();
+  }
+
+  /**
+   * Annullare chiede il motivo (facoltativo) prima di farlo: la pagina pubblica
+   * resta viva, e la prima cosa che chi l'aveva salvata legge è **perché**.
+   */
+  async function confirmCancel(eventId: string) {
+    await run(`cancel-${eventId}`, () =>
+      setEventStatusAction({ eventId, status: "cancelled", reason })
+    );
+
+    setCancellingId(null);
   }
 
   if (events.length === 0) {
@@ -143,7 +159,12 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                       <p className="mt-1 text-xs text-muted">{dict.draftNote}</p>
                     ) : null}
                     {event.status === "cancelled" ? (
-                      <p className="mt-1 text-xs text-muted">{dict.cancelledNote}</p>
+                      <>
+                        <p className="mt-1 text-xs text-muted">{dict.cancelledNote}</p>
+                        {event.cancelReason ? (
+                          <p className="mt-1 text-xs text-white/70">{event.cancelReason}</p>
+                        ) : null}
+                      </>
                     ) : null}
 
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -162,7 +183,13 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                           }
                           className={primaryButton}
                         >
-                          {busy === `publish-${event.id}` ? dict.publishing : dict.publish}
+                          {busy === `publish-${event.id}`
+                            ? event.status === "cancelled"
+                              ? dict.republishing
+                              : dict.publishing
+                            : event.status === "cancelled"
+                              ? dict.republish
+                              : dict.publish}
                         </button>
                       ) : null}
 
@@ -171,14 +198,13 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                           <button
                             type="button"
                             disabled={busy !== null}
-                            onClick={() =>
-                              run(`cancel-${event.id}`, () =>
-                                setEventStatusAction({ eventId: event.id, status: "cancelled" })
-                              )
-                            }
+                            onClick={() => {
+                              setReason("");
+                              setCancellingId(event.id);
+                            }}
                             className={ghostButton}
                           >
-                            {busy === `cancel-${event.id}` ? dict.cancelling : dict.cancelEvent}
+                            {dict.cancelEvent}
                           </button>
 
                           <LocaleLink href={eventPath(event)} className={ghostButton}>
@@ -203,6 +229,44 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                         </button>
                       ) : null}
                     </div>
+
+                    {cancellingId === event.id ? (
+                      <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                        <label
+                          htmlFor={`cancel-reason-${event.id}`}
+                          className="text-xs text-muted"
+                        >
+                          {dict.cancelReasonLabel}
+                        </label>
+
+                        <textarea
+                          id={`cancel-reason-${event.id}`}
+                          className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d1a] px-3 py-2 text-sm text-white outline-none focus:border-cyan/60"
+                          rows={2}
+                          maxLength={CANCEL_REASON_MAX}
+                          value={reason}
+                          onChange={(changeEvent) => setReason(changeEvent.target.value)}
+                        />
+
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            disabled={busy !== null}
+                            onClick={() => void confirmCancel(event.id)}
+                            className={primaryButton}
+                          >
+                            {busy === `cancel-${event.id}` ? dict.cancelling : dict.cancelConfirm}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCancellingId(null)}
+                            className={ghostButton}
+                          >
+                            {dict.cancelDismiss}
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                   </article>
                 );
               })}

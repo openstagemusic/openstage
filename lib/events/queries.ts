@@ -7,9 +7,12 @@ import type { EventKind, LocationPrecision, PublicEvent } from "./types";
 /**
  * Lettura degli eventi pubblici.
  *
- * La visibilità è decisa dal database (`events_select_public`: al pubblico solo
- * gli eventi `published`), quindi ogni query qui filtra comunque su
- * `status = 'published'` — così il piano di esecuzione usa gli indici parziali.
+ * La visibilità è decisa dal database (`events_select_public`: al pubblico gli
+ * eventi `published`, e gli `cancelled` che restano leggibili solo per la loro
+ * pagina). Gli **elenchi** di qui — ricerca, mappa, Home, schede di artisti e
+ * locali — leggono volutamente solo `published`: un annullato non è più una
+ * destinazione. La pagina dell'evento (`getEventById`/`getEventBySlug`) non
+ * filtra, e per questo può mostrarlo con l'etichetta "Annullato".
  */
 
 export const EVENT_SELECT = [
@@ -32,6 +35,12 @@ export const EVENT_SELECT = [
   "venue_name",
   "cover_image_url",
   "is_featured",
+  // Stato e annullamento servono alla **pagina** dell'evento (che resta viva
+  // anche per un annullato) e ai Preferiti, che lo mostrano marcato. Gli elenchi
+  // pubblici non li mostrano: leggono solo `published`.
+  "status",
+  "cancelled_at",
+  "cancel_reason",
   "artists ( id, slug, name, city, profile_id )",
   "venues ( id, slug, name, city, address, website, profile_id )",
 ].join(", ");
@@ -76,6 +85,15 @@ export type EventRow = {
   venue_name: string | null;
   cover_image_url: string | null;
   is_featured: boolean | null;
+  /**
+   * Lo stato della riga.
+   *
+   * Facoltativo perché la ricerca (`search_events`) legge **solo** i pubblicati e
+   * non restituisce questa colonna: lì vale il valore di partenza.
+   */
+  status?: "draft" | "published" | "cancelled" | null;
+  cancelled_at?: string | null;
+  cancel_reason?: string | null;
   artists: Embedded<ArtistRow>;
   venues: Embedded<VenueRow>;
 };
@@ -117,6 +135,9 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     coverImageUrl: row.cover_image_url,
     isFeatured: row.is_featured ?? false,
     isUnclaimed,
+    status: row.status ?? "published",
+    cancelledAt: row.cancelled_at ?? null,
+    cancelReason: row.cancel_reason ?? null,
     artist: artist
       ? { id: artist.id, slug: artist.slug, name: artist.name, city: artist.city }
       : null,

@@ -27,6 +27,14 @@ export const URL_MAX = 300;
  */
 export const COVER_URL_MAX = 500;
 
+/**
+ * Quanto può essere lungo il motivo di un annullamento.
+ *
+ * Va dritto sulla pagina pubblica dell'evento: una riga, non un comunicato. Il
+ * limite è anche nel database (`events_cancel_reason_len`, migration `0022`).
+ */
+export const CANCEL_REASON_MAX = 300;
+
 /** Fusi orari proposti dal modulo (l'ora legale la calcola `Intl`). */
 export const TIMEZONE_OPTIONS = [
   "Europe/Rome",

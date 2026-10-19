@@ -26,7 +26,7 @@ export const listMyEvents = cache(async (profileId: string): Promise<DashboardEv
 
   const { data, error } = await supabase
     .from("events")
-    .select(`${EVENT_SELECT}, status`)
+    .select(EVENT_SELECT)
     .eq("created_by", profileId)
     .order("starts_at", { ascending: true });
 
@@ -59,7 +59,13 @@ export const isProfileVerified = cache(async (profileId: string): Promise<boolea
   return data?.verified_at != null;
 });
 
-/** Gli eventi salvati dal profilo collegato, dall'ultimo salvato. */
+/**
+ * Gli eventi salvati dal profilo collegato, dall'ultimo salvato.
+ *
+ * Ci sono anche quelli **annullati**, marcati: chi aveva salvato una serata deve
+ * sapere che non si tiene. Fino a quando le email non esistono (Fase 6) la
+ * dashboard è l'unico posto dove quella notizia può arrivare.
+ */
 export const listSavedEvents = cache(async (): Promise<PublicEvent[]> => {
   const supabase = await createClient();
 
@@ -92,7 +98,7 @@ export const getMyEvent = cache(
 
     const { data, error } = await supabase
       .from("events")
-      .select(`${EVENT_SELECT}, status`)
+      .select(EVENT_SELECT)
       .eq("id", id)
       .eq("created_by", profileId)
       .maybeSingle();

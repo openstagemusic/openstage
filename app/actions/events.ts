@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { canManageEvents } from "@/lib/auth/roles";
 import { getArtistByProfileId } from "@/lib/directory/queries";
 import {
+  CANCEL_REASON_MAX,
   validateEventInput,
   type EditorErrors,
   type EventEditorState,
@@ -42,21 +43,31 @@ function result(error: { code?: string; message: string } | null): EventActionRe
 }
 
 /**
- * Pubblica o annulla un evento.
+ * Pubblica, annulla o rimette in programma un evento.
  *
  * Qui non ci sono scorciatoie: il database rifà tutti i controlli. Chi non è
  * ancora verificato resta in bozza (`events_require_review`) e chi non è il
  * proprietario dell'evento non passa la policy, qualunque cosa arrivi da qui.
+ *
+ * La data dell'annullamento non si manda: la mette il database (`0022`). Il
+ * motivo, se c'è, si vede sulla pagina pubblica — che resta viva.
  */
 export async function setEventStatusAction(input: {
   eventId: string;
   status: "published" | "cancelled";
+  /** Perché si annulla: facoltativo, si legge sulla pagina dell'evento. */
+  reason?: string | null;
 }): Promise<EventActionResult> {
   const supabase = await createClient();
+  const reason = input.reason?.trim().slice(0, CANCEL_REASON_MAX) ?? "";
 
   const { error } = await supabase
     .from("events")
-    .update({ status: input.status })
+    .update({
+      status: input.status,
+      // Tornando in programma il motivo si scarta: la serata è quella di prima.
+      cancel_reason: input.status === "cancelled" && reason ? reason : null,
+    })
     .eq("id", input.eventId);
 
   revalidatePath("/dashboard");

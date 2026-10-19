@@ -194,6 +194,9 @@ export const en = {
     tomorrow: "Tomorrow",
     approximateNote:
       "Approximate position: this event shows an area, not a single point.",
+    cancelledBadge: "Cancelled",
+    cancelledText: "This event is not happening: the organiser cancelled it.",
+    cancelledOn: "Cancelled on",
     unclaimedNote:
       "Event added by OpenStage: the venue and the artist have not claimed their page yet.",
     when: "When",
@@ -542,7 +545,13 @@ export const en = {
     viewPublic: "See the page",
     edit: "Edit",
     draftNote: "Not visible to the public yet.",
-    cancelledNote: "Cancelled: no longer in search.",
+    cancelledNote:
+      "Cancelled: no longer in search, but the page stays online with the reason.",
+    cancelReasonLabel: "Why are you cancelling? (optional — it shows on the public page)",
+    cancelConfirm: "Yes, cancel the event",
+    cancelDismiss: "No, leave it",
+    republish: "Put back on",
+    republishing: "Putting back on…",
     unverifiedNote:
       "Your profile is not verified yet: events stay in draft until OpenStage verifies you. We take care of it.",
     savedTitle: "Saved",

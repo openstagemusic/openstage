@@ -7,7 +7,7 @@ import SaveEventButton from "@/components/map/SaveEventButton";
 import { formatEventDateLong, timeZoneName } from "@/lib/events/format";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listSavedEventIds } from "@/lib/events/queries";
-import { artistRepeatsTitle, placeName, type PublicEvent } from "@/lib/events/types";
+import { artistRepeatsTitle, isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
@@ -27,6 +27,10 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
 
   const [session, savedIds] = await Promise.all([getSessionProfile(), listSavedEventIds()]);
 
+  // Una serata annullata resta raggiungibile: chi ha il link (o l'aveva salvata)
+  // deve trovare la notizia, non una pagina che non esiste più.
+  const cancelled = isCancelled(event);
+
   const hasPosition = event.latitude !== null && event.longitude !== null;
   const mapsUrl = hasPosition
     ? `https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}`
@@ -42,7 +46,9 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
     name: event.title,
     startDate: event.startsAt,
     url: absoluteUrl(`/${locale}${canonicalPath}`),
-    eventStatus: "https://schema.org/EventScheduled",
+    eventStatus: cancelled
+      ? "https://schema.org/EventCancelled"
+      : "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     image: event.coverImageUrl ?? undefined,
     description: event.description?.slice(0, 300) ?? undefined,
@@ -71,9 +77,10 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       : event.city
         ? { "@type": "Place", name: event.city }
         : undefined,
-    offers: event.ticketUrl
-      ? { "@type": "Offer", url: event.ticketUrl, availability: "https://schema.org/InStock" }
-      : undefined,
+    offers:
+      !cancelled && event.ticketUrl
+        ? { "@type": "Offer", url: event.ticketUrl, availability: "https://schema.org/InStock" }
+        : undefined,
   };
 
   return (
@@ -95,6 +102,23 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           aria-hidden="true"
         />
       )}
+
+      {cancelled ? (
+        <section className="mt-6 rounded-2xl border border-pink/40 bg-pink/10 p-5">
+          <p className="font-display text-sm font-semibold uppercase tracking-wide text-white">
+            {t.cancelledBadge}
+          </p>
+          <p className="mt-2 text-sm text-white/90">{t.cancelledText}</p>
+          {event.cancelledAt ? (
+            <p className="mt-1 text-xs text-muted">
+              {t.cancelledOn} {formatEventDateLong(event.cancelledAt, event.timezone, locale)}
+            </p>
+          ) : null}
+          {event.cancelReason ? (
+            <p className="mt-2 text-sm text-white/80">{event.cancelReason}</p>
+          ) : null}
+        </section>
+      ) : null}
 
       <div className="mt-6 flex flex-wrap items-center gap-2 text-xs">
         <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
@@ -194,7 +218,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       ) : null}
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
-        {event.ticketUrl ? (
+        {!cancelled && event.ticketUrl ? (
           <a
             href={event.ticketUrl}
             target="_blank"
@@ -205,14 +229,18 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           </a>
         ) : null}
 
-        <SaveEventButton
-          eventId={event.id}
-          nextPath={canonicalPath}
-          initiallySaved={savedIds.has(event.id)}
-          isAuthenticated={Boolean(session)}
-          labels={{ save: t.save, saved: t.saved, loginToSave: t.loginToSave, pending: t.saving }}
-          className="px-4 py-2.5 text-sm"
-        />
+        {/* Niente «Salva» su una serata che non si tiene: nei Preferiti resta
+            quello che era già salvato, ma non se ne aggiungono di nuovi. */}
+        {cancelled ? null : (
+          <SaveEventButton
+            eventId={event.id}
+            nextPath={canonicalPath}
+            initiallySaved={savedIds.has(event.id)}
+            isAuthenticated={Boolean(session)}
+            labels={{ save: t.save, saved: t.saved, loginToSave: t.loginToSave, pending: t.saving }}
+            className="px-4 py-2.5 text-sm"
+          />
+        )}
 
         <ShareEventButton
           path={canonicalPath}

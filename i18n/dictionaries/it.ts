@@ -193,6 +193,9 @@ export const it: Dictionary = {
     tomorrow: "Domani",
     approximateNote:
       "Posizione approssimativa: l'evento è indicato come area, non come punto preciso.",
+    cancelledBadge: "Annullato",
+    cancelledText: "Questa serata non si tiene: chi l'ha organizzata l'ha annullata.",
+    cancelledOn: "Annullato il",
     unclaimedNote:
       "Evento inserito da OpenStage: il locale e l'artista non hanno ancora reclamato la scheda.",
     when: "Quando",
@@ -542,7 +545,13 @@ export const it: Dictionary = {
     viewPublic: "Vedi la pagina",
     edit: "Modifica",
     draftNote: "Non è ancora visibile al pubblico.",
-    cancelledNote: "Annullato: non compare più nella ricerca.",
+    cancelledNote:
+      "Annullato: non compare più nella ricerca, ma la pagina resta raggiungibile con il motivo.",
+    cancelReasonLabel: "Perché annulli? (facoltativo — si legge sulla pagina pubblica)",
+    cancelConfirm: "Sì, annulla la serata",
+    cancelDismiss: "No, lascia stare",
+    republish: "Rimetti in programma",
+    republishing: "Rimetto in programma…",
     unverifiedNote:
       "Il tuo profilo non è ancora verificato: gli eventi restano in bozza finché OpenStage non ti verifica. Ci pensiamo noi.",
     savedTitle: "Preferiti",

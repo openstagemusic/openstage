@@ -47,7 +47,7 @@
 | **3.3.3** ✅ | Locandina: caricamento su Supabase Storage **e** generatore dal vivo con il canvas; la foto si vede **intera** su schede, mappa e pagina evento | `0019` (bucket + policy) |
 | **3.3.3b** ✅ | Correzione: **l'immagine della scheda** e **la locandina da condividere** diventano due cose separate — il poster generato non finisce più sulla card (non si carica da nessuna parte, si scarica) | nessuna |
 | **3.3.4** ✅ | **Anti-spam vero**: tetto di serate per account nelle 24 ore contato sui **tentativi** (non sulle righe, così cancellare la bozza non restituisce quota), tetto per account (`profiles.events_daily_limit`), **sospensione** di un profilo rispettata dal database; **e il buco trovato preparando i test: un profilo poteva verificarsi da solo** | `0020` (registro `event_creations`, trigger), `0021` (campi del profilo non modificabili da soli) |
-| **3.3.5** | **Eventi annullati**: la pagina resta viva con l'etichetta "Annullato" (`noindex`, fuori dalla sitemap), restano nei Preferiti marcati, `cancelled_at` e `cancel_reason`, rimessa in programma come azione distinta | `0022` |
+| **3.3.5** ✅ | **Eventi annullati**: la pagina resta viva con l'etichetta "Annullato" (`noindex`, fuori dalla sitemap), restano nei Preferiti marcati, `cancelled_at` e `cancel_reason`, rimessa in programma come azione distinta | `0022` |
 | **3.3.6** | **Igiene del salvataggio**: doppio invio (chiave di idempotenza), data nel passato, concorrenza su `updated_at`, `ticket_url` verificato, campo **"come arrivare"** per gli spazi temporanei | `0023` |
 
 ## Decisioni prese
@@ -293,22 +293,37 @@ il profilo, cioè distruggere i dati.
   l'admin sì; togliendo la sospensione si torna a scrivere; il profilo **non riesce a verificarsi da
   solo** né ad alzarsi il tetto; i testi tradotti compaiono nell'editor e in "I miei eventi".
 
-## 3.3.5 — Eventi annullati: la pagina resta viva (pianificato)
+## 3.3.5 — Eventi annullati: la pagina resta viva
 
-Oggi un evento annullato **sparisce da tutto**: dalla ricerca, dalla Home, dalla mappa, dai Preferiti
-e anche dalla sua pagina, che risponde **404** a chiunque non sia l'autore. Il link condiviso in chat
-muore e chi aveva segnato la serata non trova nessuna spiegazione: è *ghosting*, l'esatto contrario di
+Prima di questo blocco un annullato **spariva da tutto** — ricerca, Home, mappa, Preferiti — e la
+sua pagina rispondeva **404** a chiunque non fosse l'autore. Il link condiviso in chat moriva e chi
+aveva segnato la serata non trovava nessuna spiegazione: è *ghosting*, l'esatto contrario di
 *Autenticità prima dell'Hype*.
 
-- Un annullato **non è più una destinazione**: fuori da ricerca, Home e mappa.
-- Ma **esiste ancora**: la pagina resta raggiungibile con l'etichetta "Annullato", l'ora
-  dell'annullamento e il motivo (`cancelled_at`, `cancel_reason`), e i collegamenti all'artista e al
-  locale. `noindex` e fuori dalla sitemap: chi ha il link lo trova, i motori di ricerca smettono di
+- **Non è più una destinazione**: ricerca, mappa, Home e schede di artisti e locali leggono solo
+  `published`. Quelle funzioni non sono cambiate di una riga: è cambiato **chi può leggere una
+  riga** (`events_select_public` include i `cancelled`).
+- **Ma esiste ancora**: la pagina resta raggiungibile e dice "Annullato" con **quando**
+  (`cancelled_at`) e **perché** (`cancel_reason`). Niente "Biglietti" — non si manda nessuno a
+  comprare per un concerto che non c'è — e niente "Salva": resta "Condividi", perché far girare la
+  notizia serve.
+- **Fuori dall'indice**: `noindex, follow` sulla pagina, e la sitemap (che nasce dalla ricerca) li
+  esclude da sé. Il link in chat continua a funzionare, i motori di ricerca smettono di
   pubblicizzare un concerto che non c'è.
-- **Nei Preferiti resta**, marcato: chi l'aveva salvato deve saperlo. Fino a che le email non esistono
-  (Fase 6) la pagina è l'unico posto dove la notizia può arrivare.
-- **Rimettere in programma è un'azione distinta**, non un effetto collaterale del "Salva".
-- Nessun punteggio pubblico di affidabilità: le disdette si vedono solo nel pannello dell'admin.
+- **Nei Preferiti resta, marcata** con l'etichetta rosa: fino a quando le email non esistono
+  (Fase 6), la dashboard è l'unico posto dove quella notizia può arrivare.
+- **Il motivo si chiede quando si annulla**, facoltativo, in una riga sotto la scheda: si può anche
+  confermare a vuoto. Il limite è 300 caratteri, e c'è anche nel database.
+- **Rimettere in programma è un'azione distinta**: pulsante con il suo nome, che pulisce data e
+  motivo — la serata torna quella di prima, senza cicatrici.
+- **La data la mette il database** (`events_cancellation_stamp`), non il modulo: restando annullata
+  non si sposta, e una data scritta a mano si ignora. Non si può retrodatare (o postdatare) un
+  annullamento per farlo sembrare più vecchio.
+- **Test**: 19 prove sulle API (leggibile da anonimo, fuori dalla ricerca, data non falsificabile,
+  estranei respinti, motivo troppo lungo rifiutato, ritorno in programma pulito, bozze ancora
+  private) e 16 in browser (la scheda si sposta fra gli annullati con il motivo, la pagina pubblica
+  viva con etichetta/data/motivo/`noindex`, i Preferiti marcati, Home e sitemap senza la serata,
+  **0 errori in console**).
 
 ## 3.3.6 — Igiene del salvataggio (pianificato)
 

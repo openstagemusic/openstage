@@ -61,9 +61,26 @@ export type PublicEvent = {
   isFeatured: boolean;
   /** L'ha inserito OpenStage e nessuna delle schede collegate è stata reclamata. */
   isUnclaimed: boolean;
+  /**
+   * Lo stato della serata.
+   *
+   * `published` è l'unico che compare negli elenchi, nella mappa e nella Home:
+   * `cancelled` esiste ancora **solo** per la sua pagina (che resta raggiungibile
+   * con l'etichetta "Annullato") e per i Preferiti, che lo mostrano marcato.
+   */
+  status: "draft" | "published" | "cancelled";
+  /** Quando è stata annullata (`null` se non lo è). */
+  cancelledAt: string | null;
+  /** Perché è stata annullata, se chi l'ha annullata l'ha scritto. */
+  cancelReason: string | null;
   artist: EventArtist | null;
   venue: EventVenue | null;
 };
+
+/** La serata è stata annullata: la pagina lo dice, gli elenchi non la mostrano. */
+export function isCancelled(event: PublicEvent): boolean {
+  return event.status === "cancelled";
+}
 
 /**
  * Il nome del posto dove si tiene la serata: la scheda del locale se esiste,
