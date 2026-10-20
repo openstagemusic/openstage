@@ -4,6 +4,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import AddToCalendar from "@/components/events/AddToCalendar";
 import EventCountdown from "@/components/events/EventCountdown";
 import EventCover from "@/components/events/EventCover";
+import ReportEventButton from "@/components/events/ReportEventButton";
 import ShareEventPanel from "@/components/events/ShareEventPanel";
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { googleCalendarUrl } from "@/lib/events/calendar";
@@ -340,6 +341,31 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             close: t.shareClose,
           }}
         />
+
+        {/* Segnalare serve su una serata che si tiene: su una annullata non c'è
+            niente da moderare. Serve una sessione, perché una segnalazione
+            anonima non si può né verificare né fermare. */}
+        {session && !cancelled ? (
+          <ReportEventButton
+            eventId={event.id}
+            labels={{
+              open: t.reportOpen,
+              title: t.reportTitle,
+              hint: t.reportHint,
+              reason: t.reportReason,
+              reasons: t.reportReasons,
+              note: t.reportNote,
+              notePlaceholder: t.reportNotePlaceholder,
+              send: t.reportSend,
+              sending: t.reportSending,
+              done: t.reportDone,
+              close: t.reportClose,
+              already: t.reportAlready,
+              own: t.reportOwn,
+              failed: t.reportFailed,
+            }}
+          />
+        ) : null}
       </div>
     </article>
   );

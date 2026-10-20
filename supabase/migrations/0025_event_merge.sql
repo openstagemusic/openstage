@@ -48,7 +48,7 @@ set search_path = public
 as $fn$
 begin
   if not exists (
-    select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'
+    select 1 where public.is_admin()
   ) then
     raise exception 'not allowed' using errcode = '42501';
   end if;
@@ -97,7 +97,7 @@ set search_path = public
 as $fn$
 begin
   if not exists (
-    select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'
+    select 1 where public.is_admin()
   ) then
     raise exception 'not allowed' using errcode = '42501';
   end if;

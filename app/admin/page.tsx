@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import AdminQueue from "@/components/admin/AdminQueue";
+import Link from "@/components/i18n/LocaleLink";
 import {
   isCurrentUserAdmin,
   listClaimsToVerify,
@@ -56,6 +57,13 @@ export default async function AdminPage() {
         {dict.admin.title}
       </h1>
       <p className="mt-2 text-sm text-muted">{dict.admin.subtitle}</p>
+
+      <Link
+        href="/admin/eventi"
+        className="mt-4 inline-flex rounded-full border border-cyan/40 bg-cyan/10 px-4 py-2 text-xs text-white transition-colors hover:bg-cyan/20"
+      >
+        {dict.admin.moderationLink}
+      </Link>
 
       <div className="mt-10">
         <AdminQueue

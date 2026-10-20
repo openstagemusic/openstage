@@ -117,4 +117,40 @@ Copertura onesta: il **pulsante** di unione nell'interfaccia admin arriva con il
 funzione è provata via RPC); l'avviso doppioni non è stato provato con un titolo diverso e stesso
 locale/artista (stessa strada, stesso codice).
 
-### 4.3 — B40 · da costruire
+### 4.3 — B40 · fatto (migration `0026`, applicata)
+
+Cosa è entrato:
+
+- **Tabella `reports`**: una segnalazione per persona per serata (`unique (event_id, reporter_id)`),
+  motivi chiusi (`fake`, `wrong_info`, `spam`, `offensive`, `other`), nota facoltativa, stato
+  (`open`/`resolved`/`dismissed`). RLS: si inserisce solo a nome proprio, si legge solo la propria o
+  da admin, si aggiorna solo da admin.
+- **«Segnala questa serata»** in fondo alla scheda evento, per chi ha una sessione e solo su serate in
+  programma. Non è una recensione: chiede un motivo e arriva solo all'admin. La seconda segnalazione
+  della stessa persona non entra (lo dice la chiave) e l'interfaccia lo dice.
+- **Auto-nascondimento morbido**: alla **terza** segnalazione da persone **diverse e verificate** la
+  serata torna in bozza (`auto_hidden_at`, `auto_hidden_status` conserva lo stato di prima). Non è una
+  condanna e non tocca l'account: è una pausa che aspetta una persona.
+- **Pannello `/admin/eventi`** (link dalla coda): tutte le serate pubblicate e in pausa, con autore,
+  numero di segnalazioni aperte e filtri (Tutte / Online / In pausa / Segnalate). Azioni: annullare,
+  rimettere online (chiude anche la pausa), tornare in bozza, sospendere o riattivare l'autore, unire
+  un doppione indicando indirizzo, slug o identificativo.
+- **Nessuna penalità sull'account per chi pubblica tanto**: la pausa è per **serata**, non per autore.
+  Se le segnalazioni mostrano un comportamento sistematico, l'admin sospende l'account a mano. È una
+  scelta diversa dall'esempio «max 2 serate in Home» del piano: punire l'intero catalogo per una serata
+  contestata sarebbe la cosa che OpenStage non vuole essere.
+- `merge_event`/`unmerge_event` (0025) ora usano `public.is_admin()` — la stessa regola di tutta la
+  moderazione — invece di `profiles.role` (migration `0027`): due definizioni di admin sono una di
+  troppo.
+
+Prove reali (utenti Auth veri, `next start`): segnalazione inviata dalla scheda con motivo e nota →
+riga in `reports`; secondo invio → «Hai già segnalato questa serata»; due segnalazioni in più da
+persone verificate → serata **in pausa** (`draft` + `auto_hidden_at` + `auto_hidden_status=published`);
+pannello admin → «3 segnalazioni» e «In pausa», **Rimetti online** → Online e pausa chiusa, **Annulla** →
+Annullata, di nuovo **Rimetti online** → Online. Le altre serate non sono state toccate (verificato in
+tabella). Account, serata di prova, segnalazioni e righe collegate eliminati; `settings.admin_email`
+riportato al proprietario.
+
+Copertura onesta: il pulsante **Unisci** è stato provato via RPC (4.2) e non cliccato nel pannello; la
+soglia delle tre segnalazioni è provata inserendo le righe in SQL (la funzione scatta allo stesso modo);
+la sospensione dell'autore è stata resa visibile dal pannello ma non cliccata nel test.
