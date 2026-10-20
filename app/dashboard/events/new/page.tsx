@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import EventEditor from "@/components/dashboard/EventEditor";
 import { canManageEvents } from "@/lib/auth/roles";
 import { isProfileVerified, listCityOptions } from "@/lib/dashboard/queries";
-import { getVenueByProfileId } from "@/lib/directory/queries";
+import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { initialEditorState } from "@/lib/events/editor";
 import { listGenres } from "@/lib/events/queries";
 import { getVisitorLocation } from "@/lib/geo/visitor";
@@ -32,8 +32,9 @@ export default async function NewEventPage() {
 
   const dict = getDictionary(locale);
 
-  const [venue, verified, cities, genres, visitor] = await Promise.all([
+  const [venue, artist, verified, cities, genres, visitor] = await Promise.all([
     getVenueByProfileId(session.id),
+    getArtistByProfileId(session.id),
     isProfileVerified(session.id),
     listCityOptions(),
     listGenres(),
@@ -50,6 +51,9 @@ export default async function NewEventPage() {
     initial.longitude = venue.longitude;
   }
 
+  // Un artista crea le sue: la scheda artista è già collegata e non si sceglie.
+  if (artist) initial.artistId = artist.id;
+
   return (
     <div>
       <h1 className="font-display text-3xl font-bold tracking-tight">{dict.editor.newTitle}</h1>
@@ -61,6 +65,8 @@ export default async function NewEventPage() {
           eventId={null}
           initial={initial}
           linkedVenueName={venue?.name ?? null}
+          linkedArtist={artist ? { id: artist.id, name: artist.name } : null}
+          artistLocked={Boolean(artist)}
           cities={cities}
           genres={genres}
           mapCenter={{

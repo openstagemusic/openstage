@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import EventEditor from "@/components/dashboard/EventEditor";
 import { canManageEvents } from "@/lib/auth/roles";
 import { getMyEvent, isProfileVerified, listCityOptions } from "@/lib/dashboard/queries";
+import { getArtistByProfileId } from "@/lib/directory/queries";
 import { editorStateFromEvent } from "@/lib/events/editor";
 import { listGenres } from "@/lib/events/queries";
 import { getVisitorLocation } from "@/lib/geo/visitor";
@@ -45,7 +46,8 @@ export default async function EditEventPage({
 
   const dict = getDictionary(locale);
 
-  const [verified, cities, genres, visitor] = await Promise.all([
+  const [ownArtist, verified, cities, genres, visitor] = await Promise.all([
+    getArtistByProfileId(session.id),
     isProfileVerified(session.id),
     listCityOptions(),
     listGenres(),
@@ -56,6 +58,7 @@ export default async function EditEventPage({
     ...event,
     venueId: event.venue?.id ?? null,
     venueName: event.venueName,
+    artistId: event.artist?.id ?? null,
   });
 
   const statusLabel = {
@@ -76,6 +79,8 @@ export default async function EditEventPage({
           eventId={event.id}
           initial={initial}
           linkedVenueName={event.venue?.name ?? null}
+          linkedArtist={event.artist ? { id: event.artist.id, name: event.artist.name } : null}
+          artistLocked={Boolean(ownArtist)}
           cities={cities}
           genres={genres}
           mapCenter={{

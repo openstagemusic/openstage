@@ -92,6 +92,29 @@ Copertura onesta: il blocco lato **salvataggio** usa lo stesso codice della rott
 su questa rete Photon impiega più di 3 s, quindi il blocco è stato provato sulla rotta (budget pieno) e
 non attraverso il pulsante "Pubblica". In produzione la latenza è nell'ordine dei decimi di secondo.
 
-### 4.2 — B39 · da costruire
+### 4.2 — B39 · fatto (migration `0025`, applicata) — manca il pulsante admin
+
+- **Il locale collega l'artista**: campo "Artista della serata" con ricerca su `/api/artists`
+  (sessione richiesta). Il server accetta `artistId` **solo** se chi scrive non è un artista: chi ha
+  una scheda scrive sempre a nome proprio, nessuno può attribuirsi un concerto. Un artista vede la
+  propria scheda già collegata e non modificabile.
+- **Avviso doppioni**: prima di creare, `findSimilarEvents` cerca stesso giorno **e** almeno una cosa
+  in comune vera (stesso locale, stesso artista, stesso titolo). Se trova qualcosa il salvataggio si
+  ferma **senza errore** e risponde con `duplicates`: il modulo mostra "Esiste già una serata simile"
+  con [Vedi] e [Crea comunque]. Il secondo invio passa `confirmDuplicate: true`.
+- **Unione admin** (`merge_event`/`unmerge_event`, `security definer`, permesso `admin` controllato
+  **dentro** la funzione): la scheda doppione diventa `cancelled`, conserva `merged_status`, punta a
+  quella buona con `merged_into`, i Preferiti si spostano. La pagina pubblica risponde **308** verso la
+  destinazione; `unmerge` riporta la scheda allo stato di prima.
+
+Prove reali: utente "venue" di prova creato via Auth vero, serata creata dal modulo con l'artista
+"Sick Tamburo" collegato (`artist_id` scritto in tabella), seconda serata identica → avviso mostrato e
+"Crea comunque" che crea davvero; unione via RPC con claim admin → `cancelled` + `merged_into` +
+Preferito spostato; `curl` sulla pagina del doppione → `308 /it/eventi/ranica/test-b39-serata-collegata`;
+separazione → stato `draft` ripristinato. Utente, serate, preferiti e righe `event_creations` eliminati.
+
+Copertura onesta: il **pulsante** di unione nell'interfaccia admin arriva con il pannello di 4.3 (la
+funzione è provata via RPC); l'avviso doppioni non è stato provato con un titolo diverso e stesso
+locale/artista (stessa strada, stesso codice).
 
 ### 4.3 — B40 · da costruire

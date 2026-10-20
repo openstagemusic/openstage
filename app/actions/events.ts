@@ -12,6 +12,7 @@ import {
   type EventEditorState,
 } from "@/lib/events/editor";
 import { isTicketUrlReachable } from "@/lib/events/links";
+import { findSimilarEvents, type SimilarEvent } from "@/lib/events/queries";
 import { checkEventLocation, SAVE_CHECK_TIMEOUT_MS } from "@/lib/geo/location-check";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionProfile } from "@/lib/supabase/session";
@@ -109,6 +110,14 @@ export type SaveEventResult = {
     | "rateLimited"
     | "suspended"
     | "saveFailed";
+  /**
+   * Serate che assomigliano a questa, quando si sta creando.
+   *
+   * Non è un errore: il salvataggio si è fermato **prima** di scrivere, per
+   * chiedere «esiste già». Se la risposta è «crea comunque», si rimanda la
+   * stessa richiesta con `confirmDuplicate: true`.
+   */
+  duplicates?: SimilarEvent[];
 };
 
 /** Il salvataggio non è riuscito: si traduce il codice del database. */
@@ -145,6 +154,8 @@ export async function saveEventAction(input: {
   clientKey?: string | null;
   /** Quando l'evento è stato letto: se qualcuno l'ha toccato, non si sovrascrive. */
   expectedUpdatedAt?: string | null;
+  /** «Sì, lo so che esiste già una serata simile»: si salva comunque. */
+  confirmDuplicate?: boolean;
 }): Promise<SaveEventResult> {
   const session = await getSessionProfile();
 
@@ -192,6 +203,30 @@ export async function saveEventAction(input: {
 
   const supabase = await createClient();
 
+  // L'artista della serata. Se a scriverla è un artista, è la sua scheda e non
+  // si discute: nessuno può attribuirsi un concerto altrui. Se a scriverla è un
+  // locale (o l'admin), può **collegare** una scheda che esiste già — ed è così
+  // che la serata compare anche sulla pagina dell'artista (B39).
+  const ownArtist = await getArtistByProfileId(session.id);
+  let artistId: string | null = ownArtist?.id ?? null;
+
+  if (!ownArtist && values.artistId) {
+    const { data: linked, error: linkError } = await supabase
+      .from("artists")
+      .select("id")
+      .eq("id", values.artistId)
+      .maybeSingle();
+
+    if (linkError) {
+      console.error("[events] saveEventAction (artista):", linkError.message);
+      return { ok: false, error: "saveFailed" };
+    }
+
+    if (!linked) return { ok: false, fieldErrors: { artistId: "artistInvalid" } };
+
+    artistId = linked.id;
+  }
+
   const payload = {
     title: values.title,
     kind: values.kind,
@@ -201,6 +236,7 @@ export async function saveEventAction(input: {
     timezone: values.timezone,
     venue_id: values.venueId,
     venue_name: values.venueName,
+    artist_id: artistId,
     city: values.city,
     directions_text: values.directionsText,
     latitude: values.latitude,
@@ -253,8 +289,6 @@ export async function saveEventAction(input: {
     };
   }
 
-  // L'artista della serata è chi la crea: non si sceglie dal modulo.
-  const artist = await getArtistByProfileId(session.id);
   const clientKey = cleanClientKey(input.clientKey);
 
   // Stessa chiave, stessa serata: la rete ha ripetuto l'invio, o il dito è
@@ -277,9 +311,26 @@ export async function saveEventAction(input: {
     }
   }
 
+  // «Esiste già questa serata?» si chiede **prima** di scrivere, e non blocca:
+  // chi sa di avere ragione (due set nello stesso locale, la stessa sera)
+  // risponde «crea comunque» e si salva.
+  if (input.confirmDuplicate !== true) {
+    const duplicates = await findSimilarEvents({
+      startsAt: values.startsAt,
+      timezone: values.timezone,
+      venueId: values.venueId,
+      artistId,
+      title: values.title,
+    });
+
+    if (duplicates.length > 0) {
+      return { ok: false, duplicates };
+    }
+  }
+
   const { data, error } = await supabase
     .from("events")
-    .insert({ ...payload, created_by: session.id, artist_id: artist?.id ?? null, client_key: clientKey })
+    .insert({ ...payload, created_by: session.id, client_key: clientKey })
     .select("id, status, updated_at")
     .maybeSingle();
 
@@ -318,4 +369,51 @@ export async function saveEventAction(input: {
     status: data.status as SaveEventResult["status"],
     updatedAt: data.updated_at,
   };
+}
+
+/**
+ * Unisce una scheda doppione a quella che resta (solo admin).
+ *
+ * L'unione sposta i Preferiti, nasconde la scheda di partenza (`status =
+ * cancelled`) e la fa rimandare alla destinazione. È reversibile: lo stato di
+ * prima resta in `merged_status`. Il permesso è controllato **dentro** la
+ * funzione SQL, non qui: la regola vale anche se qualcuno chiama l'RPC da fuori.
+ */
+export async function mergeEventsAction(input: {
+  sourceId: string;
+  targetId: string;
+}): Promise<EventActionResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("merge_event", {
+    p_source: input.sourceId,
+    p_target: input.targetId,
+  });
+
+  if (error) {
+    console.error("[events] mergeEventsAction:", error.message);
+    return { ok: false, error: "generic" };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+
+  return { ok: true, error: null };
+}
+
+/** Disfa un'unione: la scheda torna visibile con lo stato che aveva. */
+export async function unmergeEventAction(input: { eventId: string }): Promise<EventActionResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("unmerge_event", { p_event: input.eventId });
+
+  if (error) {
+    console.error("[events] unmergeEventAction:", error.message);
+    return { ok: false, error: "generic" };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+
+  return { ok: true, error: null };
 }

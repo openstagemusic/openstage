@@ -12,7 +12,7 @@ import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { renderFlyer } from "@/lib/covers/flyer";
-import type { VenueOption } from "@/lib/dashboard/queries";
+import type { ArtistOption, VenueOption } from "@/lib/dashboard/queries";
 import {
   DIRECTIONS_MAX,
   editorInstant,
@@ -23,6 +23,7 @@ import {
   type EventEditorState,
 } from "@/lib/events/editor";
 import { formatEventDate } from "@/lib/events/format";
+import type { SimilarEvent } from "@/lib/events/queries";
 import { EVENT_KINDS } from "@/lib/events/types";
 import type { GeocodePlace } from "@/lib/geo/geocoder";
 
@@ -49,6 +50,10 @@ type EventEditorProps = {
   initial: EventEditorState;
   /** Nome del locale collegato, quando l'evento ne ha già uno. */
   linkedVenueName: string | null;
+  /** L'artista collegato: la scheda scelta, o quella di chi sta scrivendo. */
+  linkedArtist: { id: string; name: string } | null;
+  /** Un artista non sceglie: la serata è la sua. */
+  artistLocked: boolean;
   cities: string[];
   genres: string[];
   /** Dove aprire la mini mappa se non c'è ancora un pin. */
@@ -112,6 +117,8 @@ export default function EventEditor({
   eventId,
   initial,
   linkedVenueName,
+  linkedArtist,
+  artistLocked,
   cities,
   genres,
   mapCenter,
@@ -146,6 +153,16 @@ export default function EventEditor({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<VenueOption[]>([]);
   const [searching, setSearching] = useState(false);
+  // Artista collegato: lo sceglie il locale, l'artista ce l'ha già per forza.
+  const [artist, setArtist] = useState<{ id: string; name: string } | null>(
+    initial.artistId && linkedArtist ? linkedArtist : artistLocked ? linkedArtist : null
+  );
+  const [artistQuery, setArtistQuery] = useState("");
+  const [artistResults, setArtistResults] = useState<ArtistOption[]>([]);
+  const [searchingArtists, setSearchingArtists] = useState(false);
+  // Serate che assomigliano a questa: si avvisa, non si blocca.
+  const [duplicates, setDuplicates] = useState<SimilarEvent[]>([]);
+  const pendingStatus = useRef<"draft" | "published" | "cancelled">("draft");
   const [errors, setErrors] = useState<Partial<Record<EditorField, EditorErrorCode>>>({});
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState<"draft" | "published" | "cancelled" | null>(null);
@@ -205,6 +222,55 @@ export default function EventEditor({
       clearTimeout(timer);
     };
   }, [query]);
+
+  // Ricerca fra gli artisti già su OpenStage: serve al locale che organizza la
+  // serata di qualcun altro. A un artista non si chiede nulla.
+  useEffect(() => {
+    if (artistLocked) return;
+
+    const term = artistQuery.trim();
+
+    if (term.length < 2) {
+      setArtistResults([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
+      setSearchingArtists(true);
+
+      try {
+        const response = await fetch(`/api/artists?q=${encodeURIComponent(term)}`);
+        const payload = (await response.json()) as { artists?: ArtistOption[] };
+        if (!cancelled) setArtistResults(payload.artists ?? []);
+      } catch {
+        if (!cancelled) setArtistResults([]);
+      } finally {
+        if (!cancelled) setSearchingArtists(false);
+      }
+    }, 320);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [artistQuery, artistLocked]);
+
+  function linkArtist(option: ArtistOption) {
+    setArtist({ id: option.id, name: option.name });
+    setValues((current) => ({ ...current, artistId: option.id }));
+    setArtistQuery("");
+    setArtistResults([]);
+    setErrors({});
+    setMessage(null);
+  }
+
+  function unlinkArtist() {
+    setArtist(null);
+    setValues((current) => ({ ...current, artistId: "" }));
+    setMessage(null);
+  }
 
   // La mappa vola su un posto scelto fuori dalla mappa (locale collegato o città
   // cercata): il pin deve vedersi, non essere cercato a mano.
@@ -418,10 +484,12 @@ export default function EventEditor({
     saveFailed: t.saveFailed,
   };
 
-  async function submit(status: "draft" | "published" | "cancelled") {
+  async function submit(status: "draft" | "published" | "cancelled", confirmDuplicate = false) {
     setBusy(status);
     setErrors({});
     setMessage(null);
+    setDuplicates([]);
+    pendingStatus.current = status;
 
     if (!clientKey.current) clientKey.current = createClientKey();
 
@@ -432,11 +500,18 @@ export default function EventEditor({
       clientKey: clientKey.current,
       // In creazione non c'è niente da proteggere: la riga non esiste ancora.
       expectedUpdatedAt: mode === "edit" ? updatedAt : null,
+      confirmDuplicate,
     });
 
     setBusy(null);
 
     if (!outcome.ok) {
+      // «Esiste già una serata simile»: non è un errore, è una domanda.
+      if (outcome.duplicates) {
+        setDuplicates(outcome.duplicates);
+        return;
+      }
+
       if (outcome.fieldErrors) {
         setErrors(outcome.fieldErrors);
         setMessage({ tone: "error", text: t.errorsSummary });
@@ -470,6 +545,11 @@ export default function EventEditor({
     });
 
     router.refresh();
+  }
+
+  /** «Lo so, creala lo stesso»: si rimanda lo stesso salvataggio, confermando. */
+  function createAnyway() {
+    void submit(pendingStatus.current, true);
   }
 
   const radiusLabels: Record<number, string> = {
@@ -673,6 +753,72 @@ export default function EventEditor({
 
             {query.trim().length >= 2 && !searching && results.length === 0 ? (
               <p className="mt-1 text-xs text-muted">{t.venueSearchEmpty}</p>
+            ) : null}
+          </div>
+        )}
+
+        {/* --- Chi suona ------------------------------------------------- */}
+        {artistLocked ? (
+          <div className="mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+            <span className="text-sm text-white">
+              <span className="text-muted">{t.artistLinked}: </span>
+              {artist?.name ?? t.artistYou}
+            </span>
+            <p className="mt-1 text-xs text-muted">{t.artistLockedHint}</p>
+          </div>
+        ) : artist ? (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-violet/40 bg-violet/10 px-4 py-3">
+            <span className="text-sm text-white">
+              <span className="text-muted">{t.artistLinked}: </span>
+              {artist.name}
+            </span>
+            <button
+              type="button"
+              onClick={unlinkArtist}
+              className="rounded-full border border-white/15 px-3 py-1 text-xs text-muted transition-colors hover:text-white"
+            >
+              {t.artistUnlink}
+            </button>
+          </div>
+        ) : (
+          <div className="relative mt-4">
+            <Field
+              id="event-artist-search"
+              label={t.artistSearch}
+              hint={t.artistHint}
+              error={errors.artistId ? t.errors[errors.artistId] : null}
+            >
+              <input
+                id="event-artist-search"
+                className={inputClass}
+                value={artistQuery}
+                onChange={(event) => setArtistQuery(event.target.value)}
+                placeholder={t.artistSearchPlaceholder}
+                autoComplete="off"
+              />
+            </Field>
+
+            {artistResults.length > 0 ? (
+              <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0d0d1a] shadow-xl">
+                {artistResults.map((option) => (
+                  <li key={option.id}>
+                    <button
+                      type="button"
+                      onClick={() => linkArtist(option)}
+                      className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/5"
+                    >
+                      <span className="text-white">{option.name}</span>
+                      {option.city ? (
+                        <span className="block text-xs text-muted">{option.city}</span>
+                      ) : null}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            {artistQuery.trim().length >= 2 && !searchingArtists && artistResults.length === 0 ? (
+              <p className="mt-1 text-xs text-muted">{t.artistSearchEmpty}</p>
             ) : null}
           </div>
         )}
@@ -942,6 +1088,57 @@ export default function EventEditor({
             />
           </Field>
         </div>
+
+        {duplicates.length > 0 ? (
+          <div className="mt-8 rounded-2xl border border-amber-300/40 bg-amber-300/10 p-4">
+            <p className="font-display text-sm font-semibold text-white">{t.duplicatesTitle}</p>
+            <p className="mt-1 text-xs text-muted">{t.duplicatesHint}</p>
+
+            <ul className="mt-3 space-y-2">
+              {duplicates.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-black/20 px-3 py-2"
+                >
+                  <span className="text-sm text-white">
+                    {item.title}
+                    <span className="block text-xs text-muted">
+                      {[item.city, formatEventDate(item.startsAt, values.timezone, locale).full]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
+                  </span>
+                  <a
+                    href={`/${locale}${item.path}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-cyan underline underline-offset-2"
+                  >
+                    {t.duplicateSee}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={createAnyway}
+                disabled={busy !== null}
+                className={primaryButton}
+              >
+                {busy ? t.saving : t.duplicateCreateAnyway}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDuplicates([])}
+                className="text-xs text-muted transition-colors hover:text-white"
+              >
+                {t.duplicateCancel}
+              </button>
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <button type="submit" disabled={busy !== null} className={secondaryButton}>

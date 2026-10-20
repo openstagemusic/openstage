@@ -82,6 +82,7 @@ export const EDITOR_FIELDS = [
   "timezone",
   "venueId",
   "venueName",
+  "artistId",
   "city",
   "directions",
   "location",
@@ -106,6 +107,7 @@ export type EditorErrorCode =
   | "timezoneInvalid"
   | "venueInvalid"
   | "venueNameTooLong"
+  | "artistInvalid"
   | "cityRequired"
   | "cityTooLong"
   | "directionsTooLong"
@@ -133,6 +135,13 @@ export type EventEditorState = {
   timezone: string;
   venueId: string;
   venueName: string;
+  /**
+   * L'artista della serata, quando a scriverla è un locale.
+   *
+   * Un artista che crea la propria serata non sceglie niente: il server mette la
+   * sua scheda. Qui resta vuoto e l'interfaccia non lo chiede.
+   */
+  artistId: string;
   city: string;
   /** Come arrivare, per gli spazi che un indirizzo non ce l'hanno. */
   directions: string;
@@ -157,6 +166,7 @@ export type EventEditorValues = {
   timezone: string;
   venueId: string | null;
   venueName: string | null;
+  artistId: string | null;
   city: string | null;
   directionsText: string | null;
   latitude: number | null;
@@ -289,6 +299,11 @@ export function validateEventInput(
   const venueName = input.venueName.trim();
   if (!hasVenue && venueName.length > VENUE_NAME_MAX) errors.venueName = "venueNameTooLong";
 
+  // L'artista collegato lo sceglie il locale; se lo scrive l'artista stesso, il
+  // server mette la sua scheda e questo campo non conta.
+  const artistId = input.artistId.trim();
+  if (artistId !== "" && !isUuid(artistId)) errors.artistId = "artistInvalid";
+
   const city = input.city.trim();
   if (city.length > CITY_MAX) errors.city = "cityTooLong";
   // Con un locale collegato la città arriva dalla sua scheda: chiederla due
@@ -350,6 +365,7 @@ export function validateEventInput(
       // Il nome del locale scritto a mano serve solo se non c'è una scheda
       // collegata: altrimenti conterebbe due volte la stessa cosa.
       venueName: hasVenue ? null : venueName || null,
+      artistId: artistId || null,
       city: city || null,
       directionsText: directions || null,
       latitude: hasPoint ? latitude : null,
@@ -397,6 +413,7 @@ export function initialEditorState(timezone = FILTER_TIMEZONE): EventEditorState
     timezone,
     venueId: "",
     venueName: "",
+    artistId: "",
     city: "",
     directions: "",
     latitude: null,
@@ -420,6 +437,7 @@ export type EditableEvent = {
   timezone: string;
   venueId: string | null;
   venueName: string | null;
+  artistId: string | null;
   city: string | null;
   directionsText: string | null;
   latitude: number | null;
@@ -445,6 +463,7 @@ export function editorStateFromEvent(event: EditableEvent): EventEditorState {
     timezone: event.timezone,
     venueId: event.venueId ?? "",
     venueName: event.venueName ?? "",
+    artistId: event.artistId ?? "",
     city: event.city ?? "",
     directions: event.directionsText ?? "",
     latitude: event.latitude,

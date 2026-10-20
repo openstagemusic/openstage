@@ -158,6 +158,41 @@ export async function searchVenues(query: string, limit = 6): Promise<VenueOptio
   return (data ?? []) as VenueOption[];
 }
 
+/** Un artista già su OpenStage: serve al locale per collegare la serata. */
+export type ArtistOption = {
+  id: string;
+  name: string;
+  city: string | null;
+};
+
+/**
+ * Ricerca fra gli artisti già presenti.
+ *
+ * Stessa idea della ricerca dei locali: se l'artista ha una scheda, la serata
+ * compare sulla sua pagina; se non ce l'ha, si scrive il nome del locale a mano
+ * e l'artista resta fuori. La ricerca è aperta a chi ha una sessione.
+ */
+export async function searchArtists(query: string, limit = 6): Promise<ArtistOption[]> {
+  const term = query.replace(/[%_]/g, "").trim();
+  if (term.length < 2) return [];
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("artists")
+    .select("id, name, city")
+    .or(`name.ilike.%${term}%,city.ilike.%${term}%`)
+    .order("name", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    console.error("[dashboard] searchArtists:", error.message);
+    return [];
+  }
+
+  return (data ?? []) as ArtistOption[];
+}
+
 /**
  * Le città che usiamo già: servono a scrivere "Livorno" come lo scrive la
  * piattaforma, invece di "livorno" (che non troverebbe nessuno).

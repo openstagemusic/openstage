@@ -75,6 +75,11 @@ export type PublicEvent = {
   cancelledAt: string | null;
   /** Perché è stata annullata, se chi l'ha annullata l'ha scritto. */
   cancelReason: string | null;
+  /**
+   * Se valorizzata, questa scheda è un **doppione unito** a un'altra: la pagina
+   * rimanda alla destinazione, non mostra la serata due volte.
+   */
+  mergedInto: string | null;
   artist: EventArtist | null;
   venue: EventVenue | null;
 };

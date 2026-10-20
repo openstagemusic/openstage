@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import EventPageView from "@/components/events/EventPageView";
 import { eventMetadata } from "@/lib/events/metadata";
 import { eventPath } from "@/lib/events/paths";
+import { getEventById } from "@/lib/events/queries";
 import { findEventByPath } from "@/lib/events/resolve";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -33,6 +34,9 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
 
   if (!event) return {};
 
+  // Un doppione unito non deve produrre una seconda anteprima social.
+  if (event.mergedInto) return {};
+
   return eventMetadata(event, await getLocale());
 }
 
@@ -41,6 +45,16 @@ export default async function EventPage({ params }: EventPageProps) {
   const event = await findEventByPath(percorso);
 
   if (!event) notFound();
+
+  // Doppione unito dall'admin: la scheda non si mostra, si rimanda a quella
+  // buona. Il reindirizzamento è permanente (308) perché il doppione non
+  // tornerà: se l'unione viene disfatta, la pagina riprende a esistere.
+  if (event.mergedInto) {
+    const target = await getEventById(event.mergedInto);
+    if (!target) notFound();
+
+    permanentRedirect(withLocale(await getLocale(), eventPath(target)));
+  }
 
   // Un confronto solo copre tutti i casi: identificativo, città sbagliata,
   // indirizzo più corto del dovuto.

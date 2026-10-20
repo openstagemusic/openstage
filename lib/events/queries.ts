@@ -3,6 +3,8 @@ import { cache } from "react";
 import { cityKey } from "@/lib/geo/city";
 import { createClient } from "@/lib/supabase/server";
 
+import { eventPath } from "./paths";
+import { calendarDate } from "./timezone";
 import type { EventKind, LocationPrecision, PublicEvent } from "./types";
 
 /**
@@ -43,6 +45,7 @@ export const EVENT_SELECT = [
   "status",
   "cancelled_at",
   "cancel_reason",
+  "merged_into",
   "artists ( id, slug, name, city, profile_id )",
   "venues ( id, slug, name, city, address, website, profile_id )",
 ].join(", ");
@@ -101,6 +104,8 @@ export type EventRow = {
   status?: "draft" | "published" | "cancelled" | null;
   cancelled_at?: string | null;
   cancel_reason?: string | null;
+  /** Se valorizzata, questa scheda è un doppione unito a un'altra. */
+  merged_into?: string | null;
   artists: Embedded<ArtistRow>;
   venues: Embedded<VenueRow>;
 };
@@ -146,6 +151,7 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     status: row.status ?? "published",
     cancelledAt: row.cancelled_at ?? null,
     cancelReason: row.cancel_reason ?? null,
+    mergedInto: row.merged_into ?? null,
     artist: artist
       ? { id: artist.id, slug: artist.slug, name: artist.name, city: artist.city }
       : null,
@@ -467,4 +473,93 @@ export async function suggestEvents(query: string, limit = 4): Promise<EventSugg
   }
 
   return (data ?? []) as unknown as EventSuggestion[];
+}
+
+/**
+ * Una serata che assomiglia a quella che si sta per inserire.
+ *
+ * È il caso di B39: il locale mette la serata e non collega l'artista (magari
+ * non ha una scheda), poi l'artista la reinserisce per farla comparire sulla
+ * propria pagina. Due righe, un concerto.
+ *
+ * L'avviso è **preciso di proposito**: stesso giorno **e** almeno una cosa in
+ * comune vera (lo stesso locale, lo stesso artista, o lo stesso titolo). "Stessa
+ * città" da sola non basta: un sabato a Milano ci sono dieci serate diverse, e
+ * avvisare per tutte sarebbe rumore che si impara a ignorare.
+ */
+export type SimilarEvent = {
+  id: string;
+  title: string;
+  city: string | null;
+  startsAt: string;
+  /** Indirizzo canonico (senza prefisso di lingua): lo compone il modulo. */
+  path: string;
+};
+
+/** Titolo ridotto all'osso, per confrontare "Live!" con "live". */
+function titleKey(value: string | null): string {
+  return (cityKey(value) ?? "").replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+export async function findSimilarEvents(input: {
+  startsAt: string;
+  timezone: string;
+  venueId: string | null;
+  artistId: string | null;
+  title: string;
+  limit?: number;
+}): Promise<SimilarEvent[]> {
+  const supabase = await createClient();
+  const instant = new Date(input.startsAt);
+  const window = 20 * 60 * 60 * 1000;
+
+  const { data, error } = await supabase
+    .from("events")
+    .select("id, slug, title, city, starts_at, venue_id, artist_id")
+    .in("status", ["draft", "published"])
+    .is("merged_into", null)
+    .gte("starts_at", new Date(instant.getTime() - window).toISOString())
+    .lte("starts_at", new Date(instant.getTime() + window).toISOString())
+    .order("starts_at", { ascending: true })
+    .limit(40);
+
+  if (error) {
+    console.error("[events] findSimilarEvents:", error.message);
+    return [];
+  }
+
+  const day = calendarDate(instant, input.timezone);
+  const wantedTitle = titleKey(input.title);
+
+  type Row = {
+    id: string;
+    slug: string;
+    title: string;
+    city: string | null;
+    starts_at: string;
+    venue_id: string | null;
+    artist_id: string | null;
+  };
+
+  return (data as Row[])
+    .filter((row) => {
+      const rowDay = calendarDate(new Date(row.starts_at), input.timezone);
+      if (rowDay.year !== day.year || rowDay.month !== day.month || rowDay.day !== day.day) {
+        return false;
+      }
+
+      if (input.venueId && row.venue_id === input.venueId) return true;
+      if (input.artistId && row.artist_id === input.artistId) return true;
+
+      const rowTitle = titleKey(row.title);
+      return wantedTitle !== "" && rowTitle !== "" && (rowTitle === wantedTitle || rowTitle.includes(wantedTitle) || wantedTitle.includes(rowTitle));
+    })
+    .slice(0, input.limit ?? 4)
+    .map((row) => ({
+      id: row.id,
+      title: row.title,
+      city: row.city,
+      startsAt: row.starts_at,
+      path: eventPath({ id: row.id, slug: row.slug, city: row.city }),
+    }));
 }

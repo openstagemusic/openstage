@@ -607,6 +607,22 @@ export const it: Dictionary = {
     venueSearchEmpty: "Nessun locale trovato: scrivi il nome qui sotto.",
     venueLinked: "Locale",
     venueUnlink: "Scollega",
+    artistLinked: "Artista",
+    artistYou: "la tua scheda",
+    artistUnlink: "Scollega",
+    artistSearch: "Artista della serata",
+    artistSearchPlaceholder: "Cerca l'artista su OpenStage…",
+    artistSearchEmpty:
+      "Nessun artista trovato: se non ha una scheda, lascia vuoto. La serata resta del locale.",
+    artistHint:
+      "Se l'artista ha una scheda su OpenStage, collegalo: la serata comparirà anche sulla sua pagina.",
+    artistLockedHint: "La serata è tua: l'artista è la tua scheda, non si cambia.",
+    duplicatesTitle: "Esiste già una serata simile",
+    duplicatesHint:
+      "Non è un errore: controlla che non sia la stessa. Se è un'altra serata, creala comunque.",
+    duplicateSee: "Vedi",
+    duplicateCreateAnyway: "Crea comunque",
+    duplicateCancel: "No, torna al modulo",
     venueName: "Nome del locale",
     venueNamePlaceholder: "Es. Circolo Arci",
     venueNameHint:
@@ -704,6 +720,7 @@ export const it: Dictionary = {
       timezoneInvalid: "Il fuso orario non è valido.",
       venueInvalid: "Il locale scelto non è valido: riprova a cercarlo.",
       venueNameTooLong: "Il nome del locale è troppo lungo (massimo 120 caratteri).",
+      artistInvalid: "L'artista scelto non esiste più: riprova a cercarlo.",
       cityRequired: "Scrivi la città.",
       cityTooLong: "Il nome della città è troppo lungo (massimo 80 caratteri).",
       directionsTooLong:
