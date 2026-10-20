@@ -15,6 +15,8 @@ export type ModerationEvent = {
   city: string | null;
   status: "draft" | "published" | "cancelled";
   startsAt: string;
+  /** Fuso dell'evento: serve a capire se la serata è di un giorno passato. */
+  timezone: string;
   /** Valorizzato = la serata è in pausa per le segnalazioni. */
   autoHiddenAt: string | null;
   reports: number;
@@ -31,6 +33,7 @@ type Row = {
   city: string | null;
   status: "draft" | "published" | "cancelled";
   starts_at: string;
+  timezone: string;
   auto_hidden_at: string | null;
   created_by: string | null;
   profiles:
@@ -46,7 +49,7 @@ export async function listModerationEvents(limit = 120): Promise<ModerationEvent
     supabase
       .from("events")
       .select(
-        "id, title, slug, city, status, starts_at, auto_hidden_at, created_by, profiles!events_created_by_fkey ( full_name, email, suspended_at )"
+        "id, title, slug, city, status, starts_at, timezone, auto_hidden_at, created_by, profiles!events_created_by_fkey ( full_name, email, suspended_at )"
       )
       .is("merged_into", null)
       .order("starts_at", { ascending: false })
@@ -76,6 +79,7 @@ export async function listModerationEvents(limit = 120): Promise<ModerationEvent
       city: row.city,
       status: row.status,
       startsAt: row.starts_at,
+      timezone: row.timezone,
       autoHiddenAt: row.auto_hidden_at,
       reports: counts.get(row.id) ?? 0,
       ownerId: row.created_by,

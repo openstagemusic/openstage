@@ -79,17 +79,32 @@ export async function setEventStatusAction(input: {
   return result(error);
 }
 
-/** Elimina una bozza. Un evento pubblicato si annulla, non si elimina. */
-export async function deleteDraftAction(input: { eventId: string }): Promise<EventActionResult> {
+/**
+ * Elimina definitivamente una serata creata da questo profilo.
+ *
+ * L'annullamento è un'altra cosa: quello lascia la pagina viva con il motivo,
+ * così chi l'aveva salvata capisce. Qui invece la riga sparisce, e con lei i
+ * Preferiti e le segnalazioni collegate (`on delete cascade`): per questo
+ * l'interfaccia chiede conferma e, se la serata non si fa, suggerisce di
+ * annullarla.
+ *
+ * Il filtro su `created_by` è esplicito: l'admin non elimina da qui (in
+ * moderazione ha gli strumenti giusti) e nessuno cancella le serate altrui.
+ */
+export async function deleteEventAction(input: { eventId: string }): Promise<EventActionResult> {
   const supabase = await createClient();
+  const session = await getSessionProfile();
+
+  if (!session) return { ok: false, error: "generic" };
 
   const { error } = await supabase
     .from("events")
     .delete()
     .eq("id", input.eventId)
-    .eq("status", "draft");
+    .eq("created_by", session.id);
 
   revalidatePath("/dashboard");
+  revalidatePath("/");
 
   return result(error);
 }

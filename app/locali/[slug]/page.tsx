@@ -10,7 +10,7 @@ import { canManageVenueProfile } from "@/lib/auth/roles";
 import { getMyPendingRequest, getReplaceablePage } from "@/lib/claims/queries";
 import { getVenueByProfileId, getVenueBySlug } from "@/lib/directory/queries";
 import { venuePath } from "@/lib/events/paths";
-import { listUpcomingEventsByVenue } from "@/lib/events/queries";
+import { listPastEventsByVenue, listUpcomingEventsByVenue } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
@@ -50,7 +50,10 @@ export default async function VenuePage({ params }: VenuePageProps) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const session = await getSessionProfile();
-  const events = await listUpcomingEventsByVenue(venue.id);
+  const [events, past] = await Promise.all([
+    listUpcomingEventsByVenue(venue.id),
+    listPastEventsByVenue(venue.id),
+  ]);
 
   // La scheda di un locale si prende su richiesta. Il database permette una
   // sola richiesta in attesa per profilo (0014): se è per questa scheda lo
@@ -208,6 +211,18 @@ export default async function VenuePage({ params }: VenuePageProps) {
       ) : (
         <p className="mt-5 text-sm text-muted">{t.upcomingEmpty}</p>
       )}
+
+      {past.length > 0 ? (
+        <>
+          <h2 className="mt-12 font-display text-xl font-semibold">{t.pastTitle}</h2>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {past.map((event) => (
+              <EventTeaser key={event.id} event={event} locale={locale} dict={dict} />
+            ))}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

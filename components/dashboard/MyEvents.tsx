@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
-  deleteDraftAction,
+  deleteEventAction,
   setEventStatusAction,
   type EventActionError,
   type EventActionResult,
@@ -14,7 +14,7 @@ import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { DashboardEvent, DashboardStatus } from "@/lib/dashboard/queries";
 import { CANCEL_REASON_MAX } from "@/lib/events/editor";
-import { formatEventDate } from "@/lib/events/format";
+import { formatEventDate, isEventPast } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
 import { placeName } from "@/lib/events/types";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,8 @@ const primaryButton =
   "rounded-full bg-violet px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
 const ghostButton =
   "rounded-full border border-white/15 px-3 py-1.5 text-xs text-muted transition-colors hover:text-white disabled:opacity-50";
+const dangerButton =
+  "rounded-full border border-pink/40 px-3 py-1.5 text-xs text-pink transition-colors hover:bg-pink/10 disabled:opacity-50";
 
 /** "I miei eventi": bozze, pubblicati e annullati, con le azioni di ognuno. */
 export default function MyEvents({ events, verified, dict }: MyEventsProps) {
@@ -92,10 +94,37 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
     );
   }
 
-  const sections: Array<{ status: DashboardStatus; label: string }> = [
-    { status: "draft", label: dict.sectionDrafts },
-    { status: "published", label: dict.sectionPublished },
-    { status: "cancelled", label: dict.sectionCancelled },
+  const now = new Date();
+  const isPast = (event: DashboardEvent) => isEventPast(event.startsAt, event.timezone, now);
+
+  // "Passate" è una sezione di tempo, non di stato: una serata pubblicata che è
+  // già andata non è più "online" per chi la organizza, anche se la pagina
+  // resta leggibile. Bozze e annullate restano dove sono: raccontano un'altra
+  // cosa (mai pubblicata / non si tiene).
+  const sections: Array<{ key: string; label: string; list: DashboardEvent[] }> = [
+    {
+      key: "upcoming",
+      label: dict.sectionUpcoming,
+      list: events.filter((event) => event.status === "published" && !isPast(event)),
+    },
+    {
+      key: "drafts",
+      label: dict.sectionDrafts,
+      list: events.filter((event) => event.status === "draft"),
+    },
+    {
+      key: "cancelled",
+      label: dict.sectionCancelled,
+      list: events.filter((event) => event.status === "cancelled"),
+    },
+    {
+      key: "past",
+      label: dict.sectionPast,
+      // La più recente per prima: è quella che si cerca.
+      list: events
+        .filter((event) => event.status === "published" && isPast(event))
+        .sort((a, b) => b.startsAt.localeCompare(a.startsAt)),
+    },
   ];
 
   const statusLabel: Record<DashboardStatus, string> = {
@@ -123,11 +152,11 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
       ) : null}
 
       {sections.map((section) => {
-        const list = events.filter((event) => event.status === section.status);
+        const list = section.list;
         if (list.length === 0) return null;
 
         return (
-          <section key={section.status}>
+          <section key={section.key}>
             <h2 className="font-display text-xl font-semibold">
               {section.label} <span className="text-muted">({list.length})</span>
             </h2>
@@ -136,6 +165,8 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
               {list.map((event) => {
                 const when = formatEventDate(event.startsAt, event.timezone, locale);
                 const where = [placeName(event), event.city].filter(Boolean).join(" · ");
+                // Pubblicata ma già andata: si mostra "Conclusa", non "Pubblicato".
+                const archived = event.status === "published" && isPast(event);
 
                 return (
                   <article key={event.id} className="glass rounded-2xl border border-white/10 p-4">
@@ -144,10 +175,10 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                       <span
                         className={cn(
                           "rounded-full border px-2.5 py-1 text-xs",
-                          statusClass[event.status]
+                          archived ? "border-white/15 text-muted" : statusClass[event.status]
                         )}
                       >
-                        {statusLabel[event.status]}
+                        {archived ? dict.statusPast : statusLabel[event.status]}
                       </span>
                     </div>
 
@@ -165,6 +196,9 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                           <p className="mt-1 text-xs text-white/70">{event.cancelReason}</p>
                         ) : null}
                       </>
+                    ) : null}
+                    {archived ? (
+                      <p className="mt-1 text-xs text-muted">{dict.pastNote}</p>
                     ) : null}
 
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -195,17 +229,19 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
 
                       {event.status === "published" ? (
                         <>
-                          <button
-                            type="button"
-                            disabled={busy !== null}
-                            onClick={() => {
-                              setReason("");
-                              setCancellingId(event.id);
-                            }}
-                            className={ghostButton}
-                          >
-                            {dict.cancelEvent}
-                          </button>
+                          {!archived ? (
+                            <button
+                              type="button"
+                              disabled={busy !== null}
+                              onClick={() => {
+                                setReason("");
+                                setCancellingId(event.id);
+                              }}
+                              className={ghostButton}
+                            >
+                              {dict.cancelEvent}
+                            </button>
+                          ) : null}
 
                           <LocaleLink href={eventPath(event)} className={ghostButton}>
                             {dict.viewPublic}
@@ -213,21 +249,30 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                         </>
                       ) : null}
 
-                      {event.status === "draft" ? (
-                        <button
-                          type="button"
-                          disabled={busy !== null}
-                          onClick={() => {
-                            if (!window.confirm(dict.confirmDelete)) return;
-                            void run(`delete-${event.id}`, () =>
-                              deleteDraftAction({ eventId: event.id })
-                            );
-                          }}
-                          className={ghostButton}
-                        >
-                          {busy === `delete-${event.id}` ? dict.deleting : dict.deleteDraft}
-                        </button>
+                      {event.status === "cancelled" ? (
+                        <LocaleLink href={eventPath(event)} className={ghostButton}>
+                          {dict.viewPublic}
+                        </LocaleLink>
                       ) : null}
+
+                      {/*
+                        L'eliminazione è per tutti gli stati, ma è l'ultima
+                        strada: chi ha una serata che non si tiene dovrebbe
+                        annullarla, così chi l'aveva salvata legge il motivo.
+                      */}
+                      <button
+                        type="button"
+                        disabled={busy !== null}
+                        onClick={() => {
+                          if (!window.confirm(dict.confirmDelete)) return;
+                          void run(`delete-${event.id}`, () =>
+                            deleteEventAction({ eventId: event.id })
+                          );
+                        }}
+                        className={dangerButton}
+                      >
+                        {busy === `delete-${event.id}` ? dict.deleting : dict.deleteEvent}
+                      </button>
                     </div>
 
                     {cancellingId === event.id ? (

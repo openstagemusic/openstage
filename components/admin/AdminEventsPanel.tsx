@@ -10,7 +10,7 @@ import {
 } from "@/app/actions/moderation";
 import Link from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { formatEventDateLong } from "@/lib/events/format";
+import { formatEventDateLong, isEventPast } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
 import type { ModerationEvent } from "@/lib/moderation/queries";
 
@@ -27,7 +27,7 @@ import type { ModerationEvent } from "@/lib/moderation/queries";
  * **proposte**, non condanne: la serata torna in bozza e aspetta una decisione.
  */
 
-type Filter = "all" | "online" | "paused" | "reported" | "cancelled";
+type Filter = "all" | "online" | "past" | "paused" | "reported" | "cancelled";
 
 export default function AdminEventsPanel({
   events,
@@ -45,7 +45,10 @@ export default function AdminEventsPanel({
   const [mergeTarget, setMergeTarget] = useState<Record<string, string>>({});
 
   const visible = events.filter((event) => {
-    if (filter === "online") return event.status === "published";
+    if (filter === "online")
+      return event.status === "published" && !isEventPast(event.startsAt, event.timezone);
+    if (filter === "past")
+      return event.status === "published" && isEventPast(event.startsAt, event.timezone);
     if (filter === "paused") return event.autoHiddenAt !== null;
     if (filter === "reported") return event.reports > 0;
     if (filter === "cancelled") return event.status === "cancelled";
@@ -70,7 +73,12 @@ export default function AdminEventsPanel({
 
   function statusLabel(event: ModerationEvent): string {
     if (event.autoHiddenAt) return dict.moderationPaused;
-    if (event.status === "published") return dict.moderationStatusPublished;
+    if (event.status === "published") {
+      // "Online" per una serata già andata sarebbe una bugia: è conclusa.
+      return isEventPast(event.startsAt, event.timezone)
+        ? dict.moderationStatusPast
+        : dict.moderationStatusPublished;
+    }
     if (event.status === "cancelled") return dict.moderationStatusCancelled;
     return dict.moderationStatusDraft;
   }
@@ -78,6 +86,7 @@ export default function AdminEventsPanel({
   const filters: Array<{ key: Filter; label: string }> = [
     { key: "all", label: dict.moderationFilterAll },
     { key: "online", label: dict.moderationFilterOnline },
+    { key: "past", label: dict.moderationFilterPast },
     { key: "paused", label: dict.moderationFilterPaused },
     { key: "reported", label: dict.moderationFilterReported },
     { key: "cancelled", label: dict.moderationFilterCancelled },

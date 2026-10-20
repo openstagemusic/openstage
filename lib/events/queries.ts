@@ -3,6 +3,7 @@ import { cache } from "react";
 import { cityKey } from "@/lib/geo/city";
 import { createClient } from "@/lib/supabase/server";
 
+import { isEventPast } from "./format";
 import { eventPath } from "./paths";
 import { calendarDate } from "./timezone";
 import type { EventKind, LocationPrecision, PublicEvent } from "./types";
@@ -355,6 +356,52 @@ export function listUpcomingEventsByArtist(artistId: string, limit = 24): Promis
 
 export function listUpcomingEventsByVenue(venueId: string, limit = 24): Promise<PublicEvent[]> {
   return listUpcomingBy("venue_id", venueId, limit);
+}
+
+/**
+ * Serate già andate di un artista o in un locale (schede pubbliche).
+ *
+ * Solo le pubblicate: un'annullata non è una serata passata, e la sua pagina
+ * resta raggiungibile con il motivo. `starts_at < now` è il filtro grosso; poi
+ * `isEventPast` scarta le serate di oggi (nel loro fuso) già iniziate ma non
+ * ancora finite, così un concerto di stasera non compare tra le passate.
+ */
+async function listPastBy(
+  column: "artist_id" | "venue_id",
+  id: string,
+  limit: number
+): Promise<PublicEvent[]> {
+  const supabase = await createClient();
+  const now = new Date();
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(EVENT_SELECT)
+    .eq("status", "published")
+    .eq(column, id)
+    .lt("starts_at", now.toISOString())
+    // Dal più recente: l'ultima serata è quella che si vuole vedere.
+    .order("starts_at", { ascending: false })
+    // Un margine per le serate di oggi, che poi si scartano qui sotto.
+    .limit(limit * 2);
+
+  if (error) {
+    console.error("[events] listPastBy:", error.message);
+    return [];
+  }
+
+  return (data as unknown as EventRow[])
+    .filter((row) => isEventPast(row.starts_at, row.timezone, now))
+    .slice(0, limit)
+    .map(toPublicEvent);
+}
+
+export function listPastEventsByArtist(artistId: string, limit = 6): Promise<PublicEvent[]> {
+  return listPastBy("artist_id", artistId, limit);
+}
+
+export function listPastEventsByVenue(venueId: string, limit = 6): Promise<PublicEvent[]> {
+  return listPastBy("venue_id", venueId, limit);
 }
 
 /** Generi realmente presenti negli eventi pubblicati (per i filtri). */

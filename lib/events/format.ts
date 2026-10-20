@@ -63,6 +63,23 @@ export function formatEventDate(
   };
 }
 
+/**
+ * La serata è di un giorno già passato, nel fuso dell'evento.
+ *
+ * Non registriamo l'ora di fine: una serata resta "in programma" per tutto il
+ * giorno in cui si tiene (un concerto delle 21:30 non diventa "concluso" alle
+ * 21:31) e passa tra le passate solo dal giorno dopo.
+ */
+export function isEventPast(
+  startsAt: string,
+  timezone: string | null,
+  now: Date = new Date()
+): boolean {
+  const zone = timezone || "Europe/Rome";
+
+  return dayKey(new Date(startsAt), zone) < dayKey(now, zone);
+}
+
 /** Data estesa con anno, usata nella pagina dell'evento. */
 export function formatEventDateLong(
   startsAt: string,

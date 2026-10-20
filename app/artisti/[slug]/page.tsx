@@ -10,7 +10,7 @@ import { canManageArtistProfile } from "@/lib/auth/roles";
 import { getReplaceablePage } from "@/lib/claims/queries";
 import { getArtistByProfileId, getArtistBySlug } from "@/lib/directory/queries";
 import { artistPath } from "@/lib/events/paths";
-import { listUpcomingEventsByArtist } from "@/lib/events/queries";
+import { listPastEventsByArtist, listUpcomingEventsByArtist } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
@@ -51,7 +51,10 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const session = await getSessionProfile();
-  const events = await listUpcomingEventsByArtist(artist.id);
+  const [events, past] = await Promise.all([
+    listUpcomingEventsByArtist(artist.id),
+    listPastEventsByArtist(artist.id),
+  ]);
 
   // Il reclamo di una scheda artista è immediato: non esiste uno stato "in
   // attesa". O è libera, o è di chi guarda, o è di qualcun altro.
@@ -170,6 +173,18 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
       ) : (
         <p className="mt-5 text-sm text-muted">{t.upcomingEmpty}</p>
       )}
+
+      {past.length > 0 ? (
+        <>
+          <h2 className="mt-12 font-display text-xl font-semibold">{t.pastTitle}</h2>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {past.map((event) => (
+              <EventTeaser key={event.id} event={event} locale={locale} dict={dict} />
+            ))}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
