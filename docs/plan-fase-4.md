@@ -56,3 +56,42 @@ finale dell'admin.
 **Nessuno nuovo.** Niente Resend, niente PayPal, niente chiavi. Solo migration Supabase (città
 normalizzata e "come arrivare" per B38, `merged_into` per B39, `reports` per B40) e prove in
 produzione come per le fasi precedenti.
+
+## Stato di avanzamento
+
+### 4.1 — B38 · fatto (migration `0024`, applicata)
+
+Cosa è entrato davvero:
+
+- `public.city_key(text)` (immutabile) e le colonne **generate** `city_key` su `events`, `artists`,
+  `venues`: "Milano", "milano" e "Milano (MI)" sono la stessa città, per sempre, perché le calcola il
+  database. La stessa regola è copiata in `lib/geo/city.ts` per i filtri che partono dalla URL.
+- Menu dei filtri e contatori **deduplicati** per chiave (`listCities`, `listCityOptions`,
+  `getDiscoveryCounters`): una voce per città vera, con l'etichetta scritta più spesso.
+- Raggio **onesto** in `search_events`: si misura la distanza dal **bordo** della zona
+  (`distanza − area_radius_m`), non dal centro. Provato con due eventi gemelli a 2 km dal centro e
+  raggio richiesto 1 km: passa solo quello approssimativo con zona di 3 km.
+- `lib/geo/location-check.ts`: geocodifica inversa **tri-stato** (`found` / `empty` / `unavailable`),
+  confronto pin↔città (avviso oltre 50 km, rifiuto oltre 300 km). `empty` = pin sul mare, rifiutato;
+  `unavailable` = Photon giù, **non** si blocca nessuno.
+- Rotta `/api/geocode` con `?city=`: risponde anche con `locationCheck` (una sola geocodifica inversa,
+  non due in parallelo: Photon rallentava).
+- Editor: avviso morbido mentre si compila; il salvataggio rifà il controllo con un budget di 3 s
+  (`SAVE_CHECK_TIMEOUT_MS`) e blocca solo `empty` / `impossible`.
+- `GEOCODER_TIMEOUT_MS` (opzionale): serve alle prove locali, dove Photon impiega 4–7 s. In produzione
+  resta 5 s.
+- Il campo **"come arrivare"** esisteva già dalla `0023` (`directions_text`, mostrato nella pagina
+  evento): verificato, non riscritto.
+
+Prove reali (browser, sessione vera, `next start`): mare → `empty`; pin a Berlino con città "Milano"
+→ `impossible`; pin a Ranica → `ok`; rotta senza sessione → 401; menu città con **una sola** voce per
+"milano"/"Milano (MI)"; filtro `?city=milano` e vecchia URL `?city=Milano (MI)` trovano le stesse
+schede. Fixture e utente di prova eliminati dopo il test.
+
+Copertura onesta: il blocco lato **salvataggio** usa lo stesso codice della rotta ma con 3 s di budget;
+su questa rete Photon impiega più di 3 s, quindi il blocco è stato provato sulla rotta (budget pieno) e
+non attraverso il pulsante "Pubblica". In produzione la latenza è nell'ordine dei decimi di secondo.
+
+### 4.2 — B39 · da costruire
+
+### 4.3 — B40 · da costruire

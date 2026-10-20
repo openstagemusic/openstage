@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import { EVENT_SELECT, toPublicEvent, type EventRow } from "@/lib/events/queries";
 import type { PublicEvent } from "@/lib/events/types";
+import { cityKey, preferredCityLabel } from "@/lib/geo/city";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -172,12 +173,19 @@ export async function listCityOptions(limit = 200): Promise<string[]> {
   if (venues.error) console.error("[dashboard] listCityOptions (venues):", venues.error.message);
   if (events.error) console.error("[dashboard] listCityOptions (events):", events.error.message);
 
-  const cities = new Set<string>();
+  const groups = new Map<string, string[]>();
 
   for (const row of [...(venues.data ?? []), ...(events.data ?? [])] as Array<{ city: string | null }>) {
     const city = row.city?.trim();
-    if (city) cities.add(city);
+    const key = cityKey(city);
+    if (!city || !key) continue;
+
+    groups.set(key, [...(groups.get(key) ?? []), city]);
   }
 
-  return [...cities].sort((a, b) => a.localeCompare(b, "it")).slice(0, limit);
+  return [...groups.values()]
+    .map((values) => preferredCityLabel(values))
+    .filter((city): city is string => city !== null)
+    .sort((a, b) => a.localeCompare(b, "it"))
+    .slice(0, limit);
 }

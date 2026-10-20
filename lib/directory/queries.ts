@@ -1,5 +1,6 @@
 import { cache } from "react";
 
+import { cityKey, preferredCityLabel } from "@/lib/geo/city";
 import { ITEMS_PER_PAGE } from "@/lib/pagination";
 import { createClient } from "@/lib/supabase/server";
 
@@ -167,7 +168,10 @@ export async function listArtists({
   let query = supabase.from("artists").select(ARTIST_SELECT, { count: "exact" });
 
   if (term) query = query.ilike("name", `%${term}%`);
-  if (filters.city) query = query.eq("city", filters.city);
+  // La città si confronta sulla chiave normalizzata: "Milano", "milano" e
+  // "Milano (MI)" sono la stessa città (migration `0024`).
+  const city = filters.city ? cityKey(filters.city) : null;
+  if (city) query = query.eq("city_key", city);
   if (filters.genre) query = query.eq("genre", filters.genre);
 
   const { data, error, count } = await query
@@ -198,7 +202,8 @@ export async function listVenues({
   let query = supabase.from("venues").select(VENUE_SELECT, { count: "exact" });
 
   if (term) query = query.ilike("name", `%${term}%`);
-  if (filters.city) query = query.eq("city", filters.city);
+  const city = filters.city ? cityKey(filters.city) : null;
+  if (city) query = query.eq("city_key", city);
 
   const { data, error, count } = await query
     .order("name", { ascending: true })
@@ -244,8 +249,47 @@ async function listDistinct(
   return [...values].sort((a, b) => a.localeCompare(b));
 }
 
+/**
+ * Le città da mettere nel menu: **una voce per città vera**.
+ *
+ * Prima erano i valori distinti così com'erano scritti, quindi "Milano" e
+ * "milano" erano due voci e ognuna trovava metà delle schede. Ora si raggruppa
+ * per chiave normalizzata e si mostra la forma scritta più spesso.
+ */
+async function listCities(table: "artists" | "venues"): Promise<string[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from(table)
+    .select("city")
+    .not("city", "is", null)
+    .order("city", { ascending: true })
+    .limit(2000);
+
+  if (error) {
+    console.error(`[directory] listCities ${table}:`, error.message);
+    return [];
+  }
+
+  const groups = new Map<string, string[]>();
+
+  for (const row of data as Array<{ city: string | null }>) {
+    if (!row.city) continue;
+
+    const key = cityKey(row.city);
+    if (!key) continue;
+
+    groups.set(key, [...(groups.get(key) ?? []), row.city]);
+  }
+
+  return [...groups.values()]
+    .map((values) => preferredCityLabel(values))
+    .filter((label): label is string => label !== null)
+    .sort((a, b) => a.localeCompare(b));
+}
+
 export function listArtistCities(): Promise<string[]> {
-  return listDistinct("artists", "city");
+  return listCities("artists");
 }
 
 export function listArtistGenres(): Promise<string[]> {
@@ -253,7 +297,7 @@ export function listArtistGenres(): Promise<string[]> {
 }
 
 export function listVenueCities(): Promise<string[]> {
-  return listDistinct("venues", "city");
+  return listCities("venues");
 }
 
 /** Scheda pubblica di un artista. `null` se l'indirizzo non esiste. */

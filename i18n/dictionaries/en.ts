@@ -621,6 +621,8 @@ export const en = {
     mapTitle: "Location",
     mapHint: "Drag the pin where the night happens, or click on the map.",
     mapNoPin: "No pin yet: click on the map to place it.",
+    locationFarHint:
+      "The pin is far from the city you wrote (more than 50 km): check it is in the right place.",
     precision: "Precision",
     precisionExact: "Exact address",
     precisionApproximate: "Approximate area",
@@ -705,6 +707,10 @@ export const en = {
       cityTooLong: "The city name is too long (80 characters max).",
       directionsTooLong: "The directions are too long (400 characters max): keep them to the point.",
       locationRequired: "Place the pin on the map: that is how people find the night.",
+      locationEmpty:
+        "That point is in the middle of nowhere (sea or desert): move the pin where the night really happens.",
+      locationTooFar:
+        "The pin is more than 300 km from the city you wrote: either the city is wrong, or the pin is still where it was.",
       priceTooLong: "The price is too long (40 characters max).",
       ticketInvalid: "The ticket link must start with https://",
       ticketUnreachable:

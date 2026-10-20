@@ -156,6 +156,14 @@ export default function EventEditor({
   const [placesFailed, setPlacesFailed] = useState(false);
   const [focus, setFocus] = useState<MapFocus | null>(null);
   const focusCounter = useRef(0);
+  /**
+   * Città e pin raccontano lo stesso posto? Il controllo è **un avviso**: chi
+   * salva decide il server (che rifà il controllo), qui serve a non scoprirlo
+   * solo alla fine.
+   */
+  const [locationWarning, setLocationWarning] = useState<
+    "far" | "empty" | "impossible" | null
+  >(null);
 
   // Città e pin si scambiano informazioni (chi cerca un posto muove il pin, chi
   // trascina il pin riempie la città): letti una volta sola, con un nome chiaro.
@@ -316,6 +324,46 @@ export default function EventEditor({
         // La città resta vuota: si può sempre scrivere a mano.
       }
     }, 600);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [city, latitude, longitude, locale]);
+
+  // La città scritta e il pin devono raccontare lo stesso posto. Il controllo
+  // parte da solo mentre si compila, con un ritardo: il salvataggio lo rifà
+  // comunque, ed è quello che conta.
+  useEffect(() => {
+    if (city.trim() === "" || latitude === null || longitude === null) {
+      setLocationWarning(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/geocode?lat=${latitude}&lon=${longitude}&city=${encodeURIComponent(
+            city.trim()
+          )}&lang=${locale}`
+        );
+        const payload = (await response.json()) as {
+          locationCheck?: { status?: string };
+        };
+
+        if (cancelled) return;
+
+        const status = payload.locationCheck?.status;
+        setLocationWarning(
+          status === "far" || status === "empty" || status === "impossible" ? status : null
+        );
+      } catch {
+        // Il controllo è un aiuto, non una condizione: se non risponde, si tace.
+        if (!cancelled) setLocationWarning(null);
+      }
+    }, 800);
 
     return () => {
       cancelled = true;
@@ -731,6 +779,19 @@ export default function EventEditor({
             {values.latitude === null ? t.mapNoPin : t.mapHint}
           </p>
           {errors.location ? <p className="mt-1 text-xs text-pink">{t.errors[errors.location]}</p> : null}
+          {!errors.location && locationWarning ? (
+            <p
+              className={`mt-1 text-xs ${
+                locationWarning === "far" ? "text-amber-300" : "text-pink"
+              }`}
+            >
+              {locationWarning === "far"
+                ? t.locationFarHint
+                : t.errors[
+                    locationWarning === "empty" ? "locationEmpty" : "locationTooFar"
+                  ]}
+            </p>
+          ) : null}
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">

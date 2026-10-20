@@ -1,5 +1,6 @@
 import { cache } from "react";
 
+import { cityKey } from "@/lib/geo/city";
 import { createClient } from "@/lib/supabase/server";
 
 import type { EventKind, LocationPrecision, PublicEvent } from "./types";
@@ -398,7 +399,8 @@ export async function getDiscoveryCounters(): Promise<DiscoveryCounters> {
 
   const citySet = new Set<string>();
   for (const row of (cities.data ?? []) as Array<{ city: string | null }>) {
-    if (row.city) citySet.add(row.city);
+    const key = cityKey(row.city);
+    if (key) citySet.add(key);
   }
 
   return {

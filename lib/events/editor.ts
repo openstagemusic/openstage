@@ -110,6 +110,8 @@ export type EditorErrorCode =
   | "cityTooLong"
   | "directionsTooLong"
   | "locationRequired"
+  | "locationEmpty"
+  | "locationTooFar"
   | "priceTooLong"
   | "ticketInvalid"
   | "ticketUnreachable"

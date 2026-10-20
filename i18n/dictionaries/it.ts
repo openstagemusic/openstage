@@ -622,6 +622,8 @@ export const it: Dictionary = {
     mapTitle: "Posizione",
     mapHint: "Trascina il pin dove si tiene la serata, oppure clicca sulla mappa.",
     mapNoPin: "Nessun pin: clicca sulla mappa per metterlo.",
+    locationFarHint:
+      "Il pin è lontano dalla città che hai scritto (oltre 50 km): controlla che sia nel posto giusto.",
     precision: "Precisione",
     precisionExact: "Indirizzo esatto",
     precisionApproximate: "Zona approssimativa",
@@ -707,6 +709,10 @@ export const it: Dictionary = {
       directionsTooLong:
         "Le indicazioni sono troppo lunghe (massimo 400 caratteri): vanno dritte al punto.",
       locationRequired: "Metti il pin sulla mappa: serve a far trovare la serata.",
+      locationEmpty:
+        "Quel punto è in mezzo al nulla (mare o deserto): sposta il pin dove si tiene davvero la serata.",
+      locationTooFar:
+        "Il pin è a più di 300 km dalla città che hai scritto: o hai sbagliato la città, o il pin è rimasto dov'era.",
       priceTooLong: "Il prezzo è troppo lungo (massimo 40 caratteri).",
       ticketInvalid: "Il link ai biglietti deve iniziare con https://",
       ticketUnreachable:

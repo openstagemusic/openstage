@@ -12,6 +12,7 @@ import {
   type EventEditorState,
 } from "@/lib/events/editor";
 import { isTicketUrlReachable } from "@/lib/events/links";
+import { checkEventLocation, SAVE_CHECK_TIMEOUT_MS } from "@/lib/geo/location-check";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionProfile } from "@/lib/supabase/session";
 
@@ -161,6 +162,26 @@ export async function saveEventAction(input: {
   }
 
   const values = validated.values;
+
+  // La posizione si controlla **adesso**, non solo mentre si trascina il pin:
+  // il database non sa dov'è il mare, e un "Milano" con il pin a Berlino è
+  // quasi sempre un pin rimasto dov'era. Se il geocodificatore è giù non si
+  // blocca nessuno: l'incertezza non è colpa di chi pubblica.
+  const location = await checkEventLocation({
+    latitude: values.latitude,
+    longitude: values.longitude,
+    city: values.city,
+    locale: "it",
+    timeoutMs: SAVE_CHECK_TIMEOUT_MS,
+  });
+
+  if (location.status === "empty") {
+    return { ok: false, fieldErrors: { location: "locationEmpty" } };
+  }
+
+  if (location.status === "impossible") {
+    return { ok: false, fieldErrors: { location: "locationTooFar" } };
+  }
 
   // Il link dei biglietti si prova **prima** di salvare: un link morto nella
   // chiamata più importante della serata è peggio di mezzo secondo d'attesa.

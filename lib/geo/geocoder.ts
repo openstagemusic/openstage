@@ -1,4 +1,14 @@
+import { setDefaultResultOrder } from "node:dns";
+
 import { createClient } from "@/lib/supabase/server";
+
+/**
+ * Photon risponde via IPv4. Su alcune reti (e su questa macchina di sviluppo) la
+ * risoluzione IPv6 resta appesa fino al timeout, quindi la ricerca dei posti
+ * sembra lenta o rotta mentre il servizio è sanissimo. Chiedere prima gli
+ * indirizzi IPv4 costa una riga e toglie di mezzo la variabile.
+ */
+setDefaultResultOrder("ipv4first");
 
 /**
  * Ricerca di luoghi: dal nome di una città (o di un indirizzo) alle coordinate,
@@ -37,7 +47,20 @@ export type GeocodePlace = {
 
 const DEFAULT_GEOCODER_URL = "https://photon.komoot.io";
 const SEARCH_LIMIT = 6;
-const REQUEST_TIMEOUT_MS = 5000;
+
+/**
+ * Quanto si aspetta Photon.
+ *
+ * Photon è un servizio pubblico senza garanzie: dalla maggior parte delle reti
+ * risponde in poche centinaia di millisecondi, da altre (compresa questa rete di
+ * sviluppo) impiega anche sei o sette secondi. Cinque secondi sono il compromesso
+ * per la produzione; `GEOCODER_TIMEOUT_MS` serve alle prove locali, dove la
+ * lentezza non deve diventare un falso "servizio giù".
+ */
+const REQUEST_TIMEOUT_MS = (() => {
+  const fromEnv = Number.parseInt(process.env.GEOCODER_TIMEOUT_MS ?? "", 10);
+  return Number.isFinite(fromEnv) && fromEnv >= 500 ? fromEnv : 5000;
+})();
 /** Dopo questo tempo la ricerca si rifà: i nomi dei posti cambiano, lentamente. */
 const CACHE_MAX_AGE_DAYS = 90;
 
@@ -168,7 +191,19 @@ function languageParam(locale: string): string {
   return locale === "en" ? "&lang=en" : "";
 }
 
-async function askPhoton(path: string): Promise<PhotonFeature[]> {
+/**
+ * La stessa chiamata, ma che sa distinguere **"non c'è niente qui"** da
+ * **"il servizio non ha risposto"**.
+ *
+ * Serve al controllo della posizione: un pin sul mare aperto va rifiutato, un
+ * Photon momentaneamente giù no. Prima le due cose erano lo stesso elenco
+ * vuoto, e rifiutare un pin legittimo per un guasto altrui sarebbe stato
+ * peggio del difetto che stavamo correggendo.
+ */
+async function askPhotonChecked(
+  path: string,
+  timeoutMs: number = REQUEST_TIMEOUT_MS
+): Promise<{ ok: boolean; features: PhotonFeature[] }> {
   const base = (process.env.GEOCODER_URL?.trim() || DEFAULT_GEOCODER_URL).replace(/\/+$/, "");
 
   try {
@@ -179,20 +214,27 @@ async function askPhoton(path: string): Promise<PhotonFeature[]> {
         "user-agent": "OpenStage/0.1 (+https://openstage-alpha.vercel.app)",
       },
       cache: "no-store",
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
 
     if (!response.ok) {
       console.error("[geo] Photon ha risposto", response.status);
-      return [];
+      return { ok: false, features: [] };
     }
 
     const payload = (await response.json()) as { features?: PhotonFeature[] };
-    return Array.isArray(payload.features) ? payload.features : [];
+    return { ok: true, features: Array.isArray(payload.features) ? payload.features : [] };
   } catch (error) {
     console.error("[geo] Photon non raggiungibile:", error instanceof Error ? error.message : error);
-    return [];
+    return { ok: false, features: [] };
   }
+}
+
+async function askPhoton(
+  path: string,
+  timeoutMs: number = REQUEST_TIMEOUT_MS
+): Promise<PhotonFeature[]> {
+  return (await askPhotonChecked(path, timeoutMs)).features;
 }
 
 /** Un posto salvato in cache vale solo se ha la forma giusta. */
@@ -262,7 +304,7 @@ async function writeCached(canonical: string, places: GeocodePlace[]): Promise<v
  */
 export async function searchPlaces(
   query: string,
-  options: { locale: string }
+  options: { locale: string; timeoutMs?: number }
 ): Promise<GeocodePlace[]> {
   const term = query.trim().slice(0, 120);
   if (term.length < 3) return [];
@@ -273,7 +315,8 @@ export async function searchPlaces(
   if (cached) return cached;
 
   const features = await askPhoton(
-    `/api?q=${encodeURIComponent(term)}&limit=${SEARCH_LIMIT}${languageParam(options.locale)}`
+    `/api?q=${encodeURIComponent(term)}&limit=${SEARCH_LIMIT}${languageParam(options.locale)}`,
+    options.timeoutMs
   );
 
   const places = toPlaces(features);
@@ -295,11 +338,40 @@ export async function searchPlaces(
 export async function reversePlace(
   latitude: number,
   longitude: number,
-  options: { locale: string }
+  options: { locale: string; timeoutMs?: number }
 ): Promise<GeocodePlace | null> {
   const features = await askPhoton(
-    `/reverse?lat=${latitude}&lon=${longitude}&limit=1${languageParam(options.locale)}`
+    `/reverse?lat=${latitude}&lon=${longitude}&limit=1${languageParam(options.locale)}`,
+    options.timeoutMs
   );
 
   return toPlaces(features)[0] ?? null;
+}
+
+export type ReverseLookup =
+  | { status: "found"; place: GeocodePlace }
+  | { status: "empty" }
+  | { status: "unavailable" };
+
+/**
+ * Come `reversePlace`, ma dice **perché** non c'è un posto.
+ *
+ * `empty` = il servizio ha risposto e lì non c'è niente (mare aperto, deserto):
+ * quel pin non descrive una serata. `unavailable` = il servizio non ha
+ * risposto: non è colpa di chi sta inserendo l'evento, e non si blocca nulla.
+ */
+export async function reverseLookup(
+  latitude: number,
+  longitude: number,
+  options: { locale: string; timeoutMs?: number }
+): Promise<ReverseLookup> {
+  const result = await askPhotonChecked(
+    `/reverse?lat=${latitude}&lon=${longitude}&limit=1${languageParam(options.locale)}`,
+    options.timeoutMs
+  );
+
+  if (!result.ok) return { status: "unavailable" };
+
+  const place = toPlaces(result.features)[0];
+  return place ? { status: "found", place } : { status: "empty" };
 }
