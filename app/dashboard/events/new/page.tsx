@@ -7,6 +7,7 @@ import { isProfileVerified, listCityOptions } from "@/lib/dashboard/queries";
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { initialEditorState } from "@/lib/events/editor";
 import { listGenres } from "@/lib/events/queries";
+import { searchPlaces } from "@/lib/geo/geocoder";
 import { getVisitorLocation } from "@/lib/geo/visitor";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -54,6 +55,35 @@ export default async function NewEventPage() {
   // Un artista crea le sue: la scheda artista è già collegata e non si sceglie.
   if (artist) initial.artistId = artist.id;
 
+  // Dove aprire la mappa.
+  //
+  // Se il locale collegato ha un pin, si parte da lì. Se non ce l'ha (capita:
+  // la scheda è stata creata scrivendo la città e basta), si parte dalla **sua
+  // città**, non dalla posizione di chi scrive: chi organizza a Napoli non deve
+  // ritrovarsi la mappa su Milano e trascinare il pin per mezza Italia.
+  //
+  // In quel caso il pin si mette al centro della città con precisione "zona"
+  // (3 km): è vero che la serata è lì, non è vero che è a quel civico. Chi sa
+  // dov'è lo trascina e diventa esatto.
+  let mapCenter = {
+    latitude: visitor.center.latitude,
+    longitude: visitor.center.longitude,
+  };
+
+  if (venue?.latitude != null && venue.longitude != null) {
+    mapCenter = { latitude: venue.latitude, longitude: venue.longitude };
+  } else if (venue?.city) {
+    const [place] = await searchPlaces(venue.city, { locale, timeoutMs: 1800 });
+
+    if (place) {
+      mapCenter = { latitude: place.latitude, longitude: place.longitude };
+      initial.latitude = place.latitude;
+      initial.longitude = place.longitude;
+      initial.locationPrecision = "approximate";
+      initial.areaRadiusM = 3000;
+    }
+  }
+
   return (
     <div>
       <h1 className="font-display text-3xl font-bold tracking-tight">{dict.editor.newTitle}</h1>
@@ -69,10 +99,7 @@ export default async function NewEventPage() {
           artistLocked={Boolean(artist)}
           cities={cities}
           genres={genres}
-          mapCenter={{
-            latitude: visitor.center.latitude,
-            longitude: visitor.center.longitude,
-          }}
+          mapCenter={mapCenter}
           verified={verified}
           currentStatus="draft"
           updatedAt={null}

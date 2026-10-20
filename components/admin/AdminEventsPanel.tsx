@@ -27,7 +27,7 @@ import type { ModerationEvent } from "@/lib/moderation/queries";
  * **proposte**, non condanne: la serata torna in bozza e aspetta una decisione.
  */
 
-type Filter = "all" | "online" | "paused" | "reported";
+type Filter = "all" | "online" | "paused" | "reported" | "cancelled";
 
 export default function AdminEventsPanel({
   events,
@@ -48,6 +48,7 @@ export default function AdminEventsPanel({
     if (filter === "online") return event.status === "published";
     if (filter === "paused") return event.autoHiddenAt !== null;
     if (filter === "reported") return event.reports > 0;
+    if (filter === "cancelled") return event.status === "cancelled";
     return true;
   });
 
@@ -79,6 +80,7 @@ export default function AdminEventsPanel({
     { key: "online", label: dict.moderationFilterOnline },
     { key: "paused", label: dict.moderationFilterPaused },
     { key: "reported", label: dict.moderationFilterReported },
+    { key: "cancelled", label: dict.moderationFilterCancelled },
   ];
 
   return (

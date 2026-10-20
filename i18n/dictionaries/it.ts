@@ -526,6 +526,7 @@ export const it: Dictionary = {
     moderationFilterOnline: "Online",
     moderationFilterPaused: "In pausa",
     moderationFilterReported: "Segnalate",
+    moderationFilterCancelled: "Annullate",
     moderationEmpty: "Niente da moderare, per ora.",
     moderationReports: "{n} segnalazioni",
     moderationOwnerSuspended: "autore sospeso",

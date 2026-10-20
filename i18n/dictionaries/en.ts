@@ -525,6 +525,7 @@ export const en = {
     moderationFilterOnline: "Online",
     moderationFilterPaused: "Paused",
     moderationFilterReported: "Reported",
+    moderationFilterCancelled: "Cancelled",
     moderationEmpty: "Nothing to moderate, for now.",
     moderationReports: "{n} reports",
     moderationOwnerSuspended: "author suspended",
