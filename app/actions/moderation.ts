@@ -125,6 +125,35 @@ export async function adminSetEventStatusAction(input: {
   return { ok: true };
 }
 
+/**
+ * Elimina definitivamente una serata (solo admin).
+ *
+ * È l'ultima risorsa, non il primo pulsante: per una serata che non si fa c'è
+ * l'annullamento (la pagina resta viva col motivo), per una da correggere c'è
+ * la bozza. Qui la riga sparisce e con lei i Preferiti e le segnalazioni
+ * collegate (`on delete cascade`): non esiste un cestino.
+ */
+export async function adminDeleteEventAction(input: {
+  eventId: string;
+}): Promise<ModerationOutcome> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("events").delete().eq("id", input.eventId);
+
+  if (error) {
+    console.error("[moderation] adminDeleteEventAction:", error.message);
+    return { ok: false, error: "failed" };
+  }
+
+  revalidatePath("/admin/eventi");
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+
+  return { ok: true };
+}
+
 /** Sospende o riattiva un account (solo admin). */
 export async function adminSuspendProfileAction(input: {
   profileId: string;

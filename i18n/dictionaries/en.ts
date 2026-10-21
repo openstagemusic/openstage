@@ -515,6 +515,9 @@ export const en = {
     moderationCancel: "Cancel",
     moderationRestore: "Put back online",
     moderationDraft: "Back to draft",
+    moderationDelete: "Delete",
+    moderationConfirmDelete:
+      "Delete «{title}» permanently? Saved events and reports will disappear too. This cannot be undone. If the event is not happening, cancel it instead.",
     moderationSuspend: "Suspend the author",
     moderationActivate: "Reactivate the author",
     moderationMergeTitle: "Merge into another page",

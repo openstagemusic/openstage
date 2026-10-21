@@ -516,6 +516,9 @@ export const it: Dictionary = {
     moderationCancel: "Annulla",
     moderationRestore: "Rimetti online",
     moderationDraft: "Torna in bozza",
+    moderationDelete: "Elimina",
+    moderationConfirmDelete:
+      "Eliminare definitivamente «{title}»? Spariranno anche i preferiti e le segnalazioni. Non si può recuperare. Per una serata che non si fa è meglio «Annulla».",
     moderationSuspend: "Sospendi l'autore",
     moderationActivate: "Riattiva l'autore",
     moderationMergeTitle: "Unisci a un'altra scheda",

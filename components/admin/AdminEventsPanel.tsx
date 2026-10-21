@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
+  adminDeleteEventAction,
   adminMergeAction,
   adminSetEventStatusAction,
   adminSuspendProfileAction,
@@ -203,6 +204,24 @@ export default function AdminEventsPanel({
                       {dict.moderationDraft}
                     </button>
                   ) : null}
+
+                  {/*
+                    L'ultima risorsa, e sta in fondo per questo: chi modera
+                    annulla o mette in bozza. Eliminare serve per le serate che
+                    non devono esistere affatto (spam, test, dati inventati).
+                  */}
+                  <button
+                    type="button"
+                    disabled={working}
+                    onClick={() => {
+                      if (!window.confirm(dict.moderationConfirmDelete.replace("{title}", event.title)))
+                        return;
+                      void run(event.id, () => adminDeleteEventAction({ eventId: event.id }));
+                    }}
+                    className="rounded-full border border-pink/40 px-3 py-1.5 text-xs text-pink transition-colors hover:bg-pink/10 disabled:opacity-50"
+                  >
+                    {dict.moderationDelete}
+                  </button>
 
                   {event.ownerId ? (
                     <button
