@@ -26,7 +26,13 @@ import { useScrollAnchor } from "./useScrollAnchor";
  * esistono suggerimenti che portano fuori da OpenStage. La ricerca vive nella
  * URL: il risultato è condivisibile e la pagina resta renderizzata dal server.
  */
-export default function SearchBar({ locale }: { locale: Locale }) {
+export default function SearchBar({
+  locale,
+  variant = "glass",
+}: {
+  locale: Locale;
+  variant?: "glass" | "editorial";
+}) {
   const dict = getDictionary(locale);
   const t = dict.search;
 
@@ -194,7 +200,14 @@ export default function SearchBar({ locale }: { locale: Locale }) {
           {t.label}
         </label>
 
-        <div className="glass flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5 focus-within:border-white/25">
+        <div
+          className={cn(
+            "flex items-center gap-2 focus-within:border-white/25",
+            variant === "glass"
+              ? "glass rounded-full border border-white/10 px-4 py-2.5"
+              : "border-b border-line-strong bg-transparent px-0 py-3"
+          )}
+        >
           <span aria-hidden="true" className="text-muted">
             ⌕
           </span>
@@ -213,7 +226,10 @@ export default function SearchBar({ locale }: { locale: Locale }) {
             onChange={(event) => setValue(event.target.value)}
             onFocus={() => items.length > 0 && setOpen(true)}
             onKeyDown={onKeyDown}
-            className="w-full bg-transparent text-sm text-white outline-none placeholder:text-muted"
+            className={cn(
+              "w-full bg-transparent text-white outline-none placeholder:text-muted",
+              variant === "glass" ? "text-sm" : "font-mono text-xs uppercase tracking-[0.08em]"
+            )}
           />
 
           {value ? (
@@ -226,7 +242,10 @@ export default function SearchBar({ locale }: { locale: Locale }) {
                 go({ q: null });
               }}
               aria-label={t.clear}
-              className="shrink-0 rounded-full border border-white/10 px-2 text-xs text-muted transition-colors hover:text-white"
+              className={cn(
+                "shrink-0 border border-white/10 px-2 text-xs text-muted transition-colors hover:text-white",
+                variant === "glass" ? "rounded-full" : "rounded-none py-0.5"
+              )}
             >
               ✕
             </button>

@@ -119,14 +119,14 @@ export default function MobileTabBar({ dict, userEmail }: MobileTabBarProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex h-full flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium leading-none transition-colors",
+                  "relative flex h-full flex-col items-center justify-center gap-1 px-1 font-mono text-[9px] uppercase leading-none tracking-[0.06em] transition-colors",
                   active ? "text-white" : "text-muted hover:text-white"
                 )}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "absolute inset-x-4 top-0 h-0.5 rounded-full bg-cyan transition-opacity",
+                    "absolute inset-x-5 top-0 h-px bg-cyan transition-opacity",
                     active ? "opacity-100" : "opacity-0"
                   )}
                 />

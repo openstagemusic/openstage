@@ -2,23 +2,24 @@ import Link from "@/components/i18n/LocaleLink";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
-const LINK = "text-muted transition-colors hover:text-white";
+const LINK =
+  "text-muted underline-offset-4 transition-colors hover:text-white hover:underline";
 
 export default function Footer({ dict }: { dict: Dictionary["footer"] }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-20 border-t border-line bg-surface/35 md:mt-28">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] md:py-16">
+    <footer className="mt-20 border-t border-line md:mt-28">
+      <div className="mx-auto grid max-w-[1400px] gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] md:py-16">
         <div>
-          <p className="font-display text-xl font-bold tracking-tight">
-            Open<span className="text-gradient">Stage</span>
+          <p className="font-poster text-2xl uppercase leading-none tracking-[0.02em]">
+            Open<span className="text-cyan">/</span>Stage
           </p>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">{dict.tagline}</p>
         </div>
 
         <nav aria-label={dict.linksLabel}>
-          <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
+          <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
             {dict.linksLabel}
           </h2>
           <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm md:grid-cols-1">
@@ -57,7 +58,7 @@ export default function Footer({ dict }: { dict: Dictionary["footer"] }) {
       </div>
 
       <div className="border-t border-line">
-        <p className="mx-auto max-w-7xl px-4 py-4 text-xs text-muted sm:px-6">
+        <p className="mx-auto max-w-[1400px] px-4 py-4 font-mono text-[10px] uppercase tracking-[0.08em] text-muted sm:px-6">
           © {year} OpenStage. {dict.rights}
         </p>
       </div>

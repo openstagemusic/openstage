@@ -24,7 +24,7 @@ export default function LogoutButton({ label }: { label: string }) {
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="rounded-full border border-white/10 px-3 py-2 text-sm text-muted transition-colors hover:text-white disabled:opacity-60"
+      className="rounded-none border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted transition-colors hover:text-white disabled:opacity-60"
     >
       {label}
     </button>

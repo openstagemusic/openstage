@@ -68,16 +68,18 @@ export default function Counters({ items }: { items: CounterItem[] }) {
   }, [items]);
 
   return (
-    <ul ref={listRef} className="mt-4 grid grid-cols-2 gap-3">
+    <ul ref={listRef} className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
       {items.map((item) => (
         <li key={item.label}>
           <span
             data-counter={item.value}
-            className="font-display text-2xl font-bold tracking-tight text-white"
+            className="font-poster text-4xl font-normal leading-none tracking-tight text-white sm:text-5xl"
           >
             {item.value}
           </span>
-          <span className="mt-0.5 block text-xs leading-tight text-muted">{item.label}</span>
+          <span className="mt-1 block font-mono text-[10px] uppercase leading-tight tracking-[0.08em] text-muted">
+            {item.label}
+          </span>
         </li>
       ))}
     </ul>

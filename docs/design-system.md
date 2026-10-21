@@ -46,7 +46,11 @@ Regole:
 
 - Titoli e numeri: **Space Grotesk** (`font-display`).
 - Corpo e interfaccia: **Inter** (`font-sans`).
-- Caricati con `next/font`, `display: swap`.
+- Titoli-poster della Home e date: **Anton** (`font-poster`), solo maiuscolo,
+  con tracking stretto. Non si usa per paragrafi.
+- Etichette, metadati e numeri di sezione: **IBM Plex Mono** (`font-mono`).
+- Caricati con `next/font`, `display: swap`. Anton e IBM Plex Mono entrano nella
+  Fase 5.4 per la Home poster wall; non sostituiscono Space Grotesk/Inter.
 
 | Ruolo | Mobile | Desktop | Note |
 | --- | --- | --- | --- |
@@ -103,6 +107,12 @@ Regole:
 - `prefers-reduced-motion` rispettato **globalmente**: niente parallax, niente
   reveal, niente contatori animati.
 - Niente animazioni su testi lunghi, niente loop infiniti, niente autoplay.
+  Unica eccezione: il puntino “live” di stato, che pulsa piano e si spegne con
+  reduced motion.
+- **Home poster wall (5.4)**: il titolo entra con un rise di 16 px, le locandine
+  con uno stagger di 80 ms (max 4), le sezioni con `Reveal`, le righe evento con
+  uno sweep viola in hover/focus. Il ticker è statico e entra una volta: nessun
+  marquee infinito.
 - Niente page transition globali: il contenuto deve essere leggibile subito.
 - Il contenuto critico non parte da `opacity: 0` in SSR. Le sezioni sotto la
   piega usano `data-reveal`, con fallback `@media (scripting: none)`.

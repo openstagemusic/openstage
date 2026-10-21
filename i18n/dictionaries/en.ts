@@ -54,18 +54,27 @@ export const en = {
     title: "Find tonight's gig, like opening a map.",
     subtitle:
       "OpenStage gives real visibility to emerging artists and neighbourhood venues. Free, forever — for fans, artists and venues.",
+    hero: {
+      line1: "Tonight",
+      line2: "we play.",
+      foot: "The scene, right now",
+      scroll: "Scroll",
+    },
+    ticker: ["Discover", "Play", "Open the doors", "No algorithms", "Free forever"],
+    agendaLabel: "Agenda",
     explore: "Explore events",
     forArtists: "I am an artist",
     forVenues: "I am a venue",
-    discoveryTitle: "Tonight, and every night after",
+    discoveryTitle: "Find the closest night.",
     discoverySubtitle:
       "The globe shows the live shows coming up. Rotate it, zoom in, tap a pin: every point is a real event.",
-    upcomingTitle: "Next events",
+    upcomingTitle: "Next nights",
     upcomingSubtitle: "Everything published by artists and venues on OpenStage.",
     what: {
       eyebrow: "What OpenStage is",
       title: "The independent scene, without middlemen.",
       text: "OpenStage is the map of live music near you: emerging artists, neighbourhood venues and fans in one place. Free forever, no pay-to-play, no vanity metrics.",
+      claim: { lead: "Free. Forever.", accent: "For those who play." },
       points: [
         {
           title: "Real nights",

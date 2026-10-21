@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { locales, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { stripLocale, withLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
  */
 export default function LanguageSwitcher({ locale }: { locale: Locale }) {
   const pathname = usePathname();
+  const dict = getDictionary(locale);
 
   function change(next: Locale) {
     if (next === locale) return;
@@ -29,9 +31,9 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
 
   return (
     <div
-      className="flex items-center gap-0.5 rounded-full border border-white/10 p-0.5 text-xs"
+      className="flex items-center border border-line text-xs"
       role="group"
-      aria-label="Language"
+      aria-label={dict.nav.language}
     >
       {locales.map((item) => (
         <button
@@ -40,8 +42,8 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
           onClick={() => change(item)}
           aria-pressed={item === locale}
           className={cn(
-            "rounded-full px-2 py-1 font-medium uppercase transition-colors",
-            item === locale ? "bg-white/10 text-white" : "text-muted hover:text-white"
+            "px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors",
+            item === locale ? "bg-white text-bg" : "text-muted hover:text-white"
           )}
         >
           {item}

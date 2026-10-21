@@ -58,3 +58,49 @@ migration SQL.
 - Reduced motion rispettato su tutte le animazioni.
 - Nessuna regressione su auth, dashboard, creazione evento, mappa, admin.
 - Deploy di produzione testabile su Vercel.
+
+## 5.4 — Home poster wall (concept 01, approvato il 21 ottobre 2026)
+
+Il proprietario ha scelto il concept “Muro di locandine” e ha chiesto
+animazioni. La Home viene ricostruita senza card e senza contenitori arrotondati:
+il muro di locandine reali è l'hero, il calendario è una lista a righe, la mappa
+è una fascia a tutta pagina. Il resto del sito resta invariato, a parte il guscio
+(navbar, footer, switcher lingua) allineato alla nuova direzione.
+
+### Cosa entra
+
+- **Tipografia**: Anton per i titoli-poster, IBM Plex Mono per etichette e
+  metadati; Inter e Space Grotesk restano per corpo e interfaccia.
+- **Hero**: muro di 3–4 locandine reali, titolo “Stasera si suona.”, ingresso
+  sfalsato delle locandine, hover sobrio, nessuna immagine di repertorio.
+- **Lista eventi**: righe editoriali (data grande, titolo, luogo/genere, orario,
+  ingresso), hover con sweep viola e freccia; niente schede.
+- **Ricerca e filtri**: variante “editoriale” senza pillole/glass, usata solo in
+  Home; la pagina `/mappa` mantiene la variante attuale.
+- **Mappa**: fascia a tutta pagina, con intestazione editoriale e pin live.
+- **Cos'è OpenStage**: statement + tre punti a righe + claim “Gratis. Per sempre.
+  Per chi suona.”; la sezione resta breve e chiara.
+- **Come funziona**: tre passi, contatori reali e due porte (artisti/locali)
+  senza bento grid.
+- **Movimento**: entrata del titolo, stagger delle locandine, reveal delle
+  sezioni con `IntersectionObserver`, hover delle righe, puntino live. Solo CSS
+  e `transform`/`opacity`; nessuna libreria, nessun loop decorativo.
+- **Guscio**: navbar/footer/language switcher con bordi netti, etichette mono e
+  CTA rettangolari; stessa funzionalità, stessa accessibilità.
+
+### Cosa non entra
+
+- Nuovi servizi, dipendenze npm, variabili d'ambiente o migration SQL.
+- Cambi a dashboard, editor, admin, auth, pagine artista/locale.
+- Framer Motion (resta in Fase 13).
+- Marquee infinito o parallax: il ticker è una fascia statica che entra una
+  volta, non un loop.
+
+### Criteri di accettazione
+
+- `npm run build` verde e nessun overflow orizzontale a 390/1280 px.
+- H1 unico, contrasto AA, focus visibile, target ≥ 44 px.
+- Animazioni disattivate con `prefers-reduced-motion`; contenuto leggibile
+  senza JavaScript.
+- Nessuna regressione su ricerca, filtri, mappa, paginazione, lingua.
+- Commit `Fase 5.4`, deploy verificabile su Vercel.

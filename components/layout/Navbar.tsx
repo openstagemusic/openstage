@@ -51,23 +51,26 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="glass fixed inset-x-0 top-0 z-50 border-b border-line">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
-        <Link href="/" className="font-display text-lg font-bold tracking-tight">
-          Open<span className="text-gradient">Stage</span>
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-xl">
+      <nav className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-4 sm:px-6">
+        <Link
+          href="/"
+          className="font-poster text-xl uppercase leading-none tracking-[0.02em]"
+        >
+          Open<span className="text-cyan">/</span>Stage
         </Link>
 
-        <ul className="ml-4 hidden items-center gap-1 xl:flex">
+        <ul className="ml-6 hidden items-center gap-5 xl:flex">
           {links.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
                 aria-current={isActive(link.href) ? "page" : undefined}
                 className={cn(
-                  "rounded-full px-3 py-2 text-sm transition-colors",
+                  "relative py-2 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
                   isActive(link.href)
-                    ? "bg-white/10 text-white"
-                    : "text-muted hover:bg-white/5 hover:text-white"
+                    ? "text-white after:absolute after:inset-x-0 after:-bottom-[3px] after:h-px after:bg-cyan"
+                    : "text-muted hover:text-white"
                 )}
               >
                 {link.label}
@@ -80,11 +83,13 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
           <LanguageSwitcher locale={locale} />
           {userEmail ? (
             <>
-              <span className="max-w-[10rem] truncate text-sm text-muted">{userEmail}</span>
+              <span className="max-w-[9rem] truncate font-mono text-[10px] text-muted">
+                {userEmail}
+              </span>
               {userRole ? (
                 <span
                   className={cn(
-                    "rounded-full border px-2.5 py-1 text-xs",
+                    "rounded-none border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em]",
                     roleBadgeClass[userRole]
                   )}
                 >
@@ -93,21 +98,21 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
               ) : null}
               <Link
                 href="/dashboard"
-                className="rounded-full border border-white/10 px-3 py-2 text-sm text-muted transition-colors hover:text-white"
+                className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted transition-colors hover:text-white"
               >
                 {dict.dashboard}
               </Link>
               {canManageEvents(userRole) ? (
                 <Link
                   href="/dashboard/events/new"
-                  className="rounded-full border border-violet/40 px-3 py-2 text-sm text-white transition-colors hover:bg-violet/10"
+                  className="border border-violet/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet/10"
                 >
                   {dict.createEvent}
                 </Link>
               ) : (
                 <Link
                   href="/onboarding/role"
-                  className="rounded-full border border-cyan/40 px-3 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+                  className="border border-cyan/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-cyan/10"
                 >
                   {dict.upgrade}
                 </Link>
@@ -118,13 +123,13 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
             <>
               <Link
                 href="/login"
-                className="rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-white"
+                className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted transition-colors hover:text-white"
               >
                 {dict.login}
               </Link>
               <Link
                 href="/register"
-                className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white shadow-lg shadow-violet/20 transition-colors hover:bg-violet-strong/90"
+                className="rounded-none bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet"
               >
                 {dict.register}
               </Link>
@@ -138,7 +143,7 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
           aria-label={open ? dict.closeMenu : dict.openMenu}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          className="ml-auto flex h-11 w-11 items-center justify-center rounded-full border border-line text-white transition-colors hover:bg-white/5 xl:hidden"
+          className="ml-auto flex h-11 w-11 items-center justify-center rounded-none border border-line text-white transition-colors hover:bg-white/5 xl:hidden"
         >
           <svg
             aria-hidden="true"
@@ -168,9 +173,9 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
       {open ? (
         <div
           id="mobile-menu"
-          className="glass max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line xl:hidden"
+          className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-bg/95 backdrop-blur-xl xl:hidden"
         >
-          <ul className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
+          <ul className="mx-auto max-w-7xl px-4 py-2">
             {links.map((link) => (
               <li key={link.href}>
                 <Link
@@ -178,10 +183,8 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                   onClick={() => setOpen(false)}
                   aria-current={isActive(link.href) ? "page" : undefined}
                   className={cn(
-                    "block rounded-xl px-3 py-2 text-sm",
-                    isActive(link.href)
-                      ? "bg-white/10 text-white"
-                      : "text-muted hover:bg-white/5 hover:text-white"
+                    "block border-b border-line px-1 py-3 font-mono text-[11px] uppercase tracking-[0.12em]",
+                    isActive(link.href) ? "text-cyan" : "text-muted hover:text-white"
                   )}
                 >
                   {link.label}
@@ -189,14 +192,14 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
               </li>
             ))}
           </ul>
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 pb-4">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-4">
             <LanguageSwitcher locale={locale} />
             {userEmail ? (
               <>
                 {userRole ? (
                   <span
                     className={cn(
-                      "rounded-full border px-2.5 py-1 text-xs",
+                      "rounded-none border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em]",
                       roleBadgeClass[userRole]
                     )}
                   >
@@ -206,14 +209,14 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                 <Link
                   href="/dashboard"
                   onClick={() => setOpen(false)}
-                  className="rounded-full border border-white/10 px-4 py-2 text-sm text-muted"
+                  className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
                 >
                   {dict.dashboard}
                 </Link>
                 <Link
                   href={canManageEvents(userRole) ? "/dashboard/events/new" : "/onboarding/role"}
                   onClick={() => setOpen(false)}
-                  className="rounded-full border border-violet/40 px-4 py-2 text-sm text-white"
+                  className="border border-violet/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white"
                 >
                   {canManageEvents(userRole) ? dict.createEvent : dict.upgrade}
                 </Link>
@@ -224,14 +227,14 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                 <Link
                   href="/login"
                   onClick={() => setOpen(false)}
-                  className="rounded-full border border-white/10 px-4 py-2 text-sm text-white"
+                  className="border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white"
                 >
                   {dict.login}
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setOpen(false)}
-                  className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white"
+                  className="bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white"
                 >
                   {dict.register}
                 </Link>

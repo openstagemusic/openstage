@@ -58,11 +58,14 @@ export default function Pagination({
   };
 
   return (
-    <nav aria-label={labels?.label ?? "Pagination"} className="flex items-center justify-center gap-2">
+    <nav
+      aria-label={labels?.label ?? "Pagination"}
+      className="flex flex-wrap items-center justify-center gap-3"
+    >
       {page > 1 ? (
         <Link
           href={href(page - 1)}
-          className="rounded-full border border-white/10 px-4 py-2 text-sm text-muted transition-colors hover:text-white"
+          className="border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted transition-colors hover:text-white"
         >
           {labels?.previous ?? "Previous"}
         </Link>
@@ -75,10 +78,10 @@ export default function Pagination({
               href={href(item)}
               aria-current={item === page ? "page" : undefined}
               className={cn(
-                "inline-flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors",
+                "inline-flex h-8 min-w-8 items-center justify-center px-2 font-mono text-[11px] transition-colors",
                 item === page
-                  ? "bg-violet-strong font-medium text-white"
-                  : "text-muted hover:bg-white/5 hover:text-white"
+                  ? "bg-cyan font-medium text-bg"
+                  : "text-muted hover:text-white"
               )}
             >
               {item}
@@ -90,7 +93,7 @@ export default function Pagination({
       {page < totalPages ? (
         <Link
           href={href(page + 1)}
-          className="rounded-full border border-white/10 px-4 py-2 text-sm text-muted transition-colors hover:text-white"
+          className="border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted transition-colors hover:text-white"
         >
           {labels?.next ?? "Next"}
         </Link>

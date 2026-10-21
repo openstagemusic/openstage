@@ -54,6 +54,8 @@ export type GlobeMapProps = {
   locale: Locale;
   /** `home`: riquadro dentro la pagina. `fullscreen`: pagina /mappa. */
   variant?: "home" | "fullscreen";
+  /** `bleed`: fascia a tutta pagina, senza card (Home poster wall). */
+  frame?: "card" | "bleed";
   className?: string;
   /** Messaggio dello stato vuoto: dipende dai filtri, quindi lo decide la pagina. */
   empty: { title: string; text: string; cta: string; href: string };
@@ -78,6 +80,7 @@ export default function GlobeMap({
   isAuthenticated,
   locale,
   variant = "home",
+  frame = "card",
   className,
   empty,
   fullscreenHref = "/mappa",
@@ -216,10 +219,16 @@ export default function GlobeMap({
   const wrapperClass =
     variant === "fullscreen"
       ? "relative h-[calc(100dvh-4rem)] w-full overflow-hidden"
-      : "glass relative overflow-hidden rounded-card border border-line";
+      : frame === "bleed"
+        ? "relative w-full overflow-hidden bg-surface/30"
+        : "glass relative overflow-hidden rounded-card border border-line";
 
   const innerClass =
-    variant === "fullscreen" ? "relative h-full w-full" : "relative h-[54vh] min-h-[340px] sm:h-[520px]";
+    variant === "fullscreen"
+      ? "relative h-full w-full"
+      : frame === "bleed"
+        ? "relative h-[62vh] min-h-[380px] w-full sm:h-[560px]"
+        : "relative h-[54vh] min-h-[340px] sm:h-[520px]";
 
   const controlClass =
     "pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-bg/80 px-3 py-2 text-xs font-medium text-white backdrop-blur transition-colors hover:border-white/30";

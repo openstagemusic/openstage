@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Anton, IBM_Plex_Mono, Inter, Space_Grotesk } from "next/font/google";
 
 import "./globals.css";
 
@@ -24,6 +24,20 @@ const inter = Inter({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const anton = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-anton",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-plex-mono",
   display: "swap",
 });
 
@@ -87,7 +101,10 @@ export default async function RootLayout({
   const session = await getSessionProfile();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html
+      lang={locale}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${anton.variable} ${plexMono.variable}`}
+    >
       <body className="flex min-h-dvh flex-col">
         <a href="#contenuto" className="skip-link">
           {dict.nav.skipToContent}

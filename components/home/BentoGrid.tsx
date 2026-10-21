@@ -3,24 +3,18 @@ import Link from "@/components/i18n/LocaleLink";
 import Counters from "@/components/home/Counters";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { DiscoveryCounters } from "@/lib/events/queries";
-import { cn } from "@/lib/utils";
 
 type BentoGridProps = {
   dict: Dictionary;
   counters: DiscoveryCounters;
 };
 
-const TILE = "glass rounded-card border border-line p-6";
-
 const CTA =
-  "mt-4 inline-flex w-fit rounded-full border border-line-strong px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/5";
+  "mt-4 inline-flex items-center gap-2 border-b border-line-strong pb-1 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan";
 
 /**
- * Bento promozionale sotto lo showcase: come funziona, i numeri reali della
- * piattaforma e le due porte d'ingresso (artisti, locali).
- *
- * I tre pannelli dei valori restano in fondo alla griglia: sono il manifesto
- * di OpenStage, e da qui si leggono insieme a ciò che si può fare davvero.
+ * Come funziona, numeri reali e le due porte d'ingresso (artisti, locali).
+ * È una sezione a righe: niente bento, niente pannelli, niente card.
  */
 export default function BentoGrid({ dict, counters }: BentoGridProps) {
   const t = dict.bento;
@@ -33,47 +27,62 @@ export default function BentoGrid({ dict, counters }: BentoGridProps) {
   ];
 
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <li className={cn(TILE, "sm:col-span-2")}>
-        <h2 className="font-display text-lg font-semibold">{t.howTitle}</h2>
+    <section id="come-funziona" className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
+      <div className="border-t border-line pt-6">
+        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan">
+          04 / OpenStage
+        </p>
+        <h2 className="mt-2 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.01em] sm:text-6xl">
+          {t.howTitle}
+        </h2>
+      </div>
 
-        <ol className="mt-4 grid gap-4 sm:grid-cols-3">
-          {t.howSteps.map((step, index) => (
-            <li key={step.title}>
-              <span
-                aria-hidden="true"
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-strong text-xs font-semibold text-white"
-              >
-                {index + 1}
-              </span>
-              <h3 className="mt-2 font-display text-sm font-semibold">{step.title}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-muted">{step.text}</p>
-            </li>
-          ))}
-        </ol>
-      </li>
+      <ol className="mt-8 grid gap-8 md:grid-cols-3 md:gap-10">
+        {t.howSteps.map((step, index) => (
+          <li key={step.title} className="border-t border-line pt-4">
+            <span
+              aria-hidden="true"
+              className="font-poster text-5xl leading-none text-violet/80 sm:text-6xl"
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h3 className="mt-2 font-display text-lg font-semibold">{step.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{step.text}</p>
+          </li>
+        ))}
+      </ol>
 
-      <li className={TILE}>
-        <h2 className="font-display text-lg font-semibold">{t.numbersTitle}</h2>
-        <Counters items={items} />
-        <p className="mt-4 text-xs leading-relaxed text-muted">{t.numbersNote}</p>
-      </li>
+      <div className="mt-12 grid gap-10 border-y border-line py-8 md:grid-cols-[1.1fr_0.9fr] md:gap-16">
+        <div>
+          <h2 className="font-poster text-3xl uppercase leading-none tracking-[-0.01em] sm:text-4xl">
+            {t.numbersTitle}
+          </h2>
+          <Counters items={items} />
+          <p className="mt-4 max-w-xl text-xs leading-relaxed text-muted">{t.numbersNote}</p>
+        </div>
 
-      <li className={cn(TILE, "flex flex-col")}>
-        <h2 className="font-display text-lg font-semibold">{t.artistsTitle}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{t.artistsText}</p>
-        <Link href="/per-gli-artisti" className={CTA}>
-          {t.artistsCta}
-        </Link>
-      </li>
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-1">
+          <Link href="/per-gli-artisti" className="group border-t border-line pt-4">
+            <h3 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em] transition-colors group-hover:text-cyan">
+              {t.artistsTitle}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{t.artistsText}</p>
+            <span className={CTA}>
+              {t.artistsCta} <span aria-hidden="true">→</span>
+            </span>
+          </Link>
 
-      <li className={cn(TILE, "flex flex-col lg:col-span-2")}>
-        <h2 className="font-display text-lg font-semibold">{t.venuesTitle}</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t.venuesText}</p>
-        <Link href="/per-le-venue" className={CTA}>
-          {t.venuesCta}
-        </Link>
-      </li>
-    </ul>
+          <Link href="/per-le-venue" className="group border-t border-line pt-4">
+            <h3 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em] transition-colors group-hover:text-cyan">
+              {t.venuesTitle}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{t.venuesText}</p>
+            <span className={CTA}>
+              {t.venuesCta} <span aria-hidden="true">→</span>
+            </span>
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }

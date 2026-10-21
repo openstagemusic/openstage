@@ -1,11 +1,9 @@
 import Link from "@/components/i18n/LocaleLink";
-import { Suspense } from "react";
+import { Fragment, Suspense } from "react";
 
 import QuickFilters from "@/components/discovery/QuickFilters";
 import SearchBar from "@/components/discovery/SearchBar";
-import ViewSwitcher from "@/components/discovery/ViewSwitcher";
-import EventTable from "@/components/events/EventTable";
-import EventTeaser from "@/components/events/EventTeaser";
+import EventRows from "@/components/home/EventRows";
 import BentoGrid from "@/components/home/BentoGrid";
 import HeroPosters from "@/components/home/HeroPosters";
 import HomeIntro from "@/components/home/HomeIntro";
@@ -61,7 +59,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     getSessionProfile(),
     listSavedEventIds(),
     listGenres(),
-    listFeaturedEvents(3),
+    listFeaturedEvents(4),
     getDiscoveryCounters(),
   ]);
 
@@ -89,7 +87,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   // programma): sono eventi veri, non immagini di repertorio.
   const heroEvents = (featured.length > 0 ? featured : list.events)
     .filter((event) => event.coverImageUrl)
-    .slice(0, 3);
+    .slice(0, 4);
 
   const query = discoveryQuery(filters);
   // Paginazione: i filtri restano, la pagina no (cambia da sola).
@@ -113,41 +111,56 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   return (
     <>
-      <section className="relative mx-auto w-full max-w-7xl overflow-hidden px-4 pb-12 pt-14 sm:px-6 sm:pb-16 sm:pt-24">
-        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-cyan/25 bg-cyan/[0.06] px-3 py-1 text-xs text-muted">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-cyan" />
+      {/* 00 — Copertina: muro di locandine reali e titolo-poster. */}
+      <section className="relative mx-auto w-full max-w-[1400px] px-4 pb-10 pt-10 sm:px-6 sm:pb-14 sm:pt-16">
+        <div
+          className={`grid gap-10 ${
+            heroEvents.length > 0
+              ? "lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center"
+              : ""
+          }`}
+        >
+          <div className="relative z-10">
+            <p className="home-hero-kicker flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
+              <span className="home-live-dot" aria-hidden="true" />
               {dict.home.badge}
-            </span>
+            </p>
 
-            <h1 className="mt-6 text-balance font-display text-4xl font-bold leading-[1.05] tracking-[-0.03em] sm:text-6xl">
-              {dict.home.title}
+            <h1 className="home-hero-title mt-5 font-poster text-[clamp(4.25rem,21vw,6rem)] uppercase leading-none tracking-[-0.035em] lg:text-[clamp(5.5rem,11vw,9rem)]">
+              <span className="block">{dict.home.hero.line1}</span>{" "}
+              <span className="-mt-[0.08em] block text-[0.46em] leading-none text-pink">
+                {dict.home.hero.line2}
+              </span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted sm:text-xl">
+            <p className="home-hero-copy mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
               {dict.home.subtitle}
             </p>
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="home-hero-actions mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Link
                 href="#eventi"
-                className="rounded-full bg-violet-strong px-6 py-3 text-center text-sm font-medium text-white shadow-lg shadow-violet/20 transition-colors hover:bg-violet-strong/90"
+                className="inline-flex items-center gap-2 rounded-none bg-violet-strong px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
               >
-                {dict.home.explore}
+                {dict.home.explore} <span aria-hidden="true">↓</span>
               </Link>
               <Link
                 href="/per-gli-artisti"
-                className="rounded-full border border-line-strong px-6 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-white/5"
+                className="home-arrow-link inline-flex items-center gap-2 border-b border-line-strong pb-1 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:text-cyan"
               >
-                {dict.home.forArtists}
+                {dict.home.forArtists} <span aria-hidden="true">↗</span>
               </Link>
               <Link
                 href="/per-le-venue"
-                className="px-2 py-3 text-center text-sm text-muted transition-colors hover:text-white sm:text-left"
+                className="home-arrow-link inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white"
               >
-                {dict.home.forVenues} <span aria-hidden="true">→</span>
+                {dict.home.forVenues} <span aria-hidden="true">↗</span>
               </Link>
+            </div>
+
+            <div className="mt-10 flex items-center justify-between gap-4 border-t border-line pt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+              <span>00 / {dict.home.hero.foot}</span>
+              <span>{dict.home.hero.scroll} ↓</span>
             </div>
           </div>
 
@@ -155,117 +168,78 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       </section>
 
-      <HomeIntro dict={dict} />
-
-      <section className="mx-auto w-full max-w-7xl px-4 pt-12 sm:px-6 sm:pt-16">
-        <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          {dict.home.discoveryTitle}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted">{dict.home.discoverySubtitle}</p>
-
-        <div className="mt-6">
-          <GlobeMap
-            events={mapEvents}
-            initialCenter={visitor.center}
-            initialZoom={visitor.fromIp ? REGION_ZOOM : DEFAULT_ZOOM}
-            savedEventIds={savedEventIds}
-            isAuthenticated={isAuthenticated}
-            locale={locale}
-            empty={mapEmpty}
-            fullscreenHref={query ? `/mappa?${query}` : "/mappa"}
-          />
+      {/* Manifesto: una fascia che entra una volta, non un marquee infinito. */}
+      <div aria-hidden="true" className="overflow-hidden border-y border-line bg-white/[0.02]">
+        <div className="home-ticker-track mx-auto flex max-w-[1400px] items-center gap-5 overflow-x-auto px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-cyan [scrollbar-width:none] sm:px-6">
+          {dict.home.ticker.map((item, index) => (
+            <Fragment key={`${item}-${index}`}>
+              {index > 0 ? <span className="text-pink">·</span> : null}
+              <span className="whitespace-nowrap transition-colors hover:text-white">{item}</span>
+            </Fragment>
+          ))}
         </div>
-      </section>
+      </div>
 
-      {/* Ricerca e filtri: sotto il globo, sopra lo showcase. */}
-      <section className="mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6">
-        <Suspense fallback={<div className="h-[52px]" />}>
-          <SearchBar locale={locale} />
-          <QuickFilters
-            locale={locale}
-            genres={genres}
-            center={visitor.center}
-            className="mt-3"
-          />
-        </Suspense>
-
-        {filtered ? (
-          <p className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted">
-            <span>
-              <strong className="font-medium text-white">{list.total}</strong>{" "}
-              {list.total === 1 ? dict.filters.resultOne : dict.filters.resultMany}
-              {filters.q ? ` ${dict.filters.resultsFor} “${filters.q}”` : ""}
-            </span>
-            <Link
-              href="#eventi"
-              className="rounded-full border border-line px-3 py-1 text-xs text-white transition-colors hover:border-line-strong"
-            >
-              {dict.filters.goToResults}
-            </Link>
-          </p>
-        ) : null}
-      </section>
-
-      <section id="eventi" className="mx-auto w-full max-w-7xl px-4 pt-16 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+      {/* 01 — Agenda: ricerca, filtri e righe evento. */}
+      <section id="eventi" className="mx-auto w-full max-w-7xl px-4 pt-12 sm:px-6 sm:pt-16">
+        <div className="flex flex-col gap-5 border-b border-line pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
+              01 / {dict.home.agendaLabel}
+            </p>
+            <h2 className="mt-2 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.01em] sm:text-6xl">
               {dict.home.upcomingTitle}
             </h2>
-            <p className="mt-2 max-w-2xl text-sm text-muted">{dict.home.upcomingSubtitle}</p>
+            <p className="mt-3 max-w-2xl text-sm text-muted">{dict.home.upcomingSubtitle}</p>
           </div>
 
-          {list.total > 0 ? (
-            <Suspense fallback={<div className="h-9" />}>
-              <ViewSwitcher locale={locale} />
-            </Suspense>
-          ) : null}
+          <Link
+            href="/mappa"
+            className="home-arrow-link inline-flex w-fit items-center gap-2 border-b border-line-strong pb-1 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:text-cyan"
+          >
+            {dict.nav.map} <span aria-hidden="true">↗</span>
+          </Link>
         </div>
 
-        {/* In evidenza: scelta editoriale, quindi fuori dai risultati filtrati. */}
-        {featured.length > 0 && !filtered ? (
-          <div className="mt-8">
-            <h3 className="font-display text-lg font-semibold">{dict.featured.title}</h3>
-            <p className="mt-1 text-sm text-muted">{dict.featured.subtitle}</p>
+        <div className="mt-1">
+          <Suspense fallback={<div className="h-[92px]" />}>
+            <SearchBar locale={locale} variant="editorial" />
+            <QuickFilters
+              locale={locale}
+              genres={genres}
+              center={visitor.center}
+              variant="editorial"
+              className="mt-1"
+            />
+          </Suspense>
+        </div>
 
-            <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((event) => (
-                <li key={event.id} className="h-full">
-                  <EventTeaser event={event} locale={locale} dict={dict} />
-                </li>
-              ))}
-            </ul>
-          </div>
+        {filtered ? (
+          <p className="mt-4 text-sm text-muted">
+            <strong className="font-medium text-white">{list.total}</strong>{" "}
+            {list.total === 1 ? dict.filters.resultOne : dict.filters.resultMany}
+            {filters.q ? ` ${dict.filters.resultsFor} “${filters.q}”` : ""}
+          </p>
         ) : null}
 
         {list.events.length === 0 ? (
-          <div className="glass mt-6 rounded-3xl border border-white/10 p-8 text-center">
-            <h3 className="font-display text-lg font-semibold">
+          <div className="border-b border-line py-14 text-center">
+            <h3 className="font-poster text-3xl uppercase leading-none">
               {filtered ? dict.filters.noResultsTitle : dict.events.emptyTitle}
             </h3>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted">
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted">
               {filtered ? dict.filters.noResultsText : dict.events.emptyText}
             </p>
             <Link
               href={filtered ? "/" : "/contatti"}
-              className="mt-5 inline-flex rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-strong/90"
+              className="mt-6 inline-flex items-center gap-2 rounded-none bg-violet-strong px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
             >
               {filtered ? dict.filters.reset : dict.events.emptyCta}
             </Link>
           </div>
         ) : (
           <>
-            {filters.view === "table" ? (
-              <EventTable events={list.events} locale={locale} dict={dict} />
-            ) : (
-              <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {list.events.map((event) => (
-                  <li key={event.id} className="h-full">
-                    <EventTeaser event={event} locale={locale} dict={dict} />
-                  </li>
-                ))}
-              </ul>
-            )}
+            <EventRows events={list.events} locale={locale} dict={dict} />
 
             <div className="mt-10">
               <Pagination
@@ -285,11 +259,50 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         )}
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6">
-        <Reveal>
-          <BentoGrid dict={dict} counters={counters} />
-        </Reveal>
+      {/* 02 — Mappa: fascia a tutta pagina, con intestazione editoriale. */}
+      <section id="mappa" className="mt-16 border-y border-line sm:mt-24">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-10">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
+              02 / {dict.nav.map}
+            </p>
+            <h2 className="mt-2 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.01em] sm:text-6xl">
+              {dict.home.discoveryTitle}
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm text-muted">{dict.home.discoverySubtitle}</p>
+          </div>
+
+          <Link
+            href={query ? `/mappa?${query}` : "/mappa"}
+            className="home-arrow-link inline-flex w-fit items-center gap-2 border-b border-line-strong pb-1 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:text-cyan"
+          >
+            {dict.map.fullscreen} <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+
+        <GlobeMap
+          events={mapEvents}
+          initialCenter={visitor.center}
+          initialZoom={visitor.fromIp ? REGION_ZOOM : DEFAULT_ZOOM}
+          savedEventIds={savedEventIds}
+          isAuthenticated={isAuthenticated}
+          locale={locale}
+          frame="bleed"
+          className="border-t border-line"
+          empty={mapEmpty}
+          fullscreenHref={query ? `/mappa?${query}` : "/mappa"}
+        />
       </section>
+
+      {/* 03 — Cos'è OpenStage. */}
+      <Reveal>
+        <HomeIntro dict={dict} />
+      </Reveal>
+
+      {/* 04 — Come funziona, numeri reali, artisti e locali. */}
+      <Reveal>
+        <BentoGrid dict={dict} counters={counters} />
+      </Reveal>
     </>
   );
 }

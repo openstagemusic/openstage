@@ -18,6 +18,8 @@ type QuickFiltersProps = {
   /** Posizione approssimativa del visitatore: centro del filtro per distanza. */
   center: Center | null;
   className?: string;
+  /** `editorial` toglie pillole e glass: si usa nella Home poster wall. */
+  variant?: "glass" | "editorial";
 };
 
 /**
@@ -32,6 +34,7 @@ export default function QuickFilters({
   genres,
   center,
   className,
+  variant = "glass",
 }: QuickFiltersProps) {
   const dict = getDictionary(locale);
   const t = dict.filters;
@@ -68,17 +71,38 @@ export default function QuickFilters({
 
   const chipClass = (isActive: boolean) =>
     cn(
-      "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors",
-      isActive
-        ? "border-transparent bg-violet-strong text-white"
-        : "border-white/15 text-muted hover:border-white/30 hover:text-white"
+      "border transition-colors",
+      variant === "editorial"
+        ? cn(
+            "rounded-none px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em]",
+            isActive
+              ? "border-cyan bg-cyan text-bg"
+              : "border-line text-muted hover:border-cyan hover:text-white"
+          )
+        : cn(
+            "rounded-full px-3.5 py-1.5 text-xs font-medium",
+            isActive
+              ? "border-transparent bg-violet-strong text-white"
+              : "border-white/15 text-muted hover:border-white/30 hover:text-white"
+          )
     );
 
-  const selectClass =
-    "rounded-full border border-white/15 bg-bg/70 px-3 py-1.5 text-xs font-medium text-white outline-none transition-colors hover:border-white/30";
+  const selectClass = cn(
+    "border outline-none transition-colors",
+    variant === "editorial"
+      ? "rounded-none border-line bg-transparent px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-white hover:border-cyan"
+      : "rounded-full border-white/15 bg-bg/70 px-3 py-1.5 text-xs font-medium text-white hover:border-white/30"
+  );
 
   return (
-    <div className={cn("glass rounded-3xl border border-white/10 p-4", className)}>
+    <div
+      className={cn(
+        variant === "editorial"
+          ? "border-b border-line py-3"
+          : "glass rounded-3xl border border-white/10 p-4",
+        className
+      )}
+    >
       <div className="flex flex-wrap items-center gap-2">
         {WHEN_PRESETS.map((preset) => (
           <button
@@ -177,7 +201,12 @@ export default function QuickFilters({
               rememberScroll();
               router.push(withLocale(locale, pathname), { scroll: false });
             }}
-            className="ml-auto rounded-full border border-white/15 px-3.5 py-1.5 text-xs font-medium text-muted transition-colors hover:border-white/30 hover:text-white"
+            className={cn(
+              "ml-auto text-muted transition-colors hover:text-white",
+              variant === "editorial"
+                ? "border-b border-line-strong pb-0.5 font-mono text-[10px] uppercase tracking-[0.08em]"
+                : "rounded-full border border-white/15 px-3.5 py-1.5 text-xs font-medium hover:border-white/30"
+            )}
           >
             {t.reset}
           </button>

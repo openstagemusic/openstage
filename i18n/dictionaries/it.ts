@@ -52,18 +52,27 @@ export const it: Dictionary = {
     title: "Trova il concerto di stasera, come aprire una mappa.",
     subtitle:
       "OpenStage dà visibilità reale ad artisti emergenti e locali di zona. Gratis per sempre — per fan, artisti e locali.",
+    hero: {
+      line1: "Stasera",
+      line2: "si suona.",
+      foot: "La scena, adesso",
+      scroll: "Scorri",
+    },
+    ticker: ["Scopri", "Suona", "Apri le porte", "Niente algoritmi", "Gratis per sempre"],
+    agendaLabel: "Agenda",
     explore: "Esplora gli eventi",
     forArtists: "Sono un artista",
     forVenues: "Sono un locale",
-    discoveryTitle: "Stasera, e tutte le sere dopo",
+    discoveryTitle: "Trova la serata più vicina.",
     discoverySubtitle:
       "Il globo mostra i concerti in programma. Ruotalo, ingrandisci, tocca un pin: ogni punto è un evento reale.",
-    upcomingTitle: "Prossimi eventi",
+    upcomingTitle: "Prossime serate",
     upcomingSubtitle: "Tutto quello che artisti e locali hanno pubblicato su OpenStage.",
     what: {
       eyebrow: "Cos'è OpenStage",
       title: "La scena indipendente, senza intermediari.",
       text: "OpenStage è la mappa delle serate dal vivo vicino a te: artisti emergenti, locali di quartiere e fan nello stesso posto. Gratis per sempre, senza pay-to-play e senza metriche finte.",
+      claim: { lead: "Gratis. Per sempre.", accent: "Per chi suona." },
       points: [
         {
           title: "Serate vere",
