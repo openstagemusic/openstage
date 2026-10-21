@@ -198,6 +198,148 @@ conservato quando si filtrano i risultati; zero errori in console.
 **Rimandato:** pagina dei preferiti (B19), fuso del visitatore nei preset temporali (B20), indici
 trigram nella ricerca (B21), test automatici end-to-end (B05), editor degli eventi (Fase 4).
 
+## Fase 3 — Directory, reclami, editor e condivisione
+
+**Obiettivo:** trasformare le schede e l'archivio in uno strumento usabile da artisti e
+locali veri, non solo dalla redazione.
+
+**Cosa è stato costruito** (blocchi 3.0 → 3.4)
+
+- **Lingua negli URL**: `/it/...` e `/en/...`, `canonical`, `hreflang`, `sitemap.xml` e
+  `robots.txt`. Il cookie resta solo come preferenza per il primo redirect. Senza questo
+  passaggio la versione italiana non sarebbe indicizzabile.
+- **Directory reali** di artisti e locali: ricerca, filtri, paginazione, schede con slug,
+  concerti futuri, JSON-LD, link crawlable.
+- **Reclamo della scheda**: l'artista dimostra la proprietà con un link pubblico e viene
+  collegato subito; il locale invia una richiesta che l'admin approva o rifiuta. Una scheda
+  per profilo, una richiesta in attesa alla volta, possibilità di ritirarla.
+- **Verifica dello staff**: il badge "Verificato" non è decorativo, è il permesso di
+  pubblicare. Il primo evento di un account nuovo può passare dalla revisione.
+- **Dashboard artisti/locali** con panoramica, "I miei eventi", creazione, preferiti,
+  profilo e account.
+- **Editor eventi**: bozza/pubblicazione/annullamento, locandina caricata o generata,
+  posizione esatta o approssimata, pin sulla mappa, prezzo libero, link biglietti,
+  collegamento all'artista, avviso doppioni e tetto anti-spam di 10 serate nelle 24 ore.
+- **Pagina evento completa**: locandina intera, countdown, "Aggiungi al calendario"
+  (Google e `.ics`), condivisione con Share Card 1080×1920 e 1080×1080 e QR, anteprima
+  Open Graph disegnata dal server. Una serata annullata lo dice e il suo `.ics` diventa
+  `CANCELLED`.
+- **Pagina dei preferiti** in dashboard.
+- **Artisti senza account e locali senza account** possono esistere; la nota "inserito da
+  OpenStage" si calcola dall'assenza di reclamo, non è più una colonna salvata.
+
+**Decisioni e perché**
+
+- La lingua **deve** stare nell'URL: con un cookie Googlebot riceverebbe sempre l'inglese e
+  la directory italiana non esisterebbe per la ricerca.
+- **Photon** per l'autocomplete degli indirizzi: nessuna chiave, nessun account; MapTiler
+  avrebbe richiesto un piano commerciale.
+- **"Verificato", non "Pro"**: "Pro" collide con il principio "gratis per sempre" e non
+  esiste ancora un piano a pagamento.
+- **Unione dei doppioni solo dall'admin**: due set nello stesso locale la stessa sera sono
+  legittimi, quindi nessun blocco automatico; l'admin unisce e può disfare.
+- **QR e Share Card disegnati in locale** con `qrcode` e canvas: nessun servizio esterno,
+  nessun costo per immagine.
+
+**Verifiche superate:** build e produzione verdi; prove in browser con sessioni reali;
+reclamo artista e locale, coda admin, creazione e modifica eventi, `.ics`, Share Card,
+QR confrontato modulo per modulo, pagina evento in italiano e inglese, mobile e desktop.
+
+**Rimandato:** email e notifiche (Fase 7), password dimenticata (B36), conferma email
+(B35), cancellazione account (B07), rifinitura grafica delle pagine pubbliche (Fase 6/13).
+
+## Fase 4 — Qualità dei dati e moderazione
+
+**Obiettivo:** evitare che una serata vera venga persa o che una falsa resti online per
+sempre, senza punire un intero catalogo.
+
+**Cosa è stato costruito**
+
+- **Città normalizzata** (`city_key` generata dal database): "Milano", "milano" e
+  "Milano (MI)" sono la stessa città nei filtri e nei contatori.
+- **Raggio onesto**: per una serata approssimata la distanza si misura dal **bordo** della
+  zona, non solo dal centro.
+- **Controllo del pin**: geocodifica inversa tri-stato (`found`/`empty`/`unavailable`);
+  pin sul mare rifiutato, pin lontano dalla città dichiarata avvisato o bloccato, Photon
+  irraggiungibile non blocca nessuno.
+- **"Come arrivare"** per cortili, centri sociali e luoghi senza indirizzo perfetto.
+- **Serate collegate**: il locale può collegare una scheda artista esistente; un artista
+  non può attribuirsi una serata che non è sua. Avviso doppioni con "Crea comunque".
+- **Unione dei doppioni** dall'admin, reversibile, con i Preferiti spostati sulla scheda
+  buona e redirect permanente dalla scheda unita.
+- **Segnalazioni**: "Segnala questa serata" per chi ha un accesso, una volta per persona,
+  motivi chiusi e nota. Alla terza segnalazione da persone diverse e verificate la serata
+  va in pausa automaticamente.
+- **Pannello `/admin/eventi`**: serate online, in pausa e segnalate; annulla, rimetti online,
+  torna in bozza, sospendi o riattiva l'autore, unisci un doppione.
+- **Serate passate**: sezione dedicata per artista, locale e dashboard; eliminazione
+  definitiva per il proprietario e per l'admin, con conferma.
+
+**Decisioni e perché**
+
+- **La pausa è per serata, non per autore**: punire tutto il catalogo per una serata
+  contestata sarebbe arbitrario. L'account si sospende solo a mano, davanti a un
+  comportamento sistematico.
+- **Nessuna recensione pubblica**: la segnalazione è uno strumento privato di moderazione,
+  non un voto. Fedele al principio "niente metriche vanitose".
+- **Eliminazione definitiva** solo per proprietario e admin, dopo conferma: una serata
+  sbagliata non deve restare per sempre, ma non deve nemmeno sparire per un click distratto.
+- **Le regole nel database**: il tetto anti-spam, il blocco delle transizioni di ruolo e la
+  pausa automatica non dipendono dal form.
+
+**Verifiche superate:** build e produzione verdi; prove con utenti Auth reali; città
+deduplicate; raggio con eventi gemelli; pin sul mare e a Berlino; serata collegata e
+doppione; unione e separazione; segnalazioni, pausa, rimessa online e annullamento; pulizia
+delle fixture dopo i test.
+
+**Rimandato:** notifiche email delle decisioni (Fase 7), pulsante "Unisci" provato via RPC
+e non ancora cliccato in browser, sospensione autore resa visibile ma non cliccata.
+
+## Fase 5.4 — Home poster wall
+
+**Obiettivo:** dare alla Home un'identità editoriale e underground, senza trasformare
+OpenStage in una vetrina pubblicitaria.
+
+**Cosa è stato costruito**
+
+- **Muro di locandine**: fino a quattro copertine reali, con ingresso sfalsato; nessuna
+  immagine di repertorio, nessuna card.
+- **Titolo-poster** "Stasera si suona." con Anton e IBM Plex Mono per etichette e metadati.
+- **Ticker** con i valori del progetto: entra una volta e si ferma, non è un marquee.
+- **Lista a righe**: data grande, titolo, artista/locale, genere, orario e ingresso.
+- **Ricerca e filtri editoriali** senza pillole né glass, solo in Home; `/mappa` mantiene
+  la variante precedente.
+- **Mappa a tutta pagina**: fascia con intestazione, pin e link alla modalità full screen.
+- **Cos'è OpenStage**: statement, tre punti e il claim "Gratis. Per sempre. Per chi suona.".
+- **Come funziona** senza bento grid: tre passi, contatori reali e le due porte artista/locale.
+- **Guscio coerente**: navbar, footer, language switcher e paginazione con bordi netti,
+  etichette mono e CTA rettangolari.
+- **Movimento sobrio**: entrata del titolo, stagger delle locandine, reveal con
+  `IntersectionObserver`, hover delle righe e puntino live. Tutto CSS, tutto disattivato con
+  `prefers-reduced-motion`; nessuna dipendenza nuova.
+
+**Decisioni e perché**
+
+- **Concept 01 "Muro di locandine"**: scelto dal proprietario; i concept alternativi sono
+  superati.
+- **Niente Framer Motion**: per un fade aggiungeva ~45 KB gzip; resta in Fase 13 per le
+  interazioni complesse.
+- **Niente card e niente glass in Home**: la Home deve sembrare una locandina appesa, non
+  una dashboard.
+- **La Home non ha più l'interruttore schede/tabella**: la lista è a righe; la mappa ha la
+  sua pagina.
+- **Nessun nuovo servizio, variabile o migration**: il lavoro è tutto di interfaccia e
+  tipografia.
+- **Il ticker non loopa**: un'animazione infinita sarebbe rumore, non identità.
+
+**Verifiche superate:** build verde; nessun overflow a 320, 390 e 1280 px; italiano e
+inglese; menu mobile; ricerca, filtri, mappa e paginazione; `prefers-reduced-motion`
+verificato con zero animazioni; H1 unico e leggibile; produzione Vercel aggiornata con
+commit `Fase 5.4`.
+
+**Rimandato:** il resto delle pagine pubbliche (Artisti/Locali usano ancora lo stile
+precedente) passa alla Fase 6; la seconda parte delle micro-interazioni alla Fase 13.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

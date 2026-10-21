@@ -10,7 +10,7 @@ social funzionano sempre e non esiste una "SPA" vuota da riempire nel browser.
 | UI | React | 19.1.0 | Richiesto da Next 15 |
 | Linguaggio | TypeScript | 5.x | Errori presi prima del deploy |
 | Stile | Tailwind CSS | v4 | Utility-first, tema custom con i token del brand |
-| Animazioni | Framer Motion | *in arrivo* | Scroll-reveal, tilt 3D, parallax (fase design avanzato) |
+| Animazioni | CSS + `IntersectionObserver` | — | Reveal, stagger e hover leggeri. **Framer Motion** è stato valutato in Fase 5 e rimandato alla Fase 13: per un fade aggiungeva ~45 KB gzip |
 | Database + Auth | Supabase (Postgres) | eu-north-1 | RLS nativa sull'`auth.uid()`; un solo fornitore per dati e login |
 | Anti-bot | Cloudflare Turnstile | — | Captcha invisibile su registrazione e login |
 | Mappe | MapLibre GL JS + **OpenFreeMap** | 6.14.0 | Mappa e globo degli eventi: **nessuna chiave API, nessun account** (Fase 2) |
@@ -55,41 +55,57 @@ Per allineare le variabili d'ambiente locali a quelle di Vercel: `npx vercel env
 
 ```text
 app/                     Pagine (App Router) e server action
-  layout.tsx             Navbar, footer, player, lingua: struttura di ogni pagina
-  page.tsx               Home (Esplora): mappa, ricerca, filtri, vetrina, contatori
+  layout.tsx             Navbar, footer, player, barra mobile, lingua
+  page.tsx               Home (Esplora): muro di locandine, lista, ricerca, filtri, mappa
   mappa/                 Mappa a tutto schermo (stessi filtri della Home)
-  eventi/[id]/           Pagina evento (SSR, dati strutturati, anteprima social)
-  artisti/ locali/       Segnaposto: le schede pubbliche arrivano in Fase 3
+  eventi/[...percorso]   Pagina evento SSR con dati strutturati e anteprima social
+  artisti/ locali/       Directory reali con ricerca, filtri e schede [slug]
+  dashboard/             Panoramica, eventi, editor, preferiti, account
+  admin/                 Coda reclami e moderazione serate (solo staff)
+  account/               Profilo, richiesta di reclamo, impostazioni
+  onboarding/role/       Scelta del ruolo ("Diventa artista o locale")
+  onboarding/artist/     Profilo e reclamo artista
+  onboarding/venue/      Profilo e reclamo locale
   per-gli-artisti/ per-le-venue/ about/ contatti/ privacy/ terms/ cookies/
   login/ register/       Accesso e registrazione
   auth/callback/         Ritorno da Google: crea/aggiorna la sessione
-  onboarding/role/       Scelta del ruolo ("Diventa artista o locale")
-  onboarding/artist/     Profilo artista
-  events/new/            Creazione evento (segnaposto: arriva con l'editor)
   api/suggest/           Endpoint dei suggerimenti di ricerca
+  api/geocode/           Geocodifica e controllo pin/città (Photon)
   actions/locale.ts      Server action che salva la lingua scelta
 components/
-  layout/                Navbar, Footer, SpotifyPlayerDock
-  auth/                  RegisterForm, LoginForm, GoogleButton, RolePicker,
-                         OnboardingForm, TurnstileWidget, LogoutButton
+  layout/                Navbar, Footer, MobileTabBar, SpotifyPlayerDock
+  auth/                  Form di accesso/registrazione, RolePicker, Turnstile
   discovery/             SearchBar, QuickFilters, ViewSwitcher, useScrollAnchor
-  map/                   GlobeMap (contenitore), MapCanvas (istanza MapLibre),
-                         EventCard, VenueEventsCard, ShareButton
-  events/                EventTeaser (scheda), EventTable (tabella), SaveButton
-  home/                  BentoGrid, Counters
+  map/                   GlobeMap, MapCanvas, EventCard, VenueEventsCard
+  events/                EventTeaser, EventPageView, EventCountdown, ShareEventPanel,
+                         AddToCalendar, ReportEventButton, SaveButton
+  home/                  HeroPosters, EventRows, HomeIntro, BentoGrid, Counters
+  directory/             ArtistCard, VenueCard, DirectoryFilters, VerifiedBadge
+  dashboard/             DashboardShell, MyEvents, EventEditor, LocationPicker,
+                         CoverField, EventPreviewCard
+  claims/                ClaimPanel, PageSearch, PendingRequestPanel
+  admin/                 AdminQueue, AdminEventsPanel
+  motion/                Reveal (IntersectionObserver)
   ui/                    Pagination, PagePlaceholder
   i18n/                  LanguageSwitcher
 i18n/dictionaries/       it.ts e en.ts: tutti i testi dell'interfaccia
 lib/
   auth.ts                isAdminEmail() per le decisioni di interfaccia
   auth/roles.ts          Tipo UserRole, etichette, permessi
-  events/                filters (stato in URL), queries (letture), types,
-                         format, timezone (Europe/Rome), saved (server action)
+  claims/                Query e azioni del reclamo
+  dashboard/             Query della dashboard e dei preferiti
+  directory/             Query di artisti e locali
+  events/                filters, queries, types, format, timezone, paths,
+                         calendar, saved, cover
+  geo/                   città normalizzata, geocodifica, controllo del pin
   map/                   config (URL dello stile), venues (raggruppamento dei pin)
+  moderation/            Coda e azioni dell'admin sulle serate
+  covers/                Disegno canvas di locandine e Share Card
+  seo/                   canonical, JSON-LD, card Open Graph
   pagination.ts          ITEMS_PER_PAGE: costante condivisa (vedi "errori noti")
-  i18n/                  config (cookie/lingue), server (lettura), metadata, dictionaries
+  i18n/                  config, server, metadata, dictionaries
   supabase/              client, server, admin, env, middleware, session
-supabase/migrations/     0001…0008 (vedi tabella migrazioni)
+supabase/migrations/     0001…0027 (vedi tabella migrazioni)
 docs/                    Piani di fase, review di fase, sorgenti del manuale
 scripts/manuale.mjs      Generatore del PDF (solo locale, non va in produzione)
 ```
@@ -106,12 +122,13 @@ quando ne aggiungi una, impostala su tutti e tre.
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API | Indirizzo del progetto Supabase |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API | Chiave pubblica (protetta dalla RLS) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API | Chiave di servizio: **solo server**, da usare con cautela. Oggi presente ma non ancora usata |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API | Chiave di servizio: **solo server**, usata dal client admin per operazioni di manutenzione. Non va mai esposta al browser |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare → Turnstile | Chiave pubblica del captcha |
 | `TURNSTILE_SECRET_KEY` | Cloudflare → Turnstile | Verifica lato server (Supabase la usa per il captcha) |
 | `ADMIN_EMAIL` | Scelta interna | Email dello staff: deve combaciare con `settings.admin_email` |
 | `NEXT_PUBLIC_SITE_URL` | Dominio di produzione | URL canonico per SEO e link di ritorno |
 | `NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID` | URL della playlist (la parte dopo `/playlist/`) | Player Spotify in fondo alle pagine. **Oggi è vuota**: senza un id il player non compare affatto (nessun contenuto finto, nessun player vuoto) |
+| `GEOCODER_TIMEOUT_MS` | Facoltativa, solo per le prove locali | Tempo massimo di attesa di Photon. In produzione il valore predefinito è 5 s; in locale si può alzare per non far fallire il controllo del pin |
 
 > `.env.local` **non deve mai** finire su Git: il file è già escluso. Il modello da copiare è
 > `.env.example`.
@@ -120,10 +137,11 @@ quando ne aggiungi una, impostala su tutti e tre.
 > `TURNSTILE_SECRET_KEY`): una volta salvate non sono più leggibili, per questo è normale non
 > poterle "rivedere" dalla dashboard.
 
-**La Fase 2 non ha aggiunto nessuna variabile**: la mappa usa OpenFreeMap, che non richiede
-chiavi API né account. Vale la regola generale: quando una fase introduce un servizio nuovo,
-la variabile va impostata su **tutti e tre** gli ambienti Vercel (Production, Preview,
-Development) prima del test in produzione.
+**Le Fasi 2, 3, 4 e 5.4 non hanno aggiunto variabili obbligatorie**: la mappa usa
+OpenFreeMap e la geocodifica usa Photon, che non richiedono chiavi API né account. Vale la
+regola generale: quando una fase introduce un servizio nuovo, la variabile va impostata su
+**tutti e tre** gli ambienti Vercel (Production, Preview, Development) prima del test in
+produzione.
 
 # Autenticazione e gestione del ruolo
 
@@ -167,29 +185,47 @@ fatte direttamente in SQL dalla dashboard non vengono bloccate).
 
 **`profiles`** — una riga per utente (creata dal trigger alla registrazione).
 `id` (chiave, uguale a `auth.users.id`), `email`, `full_name`, `role` (**enum**:
-`fan`/`artist`/`venue`/`admin`, predefinito `fan`), `city`, `created_at`, `updated_at`.
+`fan`/`artist`/`venue`/`admin`, predefinito `fan`), `city`, `verified_at` (verifica dello
+staff), `events_daily_limit` (tetto anti-spam, vuoto = 10), `suspended_at`, `created_at`,
+`updated_at`.
 
 **`artists`** — scheda pubblica dell'artista.
-`id`, `profile_id` (unico, **nullable**: un artista può esistere senza account, come i locali),
-`name`, `city`, `genre`, `spotify_url`, `bio`, `created_at`, `updated_at`.
+`id`, `profile_id` (unico, **nullable**: un artista può esistere senza account),
+`name`, `slug` (unico, per l'URL pubblico), `city`, `city_key` (generata, per i filtri),
+`genre`, `spotify_url`, `bio`, `created_at`, `updated_at`.
 
 **`venues`** — scheda pubblica del locale/organizzatore.
-`id`, `profile_id` (unico, nullable), `name`, `city`, `address`, `latitude`, `longitude`,
-`website`, `created_at`, `updated_at`.
+`id`, `profile_id` (unico, nullable), `name`, `slug`, `city`, `city_key`, `address`,
+`latitude`, `longitude`, `capacity`, `website`, `created_at`, `updated_at`.
 
 **`events`** — gli eventi.
-`id`, `title`, `description`, `artist_id`, `venue_id`, `starts_at`, `city`, `is_unclaimed`
-(evento inserito dalla redazione e non ancora rivendicato), `status` (**enum**:
-`draft`/`published`/`cancelled`), `created_by`, `created_at`, `updated_at`, più i campi della
-scoperta aggiunti in Fase 2: `latitude`, `longitude`, `location_precision` (**enum**:
-`exact`/`approximate`), `area_radius_m` (raggio mostrato per gli eventi approssimati),
-`genre`, `kind` (**enum**: `concert`/`dj_set`/`festival`/`open_mic`/`acoustic`/`other`),
-`is_free`, `ticket_url`, `cover_image_url`, `is_featured`, `featured_until` (scadenza reale
-della vetrina), `timezone` (predefinito `Europe/Rome`, con controllo sul formato).
+`id`, `slug`, `title`, `description`, `artist_id`, `venue_id`, `venue_name` (locale senza
+scheda), `starts_at`, `city`, `city_key`, `status` (**enum**: `draft`/`published`/`cancelled`),
+`created_by`, `created_at`, `updated_at`, più i campi della scoperta: `latitude`, `longitude`,
+`location_precision` (**enum**: `exact`/`approximate`), `area_radius_m`, `directions_text`
+("Come arrivare"), `genre`, `kind` (**enum**:
+`concert`/`dj_set`/`festival`/`open_mic`/`acoustic`/`other`), `is_free`, `price_text`,
+`ticket_url`, `cover_image_url`, `is_featured`, `featured_until`, `timezone` (predefinito
+`Europe/Rome`). Per la moderazione: `cancel_reason`, `merged_into`, `merged_at`,
+`merged_status`, `auto_hidden_at`, `auto_hidden_status`. **`is_unclaimed` non esiste più**:
+lo stato "inserito da OpenStage" si calcola dall'assenza dei `profile_id` collegati.
 
 **`saved_events`** — gli eventi salvati da un profilo (Fase 2).
 `profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
 dato sensibile, e la RLS lo limita al proprietario.
+
+**`claims`** — richieste di reclamo di una scheda (Fase 3).
+`subject_type` (`artist`/`venue`), `artist_id`/`venue_id`, `profile_id`, `status`
+(`pending`/`approved`/`rejected`/`revoked`/`withdrawn`), `proof_url` obbligatorio, `note`,
+date e chi ha deciso. Una sola richiesta pendente per persona e scheda.
+
+**`reports`** — segnalazioni delle serate (Fase 4). Una per persona per evento, motivi chiusi,
+nota facoltativa, stato `open`/`resolved`/`dismissed`. Non è una recensione: la legge solo
+l'admin.
+
+**`event_creations`** — registro append-only delle serate create, usato dal tetto anti-spam
+(10 nelle 24 ore). Non si cancella insieme all'evento, altrimenti la quota si aggirerebbe
+eliminando la bozza.
 
 **`settings`** — parametri interni chiave/valore. Oggi contiene `admin_email` = email dello
 staff. È leggibile solo dall'admin.
@@ -202,9 +238,14 @@ staff. È leggibile solo dall'admin.
 | `prevent_role_escalation()` | Blocca le transizioni di ruolo non ammesse (vedi sopra) |
 | `touch_updated_at()` | Aggiorna `updated_at` a ogni modifica |
 | `is_admin()` | Vero se l'utente loggato è l'email in `settings.admin_email`. Usata dalle policy |
-| `search_events(...)` | Ricerca e filtri di Home e mappa (Fase 2): testo, preset temporali, genere, tipo, ingresso gratuito, distanza e paginazione in **una sola query**. `SECURITY INVOKER`, con `status = 'published'` esplicito |
+| `search_events(...)` | Ricerca e filtri di Home e mappa: testo, preset temporali, genere, tipo, ingresso gratuito, distanza e paginazione in **una sola query**. `SECURITY INVOKER`, con `status = 'published'` esplicito. Dalla Fase 4 la distanza si misura dal **bordo** di una zona approssimata |
 | `search_suggestions(...)` | I suggerimenti della barra di ricerca, raggruppati per tipo: città, artisti, locali, eventi, generi |
-| Trigger | `on_auth_user_created` (su `auth.users`), `profiles_guard`, `artists_touch`, `venues_touch`, `events_touch`, `settings_touch` |
+| `claim_artist(...)`, `request_venue_claim(...)`, `decide_claim(...)`, `withdraw_claim(...)` | Reclamo: artista immediato con prova, locale in approvazione, ritiro della richiesta e decisione dell'admin |
+| `merge_event(...)`, `unmerge_event(...)` | Unione reversibile di due schede doppione; sposta anche i Preferiti. Solo admin |
+| `city_key(...)` | Minuscolo, senza accenti e senza provincia: "Milano" e "milano (MI)" sono la stessa città |
+| `event_daily_limit(...)` | Tetto anti-spam per account, predefinito 10 serate nelle 24 ore |
+| `reports_apply_threshold()` | Alla terza segnalazione da persone diverse e verificate mette la serata in pausa (bozza) |
+| Trigger | `on_auth_user_created` (su `auth.users`), `profiles_guard`, `artists_touch`, `venues_touch`, `events_touch`, `settings_touch`, `events_rate_limit`, `events_log_creation`, `reports_apply_threshold` |
 
 ## Indici
 
@@ -239,9 +280,28 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0006_saved_events.sql` | Tabella `saved_events` (eventi salvati) con la sua RLS |
 | `0007_artists_unclaimed.sql` | `artists.profile_id` diventa **nullable**: un artista può esistere senza account, come i locali |
 | `0008_search_rpc.sql` | Funzioni `search_events` e `search_suggestions`: ricerca, filtri, distanza e paginazione nel database |
+| `0009_slugs.sql` | Slug di artisti, locali ed eventi, capienza dei locali, verifica del profilo, tabella `claims` |
+| `0010_search_slugs.sql` | Ricerca e suggerimenti con gli slug |
+| `0011_claims.sql` | Funzioni di reclamo e pubblicazione riservata agli account verificati |
+| `0012_claim_ownership.sql` | Proprietà della scheda reclamata e sostituzione della scheda vuota |
+| `0013_event_unclaimed_derived.sql` | "Non reclamato" diventa un valore calcolato; la colonna salvata viene eliminata |
+| `0014_claim_pending.sql` | Una richiesta in attesa alla volta, blocco della creazione, ritiro |
+| `0015_event_fields.sql` | `price_text` e `venue_name` per l'editor |
+| `0016_search_events_venue_price.sql` | Ricerca con locale e prezzo |
+| `0017_geocode_cache.sql` | Cache della geocodifica |
+| `0018_admin_publish_event.sql` | Pubblicazione per conto terzi dall'admin |
+| `0019_event_covers.sql` | Bucket e policy per le locandine |
+| `0020_event_anti_spam.sql` | Tetto di 10 serate nelle 24 ore e sospensione dell'account |
+| `0021_profiles_field_guard.sql` | Campi del profilo protetti da modifiche non ammesse |
+| `0022_event_cancellation.sql` | Annullamento delle serate con motivo |
+| `0023_event_save_hygiene.sql` | Igiene del salvataggio e "Come arrivare" |
+| `0024_city_quality.sql` | `city_key`, raggio onesto, città generata |
+| `0025_event_merge.sql` | Unione reversibile dei doppioni |
+| `0026_reports.sql` | Segnalazioni, auto-pausa e pannello di moderazione |
+| `0027_merge_admin_check.sql` | `merge_event` usa `is_admin()`, una sola definizione di admin |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
-> `0008`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
+> `0027`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
 > `supabase migration list` non la vede.
 
 # Sicurezza: Row Level Security
@@ -265,6 +325,10 @@ di `is_admin()`, mai di valori passati dal browser.
 | | `events_update_own`, `events_delete_own` | Modifichi solo i tuoi eventi (o l'admin) |
 | `saved_events` | `saved_events_select_own` | Vedi solo i **tuoi** preferiti |
 | | `saved_events_insert_own`, `saved_events_delete_own` | Salvi e togli solo i tuoi |
+| `claims` | `claims_select_own_or_admin` | Vedi la tua richiesta (o tutte se admin); si scrive solo tramite funzioni |
+| `reports` | `reports_insert_own` | Segnali solo a nome tuo, una volta per serata |
+| | `reports_select_own_or_admin`, `reports_admin_update` | Vedi le tue segnalazioni; l'admin le legge e le chiude |
+| `event_creations` | `event_creations_read_admin` | Il registro anti-spam è leggibile solo dall'admin |
 | `settings` | `settings_select_admin`, `settings_update_admin` | Solo l'admin |
 
 **Perché le policy contano davvero:** un utente malintenzionato può chiamare l'API di Supabase
@@ -334,16 +398,21 @@ sbagliato, visibilità dei profili altrui.
 | Viola (primario) | `#8B5CF6` |
 | Ciano (secondario) | `#22D3EE` |
 | Rosa (accento) | `#F472B6` |
-| Titoli | Space Grotesk |
+| Titoli-poster (Home) | Anton |
+| Titoli delle pagine | Space Grotesk |
+| Etichette e metadati | IBM Plex Mono |
 | Corpo del testo | Inter |
-| Effetti | Glass (blur + bordo traslucido 1px), gradienti viola→ciano, glow |
+| Effetti | Glass solo su navbar, pop-up e pannelli; nella Home niente card, niente contenitori arrotondati |
 
 Regole da non tradire:
 
-1. **Glass solo su navbar, card e pop-up**: mai dietro a testi lunghi, altrimenti la
-   leggibilità crolla.
+1. **Glass solo su navbar, pop-up e pannelli**: mai dietro a testi lunghi, altrimenti la
+   leggibilità crolla. La Home 5.4 non usa card: locandine, righe e bordi netti.
 2. **Mobile first**: si progetta prima lo schermo piccolo.
-3. I token del tema stanno in `app/globals.css`: cambiando lì i colori, cambiano ovunque.
+3. **Movimento sobrio**: CSS + `IntersectionObserver`, solo `transform`/`opacity`,
+   `prefers-reduced-motion` rispettato. Niente marquee infinito, niente parallax.
+4. I token del tema stanno in `app/globals.css`: cambiando lì i colori, cambiano ovunque.
+   I dettagli stanno in `docs/design-system.md`.
 
 # Mappe e tile
 
@@ -382,8 +451,9 @@ Punti tecnici da ricordare:
 
 # Ricerca, filtri e stato nell'URL
 
-Tutto lo stato della scoperta — testo cercato, filtri, raggio, vista schede/tabella, pagina —
-vive **nell'indirizzo della pagina**, non in memoria:
+Tutto lo stato della scoperta — testo cercato, filtri, raggio e pagina — vive
+**nell'indirizzo della pagina**, non in memoria. (La vecchia vista schede/tabella non è più
+esposta in Home: la lista 5.4 è a righe.)
 
 - un link filtrato è condivisibile e si apre già filtrato;
 - la pagina si compone lato server, quindi funziona anche senza JavaScript;
@@ -444,6 +514,8 @@ Scelte da non perdere:
 | Un blocco SQL con `union all` si interrompe | I valori di tipo enum vanno convertiti esplicitamente nelle unioni | Scrivere `'published'::event_status` e simili |
 | La build fallisce con `useSearchParams` | In Next 15 un componente client che legge i parametri va avvolto in `<Suspense>` | Avvolgere il componente (o il suo gruppo) in un confine `<Suspense>` |
 | La mappa resta grigia / il worker non si carica | Il worker di MapLibre non è raggiungibile dal percorso previsto | Servirlo dal nostro dominio: `scripts/copy-maplibre-worker.mjs` lo copia in `public/` durante `prebuild` |
+| Il titolo-poster appare tagliato in basso | Con `line-height` molto sotto 1 il glifo esce dalla line box e viene ritagliato | Usare `leading-none` (1) e recuperare la compattezza con un margine negativo, non con un `line-height` più piccolo |
+| Un link condiviso su `/eventi/<uuid>` non apre la scheda | Dalla Fase 3 l'URL canonico è `/eventi/[città]/[slug]` | Il vecchio indirizzo fa un redirect permanente verso quello nuovo: usare sempre il link canonico |
 
 # Come si verifica una pagina (browser headless)
 
@@ -454,8 +526,8 @@ crea, si usa e **si cancella**: non resta nel repository.
 La ricetta messa a punto nella Fase 2:
 
 1. `puppeteer.launch({ executablePath: "...chrome.exe", headless: true })`.
-2. `page.setViewport()` con **due misure**: desktop 1440×1000 e mobile 390×844 (`isMobile`,
-   `hasTouch`).
+2. `page.setViewport()` con **almeno due misure**: desktop 1280×900 e mobile 390×844
+   (`isMobile`, `hasTouch`), più 320 px per scoprire l'overflow più stretto.
 3. `page.goto(..., { waitUntil: "networkidle2" })` e una pausa: la mappa ha bisogno di qualche
    secondo prima di essere affidabile.
 4. Per cliccare **senza falsare il test**: leggere `getBoundingClientRect()` dell'elemento e
@@ -490,20 +562,20 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 
 | Fase | Contenuto previsto |
 | --- | --- |
-| 1 | ✅ Fondamenta: design system, accesso, ruoli, pagine pubbliche, database, deploy |
-| 1.2 | ✅ Indurimento del database (sicurezza, indici, avvisi) |
-| 1.3 | ✅ Regole definitive sui ruoli (database, pagine, interfaccia) |
-| 2 | ✅ Scoperta degli eventi: mappa con globo e pin, pagine evento, ricerca con suggerimenti, filtri, salvataggio, vetrina e contatori reali |
-| 3 | Schede pubbliche di artisti e locali + **reclamo** della scheda: artista immediato con prova, locale con approvazione dell'admin |
-| 4 | **Editor degli eventi**: pubblicazione e gestione delle proprie date dall'app |
-| 5 | Preferiti: pagina degli eventi salvati |
-| 6 | Email transazionali (Resend) e notifiche |
-| 7 | Community e funzioni sociali |
-| 8 | Funzioni opzionali per chi vuole sostenere il progetto (PayPal) |
-| 9 | Rifinitura: prestazioni, accessibilità, contenuti |
+| 1 · 1.2 · 1.3 | ✅ Fondamenta, indurimento del database, ruoli definitivi |
+| 2 | ✅ Scoperta: mappa, pagine evento, ricerca, filtri, salvataggio, vetrina |
+| 3 | ✅ Directory artisti/locali, reclamo, dashboard, editor eventi, condivisione, preferiti |
+| 4 | ✅ Qualità dei dati, serate collegate, segnalazioni e moderazione, serate passate |
+| 5.4 | ✅ Remake grafico della Home: muro di locandine, lista a righe, mappa a tutta pagina, guscio |
+| 6 | Pagine pubbliche ed editoriali: `/about`, `/per-gli-artisti`, `/per-le-venue`, `/contatti`, `/faq`, playlist e social reali. **Prossima fase** |
+| 7 | Email transazionali (Resend), area fan e notifiche. Bloccata dal dominio |
+| 8 | Pannello admin completo, 2FA e claim a invito |
+| 9 | Community: "segui" e inviti virali |
+| 10 | Spotify e area artista |
+| 11 | Monetizzazione opzionale (PayPal): richiede Vercel Pro e partita fiscale |
+| 12 | Serie, locali chiusi, bacheca ingaggi |
+| 13 | SEO, legal, audit, polish finale e remake parte 2 |
 
-> L'ordine delle fasi dalla 3 in poi è **indicativo** e viene dettagliato una fase per volta, con
-> un piano scritto prima di scrivere codice. Rispetto alla prima edizione di questo manuale, il
-> **reclamo delle schede** è stato anticipato alla Fase 3 e l'**editor degli eventi** spostato
-> alla Fase 4: il reclamo è più piccolo, chiude una promessa già visibile nell'interfaccia
-> ("non ancora rivendicato") e costruisce le pagine profilo di cui l'editor avrà bisogno.
+> L'ordine dalla 6 in poi è indicativo e viene dettagliato una fase per volta, con un piano
+> scritto prima di scrivere codice. La roadmap approvata è in `docs/roadmap.md`; se questo
+> manuale dice altro, vale la roadmap.

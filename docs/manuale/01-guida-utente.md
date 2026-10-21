@@ -20,20 +20,22 @@ I quattro principi che guidano ogni decisione (anche tecnica) sono:
 ## A che punto siamo
 
 **Fatto e online:** identità e accesso (email e Google), ruoli con regole definitive, design
-system, doppia lingua IT/EN, pagine pubbliche di servizio, **mappa interattiva degli eventi**
-con globo 3D e pin, **pagine evento**, **ricerca con suggerimenti**, **filtri rapidi**
-(stasera, weekend, settimana, 30 giorni, distanza, genere, tipo, ingresso gratuito),
-**salvataggio degli eventi**, vetrina con **schede o tabella**, sezione **"In evidenza"**,
-contatori reali in home, database con sicurezza a livello di riga, deploy continuo.
+system, doppia lingua IT/EN con indirizzi `/it` e `/en`, **directory reali di artisti e
+locali** con filtri e schede pubbliche, **reclamo della scheda**, **dashboard** per artisti e
+locali, **editor degli eventi** con bozze e locandine, **mappa interattiva** con pin e globo,
+**pagine evento** con calendario e condivisione, **ricerca con suggerimenti**, **filtri
+rapidi**, **pagina dei preferiti**, **segnalazioni e moderazione**, **Home poster wall**,
+database con sicurezza a livello di riga, deploy continuo.
 
-**In arrivo nelle prossime fasi:** schede pubbliche di artisti e locali con **reclamo della
-scheda**, pubblicazione e gestione degli eventi dall'app, pagina dei preferiti, notifiche
-email, pagamenti opzionali.
+**In arrivo nelle prossime fasi:** pagine editoriali (Chi siamo, Per gli artisti, Per i
+locali, Contatti, FAQ), email transazionali, community e "segui", Spotify, pagamenti
+opzionali e rifiniture SEO/legali.
 
-**Da sapere oggi:** gli eventi presenti sono **reali ma inseriti dalla redazione di
-OpenStage**, non ancora dagli artisti e dai locali (quella funzione arriva con l'editor degli
-eventi). Un evento inserito da noi resta marcato *"non ancora rivendicato"* finché il locale o
-l'artista non reclamano la propria scheda.
+**Da sapere oggi:** gli eventi presenti sono **reali**. Possono essere inseriti dalla
+redazione oppure pubblicati direttamente da artisti e locali dopo il reclamo della scheda;
+finché nessuno dei due ha reclamato, la scheda evento lo dice. La Home mostra solo le serate
+in programma; le serate passate restano nelle pagine di artista, locale e nella dashboard di
+chi le ha pubblicate.
 
 # I ruoli e le loro regole
 
@@ -110,14 +112,30 @@ con il tuo ruolo: è la conferma che il blocco funziona anche lato database.
 
 # Trovare un concerto
 
-Questa è la parte che oggi funziona di più: la Home è una vetrina con **mappa, ricerca,
-filtri e risultati**, e tutto è navigabile anche senza JavaScript (le pagine arrivano già
-composte dal server, così i link sono condivisibili e le anteprime social funzionano).
+Questa è la parte che oggi funziona di più: la Home è un **muro di locandine** reali, seguito
+da una lista di serate, ricerca e filtri; la mappa è una fascia dedicata e ha una modalità a
+tutto schermo. Tutto è navigabile anche senza JavaScript (le pagine arrivano già composte dal
+server, così i link sono condivisibili e le anteprime social funzionano).
+
+## La Home
+
+- In cima ci sono **fino a quattro locandine vere**, scelte tra le serate in evidenza o tra
+  le prossime in programma. Sono immagini caricate dagli artisti o dai locali: nessuna foto
+  di repertorio.
+- Il titolo della Home è **"Stasera si suona."**: un invito diretto, non uno slogan
+  pubblicitario.
+- Sotto il muro c'è la **lista delle prossime serate**, con data grande, titolo, luogo,
+  genere, orario e ingresso. È una lista editoriale, non una griglia di schede.
+- Se cerchi o filtri, cambiano i risultati della lista; il muro resta la copertina della
+  pagina.
+- Le serate scelte dallo staff per la vetrina alimentano il muro. **Non si può pagare per
+  comparire**: non esiste un algoritmo "pay-to-play".
 
 ## La mappa
 
-- La Home apre con un **globo 3D** che ruota una volta sola, come introduzione, e si ferma al
-  primo tocco. Se il tuo sistema chiede "meno animazioni", la rotazione non parte nemmeno.
+- La mappa sta in una **fascia a tutta pagina** sotto la lista e si carica solo quando serve.
+  Ha un **globo 3D** che ruota una volta sola, come introduzione, e si ferma al primo tocco.
+  Se il tuo sistema chiede "meno animazioni", la rotazione non parte nemmeno.
 - I **pin** sono gli eventi futuri. Più serate nello **stesso locale** diventano **un pin
   solo** con il numero delle date, per non avere tre puntini sovrapposti.
 - Toccando un pin si apre la **scheda**: data e ora nel fuso dell'evento, titolo, locale,
@@ -138,7 +156,7 @@ composte dal server, così i link sono condivisibili e le anteprime social funzi
 
 ## La ricerca
 
-Sotto la mappa c'è la **barra di ricerca**. I suggerimenti arrivano **dal database di
+Sopra la lista c'è la **barra di ricerca**. I suggerimenti arrivano **dal database di
 OpenStage**, non da un servizio esterno, e sono raggruppati per tipo: **città, artisti,
 locali, eventi, generi**. Scrivendo "druso" trovi il locale; scrivendo "rock" trovi il genere.
 
@@ -159,36 +177,99 @@ Ogni filtro **scrive nell'indirizzo della pagina**: puoi copiare il link e chi l
 esattamente la tua stessa lista. La lista e la mappa leggono gli stessi parametri, quindi non
 possono mai mostrarti cose diverse. Filtrando, la pagina **resta dove sei**: non torna in cima.
 
-## Schede, tabella e "In evidenza"
+## Muro, lista e mappa
 
-- **Schede** (predefinito): ogni evento con poster, titolo, artista, data, locale e genere.
-- **Tabella**: la stessa lista in forma compatta, per confrontare più serate a colpo d'occhio.
-- Si cambia con l'interruttore sopra la lista, e la scelta resta nell'indirizzo.
+- **Muro di locandine**: le immagini reali delle serate in evidenza o delle prossime date.
+  Su desktop e mobile cambia la composizione, non il contenuto.
+- **Lista a righe**: ogni serata ha data, titolo, artista/locale, genere, orario e prezzo o
+  ingresso gratuito. Le righe sono cliccabili e portano alla pagina evento.
 - I risultati sono **paginati a 12** per pagina, e i filtri restano attivi cambiando pagina.
-- **In evidenza**: fino a tre serate scelte a mano dallo staff. **Non si può pagare per
-  comparire**: è una scelta editoriale, non pubblicità. La sezione si vede solo quando c'è
-  almeno una serata scelta e quando non stai filtrando.
+- **Mappa**: la stessa ricerca applicata ai pin; il pulsante "Apri a schermo intero" porta a
+  `/mappa`, dove la mappa occupa tutta la pagina. La Home non usa più l'interruttore
+  schede/tabella.
+- **In evidenza**: le serate scelte a mano dallo staff compaiono nel muro. Non esiste una
+  sezione pubblicitaria separata e **non si può pagare per comparire**.
 - Se una ricerca non trova nulla, la pagina **non ti lascia a mani vuote**: ti spiega che il
   database è ancora piccolo e ti invita a segnalare locali e artisti che conosci.
 
 ## Salvare un evento
 
-Il pulsante **Salva** scrive davvero nel database, sul tuo profilo (serve l'accesso). Oggi non
-esiste ancora una pagina che raccolga gli eventi salvati: arriva con i preferiti. Il
-salvataggio però è reale e resta lì.
+Il pulsante **Salva** scrive davvero nel database, sul tuo profilo (serve l'accesso). I
+preferiti sono raccolti in **Dashboard → Preferiti** (`/dashboard/saved`), dal più recente.
+Se non hai una dashboard da artista o locale, la voce è disponibile anche per i fan.
+
+# Reclamare la tua scheda
+
+Se una scheda artista o locale è stata creata dalla redazione, puoi diventarne proprietario.
+
+## Artista
+
+1. Apri la tua scheda in **Artisti**.
+2. Premi **Sono io** e inserisci un **link pubblico** che provi che la scheda è tua (il tuo
+   sito, una pagina social, una pagina con il tuo nome).
+3. Il collegamento è **immediato**. Se gestisci già un'altra scheda artista, il sistema te lo
+   dice: un profilo amministra una scheda sola.
+
+## Locale
+
+1. Apri la scheda del locale in **Locali** e premi **Sono il gestore**.
+2. Inserisci la prova e un messaggio: la richiesta va in **approvazione** dallo staff.
+3. Finché è in attesa la vedi in **Account**, e puoi **ritirarla**. Non puoi creare una seconda
+   scheda mentre la richiesta è aperta.
+4. Quando l'admin approva, la scheda diventa tua e ricevi il badge **Verificato**.
+
+La verifica non è un badge decorativo: è il permesso che consente la pubblicazione diretta
+delle serate. Il primo evento di un account appena verificato può passare dalla revisione
+dello staff; dopo, le pubblicazioni sono automatiche.
+
+# Pubblicare una serata
+
+La dashboard è il posto dove gestisci il tuo profilo e le tue date.
+
+| Voce | Cosa trovi |
+| --- | --- |
+| **Panoramica** | Bozze, pubblicate, annullate e preferiti |
+| **I miei eventi** | Tutte le tue serate, divise tra in programma e **passate** |
+| **Crea evento** | Il modulo di pubblicazione |
+| **Preferiti** | Le serate che hai salvato |
+| **Profilo / Account** | La tua scheda, la richiesta di reclamo e le impostazioni |
+
+Nel modulo puoi inserire titolo, artista, data e ora, locale o nome del posto, indirizzo con
+pin sulla mappa, genere, tipo, prezzo o ingresso gratuito, link biglietti, locandina e il
+testo **"Come arrivare"** per i posti difficili da trovare. La posizione può essere **esatta o
+approssimata**: se scegli l'area, la pagina evento mostra una zona e non un punto finto.
+
+Le serate nascono in **bozza**: puoi pubblicarle, annullarle o modificarle. Un locale può
+collegare la scheda di un artista esistente; se una serata simile è già presente, il sistema
+ti avvisa e ti lascia decidere. C'è un tetto anti-spam di **10 serate nelle 24 ore** per
+account, imposto dal database.
+
+La **serata passata** non sparisce dalla tua dashboard: finisce nella sezione "Passate". Puoi
+eliminarla definitivamente (con conferma) se è un doppione o un errore; l'admin può farlo su
+qualsiasi scheda.
+
+# Segnalare una serata
+
+Nella pagina di una serata in programma, chi ha un accesso può usare **Segnala questa
+serata** e scegliere un motivo (informazioni sbagliate, spam, contenuto offensivo, altro). La
+segnalazione arriva solo allo staff: **non è una recensione e non è pubblica**. Dopo tre
+segnalazioni da persone diverse e verificate, la serata va in pausa automaticamente e aspetta
+un controllo umano; l'admin può rimetterla online, annullarla o sospendere l'autore.
 
 # Navigare il sito
 
 | Voce | Cosa trovi |
 | --- | --- |
-| **Esplora** (Home) | Mappa, ricerca, filtri, vetrina degli eventi e contatori del progetto |
+| **Esplora** (Home) | Muro di locandine, lista delle prossime serate, ricerca, filtri e mappa |
 | **Mappa** | La mappa a tutto schermo, con gli stessi filtri della Home |
-| **Artisti** | *Segnaposto*: l'elenco pubblico arriva con le schede artista (Fase 3) |
-| **Locali** | *Segnaposto*: l'elenco pubblico arriva con le schede locale (Fase 3) |
-| **Per gli Artisti** | *Segnaposto*: la pagina dedicata arriva con le schede artista |
-| **Per le Venue** | *Segnaposto*: la pagina dedicata arriva con le schede locale |
-| **Chi siamo** | *Segnaposto* |
+| **Artisti** | Directory reale con ricerca, filtri, schede e concerti futuri |
+| **Locali** | Directory reale con ricerca, filtri, schede e programmazione |
+| **Per gli Artisti** | *Segnaposto*: la pagina editoriale arriva con la Fase 6 |
+| **Per le Venue** | *Segnaposto*: la pagina editoriale arriva con la Fase 6 |
+| **Chi siamo** | *Segnaposto*: la pagina editoriale arriva con la Fase 6 |
 | **Accedi / Registrati** | Accesso e creazione account |
+| **Dashboard** (dopo l'accesso) | I miei eventi, crea evento, preferiti, profilo e impostazioni |
+| **Admin** (solo staff) | Coda dei reclami e moderazione delle serate |
 
 > Le pagine di servizio (Privacy Policy, Termini, Cookie Policy, Chi siamo, Contatti) sono
 > raggiungibili dal **footer** in fondo a ogni pagina. Alcune sono ancora segnaposto: lo
@@ -197,8 +278,9 @@ salvataggio però è reale e resta lì.
 ## Lingua
 
 La piattaforma parte in **italiano** se ti colleghi dall'Italia, in **inglese** da qualsiasi
-altro paese. Puoi cambiarla quando vuoi con il selettore **IT / EN** nella barra in alto:
-la scelta viene ricordata anche alla visita successiva.
+altro paese. Puoi cambiarla quando vuoi con il selettore **IT / EN** nella barra in alto: la
+lingua vive nell'indirizzo (`/it/...` oppure `/en/...`), quindi un link mantiene la lingua
+anche quando lo condividi. La scelta viene ricordata alla visita successiva.
 
 ## Il player in basso (non ancora attivo)
 
@@ -234,17 +316,23 @@ rendere illeggibile la mappa. Le date si scorrono con le frecce nella scheda.
 mappa. Per muoverla usa **due dita**, oppure aprila a tutto schermo.
 
 **Perché un evento dice "non ancora rivendicato"?**
-Perché l'ha inserito la redazione di OpenStage e il locale o l'artista non hanno ancora
-reclamato la loro scheda. La funzione di reclamo arriva nella prossima fase.
+Perché né l'artista né il locale hanno ancora reclamato la loro scheda. Puoi reclamarla dalla
+scheda stessa: per un artista il collegamento è immediato con un link di prova; per un locale
+serve l'approvazione dello staff.
 
 **Ho salvato un evento: dove lo ritrovo?**
-Oggi il salvataggio è reale ma la pagina che raccoglie i preferiti non esiste ancora: arriva
-con i preferiti (backlog del progetto).
+In **Dashboard → Preferiti** (`/dashboard/saved`), dal più recente. Il salvataggio è reale e
+resta legato al tuo account.
+
+**Come pubblico una serata?**
+Dalla **Dashboard → Crea evento**, se il tuo profilo è artista o locale. Se sei ancora un fan,
+prima devi scegliere il ruolo; la scelta è definitiva. Il primo evento può passare dalla
+revisione dello staff, poi la pubblicazione è automatica.
 
 **Non trovo eventi nella mia città: la piattaforma è rotta?**
 No. Il database cresce con i locali e gli artisti che pubblicano: all'inizio ci sono poche
 città. Se conosci un locale o un artista che dovrebbe esserci, segnalalo.
 
-**Non vedo ancora la creazione degli eventi: è rotta?**
-No, non è ancora stata costruita: arriva con l'editor degli eventi. Se provi ad aprire "Crea
-evento" oggi vedi una pagina segnaposto.
+**Perché la creazione evento non compare?**
+Perché il tuo profilo è ancora **fan**. La creazione è riservata ad artisti e locali: scegli il
+ruolo dalla barra in alto (la scelta è definitiva) oppure reclama la tua scheda esistente.
