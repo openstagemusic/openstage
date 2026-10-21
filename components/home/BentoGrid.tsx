@@ -10,10 +10,10 @@ type BentoGridProps = {
   counters: DiscoveryCounters;
 };
 
-const TILE = "glass rounded-3xl border border-white/10 p-6";
+const TILE = "glass rounded-card border border-line p-6";
 
 const CTA =
-  "mt-4 inline-flex w-fit rounded-full border border-white/15 px-4 py-2 text-xs font-medium text-white transition-colors hover:border-white/30 hover:bg-white/5";
+  "mt-4 inline-flex w-fit rounded-full border border-line-strong px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/5";
 
 /**
  * Bento promozionale sotto lo showcase: come funziona, i numeri reali della
@@ -24,7 +24,6 @@ const CTA =
  */
 export default function BentoGrid({ dict, counters }: BentoGridProps) {
   const t = dict.bento;
-  const values = dict.home.values;
 
   const items = [
     { label: t.eventsLabel, value: counters.events },
@@ -43,7 +42,7 @@ export default function BentoGrid({ dict, counters }: BentoGridProps) {
             <li key={step.title}>
               <span
                 aria-hidden="true"
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-violet to-cyan text-xs font-semibold text-white"
+                className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-strong text-xs font-semibold text-white"
               >
                 {index + 1}
               </span>
@@ -68,27 +67,12 @@ export default function BentoGrid({ dict, counters }: BentoGridProps) {
         </Link>
       </li>
 
-      <li className={cn(TILE, "flex flex-col")}>
+      <li className={cn(TILE, "flex flex-col lg:col-span-2")}>
         <h2 className="font-display text-lg font-semibold">{t.venuesTitle}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{t.venuesText}</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t.venuesText}</p>
         <Link href="/per-le-venue" className={CTA}>
           {t.venuesCta}
         </Link>
-      </li>
-
-      <li className={TILE}>
-        <h2 className="font-display text-lg font-semibold">{values.ethicsTitle}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{values.ethicsText}</p>
-      </li>
-
-      <li className={cn(TILE, "sm:col-span-2 lg:col-span-1")}>
-        <h2 className="font-display text-lg font-semibold">{values.undergroundTitle}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{values.undergroundText}</p>
-      </li>
-
-      <li className={cn(TILE, "sm:col-span-2")}>
-        <h2 className="font-display text-lg font-semibold">{values.authenticTitle}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{values.authenticText}</p>
       </li>
     </ul>
   );

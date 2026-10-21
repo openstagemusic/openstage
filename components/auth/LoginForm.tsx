@@ -109,7 +109,7 @@ export default function LoginForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-gradient-to-r from-violet to-cyan px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+        className="w-full rounded-xl bg-violet-strong px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
       >
         {loading ? dict.loading : dict.loginSubmit}
       </button>

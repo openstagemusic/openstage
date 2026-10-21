@@ -69,7 +69,7 @@ export default async function VenuesPage({
       <JsonLd data={itemList} />
 
       <header className="max-w-2xl">
-        <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="text-balance font-display text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
           {dict.pages.venues.title}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted">{t.venuesIntro}</p>
@@ -95,7 +95,7 @@ export default async function VenuesPage({
           ))}
         </div>
       ) : (
-        <div className="glass mt-6 rounded-3xl border border-white/10 p-8">
+        <div className="glass mt-6 rounded-card border border-line p-8">
           <h2 className="font-display text-lg font-semibold">{t.noResultsTitle}</h2>
           <p className="mt-2 text-sm text-muted">{t.noResultsText}</p>
         </div>

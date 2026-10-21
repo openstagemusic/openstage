@@ -3,18 +3,34 @@
 @theme {
   --color-bg: #07070d;
   --color-surface: #0d0d1a;
+  --color-surface-2: #12121f;
   --color-foreground: #e8e8f2;
   --color-muted: #9aa0b8;
+  --color-line: rgba(255, 255, 255, 0.1);
+  --color-line-strong: rgba(255, 255, 255, 0.18);
   --color-violet: #8b5cf6;
+  /* Viola dei bottoni: più scuro dell'accento, per il contrasto AA sul bianco. */
+  --color-violet-strong: #7c3aed;
   --color-cyan: #22d3ee;
   --color-pink: #f472b6;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.5rem;
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow-lift: 0 24px 60px -30px rgba(0, 0, 0, 0.85);
+  --shadow-glow: 0 0 0 1px rgba(139, 92, 246, 0.35),
+    0 18px 60px -24px rgba(139, 92, 246, 0.55);
 }
 
 :root {
   color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -25,6 +41,32 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Focus visibile su tutto ciò che si può raggiungere da tastiera. I campi che
+   gestiscono il focus con il proprio bordo mantengono la loro regola. */
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  border-radius: 9999px;
+  background-color: var(--color-violet);
+  color: #fff;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: transform 150ms var(--ease-out-expo);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
 /* Neon ambience: pure CSS, no images, no external requests. */
 body::before {
   content: "";
@@ -33,9 +75,9 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(60rem 60rem at 12% -10%, rgba(139, 92, 246, 0.2), transparent 60%),
-    radial-gradient(50rem 50rem at 92% 0%, rgba(34, 211, 238, 0.14), transparent 55%),
-    radial-gradient(45rem 45rem at 50% 120%, rgba(244, 114, 182, 0.1), transparent 60%);
+    radial-gradient(60rem 60rem at 12% -10%, rgba(139, 92, 246, 0.15), transparent 60%),
+    radial-gradient(50rem 50rem at 92% 0%, rgba(34, 211, 238, 0.1), transparent 55%),
+    radial-gradient(45rem 45rem at 50% 120%, rgba(244, 114, 182, 0.07), transparent 60%);
 }
 
 /* Glassmorphism: only used on navbar, cards and pop-ups — never behind long text. */
@@ -184,7 +226,51 @@ select optgroup {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .openstage-user-dot {
     animation: none;
+  }
+}
+
+/* Senza JavaScript il contenuto delle sezioni “reveal” deve restare leggibile. */
+@media (scripting: none) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Il player fisso, quando c'è, non deve coprire la fine della pagina. */
+body:has(.spotify-dock) {
+  padding-bottom: 5rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Guscio mobile: barra di navigazione fissa in basso e player sopra di essa.
+   Lo spazio si prenota solo quando la barra è davvero nella pagina.
+   --------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  body:has(.mobile-tabbar) {
+    padding-bottom: calc(3.5rem + 1px + env(safe-area-inset-bottom));
+  }
+
+  body:has(.mobile-tabbar) .spotify-dock {
+    bottom: calc(3.5rem + 1px + env(safe-area-inset-bottom));
+  }
+
+  body:has(.mobile-tabbar):has(.spotify-dock) {
+    padding-bottom: calc(3.5rem + 5rem + 1px + env(safe-area-inset-bottom));
   }
 }

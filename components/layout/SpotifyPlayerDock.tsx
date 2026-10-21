@@ -13,7 +13,7 @@ export default function SpotifyPlayerDock() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-bg/95 backdrop-blur">
+    <div className="spotify-dock fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 backdrop-blur">
       <iframe
         title="Spotify"
         src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`}

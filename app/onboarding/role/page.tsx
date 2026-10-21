@@ -42,7 +42,7 @@ export default async function RoleOnboardingPage() {
 
         <Link
           href="/events/new"
-          className="mt-8 inline-flex rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          className="mt-8 inline-flex rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           {dict.onboarding.roleLockedCta}
         </Link>

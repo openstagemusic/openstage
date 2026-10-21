@@ -39,7 +39,7 @@ const inputClass =
   "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
 const labelClass = "mb-1 block text-sm text-muted";
 const primaryButton =
-  "rounded-full bg-gradient-to-r from-violet to-cyan px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
+  "rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
 const secondaryButton =
   "rounded-full border border-white/15 px-5 py-2.5 text-sm text-white transition-colors hover:bg-white/5 disabled:opacity-50";
 

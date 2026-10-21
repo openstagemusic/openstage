@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 import Footer from "@/components/layout/Footer";
+import MobileTabBar from "@/components/layout/MobileTabBar";
 import Navbar from "@/components/layout/Navbar";
 import SpotifyPlayerDock from "@/components/layout/SpotifyPlayerDock";
 import { LocaleProvider } from "@/components/i18n/LocaleProvider";
@@ -88,6 +89,9 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="flex min-h-dvh flex-col">
+        <a href="#contenuto" className="skip-link">
+          {dict.nav.skipToContent}
+        </a>
         <LocaleProvider locale={locale}>
           <Navbar
             locale={locale}
@@ -95,8 +99,11 @@ export default async function RootLayout({
             userEmail={session?.email ?? null}
             userRole={session?.role ?? null}
           />
-          <main className="flex-1 pt-16">{children}</main>
+          <main id="contenuto" tabIndex={-1} className="flex-1 pt-16 outline-none">
+            {children}
+          </main>
           <Footer dict={dict.footer} />
+          <MobileTabBar dict={dict.nav} userEmail={session?.email ?? null} />
           <SpotifyPlayerDock />
         </LocaleProvider>
       </body>

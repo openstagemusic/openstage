@@ -87,7 +87,7 @@ export default function VenueEventsCard({
         </div>
       ) : (
         <div
-          className="h-1 w-full bg-gradient-to-r from-violet via-cyan to-pink"
+          className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
           aria-hidden="true"
         />
       )}
@@ -158,7 +158,7 @@ export default function VenueEventsCard({
           {current ? (
             <Link
               href={eventPath(current)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet to-cyan px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-1.5 rounded-full bg-violet-strong px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
             >
               {t.viewEvent}
             </Link>

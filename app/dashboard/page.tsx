@@ -48,7 +48,7 @@ export default async function DashboardPage() {
   return (
     <div>
       <div
-        className="h-1.5 w-full rounded-full bg-gradient-to-r from-violet via-cyan to-pink"
+        className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
         aria-hidden="true"
       />
 
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <LocaleLink
             href="/dashboard/events/new"
-            className="rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             {t.navNew}
           </LocaleLink>

@@ -136,7 +136,7 @@ export default function VenueOnboardingForm({ dict }: { dict: Dictionary["onboar
       <button
         type="submit"
         disabled={loading}
-        className="rounded-full bg-violet px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
       >
         {loading ? dict.saving : dict.venueSubmit}
       </button>

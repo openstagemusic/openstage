@@ -70,7 +70,7 @@ export default function QuickFilters({
     cn(
       "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors",
       isActive
-        ? "border-transparent bg-gradient-to-r from-violet to-cyan text-white"
+        ? "border-transparent bg-violet-strong text-white"
         : "border-white/15 text-muted hover:border-white/30 hover:text-white"
     );
 

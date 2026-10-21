@@ -288,7 +288,7 @@ export default function ShareEventPanel({
                 type="button"
                 onClick={shareImage}
                 disabled={status !== "ready"}
-                className="rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               >
                 {labels.native}
               </button>

@@ -49,7 +49,7 @@ export default async function AdminPage() {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
       <div
-        className="h-1.5 w-full rounded-full bg-gradient-to-r from-violet via-cyan to-pink"
+        className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
         aria-hidden="true"
       />
 

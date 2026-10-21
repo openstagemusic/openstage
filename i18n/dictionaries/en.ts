@@ -33,6 +33,8 @@ export const en = {
     createEvent: "Create event",
     upgrade: "Become an artist or venue",
     map: "Map",
+    primaryNav: "Main navigation",
+    skipToContent: "Skip to content",
   },
   footer: {
     tagline: "Live music, real places, real people.",
@@ -44,6 +46,7 @@ export const en = {
     cookies: "Cookie Policy",
     playlist: "Spotify Playlist",
     social: "Social",
+    linksLabel: "Useful links",
     rights: "All rights reserved.",
   },
   home: {
@@ -59,6 +62,27 @@ export const en = {
       "The globe shows the live shows coming up. Rotate it, zoom in, tap a pin: every point is a real event.",
     upcomingTitle: "Next events",
     upcomingSubtitle: "Everything published by artists and venues on OpenStage.",
+    what: {
+      eyebrow: "What OpenStage is",
+      title: "The independent scene, without middlemen.",
+      text: "OpenStage is the map of live music near you: emerging artists, neighbourhood venues and fans in one place. Free forever, no pay-to-play, no vanity metrics.",
+      points: [
+        {
+          title: "Real nights",
+          text: "Every event is published by the people organising it: place, date and poster.",
+        },
+        {
+          title: "Local scene",
+          text: "Emerging artists and neighbourhood venues, not just the big names.",
+        },
+        {
+          title: "Actually free",
+          text: "No subscription to find out what's on tonight.",
+        },
+      ],
+      aboutCta: "About us",
+      artistsCta: "For artists",
+    },
     values: {
       undergroundTitle: "Underground first",
       undergroundText: "Real visibility for emerging artists and neighbourhood venues.",

@@ -26,7 +26,7 @@ type AdminQueueProps = {
 };
 
 const primaryButton =
-  "rounded-full bg-violet px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
+  "rounded-full bg-violet-strong px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
 const ghostButton =
   "rounded-full border border-white/15 px-3 py-1.5 text-xs text-muted transition-colors hover:text-white disabled:opacity-50";
 

@@ -31,6 +31,8 @@ export const it: Dictionary = {
     createEvent: "Crea evento",
     upgrade: "Diventa artista o locale",
     map: "Mappa",
+    primaryNav: "Navigazione principale",
+    skipToContent: "Vai al contenuto",
   },
   footer: {
     tagline: "Musica dal vivo, luoghi reali, persone reali.",
@@ -42,6 +44,7 @@ export const it: Dictionary = {
     cookies: "Cookie Policy",
     playlist: "Playlist Spotify",
     social: "Social",
+    linksLabel: "Link utili",
     rights: "Tutti i diritti riservati.",
   },
   home: {
@@ -57,6 +60,27 @@ export const it: Dictionary = {
       "Il globo mostra i concerti in programma. Ruotalo, ingrandisci, tocca un pin: ogni punto è un evento reale.",
     upcomingTitle: "Prossimi eventi",
     upcomingSubtitle: "Tutto quello che artisti e locali hanno pubblicato su OpenStage.",
+    what: {
+      eyebrow: "Cos'è OpenStage",
+      title: "La scena indipendente, senza intermediari.",
+      text: "OpenStage è la mappa delle serate dal vivo vicino a te: artisti emergenti, locali di quartiere e fan nello stesso posto. Gratis per sempre, senza pay-to-play e senza metriche finte.",
+      points: [
+        {
+          title: "Serate vere",
+          text: "Ogni evento è pubblicato da chi lo organizza: luogo, data e locandina.",
+        },
+        {
+          title: "Scena locale",
+          text: "Artisti emergenti e locali di zona, non solo i grandi nomi.",
+        },
+        {
+          title: "Gratis davvero",
+          text: "Nessun abbonamento per scoprire cosa succede stasera.",
+        },
+      ],
+      aboutCta: "Chi siamo",
+      artistsCta: "Per gli artisti",
+    },
     values: {
       undergroundTitle: "Underground prima di tutto",
       undergroundText: "Visibilità reale per artisti emergenti e locali di quartiere.",

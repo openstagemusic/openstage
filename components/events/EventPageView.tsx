@@ -146,14 +146,14 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           // del riquadro lo riempie la stessa foto sfocata.
           <EventCover
             src={event.coverImageUrl}
-            className="aspect-[4/5] w-full rounded-3xl border border-white/10"
+            className="aspect-[4/5] w-full rounded-card border border-line"
           />
         ) : null}
 
         <div>
           {event.coverImageUrl ? null : (
             <div
-              className="mb-6 h-1.5 w-full rounded-full bg-gradient-to-r from-violet via-cyan to-pink"
+              className="mb-6 h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
               aria-hidden="true"
             />
           )}
@@ -163,7 +163,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
               {kindLabel}
             </span>
             {event.genre ? (
-              <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
+              <span className="rounded-full border border-line px-2.5 py-1 text-muted">
                 {event.genre}
               </span>
             ) : null}
@@ -174,7 +174,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             ) : null}
           </div>
 
-          <h1 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-5xl">
             {event.title}
           </h1>
 
@@ -287,7 +287,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             href={event.ticketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-full bg-gradient-to-r from-violet to-cyan px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             {t.tickets}
           </a>

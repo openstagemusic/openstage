@@ -216,10 +216,10 @@ export default function GlobeMap({
   const wrapperClass =
     variant === "fullscreen"
       ? "relative h-[calc(100dvh-4rem)] w-full overflow-hidden"
-      : "glass relative overflow-hidden rounded-3xl border border-white/10";
+      : "glass relative overflow-hidden rounded-card border border-line";
 
   const innerClass =
-    variant === "fullscreen" ? "relative h-full w-full" : "relative h-[68vh] min-h-[420px] sm:h-[560px]";
+    variant === "fullscreen" ? "relative h-full w-full" : "relative h-[54vh] min-h-[340px] sm:h-[520px]";
 
   const controlClass =
     "pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-bg/80 px-3 py-2 text-xs font-medium text-white backdrop-blur transition-colors hover:border-white/30";
@@ -321,7 +321,7 @@ export default function GlobeMap({
               <p className="mt-2 text-sm text-muted">{empty.text}</p>
               <Link
                 href={empty.href}
-                className="mt-4 inline-flex rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-xs font-medium text-white"
+                className="mt-4 inline-flex rounded-full bg-violet-strong px-4 py-2 text-xs font-medium text-white"
               >
                 {empty.cta}
               </Link>

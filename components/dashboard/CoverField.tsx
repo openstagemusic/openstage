@@ -43,7 +43,7 @@ type CoverFieldProps = {
 const buttonClass =
   "rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:bg-white/5 disabled:opacity-50";
 const primaryClass =
-  "rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
+  "rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
 
 /** Il titolo diventa il nome del file: niente caratteri strani per i sistemi. */
 function fileBase(title: string): string {

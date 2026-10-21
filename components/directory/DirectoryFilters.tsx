@@ -140,7 +140,7 @@ export default function DirectoryFilters({
 
         <button
           type="submit"
-          className="rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-90"
+          className="rounded-full bg-violet-strong px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-90"
         >
           {t.apply}
         </button>

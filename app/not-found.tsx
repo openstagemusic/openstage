@@ -22,7 +22,7 @@ export default async function NotFound() {
 
       <Link
         href="/"
-        className="mt-8 rounded-full bg-gradient-to-r from-violet to-cyan px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        className="mt-8 rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
       >
         {dict.notFound.cta}
       </Link>

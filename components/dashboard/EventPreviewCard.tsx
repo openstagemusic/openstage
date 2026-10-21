@@ -40,7 +40,7 @@ export default function EventPreviewCard({ values, locale, dict }: EventPreviewC
         <EventCover src={values.coverImageUrl} className="aspect-square w-full" />
       ) : (
         <div
-          className="h-1.5 w-full bg-gradient-to-r from-violet via-cyan to-pink"
+          className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
           aria-hidden="true"
         />
       )}

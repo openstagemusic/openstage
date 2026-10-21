@@ -128,7 +128,7 @@ export default function ReportEventButton({
           type="button"
           onClick={() => void send()}
           disabled={busy}
-          className="rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+          className="rounded-full bg-violet-strong px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
         >
           {busy ? labels.sending : labels.send}
         </button>

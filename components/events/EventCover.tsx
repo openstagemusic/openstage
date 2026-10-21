@@ -42,7 +42,8 @@ export default function EventCover({ src, className }: EventCoverProps) {
   }
 
   return (
-    <div className={cn("relative overflow-hidden bg-surface", className)}>
+    <div className={cn("relative overflow-hidden bg-gradient-to-br from-violet/10 via-surface to-cyan/10", className)}>
+      {/* Sul telefono la copia sfocata non serve: una sola immagine, meno lavoro. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- locandine da URL arbitrari */}
       <img
         src={src}
@@ -51,7 +52,7 @@ export default function EventCover({ src, className }: EventCoverProps) {
         loading="lazy"
         decoding="async"
         referrerPolicy="no-referrer"
-        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-xl"
+        className="absolute inset-0 hidden h-full w-full scale-110 object-cover opacity-40 blur-xl sm:block"
       />
       {/* eslint-disable-next-line @next/next/no-img-element -- locandine da URL arbitrari */}
       <img

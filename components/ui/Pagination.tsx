@@ -77,7 +77,7 @@ export default function Pagination({
               className={cn(
                 "inline-flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors",
                 item === page
-                  ? "bg-gradient-to-r from-violet to-cyan font-medium text-white"
+                  ? "bg-violet-strong font-medium text-white"
                   : "text-muted hover:bg-white/5 hover:text-white"
               )}
             >

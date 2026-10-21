@@ -27,7 +27,7 @@ type MyEventsProps = {
 };
 
 const primaryButton =
-  "rounded-full bg-violet px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
+  "rounded-full bg-violet-strong px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
 const ghostButton =
   "rounded-full border border-white/15 px-3 py-1.5 text-xs text-muted transition-colors hover:text-white disabled:opacity-50";
 const dangerButton =
@@ -86,7 +86,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
         <p className="mt-2 text-sm text-muted">{dict.emptyEventsText}</p>
         <LocaleLink
           href="/dashboard/events/new"
-          className="mt-4 inline-block rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          className="mt-4 inline-block rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           {dict.emptyEventsCta}
         </LocaleLink>

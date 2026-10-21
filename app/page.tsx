@@ -7,7 +7,10 @@ import ViewSwitcher from "@/components/discovery/ViewSwitcher";
 import EventTable from "@/components/events/EventTable";
 import EventTeaser from "@/components/events/EventTeaser";
 import BentoGrid from "@/components/home/BentoGrid";
+import HeroPosters from "@/components/home/HeroPosters";
+import HomeIntro from "@/components/home/HomeIntro";
 import GlobeMap from "@/components/map/GlobeMap";
+import Reveal from "@/components/motion/Reveal";
 import Pagination from "@/components/ui/Pagination";
 import {
   discoveryQuery,
@@ -82,6 +85,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const isAuthenticated = Boolean(session);
   const filtered = hasActiveFilters(filters);
 
+  // Il muro di locandine dell'hero usa le serate in evidenza (o le prime in
+  // programma): sono eventi veri, non immagini di repertorio.
+  const heroEvents = (featured.length > 0 ? featured : list.events)
+    .filter((event) => event.coverImageUrl)
+    .slice(0, 3);
+
   const query = discoveryQuery(filters);
   // Paginazione: i filtri restano, la pagina no (cambia da sola).
   const pageParams = Object.fromEntries(
@@ -104,40 +113,51 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   return (
     <>
-      <section className="mx-auto w-full max-w-5xl px-4 pb-10 pt-16 sm:px-6 sm:pt-24">
-        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-muted">
-          {dict.home.badge}
-        </span>
+      <section className="relative mx-auto w-full max-w-7xl overflow-hidden px-4 pb-12 pt-14 sm:px-6 sm:pb-16 sm:pt-24">
+        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-cyan/25 bg-cyan/[0.06] px-3 py-1 text-xs text-muted">
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-cyan" />
+              {dict.home.badge}
+            </span>
 
-        <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
-          {dict.home.title}
-        </h1>
+            <h1 className="mt-6 text-balance font-display text-4xl font-bold leading-[1.05] tracking-[-0.03em] sm:text-6xl">
+              {dict.home.title}
+            </h1>
 
-        <p className="mt-6 max-w-2xl text-lg text-muted">{dict.home.subtitle}</p>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted sm:text-xl">
+              {dict.home.subtitle}
+            </p>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="#eventi"
-            className="rounded-full bg-gradient-to-r from-violet to-cyan px-6 py-3 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
-          >
-            {dict.home.explore}
-          </Link>
-          <Link
-            href="/per-gli-artisti"
-            className="rounded-full border border-white/10 px-6 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-white/5"
-          >
-            {dict.home.forArtists}
-          </Link>
-          <Link
-            href="/per-le-venue"
-            className="rounded-full border border-white/10 px-6 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-white/5"
-          >
-            {dict.home.forVenues}
-          </Link>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link
+                href="#eventi"
+                className="rounded-full bg-violet-strong px-6 py-3 text-center text-sm font-medium text-white shadow-lg shadow-violet/20 transition-colors hover:bg-violet-strong/90"
+              >
+                {dict.home.explore}
+              </Link>
+              <Link
+                href="/per-gli-artisti"
+                className="rounded-full border border-line-strong px-6 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-white/5"
+              >
+                {dict.home.forArtists}
+              </Link>
+              <Link
+                href="/per-le-venue"
+                className="px-2 py-3 text-center text-sm text-muted transition-colors hover:text-white sm:text-left"
+              >
+                {dict.home.forVenues} <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+
+          <HeroPosters events={heroEvents} />
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+      <HomeIntro dict={dict} />
+
+      <section className="mx-auto w-full max-w-7xl px-4 pt-12 sm:px-6 sm:pt-16">
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
           {dict.home.discoveryTitle}
         </h2>
@@ -178,7 +198,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </span>
             <Link
               href="#eventi"
-              className="rounded-full border border-white/15 px-3 py-1 text-xs text-white transition-colors hover:border-white/30"
+              className="rounded-full border border-line px-3 py-1 text-xs text-white transition-colors hover:border-line-strong"
             >
               {dict.filters.goToResults}
             </Link>
@@ -228,7 +248,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </p>
             <Link
               href={filtered ? "/" : "/contatti"}
-              className="mt-5 inline-flex rounded-full bg-gradient-to-r from-violet to-cyan px-5 py-2.5 text-sm font-medium text-white"
+              className="mt-5 inline-flex rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-strong/90"
             >
               {filtered ? dict.filters.reset : dict.events.emptyCta}
             </Link>
@@ -266,7 +286,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6">
-        <BentoGrid dict={dict} counters={counters} />
+        <Reveal>
+          <BentoGrid dict={dict} counters={counters} />
+        </Reveal>
       </section>
     </>
   );

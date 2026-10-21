@@ -107,7 +107,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
       </Link>
 
       <div
-        className="mt-6 h-1.5 w-full rounded-full bg-gradient-to-r from-violet via-cyan to-pink"
+        className="mt-6 h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
         aria-hidden="true"
       />
 
@@ -118,20 +118,20 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           </span>
         ) : null}
         {artist.city ? (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
+          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
             {artist.city}
           </span>
         ) : null}
         {artist.verified ? (
           <VerifiedBadge dict={t} />
         ) : artist.claimed ? null : (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
+          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
             {t.badgeUnclaimed}
           </span>
         )}
       </div>
 
-      <h1 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+      <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-5xl">
         {artist.name}
       </h1>
 

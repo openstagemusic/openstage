@@ -125,7 +125,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
       </Link>
 
       <div
-        className="mt-6 h-1.5 w-full rounded-full bg-gradient-to-r from-violet via-cyan to-pink"
+        className="mt-6 h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
         aria-hidden="true"
       />
 
@@ -136,25 +136,25 @@ export default async function VenuePage({ params }: VenuePageProps) {
           </span>
         ) : null}
         {venue.capacity ? (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
+          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
             {t.capacity}: {venue.capacity} {t.capacityPeople}
           </span>
         ) : null}
         {venue.verified ? (
           <VerifiedBadge dict={t} />
         ) : venue.claimed ? null : (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
+          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
             {t.badgeUnclaimed}
           </span>
         )}
       </div>
 
-      <h1 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+      <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-5xl">
         {venue.name}
       </h1>
 
       <dl className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="glass rounded-2xl border border-white/10 p-5">
+        <div className="glass rounded-2xl border border-line p-5">
           <dt className="text-xs uppercase tracking-wide text-muted">{t.address}</dt>
           <dd className="mt-1 text-sm text-white">
             {[venue.address, venue.city].filter(Boolean).join(" · ") || "—"}
@@ -174,7 +174,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
         </div>
 
         {venue.website ? (
-          <div className="glass rounded-2xl border border-white/10 p-5">
+          <div className="glass rounded-2xl border border-line p-5">
             <dt className="text-xs uppercase tracking-wide text-muted">{t.website}</dt>
             <dd className="mt-1">
               <a

@@ -95,7 +95,7 @@ export default function EventCard({
       {isSheet && event.coverImageUrl ? (
         <EventCover src={event.coverImageUrl} className="mt-3 aspect-[4/3] w-full" />
       ) : (
-        <div className="h-1 w-full bg-gradient-to-r from-violet via-cyan to-pink" aria-hidden="true" />
+        <div className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent" aria-hidden="true" />
       )}
 
       <div className="p-4">
@@ -155,7 +155,7 @@ export default function EventCard({
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
             href={eventPath(event)}
-            className="rounded-full bg-gradient-to-r from-violet to-cyan px-3.5 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
+            className="rounded-full bg-violet-strong px-3.5 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
           >
             {t.eventPage}
           </Link>

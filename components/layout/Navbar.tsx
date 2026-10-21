@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import LogoutButton from "@/components/auth/LogoutButton";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
@@ -32,6 +32,11 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
   // quale voce è attiva serve la parte che viene dopo.
   const pathname = stripLocale(usePathname());
 
+  // Il menu mobile si chiude da solo quando si cambia pagina.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   const links = [
     { href: "/", label: dict.explore },
     { href: "/mappa", label: dict.map },
@@ -46,17 +51,18 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="glass fixed inset-x-0 top-0 z-50 border-b border-white/10">
+    <header className="glass fixed inset-x-0 top-0 z-50 border-b border-line">
       <nav className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         <Link href="/" className="font-display text-lg font-bold tracking-tight">
           Open<span className="text-gradient">Stage</span>
         </Link>
 
-        <ul className="ml-4 hidden items-center gap-1 lg:flex">
+        <ul className="ml-4 hidden items-center gap-1 xl:flex">
           {links.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
+                aria-current={isActive(link.href) ? "page" : undefined}
                 className={cn(
                   "rounded-full px-3 py-2 text-sm transition-colors",
                   isActive(link.href)
@@ -70,7 +76,7 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
           ))}
         </ul>
 
-        <div className="ml-auto hidden items-center gap-3 lg:flex">
+        <div className="ml-auto hidden items-center gap-3 xl:flex">
           <LanguageSwitcher locale={locale} />
           {userEmail ? (
             <>
@@ -118,7 +124,7 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
               </Link>
               <Link
                 href="/register"
-                className="rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-sm font-medium text-white shadow-lg shadow-violet/20 transition-opacity hover:opacity-90"
+                className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white shadow-lg shadow-violet/20 transition-colors hover:bg-violet-strong/90"
               >
                 {dict.register}
               </Link>
@@ -131,22 +137,46 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
           onClick={() => setOpen((value) => !value)}
           aria-label={open ? dict.closeMenu : dict.openMenu}
           aria-expanded={open}
-          className="ml-auto rounded-full border border-white/10 p-2.5 lg:hidden"
+          aria-controls="mobile-menu"
+          className="ml-auto flex h-11 w-11 items-center justify-center rounded-full border border-line text-white transition-colors hover:bg-white/5 xl:hidden"
         >
-          <span className="block h-0.5 w-5 bg-current" />
-          <span className="mt-1 block h-0.5 w-5 bg-current" />
-          <span className="mt-1 block h-0.5 w-5 bg-current" />
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            strokeLinecap="round"
+          >
+            {open ? (
+              <>
+                <path d="m6 6 12 12" />
+                <path d="M18 6 6 18" />
+              </>
+            ) : (
+              <>
+                <path d="M4 7h16" />
+                <path d="M4 12h16" />
+                <path d="M4 17h16" />
+              </>
+            )}
+          </svg>
         </button>
       </nav>
 
       {open ? (
-        <div className="glass border-t border-white/10 lg:hidden">
+        <div
+          id="mobile-menu"
+          className="glass max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line xl:hidden"
+        >
           <ul className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
             {links.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
+                  aria-current={isActive(link.href) ? "page" : undefined}
                   className={cn(
                     "block rounded-xl px-3 py-2 text-sm",
                     isActive(link.href)
@@ -201,7 +231,7 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                 <Link
                   href="/register"
                   onClick={() => setOpen(false)}
-                  className="rounded-full bg-gradient-to-r from-violet to-cyan px-4 py-2 text-sm font-medium text-white"
+                  className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white"
                 >
                   {dict.register}
                 </Link>
