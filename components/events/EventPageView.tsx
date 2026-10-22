@@ -7,6 +7,7 @@ import EventCover from "@/components/events/EventCover";
 import ReportEventButton from "@/components/events/ReportEventButton";
 import ShareEventPanel from "@/components/events/ShareEventPanel";
 import SaveEventButton from "@/components/map/SaveEventButton";
+import { cityPath } from "@/lib/cities/paths";
 import { googleCalendarUrl } from "@/lib/events/calendar";
 import { formatEventDate, formatEventDateLong, timeZoneName } from "@/lib/events/format";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
@@ -218,10 +219,21 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
               <Link href={venuePath(event.venue)} className="transition-colors hover:text-cyan">
                 {event.venue.name}
               </Link>
+            ) : event.city ? (
+              <Link href={cityPath(event.city)} className="transition-colors hover:text-cyan">
+                {event.city}
+              </Link>
             ) : (
-              (event.city ?? "—")
+              "—"
             )}
-            {event.venue && event.city ? ` · ${event.city}` : ""}
+            {event.venue && event.city ? (
+              <>
+                {" · "}
+                <Link href={cityPath(event.city)} className="transition-colors hover:text-cyan">
+                  {event.city}
+                </Link>
+              </>
+            ) : null}
           </dd>
           {event.venue?.address ? (
             <dd className="mt-1 text-xs text-muted">{event.venue.address}</dd>

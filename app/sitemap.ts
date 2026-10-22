@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { cityPath } from "@/lib/cities/paths";
+import { listCityDirectory } from "@/lib/cities/queries";
 import { listArtists, listVenues } from "@/lib/directory/queries";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listEvents } from "@/lib/events/queries";
@@ -26,6 +28,7 @@ const STATIC_PATHS = [
   "/mappa",
   "/artisti",
   "/locali",
+  "/citta",
   "/per-gli-artisti",
   "/per-le-venue",
   "/about",
@@ -53,16 +56,22 @@ function entry(path: string, lastModified?: Date): MetadataRoute.Sitemap[number]
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [artists, venues, events] = await Promise.all([
+  const [artists, venues, events, cities] = await Promise.all([
     listArtists({ perPage: MAX_PER_SECTION }),
     listVenues({ perPage: MAX_PER_SECTION }),
     listEvents({ perPage: MAX_PER_SECTION }),
+    listCityDirectory(),
   ]);
 
   return [
     ...STATIC_PATHS.map((path) => entry(path)),
     ...artists.items.map((artist) => entry(artistPath(artist))),
     ...venues.items.map((venue) => entry(venuePath(venue))),
+    // Le città sottili restano fuori: la pagina esiste, ma non chiediamo a
+    // Google di indicizzarla finché non ha abbastanza serate.
+    ...cities
+      .filter((city) => city.indexable)
+      .map((city) => entry(cityPath(city.label), new Date(city.nextEventAt ?? Date.now()))),
     ...events.events.map((event) => entry(eventPath(event), new Date(event.startsAt))),
   ];
 }

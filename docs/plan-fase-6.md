@@ -1,6 +1,6 @@
 # Fase 6 — Fiducia pubblica e densità locale
 
-> **Stato: 6.1 completata il 22 ottobre 2026; 6.2 e 6.3 ancora da fare.**
+> **Stato: 6.1 e 6.2 completate il 22 ottobre 2026; 6.3 ancora da fare.**
 > Approvata la direzione il 22 ottobre 2026. Obiettivo: sostituire i segnaposto con
 > pagine pubbliche vere e rendere OpenStage trovabile **città per città**, senza
 > aggiungere servizi esterni e senza toccare il modello di business.

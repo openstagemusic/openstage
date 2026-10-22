@@ -29,6 +29,11 @@ export default function Footer({ dict }: { dict: Dictionary["footer"] }) {
               </Link>
             </li>
             <li>
+              <Link href="/citta" className={LINK}>
+                {dict.cities}
+              </Link>
+            </li>
+            <li>
               <Link href="/contatti" className={LINK}>
                 {dict.contact}
               </Link>
