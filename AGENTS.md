@@ -27,7 +27,7 @@ Integrazioni, Guida e Consulenza Critica sugli Strumenti:
 - COSTRUZIONE CRITICA DELLO STACK: Se per una determinata esigenza (es. Supabase, Resend, PayPal) l'agente ritiene esista un'alternativa migliore (più spazio free, costi inferiori, maggiore scalabilità o semplicità), DEVE proporre il confronto all'utente con pro e contro PRIMA di iniziare a scrivere codice.
 
 Stack di Riferimento Iniziale: 
-Next.js (App Router, TypeScript) con Server-Side Rendering (SSR) su tutte le pagine pubbliche; Supabase (Auth, Postgres con Row Level Security su ogni tabella); Tailwind CSS; Framer Motion; MapLibre GL JS con MapTiler; Resend per le email; Cloudflare Turnstile; PayPal per i pagamenti; Deploy e Hosting su Vercel con repository GitHub. Mai SPA solo client: SEO e preview social devono funzionare ovunque.
+Next.js (App Router, TypeScript) con Server-Side Rendering (SSR) su tutte le pagine pubbliche; Supabase (Auth, Postgres con Row Level Security su ogni tabella); Tailwind CSS; animazioni CSS + IntersectionObserver (niente Framer Motion nel bundle iniziale; Framer Motion solo in Fase 13 se giustificato, budget massimo 20 KB gzip, vedi docs/design-system.md); MapLibre GL JS con MapTiler; Resend per le email; Cloudflare Turnstile; PayPal per i pagamenti; Deploy e Hosting su Vercel con repository GitHub. Mai SPA solo client: SEO e preview social devono funzionare ovunque.
 
 Design:
 Dark cyber-neon con glassmorphism. Sfondo #07070D, pannelli glass (backdrop-blur, bordo traslucido 1px), accenti viola #8B5CF6, ciano #22D3EE, rosa #F472B6. Font: Space Grotesk per i titoli, Inter per il corpo. Bento grid, parallax hero, scroll-reveal, card con effetto 3D tilt/glow. Glass solo su navbar, card e pop-up—mai dietro a testi lunghi. Mobile first.
