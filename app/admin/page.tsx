@@ -13,6 +13,7 @@ import {
 } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
+import { countNewContactMessages } from "@/lib/messages/queries";
 
 /**
  * Coda di moderazione: reclami, verifiche ed eventi in bozza.
@@ -38,12 +39,13 @@ export default async function AdminPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
 
-  const [pending, toVerify, unverified, verified, drafts] = await Promise.all([
+  const [pending, toVerify, unverified, verified, drafts, newMessages] = await Promise.all([
     listPendingClaims(),
     listClaimsToVerify(),
     listUnverifiedProfiles(),
     listVerifiedProfiles(),
     listDraftEvents(),
+    countNewContactMessages(),
   ]);
 
   return (
@@ -58,12 +60,25 @@ export default async function AdminPage() {
       </h1>
       <p className="mt-2 text-sm text-muted">{dict.admin.subtitle}</p>
 
-      <Link
-        href="/admin/eventi"
-        className="mt-4 inline-flex rounded-full border border-cyan/40 bg-cyan/10 px-4 py-2 text-xs text-white transition-colors hover:bg-cyan/20"
-      >
-        {dict.admin.moderationLink}
-      </Link>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link
+          href="/admin/eventi"
+          className="inline-flex rounded-full border border-cyan/40 bg-cyan/10 px-4 py-2 text-xs text-white transition-colors hover:bg-cyan/20"
+        >
+          {dict.admin.moderationLink}
+        </Link>
+        <Link
+          href="/admin/messaggi"
+          className="inline-flex rounded-full border border-violet/40 bg-violet/10 px-4 py-2 text-xs text-white transition-colors hover:bg-violet/20"
+        >
+          {dict.admin.messagesLink}
+          {newMessages > 0 ? (
+            <span className="ml-2 rounded-full bg-violet-strong px-2 py-0.5 text-[0.65rem] text-white">
+              {newMessages}
+            </span>
+          ) : null}
+        </Link>
+      </div>
 
       <div className="mt-10">
         <AdminQueue
