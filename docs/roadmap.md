@@ -5,6 +5,9 @@
 > dopo la chiusura delle Fasi 4, 5 e 6.** Fonte unica: se la tabella del manuale dice altro, vale
 > questa. Il manuale (e il PDF) si aggiornano **solo su richiesta** ("aggiorna pdf").
 >
+> **Design e movimento**: `docs/design-system.md` (approvato il 21 ottobre 2026) è il
+> riferimento per colori, tipografia, spazi, glass, animazioni, mobile e accessibilità.
+>
 > Regola ferma: ogni fase passa la build, è testabile in produzione e finisce con un commit
 > "Fase N". Ogni fase apre con il parere critico e la lista dei servizi esterni in chat.
 
@@ -84,5 +87,5 @@ iniziativa.
 | 5 | **`is_demo` non si crea**: la pulizia dei dati di prova resta la procedura SQL documentata a fine blocco |
 | 6 | **Il remake grafico si fa in due tempi**: prima il sistema e il guscio (Fase 5), poi i dettagli (Fase 13). Così le pagine costruite dopo nascono già nel look nuovo e non si rifà due volte lo stesso lavoro |
 | 7 | **Nessuna funzione di recensioni o valutazioni pubbliche** dei locali e delle serate: le valutazioni restano una raccolta interna di proposte (vedi `S1`–`S10`), non una funzione per gli utenti. Fedele a "niente metriche vanitose" |
-| 8 | **Niente Framer Motion per ora**: il guscio e le pagine usano CSS + `IntersectionObserver`. Il tilt 3D e il parallax restano B12, da valutare in Fase 13. La riga della Fase 5 è stata corretta |
+| 8 | **Niente Framer Motion per ora**: il guscio e le pagine usano CSS + `IntersectionObserver`. Il tilt 3D e il parallax restano B12. In Fase 13 Framer Motion entra **solo** per interazioni che lo giustificano, con budget massimo 20 KB gzip (`docs/design-system.md`) |
 | 9 | **Risposta ai messaggi**: per ora `mailto:`; casella ufficiale e risposta integrata solo in Fase 7 (B48). Il pulsante non dipende da Resend |
