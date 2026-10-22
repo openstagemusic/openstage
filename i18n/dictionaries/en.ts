@@ -41,12 +41,16 @@ export const en = {
     explore: "Explore",
     about: "About",
     contact: "Contact",
+    faq: "FAQ",
     privacy: "Privacy Policy",
     terms: "Terms of Service",
     cookies: "Cookie Policy",
     playlist: "Spotify Playlist",
     social: "Social",
     linksLabel: "Useful links",
+    takePart: "Take part",
+    forArtists: "For artists",
+    forVenues: "For venues",
     rights: "All rights reserved.",
   },
   home: {
@@ -416,17 +420,260 @@ export const en = {
     forArtists: {
       title: "For Artists",
       description: "Get real visibility and reach your audience for free.",
+      eyebrow: "For artists",
+      accent: "on the map.",
+      headline: "Your music,",
+      lead:
+        "Create your page, publish your dates, reach the people already looking for a night out. Free, with no pay-to-play.",
+      introTitle: "From the first gig to the next.",
+      introText:
+        "OpenStage is built around real nights, not profiles that never update. Your page grows with the dates you publish: upcoming shows first, past shows as an archive.",
+      stepsTitle: "How it works",
+      steps: [
+        {
+          title: "Claim your page",
+          text: "If we already created your page from a real gig, claim it with a public link. If you are new, create your artist profile.",
+        },
+        {
+          title: "Publish a night",
+          text: "Add the date, the venue, the poster and the useful details. Save it as a draft until everything is ready.",
+        },
+        {
+          title: "Share it",
+          text: "Every event has a page, a calendar file and social cards. Send the link to your audience; no platform commission.",
+        },
+      ],
+      benefitsTitle: "What you get",
+      benefits: [
+        {
+          title: "A page that belongs to you",
+          text: "Your bio, genre, city and links, connected to every date you publish.",
+        },
+        {
+          title: "Discovery by city and date",
+          text: "People can find you through the map, the agenda and the city pages.",
+        },
+        {
+          title: "No pay-to-play",
+          text: "Visibility is never sold. There is no paid priority in search, on the map or in the featured wall.",
+        },
+      ],
+      claimTitle: "Already on OpenStage?",
+      claimText:
+        "Some artist pages are created by our editorial team from real gigs. If the page is yours, open it and choose “This is me”. You will need a public link that proves it: your website, a social page or a press page with your name.",
+      claimNote:
+        "The claim is immediate for artists. The first published event can pass through a staff review; after that, publication is automatic.",
+      rulesTitle: "A few rules, for everyone",
+      rules: [
+        "One artist page per profile: an artist cannot manage two pages.",
+        "Publish real events only. Fake dates and duplicate pages are removed.",
+        "A night can be a draft, published or cancelled; a cancelled night stays online with a clear notice.",
+      ],
+      ctaTitle: "The scene does not need permission.",
+      ctaText: "Create your page and put your next date on the map.",
+      primaryCta: "Create an artist account",
+      secondaryCta: "Find your page",
     },
     forVenues: {
       title: "For Venues",
       description: "Fill your room and connect with local artists, for free.",
+      eyebrow: "For venues",
+      accent: "not the algorithm.",
+      headline: "Fill the room,",
+      lead:
+        "Publish your programme, connect with local artists and bring the right people through the door. Free, with no fees on the door.",
+      introTitle: "A programme that stays findable.",
+      introText:
+        "A story disappears. A listing on OpenStage remains: date, line-up, address, directions and a link to the artist. Your venue page becomes the archive of what happens in your room.",
+      stepsTitle: "How it works",
+      steps: [
+        {
+          title: "Claim your venue",
+          text: "If your venue is already on OpenStage, send a claim request with a public link. A staff member checks it before linking the page.",
+        },
+        {
+          title: "Publish the programme",
+          text: "Create each night from your dashboard: poster, artists, time, price and how to get there.",
+        },
+        {
+          title: "Link the artists",
+          text: "Connect an existing artist page, or write the name of a guest who is not on OpenStage yet.",
+        },
+      ],
+      benefitsTitle: "What you get",
+      benefits: [
+        {
+          title: "A venue page with memory",
+          text: "Upcoming events and past nights, in one place, with the venue address and capacity when you provide them.",
+        },
+        {
+          title: "A real map pin",
+          text: "Exact or approximate location: we never invent a point that does not exist.",
+        },
+        {
+          title: "No commission",
+          text: "No checkout, no fee on tickets, no paid visibility. If you sell tickets elsewhere, keep your link.",
+        },
+      ],
+      claimTitle: "Is this your venue?",
+      claimText:
+        "OpenStage can create a venue page from a real event. If the page is yours, choose “I manage this venue” and send a public proof link. A staff member approves the request.",
+      claimNote:
+        "While a request is pending you can see it in your account and withdraw it. Once approved, the venue page is linked to your profile.",
+      rulesTitle: "A few rules, for everyone",
+      rules: [
+        "One venue page per profile.",
+        "Publish real nights, with a real place and a real date.",
+        "If you need to change a date, cancel the event: it stays visible with a clear notice instead of disappearing.",
+      ],
+      ctaTitle: "The room is yours. The map is shared.",
+      ctaText: "Create your venue profile and publish the next night.",
+      primaryCta: "Create a venue account",
+      secondaryCta: "Find your venue",
     },
     about: {
       title: "About us",
       description:
         "OpenStage exists to give real visibility to underground and independent music.",
+      eyebrow: "About OpenStage",
+      headline: "The independent scene,",
+      accent: "without middlemen.",
+      lead:
+        "OpenStage is the free, independent map of live music in Italy: emerging artists, neighbourhood venues and the people who go out to listen.",
+      storyTitle: "Why we exist",
+      story: [
+        "Most gigs do not live on a ticketing platform. They live on a poster, in a WhatsApp group, on a story that disappears in 24 hours. We built OpenStage so that a night can still be found after the story is gone.",
+        "Artists and venues publish their own dates. Fans search by city, date and distance. No checkout, no pay-to-play, no algorithm selling visibility.",
+        "We start from Italy, city by city, because the independent scene is local before it is global.",
+      ],
+      principlesTitle: "What we believe",
+      principles: [
+        {
+          title: "Underground first",
+          text: "Emerging artists and small venues are the protagonists, not the background.",
+        },
+        {
+          title: "Free, forever",
+          text: "No paywall for fans, artists or venues on the base plan. No subscription traps.",
+        },
+        {
+          title: "Authentic by design",
+          text: "Real events, real places, real people. No fake numbers and no vanity metrics.",
+        },
+        {
+          title: "Frictionless discovery",
+          text: "Finding tonight's gig should be as easy as opening a map.",
+        },
+      ],
+      notTitle: "What we are not",
+      not: [
+        "Not a ticket office: we do not take payments, commissions or booking fees.",
+        "Not a review site: there are no public ratings of artists or venues.",
+        "Not a pay-to-play showcase: nobody can buy a place in search, on the map or in the featured wall.",
+        "Not another social network: we are here to make real nights findable.",
+      ],
+      ctaTitle: "The scene is already here.",
+      ctaText: "Open the map, find a night, or bring your own.",
+      primaryCta: "Explore events",
+      secondaryCta: "For artists",
+      tertiaryCta: "For venues",
     },
-    contact: { title: "Contact", description: "Write to us: we read every message." },
+    contact: {
+      title: "Contact",
+      description: "Write to us: we read every message.",
+      eyebrow: "Contact",
+      headline: "Let's talk.",
+      lead:
+        "A problem, a page to claim, a venue to suggest, an idea: write to us. We read every message.",
+      formTitle: "Send a message",
+      formText: "Tell us what you need. We will reply to the email address you leave.",
+      fields: {
+        name: "Your name",
+        email: "Email",
+        topic: "Topic",
+        message: "Message",
+        messagePlaceholder: "Tell us what happened, or what you would like to see on OpenStage.",
+      },
+      topics: {
+        general: "General question",
+        artist: "Artist page or claim",
+        venue: "Venue page or claim",
+        report: "Report an event",
+        privacy: "Privacy or data",
+        other: "Something else",
+      },
+      submit: "Send message",
+      successTitle: "Message received.",
+      successText: "Thank you. We will reply to the address you left.",
+      errorTitle: "Message not sent.",
+      errorText: "Check the fields and try again.",
+      failedText: "Something went wrong. Please try again in a moment.",
+      privacy:
+        "We use the data you enter only to read and answer your message. Do not send sensitive information.",
+      privacyCta: "Privacy Policy",
+      directTitle: "Before writing",
+      directText:
+        "If you want to claim an artist or venue page, the fastest way is the button on the page itself. If a night has wrong information, use “Report this event” on the event page.",
+      directCta: "Go to the artists directory",
+      venueCta: "Go to the venues directory",
+    },
+    faq: {
+      title: "FAQ",
+      description: "Answers about OpenStage: accounts, pages, events and privacy.",
+      eyebrow: "FAQ",
+      headline: "Questions,",
+      accent: "answers.",
+      lead: "The short answers to the things people ask us most often.",
+      items: [
+        {
+          q: "Is OpenStage free?",
+          a: "Yes. The base plan is free for fans, artists and venues. There is no paywall to discover events, publish a page or add a date.",
+        },
+        {
+          q: "Do I need an account to look for events?",
+          a: "No. You can browse the Home, the map, the artist and venue pages without signing in. An account is needed to save events, claim a page, publish a night or report a problem.",
+        },
+        {
+          q: "Can I have two profiles with the same email?",
+          a: "No: one email is one account. If you chose a role and want to change it, write to us; only an administrator can correct it.",
+        },
+        {
+          q: "How do I claim an artist or venue page?",
+          a: "Open the page and choose “This is me” for an artist or “I manage this venue” for a venue. You need a public link that proves the page is yours. Artist claims are immediate; venue requests are approved by staff.",
+        },
+        {
+          q: "How do I publish an event?",
+          a: "From the dashboard, choose “Create event”. You need an artist or venue profile. You can save a draft, publish it, edit it or cancel it later.",
+        },
+        {
+          q: "Why does an event say “Unclaimed”?",
+          a: "It means OpenStage created the page from a real gig, but neither the artist nor the venue has claimed it yet. The page remains useful and can be claimed at any time.",
+        },
+        {
+          q: "Where do I find my saved events?",
+          a: "In Dashboard → Saved. The list is tied to your account and starts with the most recently saved event.",
+        },
+        {
+          q: "Can I report a wrong or fake event?",
+          a: "Yes. Open an event page and choose “Report this event”. Reports are private: they go to the staff, not to a public review section. After three reports from different verified people, the event is paused while we check it.",
+        },
+        {
+          q: "How does the map work?",
+          a: "Each pin is a real event. On a phone, one finger scrolls the page; use two fingers to move the map, or open the full-screen map. Approximate events show an area, not a made-up exact point.",
+        },
+        {
+          q: "Why is the Spotify player not visible?",
+          a: "The player is ready in the code but only appears when an OpenStage playlist is configured. We prefer no player to a player with fake content.",
+        },
+        {
+          q: "Can I delete my account?",
+          a: "Account deletion is not available yet. Write to us from the contact form and we will handle the request manually while the self-service flow is being built.",
+        },
+      ],
+      moreTitle: "Did not find your answer?",
+      moreText: "Write to us: a real person reads the messages.",
+      moreCta: "Contact us",
+    },
     privacy: { title: "Privacy Policy", description: "How OpenStage handles your personal data." },
     terms: { title: "Terms of Service", description: "The rules for using OpenStage." },
     cookies: { title: "Cookie Policy", description: "How OpenStage uses cookies." },

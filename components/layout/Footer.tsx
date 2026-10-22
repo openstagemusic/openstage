@@ -51,10 +51,28 @@ export default function Footer({ dict }: { dict: Dictionary["footer"] }) {
           </ul>
         </nav>
 
-        <div className="space-y-2 text-sm">
-          <p className="text-muted">{dict.playlist}</p>
-          <p className="text-muted">{dict.social}</p>
-        </div>
+        <nav aria-label={dict.takePart}>
+          <h2 className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+            {dict.takePart}
+          </h2>
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm md:grid-cols-1">
+            <li>
+              <Link href="/per-gli-artisti" className={LINK}>
+                {dict.forArtists}
+              </Link>
+            </li>
+            <li>
+              <Link href="/per-le-venue" className={LINK}>
+                {dict.forVenues}
+              </Link>
+            </li>
+            <li>
+              <Link href="/faq" className={LINK}>
+                {dict.faq}
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       <div className="border-t border-line">

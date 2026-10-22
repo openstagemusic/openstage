@@ -39,12 +39,16 @@ export const it: Dictionary = {
     explore: "Esplora",
     about: "Chi siamo",
     contact: "Contatti",
+    faq: "Domande frequenti",
     privacy: "Privacy Policy",
     terms: "Termini di Servizio",
     cookies: "Cookie Policy",
     playlist: "Playlist Spotify",
     social: "Social",
     linksLabel: "Link utili",
+    takePart: "Partecipa",
+    forArtists: "Per gli artisti",
+    forVenues: "Per le venue",
     rights: "Tutti i diritti riservati.",
   },
   home: {
@@ -416,17 +420,260 @@ export const it: Dictionary = {
     forArtists: {
       title: "Per gli Artisti",
       description: "Visibilità reale e contatto diretto con il tuo pubblico, gratis.",
+      eyebrow: "Per gli artisti",
+      accent: "sulla mappa.",
+      headline: "La tua musica,",
+      lead:
+        "Crei la tua scheda, pubblichi le date, raggiungi chi sta già cercando una serata. Gratis, senza pay-to-play.",
+      introTitle: "Dal primo concerto al prossimo.",
+      introText:
+        "OpenStage nasce intorno alle serate vere, non a profili che non si aggiornano mai. La tua pagina cresce con le date che pubblichi: prima i concerti in programma, poi le serate passate come archivio.",
+      stepsTitle: "Come funziona",
+      steps: [
+        {
+          title: "Reclama la tua scheda",
+          text: "Se abbiamo già creato la tua pagina da un concerto reale, reclamala con un link pubblico. Se sei nuovo, crea il profilo artista.",
+        },
+        {
+          title: "Pubblica una serata",
+          text: "Aggiungi data, locale, locandina e informazioni utili. Salvala come bozza finché non è tutto pronto.",
+        },
+        {
+          title: "Condividila",
+          text: "Ogni evento ha una pagina, un file calendario e le card social. Manda il link al tuo pubblico; nessuna commissione.",
+        },
+      ],
+      benefitsTitle: "Cosa ottieni",
+      benefits: [
+        {
+          title: "Una pagina che è tua",
+          text: "Bio, genere, città e link, collegati a ogni data che pubblichi.",
+        },
+        {
+          title: "Scoperta per città e data",
+          text: "Chi cerca ti trova dalla mappa, dall'agenda e dalle pagine città.",
+        },
+        {
+          title: "Niente pay-to-play",
+          text: "La visibilità non si vende. Non esiste una priorità a pagamento nella ricerca, sulla mappa o nel muro in evidenza.",
+        },
+      ],
+      claimTitle: "Sei già su OpenStage?",
+      claimText:
+        "Alcune schede artista sono create dalla redazione partendo da concerti reali. Se la pagina è tua, aprila e scegli “Sono io”. Ti serve un link pubblico che lo dimostri: il tuo sito, una pagina social o una pagina stampa con il tuo nome.",
+      claimNote:
+        "Il reclamo dell'artista è immediato. Il primo evento pubblicato può passare dalla revisione dello staff; dopo, la pubblicazione è automatica.",
+      rulesTitle: "Poche regole, per tutti",
+      rules: [
+        "Una scheda artista per profilo: un artista non può amministrarne due.",
+        "Pubblica solo serate reali. Date false e pagine doppione vengono rimosse.",
+        "Una serata può essere bozza, pubblicata o annullata; una serata annullata resta online con un avviso chiaro.",
+      ],
+      ctaTitle: "La scena non ha bisogno di permessi.",
+      ctaText: "Crea la tua pagina e metti la prossima data sulla mappa.",
+      primaryCta: "Crea un account artista",
+      secondaryCta: "Cerca la tua scheda",
     },
     forVenues: {
       title: "Per le Venue",
       description: "Riempi la sala e entra in contatto con gli artisti di zona, gratis.",
+      eyebrow: "Per le venue",
+      accent: "non l'algoritmo.",
+      headline: "Riempi la sala,",
+      lead:
+        "Pubblichi la programmazione, entri in contatto con gli artisti di zona e porti in sala le persone giuste. Gratis, senza commissioni sull'ingresso.",
+      introTitle: "Una programmazione che resta trovabile.",
+      introText:
+        "Una storia sparisce. Una serata su OpenStage resta: data, lineup, indirizzo, come arrivare e link all'artista. La pagina del locale diventa l'archivio di quello che succede nella tua sala.",
+      stepsTitle: "Come funziona",
+      steps: [
+        {
+          title: "Reclama il tuo locale",
+          text: "Se il locale è già su OpenStage, invia una richiesta con un link pubblico. Lo staff la controlla prima di collegare la pagina.",
+        },
+        {
+          title: "Pubblica la programmazione",
+          text: "Crea ogni serata dalla dashboard: locandina, artisti, orario, prezzo e indicazioni per arrivare.",
+        },
+        {
+          title: "Collega gli artisti",
+          text: "Collega una scheda artista esistente, oppure scrivi il nome di un ospite che non è ancora su OpenStage.",
+        },
+      ],
+      benefitsTitle: "Cosa ottieni",
+      benefits: [
+        {
+          title: "Una pagina locale con memoria",
+          text: "Serate in programma e serate passate nello stesso posto, con indirizzo e capienza quando li fornisci.",
+        },
+        {
+          title: "Un pin vero sulla mappa",
+          text: "Posizione esatta o approssimata: non inventiamo un punto che non esiste.",
+        },
+        {
+          title: "Nessuna commissione",
+          text: "Niente checkout, niente commissione sui biglietti, niente visibilità a pagamento. Se vendi altrove, tieni il tuo link.",
+        },
+      ],
+      claimTitle: "È il tuo locale?",
+      claimText:
+        "OpenStage può creare la pagina di un locale partendo da un evento reale. Se la pagina è tua, scegli “Sono il gestore” e invia un link pubblico come prova. La richiesta viene approvata dallo staff.",
+      claimNote:
+        "Finché la richiesta è in attesa la vedi nel tuo account e puoi ritirarla. Quando viene approvata, la pagina del locale è collegata al tuo profilo.",
+      rulesTitle: "Poche regole, per tutti",
+      rules: [
+        "Una pagina locale per profilo.",
+        "Pubblica serate reali, con un luogo vero e una data vera.",
+        "Se devi cambiare una data, annulla l'evento: resta visibile con un avviso chiaro invece di sparire.",
+      ],
+      ctaTitle: "La sala è tua. La mappa è di tutti.",
+      ctaText: "Crea il profilo del locale e pubblica la prossima serata.",
+      primaryCta: "Crea un account locale",
+      secondaryCta: "Cerca il tuo locale",
     },
     about: {
       title: "Chi siamo",
       description:
         "OpenStage esiste per dare visibilità reale alla musica underground e indipendente.",
+      eyebrow: "Chi è OpenStage",
+      headline: "La scena indipendente,",
+      accent: "senza intermediari.",
+      lead:
+        "OpenStage è la mappa gratuita e indipendente del live italiano: artisti emergenti, locali di quartiere e persone che escono per ascoltare.",
+      storyTitle: "Perché esistiamo",
+      story: [
+        "La maggior parte dei concerti non vive su una piattaforma di ticketing. Vive su una locandina, in un gruppo WhatsApp, in una storia che sparisce dopo 24 ore. Abbiamo costruito OpenStage perché una serata si possa trovare anche quando la storia non c'è più.",
+        "Artisti e locali pubblicano le proprie date. Chi cerca filtra per città, data e distanza. Niente checkout, niente pay-to-play, nessun algoritmo che vende visibilità.",
+        "Partiamo dall'Italia, città per città, perché la scena indipendente è locale prima di essere globale.",
+      ],
+      principlesTitle: "In cosa crediamo",
+      principles: [
+        {
+          title: "Underground prima di tutto",
+          text: "Artisti emergenti e piccoli locali sono i protagonisti, non lo sfondo.",
+        },
+        {
+          title: "Gratis, per sempre",
+          text: "Nessun paywall per fan, artisti o locali nel piano base. Nessuna trappola in abbonamento.",
+        },
+        {
+          title: "Autenticità prima dell'hype",
+          text: "Eventi reali, luoghi reali, persone reali. Niente numeri finti e niente metriche di vanità.",
+        },
+        {
+          title: "Scoperta senza attrito",
+          text: "Trovare il concerto di stasera deve essere facile come aprire una mappa.",
+        },
+      ],
+      notTitle: "Cosa non siamo",
+      not: [
+        "Non siamo una biglietteria: non prendiamo pagamenti, commissioni o costi di prenotazione.",
+        "Non siamo un sito di recensioni: non ci sono valutazioni pubbliche di artisti o locali.",
+        "Non siamo una vetrina pay-to-play: nessuno può comprare un posto nella ricerca, sulla mappa o nel muro in evidenza.",
+        "Non siamo un altro social network: siamo qui per rendere trovabili le serate vere.",
+      ],
+      ctaTitle: "La scena è già qui.",
+      ctaText: "Apri la mappa, trova una serata, oppure porta la tua.",
+      primaryCta: "Esplora gli eventi",
+      secondaryCta: "Per gli artisti",
+      tertiaryCta: "Per le venue",
     },
-    contact: { title: "Contatti", description: "Scrivici: leggiamo ogni messaggio." },
+    contact: {
+      title: "Contatti",
+      description: "Scrivici: leggiamo ogni messaggio.",
+      eyebrow: "Contatti",
+      headline: "Parliamone.",
+      lead:
+        "Un problema, una scheda da reclamare, un locale da segnalare, un'idea: scrivici. Leggiamo ogni messaggio.",
+      formTitle: "Invia un messaggio",
+      formText: "Raccontaci cosa ti serve. Ti risponderemo all'indirizzo email che lasci.",
+      fields: {
+        name: "Il tuo nome",
+        email: "Email",
+        topic: "Argomento",
+        message: "Messaggio",
+        messagePlaceholder: "Raccontaci cosa è successo, o cosa vorresti vedere su OpenStage.",
+      },
+      topics: {
+        general: "Domanda generale",
+        artist: "Scheda artista o reclamo",
+        venue: "Scheda locale o reclamo",
+        report: "Segnala un evento",
+        privacy: "Privacy o dati",
+        other: "Altro",
+      },
+      submit: "Invia messaggio",
+      successTitle: "Messaggio ricevuto.",
+      successText: "Grazie. Ti risponderemo all'indirizzo che hai lasciato.",
+      errorTitle: "Messaggio non inviato.",
+      errorText: "Controlla i campi e riprova.",
+      failedText: "Qualcosa non ha funzionato. Riprova tra poco.",
+      privacy:
+        "Usiamo i dati che inserisci solo per leggere e rispondere al messaggio. Non inviare informazioni sensibili.",
+      privacyCta: "Privacy Policy",
+      directTitle: "Prima di scrivere",
+      directText:
+        "Se vuoi reclamare la scheda di un artista o di un locale, la via più veloce è il pulsante sulla pagina stessa. Se una serata ha informazioni sbagliate, usa “Segnala questa serata” dalla pagina evento.",
+      directCta: "Vai all'elenco artisti",
+      venueCta: "Vai all'elenco locali",
+    },
+    faq: {
+      title: "Domande frequenti",
+      description: "Risposte su OpenStage: account, schede, eventi e privacy.",
+      eyebrow: "Domande frequenti",
+      headline: "Domande,",
+      accent: "risposte.",
+      lead: "Le risposte brevi alle cose che ci chiedono più spesso.",
+      items: [
+        {
+          q: "OpenStage è gratis?",
+          a: "Sì. Il piano base è gratuito per fan, artisti e locali. Non c'è nessun paywall per scoprire gli eventi, pubblicare una scheda o aggiungere una data.",
+        },
+        {
+          q: "Serve un account per cercare eventi?",
+          a: "No. Puoi navigare Home, mappa, schede artista e locale senza accedere. L'account serve per salvare eventi, reclamare una scheda, pubblicare una serata o segnalare un problema.",
+        },
+        {
+          q: "Posso avere due profili con la stessa email?",
+          a: "No: ogni email è un account. Se hai scelto un ruolo e vuoi cambiarlo, scrivici; solo un amministratore può correggerlo.",
+        },
+        {
+          q: "Come reclamo una scheda artista o locale?",
+          a: "Apri la pagina e scegli “Sono io” per un artista o “Sono il gestore” per un locale. Ti serve un link pubblico che dimostri che la pagina è tua. Il reclamo artista è immediato; la richiesta del locale viene approvata dallo staff.",
+        },
+        {
+          q: "Come pubblico una serata?",
+          a: "Dalla dashboard scegli “Crea evento”. Ti serve un profilo artista o locale. Puoi salvare una bozza, pubblicarla, modificarla o annullarla in seguito.",
+        },
+        {
+          q: "Perché un evento dice “Non reclamato”?",
+          a: "Significa che OpenStage ha creato la pagina da un concerto reale, ma né l'artista né il locale l'hanno ancora reclamata. La pagina resta utile e può essere reclamata in qualsiasi momento.",
+        },
+        {
+          q: "Dove trovo gli eventi salvati?",
+          a: "In Dashboard → Preferiti. La lista è legata al tuo account e parte dall'evento salvato più di recente.",
+        },
+        {
+          q: "Posso segnalare un evento sbagliato o falso?",
+          a: "Sì. Apri la pagina dell'evento e scegli “Segnala questa serata”. Le segnalazioni sono private: arrivano allo staff, non a una sezione di recensioni pubbliche. Dopo tre segnalazioni da persone diverse e verificate, la serata va in pausa mentre la controlliamo.",
+        },
+        {
+          q: "Come funziona la mappa?",
+          a: "Ogni pin è un evento reale. Sul telefono un dito scorre la pagina; usa due dita per muovere la mappa, oppure aprila a tutto schermo. Gli eventi approssimati mostrano una zona, non un punto esatto inventato.",
+        },
+        {
+          q: "Perché il player Spotify non si vede?",
+          a: "Il player è pronto nel codice ma compare solo quando è configurata una playlist OpenStage. Preferiamo nessun player a un player con contenuti finti.",
+        },
+        {
+          q: "Posso cancellare il mio account?",
+          a: "La cancellazione automatica non è ancora disponibile. Scrivici dal modulo contatti e gestiremo la richiesta a mano mentre costruiamo il flusso self-service.",
+        },
+      ],
+      moreTitle: "Non hai trovato la risposta?",
+      moreText: "Scrivici: i messaggi li legge una persona vera.",
+      moreCta: "Contattaci",
+    },
     privacy: { title: "Privacy Policy", description: "Come OpenStage tratta i tuoi dati personali." },
     terms: { title: "Termini di Servizio", description: "Le regole per usare OpenStage." },
     cookies: { title: "Cookie Policy", description: "Come OpenStage utilizza i cookie." },

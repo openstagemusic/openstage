@@ -30,6 +30,7 @@ const STATIC_PATHS = [
   "/per-le-venue",
   "/about",
   "/contatti",
+  "/faq",
   "/privacy",
   "/terms",
   "/cookies",
