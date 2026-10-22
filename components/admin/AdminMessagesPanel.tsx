@@ -143,7 +143,7 @@ export default function AdminMessagesPanel({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-display text-base font-semibold text-white">
+                      <p className="break-words font-display text-base font-semibold text-white">
                         {message.name}
                       </p>
                       <span
@@ -178,7 +178,7 @@ export default function AdminMessagesPanel({
                   </a>
                 </div>
 
-                <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-white/90">
+                <p className="mt-4 whitespace-pre-line break-words text-sm leading-relaxed text-white/90">
                   {message.message}
                 </p>
 
