@@ -98,7 +98,13 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
               ) : null}
               <Link
                 href="/dashboard"
-                className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted transition-colors hover:text-white"
+                aria-current={isActive("/dashboard") ? "page" : undefined}
+                className={cn(
+                  "inline-flex items-center whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors",
+                  isActive("/dashboard")
+                    ? "border-cyan bg-cyan text-bg"
+                    : "border-cyan/50 bg-cyan/10 text-white hover:border-cyan hover:bg-cyan/20"
+                )}
               >
                 {dict.dashboard}
               </Link>

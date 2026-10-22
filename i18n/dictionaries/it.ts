@@ -73,6 +73,15 @@ export const it: Dictionary = {
       "Il globo mostra i concerti in programma. Ruotalo, ingrandisci, tocca un pin: ogni punto è un evento reale.",
     upcomingTitle: "Prossime serate",
     upcomingSubtitle: "Tutto quello che artisti e locali hanno pubblicato su OpenStage.",
+    cities: {
+      eyebrow: "Città",
+      title: "Scegli la tua città.",
+      subtitle: "La scena locale, città per città: solo serate reali e pubblicate.",
+      all: "Tutte le città",
+      eventOne: "serata",
+      eventMany: "serate",
+      next: "prossima",
+    },
     what: {
       eyebrow: "Cos'è OpenStage",
       title: "La scena indipendente, senza intermediari.",

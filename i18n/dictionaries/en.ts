@@ -75,6 +75,15 @@ export const en = {
       "The globe shows the live shows coming up. Rotate it, zoom in, tap a pin: every point is a real event.",
     upcomingTitle: "Next nights",
     upcomingSubtitle: "Everything published by artists and venues on OpenStage.",
+    cities: {
+      eyebrow: "Cities",
+      title: "Pick your city.",
+      subtitle: "The local scene, city by city: only real, published nights.",
+      all: "All cities",
+      eventOne: "night",
+      eventMany: "nights",
+      next: "next",
+    },
     what: {
       eyebrow: "What OpenStage is",
       title: "The independent scene, without middlemen.",

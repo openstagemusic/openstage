@@ -30,7 +30,7 @@ export default function BentoGrid({ dict, counters }: BentoGridProps) {
     <section id="come-funziona" className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
       <div className="border-t border-line pt-6">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan">
-          04 / OpenStage
+          05 / OpenStage
         </p>
         <h2 className="mt-2 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.01em] sm:text-6xl">
           {t.howTitle}

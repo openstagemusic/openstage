@@ -14,7 +14,7 @@ export default function HomeIntro({ dict }: { dict: Dictionary }) {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan">
-            03 / {t.eyebrow}
+            04 / {t.eyebrow}
           </p>
 
           <h2 className="mt-3 max-w-3xl text-balance font-poster text-4xl uppercase leading-[0.92] tracking-[-0.01em] sm:text-6xl">

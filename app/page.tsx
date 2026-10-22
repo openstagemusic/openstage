@@ -5,6 +5,7 @@ import QuickFilters from "@/components/discovery/QuickFilters";
 import SearchBar from "@/components/discovery/SearchBar";
 import EventRows from "@/components/home/EventRows";
 import BentoGrid from "@/components/home/BentoGrid";
+import CityStrip from "@/components/home/CityStrip";
 import HeroPosters from "@/components/home/HeroPosters";
 import HomeIntro from "@/components/home/HomeIntro";
 import GlobeMap from "@/components/map/GlobeMap";
@@ -24,6 +25,7 @@ import {
   listMapEvents,
   listSavedEventIds,
 } from "@/lib/events/queries";
+import { listCityDirectory } from "@/lib/cities/queries";
 import { getVisitorLocation } from "@/lib/geo/visitor";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getPageMetadata } from "@/lib/i18n/metadata";
@@ -54,14 +56,30 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const params = await searchParams;
 
-  const [visitor, session, savedIds, genres, featured, counters] = await Promise.all([
+  const [visitor, session, savedIds, genres, featured, counters, cityDirectory] = await Promise.all([
     getVisitorLocation(),
     getSessionProfile(),
     listSavedEventIds(),
     listGenres(),
     listFeaturedEvents(4),
     getDiscoveryCounters(),
+    listCityDirectory(),
   ]);
+
+  // Le città più vive in Home: prima chi ha più serate future, poi chi suona
+  // prima. L'indice completo resta su /citta.
+  const homeCities = cityDirectory
+    .filter((city) => city.eventCount > 0)
+    .sort((a, b) => {
+      if (b.eventCount !== a.eventCount) return b.eventCount - a.eventCount;
+
+      const aNext = a.nextEventAt ? new Date(a.nextEventAt).getTime() : Number.POSITIVE_INFINITY;
+      const bNext = b.nextEventAt ? new Date(b.nextEventAt).getTime() : Number.POSITIVE_INFINITY;
+      if (aNext !== bNext) return aNext - bNext;
+
+      return a.label.localeCompare(b.label, locale);
+    })
+    .slice(0, 6);
 
   const filters = parseDiscoveryFilters(params, visitor.center);
   const queryFilters = toQueryFilters(filters);
@@ -259,12 +277,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         )}
       </section>
 
-      {/* 02 — Mappa: fascia a tutta pagina, con intestazione editoriale. */}
+      {homeCities.length > 0 ? (
+        <Reveal>
+          <CityStrip cities={homeCities} locale={locale} dict={dict} />
+        </Reveal>
+      ) : null}
+
+      {/* 03 - Mappa: fascia a tutta pagina, con intestazione editoriale. */}
       <section id="mappa" className="mt-16 border-y border-line sm:mt-24">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-10">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
-              02 / {dict.nav.map}
+              03 / {dict.nav.map}
             </p>
             <h2 className="mt-2 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.01em] sm:text-6xl">
               {dict.home.discoveryTitle}
@@ -294,12 +318,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         />
       </section>
 
-      {/* 03 — Cos'è OpenStage. */}
+      {/* 04 - Cos'è OpenStage. */}
       <Reveal>
         <HomeIntro dict={dict} />
       </Reveal>
 
-      {/* 04 — Come funziona, numeri reali, artisti e locali. */}
+      {/* 05 - Come funziona, numeri reali, artisti e locali. */}
       <Reveal>
         <BentoGrid dict={dict} counters={counters} />
       </Reveal>
