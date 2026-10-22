@@ -70,7 +70,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   // con la ricerca, vive su /citta. Così la sezione non diventa un muro.
   const homeCities = cityDirectory
     .filter((city) => city.eventCount > 0)
-    .sort((a, b) => a.label.localeCompare(b.label, locale))
+    .sort((a, b) => a.label.localeCompare(b.label, locale, { sensitivity: "base" }))
     .slice(0, 6);
 
   const filters = parseDiscoveryFilters(params, visitor.center);

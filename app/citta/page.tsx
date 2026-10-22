@@ -29,8 +29,12 @@ export default async function CitiesPage() {
   const dict = getDictionary(locale);
   const t = dict.pages.cities;
   // Una città senza serate future resta raggiungibile dall'indirizzo diretto,
-  // ma non occupa l'indice "dove andare".
-  const cities = (await listCityDirectory()).filter((city) => city.eventCount > 0);
+  // ma non occupa l'indice "dove andare". L'ordine alfabetico è esplicito qui,
+  // non solo nella query: l'indice deve restare leggibile anche se la fonte
+  // cambia (per esempio con una paginazione futura).
+  const cities = (await listCityDirectory())
+    .filter((city) => city.eventCount > 0)
+    .sort((a, b) => a.label.localeCompare(b.label, locale, { sensitivity: "base" }));
   const url = absoluteUrl(withLocale(locale, "/citta"));
 
   const data = {
