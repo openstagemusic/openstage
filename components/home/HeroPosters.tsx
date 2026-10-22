@@ -1,4 +1,5 @@
 import type { PublicEvent } from "@/lib/events/types";
+import { coverSrcSet, coverVariant } from "@/lib/images/covers";
 
 type HeroPostersProps = {
   events: PublicEvent[];
@@ -32,10 +33,12 @@ export default function HeroPosters({ events }: HeroPostersProps) {
         <div key={event.id} className={`poster-tile ${POSITIONS[index]}`}>
           {/* eslint-disable-next-line @next/next/no-img-element -- locandine da URL arbitrari */}
           <img
-            src={event.coverImageUrl ?? undefined}
+            src={coverVariant(event.coverImageUrl, 640) ?? undefined}
+            srcSet={coverSrcSet(event.coverImageUrl, [320, 480, 640, 960])}
+            sizes="(max-width: 1023px) 50vw, 400px"
             alt=""
-            loading={index === 0 ? "eager" : "lazy"}
-            fetchPriority={index === 0 ? "high" : "auto"}
+            loading={index < 2 ? "eager" : "lazy"}
+            fetchPriority={index < 2 ? "high" : "auto"}
             decoding="async"
             referrerPolicy="no-referrer"
           />
