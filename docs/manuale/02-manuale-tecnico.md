@@ -61,17 +61,21 @@ app/                     Pagine (App Router) e server action
   eventi/[...percorso]   Pagina evento SSR con dati strutturati e anteprima social
   artisti/ locali/       Directory reali con ricerca, filtri e schede [slug]
   dashboard/             Panoramica, eventi, editor, preferiti, account
-  admin/                 Coda reclami e moderazione serate (solo staff)
+  admin/                 Coda reclami, moderazione serate e coda messaggi (solo staff)
+  admin/messaggi/        Messaggi dal modulo contatti, con filtri e stati
   account/               Profilo, richiesta di reclamo, impostazioni
   onboarding/role/       Scelta del ruolo ("Diventa artista o locale")
   onboarding/artist/     Profilo e reclamo artista
   onboarding/venue/      Profilo e reclamo locale
-  per-gli-artisti/ per-le-venue/ about/ contatti/ privacy/ terms/ cookies/
+  citta/                 Indice città e pagina /citta/[city], generate dai dati reali
+  per-gli-artisti/ per-le-venue/ about/ contatti/ faq/ privacy/ terms/ cookies/
   login/ register/       Accesso e registrazione
   auth/callback/         Ritorno da Google: crea/aggiorna la sessione
   api/suggest/           Endpoint dei suggerimenti di ricerca
   api/geocode/           Geocodifica e controllo pin/città (Photon)
   actions/locale.ts      Server action che salva la lingua scelta
+  actions/contact.ts     Server action del modulo contatti (scrive in database)
+  actions/messages.ts    Cambio stato di un messaggio (solo admin)
 components/
   layout/                Navbar, Footer, MobileTabBar, SpotifyPlayerDock
   auth/                  Form di accesso/registrazione, RolePicker, Turnstile
@@ -79,12 +83,12 @@ components/
   map/                   GlobeMap, MapCanvas, EventCard, VenueEventsCard
   events/                EventTeaser, EventPageView, EventCountdown, ShareEventPanel,
                          AddToCalendar, ReportEventButton, SaveButton
-  home/                  HeroPosters, EventRows, HomeIntro, BentoGrid, Counters
+  home/                  HeroPosters, EventRows, CityStrip, HomeIntro, BentoGrid, Counters
   directory/             ArtistCard, VenueCard, DirectoryFilters, VerifiedBadge
   dashboard/             DashboardShell, MyEvents, EventEditor, LocationPicker,
                          CoverField, EventPreviewCard
   claims/                ClaimPanel, PageSearch, PendingRequestPanel
-  admin/                 AdminQueue, AdminEventsPanel
+  admin/                 AdminQueue, AdminEventsPanel, AdminMessagesPanel
   motion/                Reveal (IntersectionObserver)
   ui/                    Pagination, PagePlaceholder
   i18n/                  LanguageSwitcher
@@ -92,9 +96,11 @@ i18n/dictionaries/       it.ts e en.ts: tutti i testi dell'interfaccia
 lib/
   auth.ts                isAdminEmail() per le decisioni di interfaccia
   auth/roles.ts          Tipo UserRole, etichette, permessi
+  cities/                Query dell'indice città e percorsi pubblici
   claims/                Query e azioni del reclamo
   dashboard/             Query della dashboard e dei preferiti
   directory/             Query di artisti e locali
+  messages/              Query della coda messaggi e cambio stato
   events/                filters, queries, types, format, timezone, paths,
                          calendar, saved, cover
   geo/                   città normalizzata, geocodifica, controllo del pin
@@ -105,7 +111,7 @@ lib/
   pagination.ts          ITEMS_PER_PAGE: costante condivisa (vedi "errori noti")
   i18n/                  config, server, metadata, dictionaries
   supabase/              client, server, admin, env, middleware, session
-supabase/migrations/     0001…0027 (vedi tabella migrazioni)
+supabase/migrations/     0001…0028 (vedi tabella migrazioni)
 docs/                    Piani di fase, review di fase, sorgenti del manuale
 scripts/manuale.mjs      Generatore del PDF (solo locale, non va in produzione)
 ```
@@ -299,9 +305,10 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0025_event_merge.sql` | Unione reversibile dei doppioni |
 | `0026_reports.sql` | Segnalazioni, auto-pausa e pannello di moderazione |
 | `0027_merge_admin_check.sql` | `merge_event` usa `is_admin()`, una sola definizione di admin |
+| `0028_contact_messages.sql` | Tabella, indici e RLS dei messaggi dal modulo contatti |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
-> `0027`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
+> `0028`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
 > `supabase migration list` non la vede.
 
 # Sicurezza: Row Level Security
@@ -330,6 +337,8 @@ di `is_admin()`, mai di valori passati dal browser.
 | | `reports_select_own_or_admin`, `reports_admin_update` | Vedi le tue segnalazioni; l'admin le legge e le chiude |
 | `event_creations` | `event_creations_read_admin` | Il registro anti-spam è leggibile solo dall'admin |
 | `settings` | `settings_select_admin`, `settings_update_admin` | Solo l'admin |
+| `contact_messages` | `contact_messages_insert_public` | Chiunque può inviare un messaggio, solo con stato `new` |
+| | `contact_messages_select_admin`, `..._update_admin`, `..._delete_admin` | Legge, aggiorna e cancella solo l'admin |
 
 **Perché le policy contano davvero:** un utente malintenzionato può chiamare l'API di Supabase
 direttamente, senza passare dall'interfaccia. Le regole "il fan non vede il pulsante" valgono
@@ -567,8 +576,8 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 3 | ✅ Directory artisti/locali, reclamo, dashboard, editor eventi, condivisione, preferiti |
 | 4 | ✅ Qualità dei dati, serate collegate, segnalazioni e moderazione, serate passate |
 | 5.4 | ✅ Remake grafico della Home: muro di locandine, lista a righe, mappa a tutta pagina, guscio |
-| 6 | Pagine pubbliche ed editoriali: `/about`, `/per-gli-artisti`, `/per-le-venue`, `/contatti`, `/faq`, playlist e social reali. **Prossima fase** |
-| 7 | Email transazionali (Resend), area fan e notifiche. Bloccata dal dominio |
+| 6 | ✅ Pagine pubbliche ed editoriali, `/citta` e schede città, modulo contatti reale e coda messaggi admin; sezione Città in Home e Dashboard evidenziata |
+| 7 | Email transazionali (Resend), conferma email, reset password, area fan e notifiche. **Prossima fase**, bloccata dal dominio |
 | 8 | Pannello admin completo, 2FA e claim a invito |
 | 9 | Community: "segui" e inviti virali |
 | 10 | Spotify e area artista |

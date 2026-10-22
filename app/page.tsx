@@ -66,19 +66,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     listCityDirectory(),
   ]);
 
-  // Le città più vive in Home: prima chi ha più serate future, poi chi suona
-  // prima. L'indice completo resta su /citta.
+  // In Home le città restano poche e in ordine alfabetico: l'elenco completo,
+  // con la ricerca, vive su /citta. Così la sezione non diventa un muro.
   const homeCities = cityDirectory
     .filter((city) => city.eventCount > 0)
-    .sort((a, b) => {
-      if (b.eventCount !== a.eventCount) return b.eventCount - a.eventCount;
-
-      const aNext = a.nextEventAt ? new Date(a.nextEventAt).getTime() : Number.POSITIVE_INFINITY;
-      const bNext = b.nextEventAt ? new Date(b.nextEventAt).getTime() : Number.POSITIVE_INFINITY;
-      if (aNext !== bNext) return aNext - bNext;
-
-      return a.label.localeCompare(b.label, locale);
-    })
+    .sort((a, b) => a.label.localeCompare(b.label, locale))
     .slice(0, 6);
 
   const filters = parseDiscoveryFilters(params, visitor.center);

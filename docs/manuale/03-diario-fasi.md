@@ -340,6 +340,51 @@ commit `Fase 5.4`.
 **Rimandato:** il resto delle pagine pubbliche (Artisti/Locali usano ancora lo stile
 precedente) passa alla Fase 6; la seconda parte delle micro-interazioni alla Fase 13.
 
+## Fase 6 — Fiducia pubblica e densità locale
+
+**Obiettivo:** sostituire i segnaposto con pagine pubbliche vere e rendere OpenStage trovabile
+città per città, senza aggiungere servizi esterni e senza toccare il modello di business.
+
+**Cosa è stato costruito**
+
+- **6.1 — Pagine pubbliche:** `/about`, `/per-gli-artisti`, `/per-le-venue`, `/contatti` e
+  `/faq` con contenuti reali in italiano e inglese, metadata, canonical, JSON-LD e footer con
+  link coerenti. Social e playlist restano nascosti finché non ci sono URL veri.
+- **Modulo contatti reale:** scrive in `contact_messages` con validazione, honeypot e limiti
+  di lunghezza; nessun servizio email in questa fase. La coda è in `/admin/messaggi`, con
+  stati `new`, `read`, `closed` e risposta via `mailto:`.
+- **6.2 — Città:** `/citta` e `/citta/[city]` generate dagli eventi reali, con prossime serate,
+  artisti, locali, link alla mappa filtrata, canonical e JSON-LD. Soglia editoriale di tre
+  serate future: sotto soglia la pagina resta raggiungibile ma è `noindex` e fuori dalla
+  sitemap.
+- **6.3 — Moderazione minima:** migration `0028_contact_messages.sql` con tabella, indici e
+  RLS (inserimento pubblico, lettura e gestione solo admin); route admin senza sessione
+  protetta.
+- **Rifinitura post-6.3:** nuova sezione **Città** in Home (massimo sei città, ordine
+  alfabetico, conteggio serate e prossima data, link a `/citta`) e pulsante **Dashboard**
+  evidenziato nella navbar desktop.
+
+**Decisioni e perché**
+
+- **Nessun servizio nuovo:** la fase usa solo Supabase già configurato; Resend arriva con la
+  Fase 7.
+- **Nessun dato finto:** le città e i messaggi vengono dal database; il footer non mostra
+  social o playlist senza URL reali.
+- **Soglia a tre serate:** evita pagine città sottili e duplicate, senza nascondere quelle
+  esistenti.
+- **Home corta:** la sezione Città non deve diventare un elenco infinito; l'indice completo
+  vive su `/citta`.
+- **Risposta ai messaggi con `mailto:`:** sufficiente finché non esiste la casella ufficiale;
+  la risposta integrata è rimandata alla Fase 7.
+
+**Verifiche superate:** build verde; pagine pubbliche 200 in produzione; form contatti con
+invio valido, honeypot ed errore; messaggio visibile all'admin e route protetta senza sessione
+(404); città con zero, una e più serate; `noindex` sotto soglia; italiano e inglese; controlli
+Lighthouse su Home, città e contatti.
+
+**Rimandato:** email transazionali, conferma email e reset password (Fase 7); risposta
+integrata ai messaggi (`B48`); alcune voci di audit (`B08`, `B26`, `B28`, `B43`).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

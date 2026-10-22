@@ -24,12 +24,14 @@ system, doppia lingua IT/EN con indirizzi `/it` e `/en`, **directory reali di ar
 locali** con filtri e schede pubbliche, **reclamo della scheda**, **dashboard** per artisti e
 locali, **editor degli eventi** con bozze e locandine, **mappa interattiva** con pin e globo,
 **pagine evento** con calendario e condivisione, **ricerca con suggerimenti**, **filtri
-rapidi**, **pagina dei preferiti**, **segnalazioni e moderazione**, **Home poster wall**,
-database con sicurezza a livello di riga, deploy continuo.
+rapidi**, **pagina dei preferiti**, **segnalazioni e moderazione**, **Home poster wall** con
+**sezione Città**, **pagine pubbliche reali** (Chi siamo, Per gli artisti, Per le venue,
+Contatti, FAQ), **indice e pagine città**, **modulo contatti che scrive nel database** con
+coda messaggi per lo staff, database con sicurezza a livello di riga, deploy continuo.
 
-**In arrivo nelle prossime fasi:** pagine editoriali (Chi siamo, Per gli artisti, Per i
-locali, Contatti, FAQ), email transazionali, community e "segui", Spotify, pagamenti
-opzionali e rifiniture SEO/legali.
+**In arrivo nelle prossime fasi:** email transazionali (Resend), conferma email e recupero
+password, community e "segui", Spotify, pagamenti opzionali, testi legali definitivi e
+rifiniture SEO.
 
 **Da sapere oggi:** gli eventi presenti sono **reali**. Possono essere inseriti dalla
 redazione oppure pubblicati direttamente da artisti e locali dopo il reclamo della scheda;
@@ -130,6 +132,12 @@ server, così i link sono condivisibili e le anteprime social funzionano).
   pagina.
 - Le serate scelte dallo staff per la vetrina alimentano il muro. **Non si può pagare per
   comparire**: non esiste un algoritmo "pay-to-play".
+- Sotto la lista c'è la sezione **Città**: mostra al massimo **sei città**, in **ordine
+  alfabetico**, con il numero di serate future e la prossima data. Il link **Tutte le città**
+  porta a `/citta`. Le città non sono un elenco fisso: entrano quando c'è almeno una serata
+  pubblicata e vengono lette dal database.
+- Dopo l'accesso, nella **navbar desktop** il pulsante **Dashboard** è evidenziato: non è più
+  un link grigio confuso tra le altre voci.
 
 ## La mappa
 
@@ -248,6 +256,18 @@ La **serata passata** non sparisce dalla tua dashboard: finisce nella sezione "P
 eliminarla definitivamente (con conferma) se è un doppione o un errore; l'admin può farlo su
 qualsiasi scheda.
 
+# Scrivere allo staff
+
+La pagina **Contatti** (`/contatti`) ha un modulo vero: il messaggio viene salvato nel
+database, non affidato a un semplice link `mailto:`. Servono nome, email, un argomento
+(domanda generale, artista, locale, segnalazione, privacy o altro) e il testo; il modulo ha un
+campo nascosto anti-bot e limiti di lunghezza.
+
+Dopo l'invio vedi una conferma. Lo staff legge i messaggi in **Admin → Messaggi**
+(`/admin/messaggi`), li filtra per **nuovi**, **letti** e **chiusi** e può rispondere via email.
+In questa fase **non parte un'email automatica**: la risposta usa il client di posta di chi
+gestisce la coda. La casella ufficiale e la risposta integrata arriveranno con la Fase 7.
+
 # Segnalare una serata
 
 Nella pagina di una serata in programma, chi ha un accesso può usare **Segnala questa
@@ -264,16 +284,17 @@ un controllo umano; l'admin può rimetterla online, annullarla o sospendere l'au
 | **Mappa** | La mappa a tutto schermo, con gli stessi filtri della Home |
 | **Artisti** | Directory reale con ricerca, filtri, schede e concerti futuri |
 | **Locali** | Directory reale con ricerca, filtri, schede e programmazione |
-| **Per gli Artisti** | *Segnaposto*: la pagina editoriale arriva con la Fase 6 |
-| **Per le Venue** | *Segnaposto*: la pagina editoriale arriva con la Fase 6 |
-| **Chi siamo** | *Segnaposto*: la pagina editoriale arriva con la Fase 6 |
+| **Per gli Artisti** | Pagina editoriale reale: cosa ottiene un artista, reclamo e pubblicazione |
+| **Per le Venue** | Pagina editoriale reale: programmazione, dashboard e pubblico locale |
+| **Chi siamo** | Pagina editoriale reale: principi, storia e cosa è (e non è) OpenStage |
+| **Città** | Indice completo su `/citta`; la Home ne mostra solo sei, in ordine alfabetico |
 | **Accedi / Registrati** | Accesso e creazione account |
-| **Dashboard** (dopo l'accesso) | I miei eventi, crea evento, preferiti, profilo e impostazioni |
-| **Admin** (solo staff) | Coda dei reclami e moderazione delle serate |
+| **Dashboard** (dopo l'accesso) | I miei eventi, crea evento, preferiti, profilo e impostazioni; il pulsante è evidenziato in navbar |
+| **Admin** (solo staff) | Coda dei reclami, moderazione delle serate e coda messaggi |
 
-> Le pagine di servizio (Privacy Policy, Termini, Cookie Policy, Chi siamo, Contatti) sono
-> raggiungibili dal **footer** in fondo a ogni pagina. Alcune sono ancora segnaposto: lo
-> dicono loro stesse.
+> Le pagine di servizio (Privacy Policy, Termini, Cookie Policy, Chi siamo, Contatti, FAQ)
+> sono raggiungibili dal **footer** in fondo a ogni pagina. Chi siamo, Contatti e FAQ sono
+> reali; Privacy, Termini e Cookie sono ancora segnaposto e lo dicono apertamente.
 
 ## Lingua
 
@@ -332,6 +353,11 @@ revisione dello staff, poi la pubblicazione è automatica.
 **Non trovo eventi nella mia città: la piattaforma è rotta?**
 No. Il database cresce con i locali e gli artisti che pubblicano: all'inizio ci sono poche
 città. Se conosci un locale o un artista che dovrebbe esserci, segnalalo.
+
+**Dove trovo tutte le città?**
+Nell'indice **`/citta`**, raggiungibile dal link "Tutte le città" nella sezione Città della
+Home e dal footer. La Home mostra solo sei città in ordine alfabetico, così non diventa un
+elenco lunghissimo.
 
 **Perché la creazione evento non compare?**
 Perché il tuo profilo è ancora **fan**. La creazione è riservata ad artisti e locali: scegli il
