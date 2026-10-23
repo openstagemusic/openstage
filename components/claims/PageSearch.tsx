@@ -1,8 +1,7 @@
 import LocaleLink from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
-const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
+import { authInputClass, authLabelClass } from "@/components/auth/formStyles";
 
 export type PageSearchResult = {
   id: string;
@@ -37,22 +36,22 @@ export default function PageSearch({
   const isArtist = kind === "artist";
 
   return (
-    <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div className="border border-line bg-surface/40 p-5 sm:p-6">
       <h2 className="font-display text-lg font-semibold">{dict.pageSearchTitle}</h2>
-      <p className="mt-1 text-xs text-muted">
+      <p className="mt-2 text-xs leading-relaxed text-muted">
         {isArtist ? dict.pageSearchArtistText : dict.pageSearchVenueText}
       </p>
 
       {ownedName ? (
-        <p className="mt-3 rounded-xl border border-pink/40 bg-pink/10 p-3 text-xs text-white">
+        <p className="mt-4 border-l-2 border-pink bg-pink/10 px-3 py-3 text-xs leading-relaxed text-white">
           {isArtist ? dict.pageSearchArtistOwned : dict.pageSearchVenueOwned}
           <span className="mt-1 block text-muted">«{ownedName}»</span>
         </p>
       ) : null}
 
-      <form method="get" className="mt-4 flex flex-wrap items-end gap-2">
+      <form method="get" className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="min-w-0 flex-1">
-          <label htmlFor="page-search" className="text-xs text-muted">
+          <label htmlFor="page-search" className={authLabelClass}>
             {dict.pageSearchLabel}
           </label>
           <input
@@ -62,12 +61,12 @@ export default function PageSearch({
             placeholder={
               isArtist ? dict.pageSearchArtistPlaceholder : dict.pageSearchVenuePlaceholder
             }
-            className={`${inputClass} mt-1`}
+            className={authInputClass}
           />
         </div>
         <button
           type="submit"
-          className="rounded-full border border-cyan/40 px-4 py-2.5 text-sm text-white transition-colors hover:bg-cyan/10"
+          className="inline-flex min-h-11 items-center justify-center border border-cyan/50 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-cyan/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan"
         >
           {dict.pageSearchCta}
         </button>
@@ -75,11 +74,11 @@ export default function PageSearch({
 
       {term ? (
         results.length > 0 ? (
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-5 border-t border-line">
             {results.map((result) => (
               <li
                 key={result.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2"
+                className="flex flex-wrap items-center justify-between gap-3 border-b border-line py-3"
               >
                 <span className="text-sm text-white">
                   {result.name}
@@ -87,7 +86,7 @@ export default function PageSearch({
                 </span>
                 <LocaleLink
                   href={result.href}
-                  className="text-xs text-cyan transition-opacity hover:opacity-80"
+                  className="font-mono text-[10px] uppercase tracking-[0.1em] text-cyan transition-opacity hover:opacity-80"
                 >
                   {dict.pageSearchResultCta} →
                 </LocaleLink>
@@ -95,7 +94,7 @@ export default function PageSearch({
             ))}
           </ul>
         ) : (
-          <p className="mt-4 text-xs text-muted">{dict.pageSearchEmpty}</p>
+          <p className="mt-5 text-xs text-muted">{dict.pageSearchEmpty}</p>
         )
       ) : null}
     </div>

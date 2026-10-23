@@ -8,6 +8,8 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
+import { authErrorClass, authNoteClass, authPrimaryButtonClass } from "./formStyles";
+
 type Role = "fan" | "artist" | "venue";
 
 /**
@@ -86,14 +88,14 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-3">
-      {options.map((option) => (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      {options.map((option, index) => (
         <label
           key={option.value}
-          className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors ${
+          className={`flex cursor-pointer items-start gap-4 border p-4 transition-colors focus-within:ring-2 focus-within:ring-cyan/50 focus-within:ring-offset-2 focus-within:ring-offset-bg ${
             role === option.value
-              ? "border-violet/60 bg-violet/10"
-              : "border-white/10 bg-white/5 hover:bg-white/10"
+              ? "border-violet bg-violet/10"
+              : "border-line bg-surface/40 hover:border-line-strong hover:bg-white/[0.03]"
           }`}
         >
           <input
@@ -102,24 +104,37 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
             value={option.value}
             checked={role === option.value}
             onChange={() => setRole(option.value)}
-            className="mt-1 accent-violet"
+            className="sr-only"
           />
-          <span>
-            <span className="block text-sm font-medium text-white">{option.label}</span>
-            <span className="mt-0.5 block text-xs text-muted">{option.description}</span>
+          <span className="mt-0.5 font-mono text-[10px] tracking-[0.16em] text-cyan">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-base font-semibold text-white">
+              {option.label}
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed text-muted">
+              {option.description}
+            </span>
+          </span>
+          <span
+            aria-hidden="true"
+            className={`mt-1 text-sm ${role === option.value ? "text-cyan" : "text-muted"}`}
+          >
+            {role === option.value ? "●" : "○"}
           </span>
         </label>
       ))}
 
-      <p className="text-xs text-muted">{dict.roleIrreversible}</p>
+      <p className={authNoteClass}>{dict.roleIrreversible}</p>
 
-      {error ? <p className="text-sm text-pink">{error}</p> : null}
+      {error ? (
+        <p role="alert" aria-live="polite" className={authErrorClass}>
+          {error}
+        </p>
+      ) : null}
 
-      <button
-        type="submit"
-        disabled={loading || !role}
-        className="w-full rounded-xl bg-violet-strong px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-      >
+      <button type="submit" disabled={loading || !role} className={authPrimaryButtonClass}>
         {loading ? dict.roleSaving : dict.roleSubmit}
       </button>
     </form>

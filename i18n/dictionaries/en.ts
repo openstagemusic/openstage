@@ -118,8 +118,22 @@ export const en = {
   auth: {
     loginTitle: "Welcome back",
     loginSubtitle: "Log in to your OpenStage account.",
+    loginEyebrow: "01 / Log in",
+    loginAccent: "live tonight.",
+    loginLead:
+      "Step back into the scene: saved events, your dashboard and the nights you follow.",
+    loginPanelTitle: "Log in",
+    loginPanelText: "Use your email or your Google account.",
     registerTitle: "Create your account",
     registerSubtitle: "Free, forever. Join the OpenStage community.",
+    registerEyebrow: "02 / Sign up",
+    registerAccent: "join the scene.",
+    registerLead:
+      "Free, forever. Create your account and find out what is happening tonight.",
+    registerPanelTitle: "Create account",
+    registerPanelText: "One account for fans, artists and venues.",
+    tagline: "OpenStage / The scene, right now",
+    values: ["Free, forever", "No pay-to-play", "Real events, real places"],
     email: "Email",
     password: "Password",
     fullName: "Full name",
@@ -152,6 +166,9 @@ export const en = {
   onboarding: {
     roleTitle: "How do you want to use OpenStage?",
     roleSubtitle: "Choose how you want to use OpenStage.",
+    roleEyebrow: "03 / Onboarding",
+    artistEyebrow: "04 / Artist",
+    venueEyebrow: "04 / Venue",
     roleIrreversible:
       "Heads up: choosing Artist or Venue is permanent. A Fan can become an Artist or Venue later, only once.",
     roleLockedTitle: "Your role is already active",
@@ -902,6 +919,9 @@ export const en = {
   account: {
     title: "Your account",
     subtitle: "Your page on OpenStage.",
+    eyebrow: "02 / Account",
+    signedInAs: "Signed in as",
+    roleLabel: "Role",
     artistTitle: "Artist page",
     venueTitle: "Venue page",
     name: "Name",

@@ -125,8 +125,12 @@ OpenStage si usa per strada, con una mano:
 
 - target minimo **44×44 px**;
 - azioni principali nella metà bassa dello schermo;
-- barra fissa in basso (Esplora · Mappa · Artisti · Locali · Profilo) sulle
-  pagine di scoperta, nascosta in dashboard/admin/auth/form lunghi;
+- barra fissa in basso sulle pagine di scoperta, nascosta in dashboard/admin/auth/form
+  lunghi. È **ruolo-specifica**:
+  - non loggato: `Esplora · Mappa · Artisti · Locali · Accedi`;
+  - loggato: `Esplora · Notifiche · Artisti · Locali · Profilo`;
+  - admin: nessuna barra pubblica, c'è il guscio admin;
+  - la mappa resta raggiungibile da Esplora e da `/mappa`, non sparisce dal prodotto;
 - player Spotify sopra la barra, mai sopra il contenuto;
 - `env(safe-area-inset-bottom)` rispettato;
 - niente informazioni disponibili solo su hover.
@@ -164,3 +168,167 @@ fallire). Non si consegna un componente con il solo stato default.
 Sfondi bianchi o chiari, card blu da dashboard, tabelle da gestionale,
 gradienti ovunque, blob 3D, foto stock, testimonial finti, contatori finti,
 confetti, cursori personalizzati, autoplay, light mode, hover-only su mobile.
+Niente notifiche di vanità (“nuovo follower”, “visualizzazioni”, “complimenti”):
+non sono eventi azionabili e sporcano il centro notifiche.
+
+## 12. Applicazione alle pagine interne (Fase 5.5)
+
+La Home 5.4 è il **riferimento**, non un template da copiare. Le pagine interne
+devono sembrare lo stesso prodotto, ma restare più leggibili e più sobrie.
+
+### Regole comuni
+
+- Meno card glass generiche, più gerarchia editoriale: titolo-poster, etichette
+  mono, righe e separatori.
+- Il glass resta su navbar, card e pop-up. Non va dietro a testi lunghi.
+- I controlli principali sono quadrati o pill a seconda del contesto, ma non
+  cambiano forma da una pagina all'altra.
+- I dati reali comandano il layout: nessuna immagine di repertorio, nessun
+  numero inventato, nessuna dashboard riempita con placeholder.
+- SSR e contenuto indicizzabile restano intatti: il restyling non nasconde il
+  testo dietro JavaScript.
+- Un blocco alla volta, con build e QA. Niente "grande restyling" unico.
+
+### 5.5A — Login, registrazione, account e onboarding
+
+- **Login e registrazione**: pagina a due tempi, non una card sola al centro.
+  - Mobile: etichetta mono, titolo-poster compatto, testo breve, poi il form.
+  - Desktop: colonna editoriale a sinistra (titolo-poster, valori reali del
+    prodotto) e pannello form a destra, largo al massimo `max-w-md`.
+  - Il pannello form è una card sobria: bordo `line`, fondo `surface`, niente
+    glass dietro a testi lunghi.
+  - Un solo H1. Il titolo può usare Anton, il corpo resta Inter.
+  - I valori sotto il titolo sono solo quelli veri: gratis per sempre, niente
+    pay-to-play, eventi e luoghi reali. Nessun numero inventato.
+- **Campi**: label mono maiuscole, input alti almeno 44 px, bordo sottile,
+  focus ciano visibile, errore testuale sotto il campo o sopra il pulsante.
+  Niente placeholder al posto della label.
+- **Azioni**: pulsante primario pieno viola, forma squadrata o pill coerente con
+  il resto del sito; Google è un'azione secondaria, non un secondo mondo.
+- **Account**: testata editoriale con etichetta mono, titolo-poster, email e
+  ruolo; sezioni separate da `border-line`, non una pila di card glass. La
+  scheda artista/locale resta il blocco principale, con stato di verifica e
+  link pubblico. Le azioni admin/fan sono righe o pannelli sobri, non card
+  promozionali.
+- **Onboarding**: stesso guscio editoriale. La scelta del ruolo è una lista di
+  tre opzioni grandi, con numero mono, titolo e descrizione; quella selezionata
+  usa bordo viola e fondo viola tenue. Le pagine artista/locale mettono prima la
+  ricerca della scheda e poi la creazione, con la stessa gerarchia.
+- **Niente nuove funzioni**: la 5.5A è solo pelle e gerarchia. Conferma email,
+  reset password e password per Google restano nella 7A.
+- **Build e QA**: 320, 390 e 1280 px; italiano e inglese; form reali; nessun
+  dato finto.
+
+### 5.5B — Scheda evento e popup mappa
+
+- Scheda evento: copertina-first quando esiste; titolo grande, metadati in
+  righe, azioni principali in basso su mobile. Il dettaglio non è una griglia di
+  card tutte uguali.
+- Popup mappa: compatto, una serata alla volta, gerarchia chiara e target
+  ≥ 44 px. Il glass è ammesso perché è un pop-up, ma niente card dentro card.
+- Bottom sheet mobile: stessa informazione del popup, senza duplicare la
+  pagina evento.
+
+### 5.5C — Directory artisti e locali
+
+- Card con copertina reale quando esiste; altrimenti monogramma tipografico o
+  poster tipografico, mai foto stock.
+- Nome, città e genere/indirizzo devono leggersi subito; il badge di verifica
+  non ruba la scena.
+- Schede artista/locale: testata forte, dati reali, eventi in arrivo e passati
+  con lo stesso linguaggio delle righe della Home.
+- Filtri e paginazione restano funzionali e visibili; il restyling non li
+  nasconde.
+
+### 5.5D — Guscio dashboard
+
+- Un solo guscio per artista, locale e fan; i moduli cambiano, la struttura no.
+- Menu laterale desktop e pannello mobile già esistenti: si ripuliscono, non si
+  reinventano.
+- La panoramica usa solo numeri reali già disponibili (bozze, pubblicati,
+  annullati, preferiti). Niente statistiche finte.
+- I moduli funzionali ruolo-specifici arrivano nella Fase 10, non nella 5.5D.
+
+### Confine con il resto
+
+- **7A**: logica email e auth, non restyling. Se la 5.5A non è pronta, la 7A
+  tocca solo copy e flussi.
+- **7B**: coda, webhook, preferenze e Area Fan dentro il guscio della 5.5D.
+- **Fase 8**: pannello admin con lo stesso linguaggio visivo, senza rifare la
+  struttura da zero.
+- **Fase 13**: rifiniture, OG, favicon, legale e polish. Non rifà le pagine
+  della 5.5.
+
+## 13. Control room (Fase 8)
+
+La control room è **uno strumento di lavoro**, non una pagina pubblica. Non ha
+navbar pubblica, non ha player Spotify, non ha bottom bar di scoperta. Ha un
+guscio suo, con “Torna al sito”, stato 2FA e uscita.
+
+### Struttura
+
+- **Desktop**: sidebar a gruppi, larghezza fissa, contenuto su una colonna.
+- **Mobile**: tab orizzontali raggruppati, non quindici voci in fila; le tabelle
+  diventano card espandibili o righe con dettaglio.
+- **Una rotta per modulo** (`/admin/<modulo>`), non una pagina unica che carica
+  tutto. L'overview aggrega solo conteggi e code.
+- **Overview**: prima “Da fare adesso”, poi i KPI. Ogni KPI è cliccabile e porta
+  alla lista già filtrata.
+- **Filtri nell'URL**, paginazione server-side, export CSV/JSON, stati di
+  caricamento/vuoto/errore.
+- **Ricerca globale** in seguito, con scorciatoia Ctrl+K per utenti, eventi,
+  artisti, locali e messaggi.
+
+### Linguaggio visivo
+
+- Fondo `bg`, pannelli `surface` con bordo `line`; niente glass dietro a tabelle
+  lunghe.
+- Etichette mono maiuscole, numeri KPI in Space Grotesk, titoli in Anton solo
+  per la testata.
+- Tre accenti con ruoli: viola per l'azione primaria, ciano per informazione e
+  stato attivo, rosa per problemi, annullamenti e segnalazioni. **Niente
+  giallo.**
+- Tabelle dense ma leggibili: intestazioni mono, righe separate da `line`,
+  stato sempre testo + colore.
+- Niente card dentro card, niente gradienti decorativi, niente metriche finte.
+
+### Moduli e registro
+
+I moduli si raggruppano in:
+
+- **Oggi**: panoramica, cose da fare, alert.
+- **Persone**: utenti, artisti, locali, claim e verifiche, sospensioni.
+- **Contenuti**: eventi, bozze, annullati, segnalazioni, città, generi, media.
+- **Community**: messaggi contatti, segnalazioni, follow, inviti.
+- **Comunicazione**: email, coda, log, quota Resend, notifiche in-app, template.
+- **Sistema**: impostazioni, admin, audit, jobs, backup, feature flag.
+
+Ogni modulo è descritto da un **registro**: chiave, nome, gruppo, icona,
+permesso, rotta, badge, descrizione, ordine. Aggiungere un pannello deve essere
+un'operazione ordinata, non una modifica al buio. La lista finale si completa
+con il proprietario prima della Fase 8 (`docs/plan-fase-8.md`).
+
+### Sicurezza e azioni
+
+- 2FA (AAL2) obbligatoria per l'admin.
+- Audit log per ogni azione che cambia dati.
+- Conferma esplicita per eliminare, sospendere, annullare o inviare in massa.
+- “Retry failed” a lotti, con dry run e controllo quota; mai 542 invii in un
+  clic.
+- Errori del provider sanitizzati: niente URL, token o API key nell'interfaccia.
+- Nessun dato personale in più di quanto serve; export tracciati.
+
+## 14. Notifiche in-app
+
+- Campanella in navbar per i loggati, badge unread reale; pagina dentro l'area
+  personale.
+- Notifica = fatto azionabile, non metrica di vanità. Niente “nuovo follower”,
+  “qualcuno ha salvato”, “visualizzazioni”.
+- Raggruppa gli eventi simili (“3 nuovi eventi da artisti che segui”) e usa
+  `dedupe_key`.
+- Priorità: critica, normale, bassa. Le critiche restano visibili anche con le
+  preferenze non critiche disattivate.
+- Link diretto all'evento, alla scheda o all'account; “segna tutte come lette”.
+- Retention 90 giorni; niente realtime nella prima versione.
+- Il digest settimanale è opt-in, massimo una email a settimana, solo se c'è
+  qualcosa. La politica completa è in `docs/notifications-email-policy.md`.

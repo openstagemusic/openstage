@@ -63,33 +63,42 @@ export default async function ArtistOnboardingPage({ searchParams }: ArtistOnboa
   const dict = getDictionary(locale);
 
   return (
-    <section className="mx-auto w-full max-w-lg px-4 py-16 sm:px-6">
-      <h1 className="font-display text-3xl font-bold tracking-tight">
-        {dict.onboarding.artistTitle}
-      </h1>
-      <p className="mt-2 text-sm text-muted">{dict.onboarding.artistSubtitle}</p>
+    <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
+      <header className="border-b border-line pb-8">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
+          {dict.onboarding.artistEyebrow}
+        </p>
+        <h1 className="mt-4 max-w-3xl font-poster text-[clamp(2.75rem,9vw,5.5rem)] uppercase leading-[0.9] tracking-[-0.02em]">
+          {dict.onboarding.artistTitle}
+        </h1>
+        <p className="mt-5 max-w-2xl text-sm leading-relaxed text-muted">
+          {dict.onboarding.artistSubtitle}
+        </p>
+      </header>
 
-      <PageSearch
-        kind="artist"
-        term={term}
-        results={(found?.items ?? []).map((artist) => ({
-          id: artist.id,
-          name: artist.name,
-          city: artist.city,
-          href: artistPath(artist),
-        }))}
-        ownedName={replaceable?.name ?? null}
-        dict={dict.onboarding}
-      />
+      <div className="mt-8 max-w-3xl space-y-8">
+        <PageSearch
+          kind="artist"
+          term={term}
+          results={(found?.items ?? []).map((artist) => ({
+            id: artist.id,
+            name: artist.name,
+            city: artist.city,
+            href: artistPath(artist),
+          }))}
+          ownedName={replaceable?.name ?? null}
+          dict={dict.onboarding}
+        />
 
-      {replaceable ? null : (
-        <>
-          <h2 className="mt-10 font-display text-xl font-semibold">
-            {dict.onboarding.createArtistTitle}
-          </h2>
-          <OnboardingForm dict={dict.onboarding} />
-        </>
-      )}
+        {replaceable ? null : (
+          <div className="border-t border-line pt-8">
+            <h2 className="font-display text-xl font-semibold">
+              {dict.onboarding.createArtistTitle}
+            </h2>
+            <OnboardingForm dict={dict.onboarding} />
+          </div>
+        )}
+      </div>
     </section>
   );
 }

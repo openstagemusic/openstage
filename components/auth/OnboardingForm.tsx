@@ -8,8 +8,12 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
-const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
+import {
+  authErrorClass,
+  authInputClass,
+  authLabelClass,
+  authPrimaryButtonClass,
+} from "./formStyles";
 
 export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"] }) {
   const router = useRouter();
@@ -56,9 +60,9 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+    <form onSubmit={handleSubmit} className="mt-6 space-y-5">
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm text-muted">
+        <label htmlFor="name" className={authLabelClass}>
           {dict.name}
         </label>
         <input
@@ -67,44 +71,46 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
           required
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
-      <div>
-        <label htmlFor="city" className="mb-1 block text-sm text-muted">
-          {dict.city}
-        </label>
-        <input
-          id="city"
-          type="text"
-          value={city}
-          onChange={(event) => setCity(event.target.value)}
-          className={inputClass}
-        />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="city" className={authLabelClass}>
+            {dict.city}
+          </label>
+          <input
+            id="city"
+            type="text"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            className={authInputClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="genre" className={authLabelClass}>
+            {dict.genre}
+          </label>
+          <select
+            id="genre"
+            value={genre}
+            onChange={(event) => setGenre(event.target.value)}
+            className={authInputClass}
+          >
+            <option value="">{dict.genrePlaceholder}</option>
+            {dict.genres.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div>
-        <label htmlFor="genre" className="mb-1 block text-sm text-muted">
-          {dict.genre}
-        </label>
-        <select
-          id="genre"
-          value={genre}
-          onChange={(event) => setGenre(event.target.value)}
-          className={inputClass}
-        >
-          <option value="">{dict.genrePlaceholder}</option>
-          {dict.genres.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="spotifyUrl" className="mb-1 block text-sm text-muted">
+        <label htmlFor="spotifyUrl" className={authLabelClass}>
           {dict.spotifyUrl}
         </label>
         <input
@@ -113,17 +119,17 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
           placeholder="https://open.spotify.com/artist/..."
           value={spotifyUrl}
           onChange={(event) => setSpotifyUrl(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
-      {error ? <p className="text-sm text-pink">{error}</p> : null}
+      {error ? (
+        <p role="alert" aria-live="polite" className={authErrorClass}>
+          {error}
+        </p>
+      ) : null}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-xl bg-violet-strong px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-      >
+      <button type="submit" disabled={loading} className={authPrimaryButtonClass}>
         {loading ? dict.saving : dict.submit}
       </button>
     </form>

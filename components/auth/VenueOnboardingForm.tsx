@@ -8,8 +8,12 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
-const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
+import {
+  authErrorClass,
+  authInputClass,
+  authLabelClass,
+  authPrimaryButtonClass,
+} from "./formStyles";
 
 /**
  * "Aggiungi il tuo locale": la regola esiste già nel database
@@ -63,9 +67,9 @@ export default function VenueOnboardingForm({ dict }: { dict: Dictionary["onboar
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+    <form onSubmit={handleSubmit} className="mt-6 space-y-5">
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm text-muted">
+        <label htmlFor="name" className={authLabelClass}>
           {dict.venueName}
         </label>
         <input
@@ -74,25 +78,41 @@ export default function VenueOnboardingForm({ dict }: { dict: Dictionary["onboar
           required
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
-      <div>
-        <label htmlFor="city" className="mb-1 block text-sm text-muted">
-          {dict.city}
-        </label>
-        <input
-          id="city"
-          type="text"
-          value={city}
-          onChange={(event) => setCity(event.target.value)}
-          className={inputClass}
-        />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="city" className={authLabelClass}>
+            {dict.city}
+          </label>
+          <input
+            id="city"
+            type="text"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            className={authInputClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="capacity" className={authLabelClass}>
+            {dict.capacity}
+          </label>
+          <input
+            id="capacity"
+            type="number"
+            min={1}
+            value={capacity}
+            onChange={(event) => setCapacity(event.target.value)}
+            className={authInputClass}
+          />
+        </div>
       </div>
 
       <div>
-        <label htmlFor="address" className="mb-1 block text-sm text-muted">
+        <label htmlFor="address" className={authLabelClass}>
           {dict.address}
         </label>
         <input
@@ -100,12 +120,12 @@ export default function VenueOnboardingForm({ dict }: { dict: Dictionary["onboar
           type="text"
           value={address}
           onChange={(event) => setAddress(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
       <div>
-        <label htmlFor="website" className="mb-1 block text-sm text-muted">
+        <label htmlFor="website" className={authLabelClass}>
           {dict.website}
         </label>
         <input
@@ -113,31 +133,17 @@ export default function VenueOnboardingForm({ dict }: { dict: Dictionary["onboar
           type="url"
           value={website}
           onChange={(event) => setWebsite(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
-      <div>
-        <label htmlFor="capacity" className="mb-1 block text-sm text-muted">
-          {dict.capacity}
-        </label>
-        <input
-          id="capacity"
-          type="number"
-          min={1}
-          value={capacity}
-          onChange={(event) => setCapacity(event.target.value)}
-          className={inputClass}
-        />
-      </div>
+      {error ? (
+        <p role="alert" aria-live="polite" className={authErrorClass}>
+          {error}
+        </p>
+      ) : null}
 
-      {error ? <p className="text-sm text-pink">{error}</p> : null}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-      >
+      <button type="submit" disabled={loading} className={authPrimaryButtonClass}>
         {loading ? dict.saving : dict.venueSubmit}
       </button>
     </form>

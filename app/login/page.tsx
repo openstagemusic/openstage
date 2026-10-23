@@ -1,5 +1,6 @@
 import Link from "@/components/i18n/LocaleLink";
 
+import AuthShell from "@/components/auth/AuthShell";
 import LoginForm from "@/components/auth/LoginForm";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getPageMetadata } from "@/lib/i18n/metadata";
@@ -27,18 +28,33 @@ export default async function LoginPage({
       : null;
 
   return (
-    <section className="mx-auto w-full max-w-md px-4 py-16 sm:px-6">
-      <h1 className="font-display text-3xl font-bold tracking-tight">{dict.auth.loginTitle}</h1>
-      <p className="mt-2 text-sm text-muted">{dict.auth.loginSubtitle}</p>
+    <AuthShell
+      eyebrow={dict.auth.loginEyebrow}
+      title={dict.auth.loginTitle}
+      accent={dict.auth.loginAccent}
+      lead={dict.auth.loginLead}
+      tagline={dict.auth.tagline}
+      values={dict.auth.values}
+      footer={
+        <p>
+          {dict.auth.noAccount}{" "}
+          <Link href="/register" className="text-cyan hover:underline">
+            {dict.nav.register}
+          </Link>
+        </p>
+      }
+    >
+      <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">OpenStage</p>
+          <h2 className="mt-1 font-display text-xl font-semibold">{dict.auth.loginPanelTitle}</h2>
+        </div>
+        <span className="font-mono text-[10px] tracking-[0.14em] text-muted">01</span>
+      </div>
+
+      <p className="mt-4 text-xs leading-relaxed text-muted">{dict.auth.loginPanelText}</p>
 
       <LoginForm dict={dict.auth} nextPath={nextPath} />
-
-      <p className="mt-6 text-sm text-muted">
-        {dict.auth.noAccount}{" "}
-        <Link href="/register" className="text-cyan hover:underline">
-          {dict.nav.register}
-        </Link>
-      </p>
-    </section>
+    </AuthShell>
   );
 }

@@ -62,7 +62,7 @@ export default function PendingRequestPanel({
 
   if (done) {
     return (
-      <section className="glass mt-8 rounded-3xl border border-white/10 p-6">
+      <section className="border border-line bg-surface/40 p-5 sm:p-6">
         <h2 className="font-display text-xl font-semibold">{dict.pendingTitle}</h2>
         <p className="mt-2 text-sm text-cyan">{dict.withdrawn}</p>
       </section>
@@ -70,16 +70,18 @@ export default function PendingRequestPanel({
   }
 
   return (
-    <section className="glass mt-8 rounded-3xl border border-cyan/30 p-6">
-      <h2 className="font-display text-xl font-semibold">{dict.pendingTitle}</h2>
-      <p className="mt-2 text-sm text-muted">{dict.pendingText}</p>
+    <section className="border-l-2 border-cyan bg-cyan/[0.04] p-5 sm:p-6">
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+        {dict.pendingTitle}
+      </p>
+      <p className="mt-2 text-sm leading-relaxed text-muted">{dict.pendingText}</p>
 
-      <p className="mt-3 text-sm">
+      <p className="mt-4 text-sm">
         <LocaleLink href={subjectHref} className="text-cyan transition-opacity hover:opacity-80">
           {subjectName} →
         </LocaleLink>
       </p>
-      <p className="mt-1 text-xs text-muted">
+      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
         {dict.pendingSince} {data.format(new Date(createdAt))}
       </p>
 
@@ -87,12 +89,16 @@ export default function PendingRequestPanel({
         type="button"
         onClick={handleWithdraw}
         disabled={busy}
-        className="mt-4 rounded-full border border-white/15 px-4 py-2 text-sm text-muted transition-colors hover:text-white disabled:opacity-50"
+        className="mt-4 inline-flex min-h-11 items-center justify-center border border-line-strong px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white disabled:opacity-50"
       >
         {busy ? dict.withdrawing : dict.withdraw}
       </button>
 
-      {error ? <p className="mt-3 text-sm text-pink">{error}</p> : null}
+      {error ? (
+        <p role="alert" aria-live="polite" className="mt-3 text-sm text-pink">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }

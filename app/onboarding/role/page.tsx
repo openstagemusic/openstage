@@ -28,36 +28,63 @@ export default async function RoleOnboardingPage() {
   // Artista e locale sono definitivi: chi li ha già scelti non può più cambiare.
   if (!canChooseRole(session.role) && session.role) {
     return (
-      <section className="mx-auto w-full max-w-lg px-4 py-16 sm:px-6">
-        <h1 className="font-display text-3xl font-bold tracking-tight">
-          {dict.onboarding.roleLockedTitle}
-        </h1>
-        <p className="mt-2 text-sm text-muted">{dict.onboarding.roleLockedText}</p>
+      <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
+        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <header>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
+              {dict.onboarding.roleEyebrow}
+            </p>
+            <h1 className="mt-4 font-poster text-[clamp(2.75rem,9vw,5.5rem)] uppercase leading-[0.9] tracking-[-0.02em]">
+              {dict.onboarding.roleLockedTitle}
+            </h1>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-muted">
+              {dict.onboarding.roleLockedText}
+            </p>
+          </header>
 
-        <span className="mt-6 inline-flex rounded-full border border-violet/40 bg-violet/10 px-3 py-1 text-sm text-white">
-          {dict.onboarding[ROLE_LABEL_KEY[session.role]]}
-        </span>
+          <div className="border border-line bg-surface/50 p-5 sm:p-7">
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+              {dict.onboarding.roleLockedTitle}
+            </p>
+            <span className="mt-4 inline-flex border border-violet/50 bg-violet/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white">
+              {dict.onboarding[ROLE_LABEL_KEY[session.role]]}
+            </span>
 
-        <p className="mt-6 text-sm text-muted">{dict.onboarding.roleLockedNewAccount}</p>
+            <p className="mt-5 text-sm leading-relaxed text-muted">
+              {dict.onboarding.roleLockedNewAccount}
+            </p>
 
-        <Link
-          href="/events/new"
-          className="mt-8 inline-flex rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-        >
-          {dict.onboarding.roleLockedCta}
-        </Link>
+            <Link
+              href="/events/new"
+              className="mt-6 inline-flex min-h-11 items-center justify-center border border-violet/50 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet/10"
+            >
+              {dict.onboarding.roleLockedCta}
+            </Link>
+          </div>
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="mx-auto w-full max-w-lg px-4 py-16 sm:px-6">
-      <h1 className="font-display text-3xl font-bold tracking-tight">
-        {dict.onboarding.roleTitle}
-      </h1>
-      <p className="mt-2 text-sm text-muted">{dict.onboarding.roleSubtitle}</p>
+    <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
+      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <header>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">
+            {dict.onboarding.roleEyebrow}
+          </p>
+          <h1 className="mt-4 font-poster text-[clamp(2.75rem,9vw,5.5rem)] uppercase leading-[0.9] tracking-[-0.02em]">
+            {dict.onboarding.roleTitle}
+          </h1>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-muted">
+            {dict.onboarding.roleSubtitle}
+          </p>
+        </header>
 
-      <RolePicker dict={dict.onboarding} />
+        <div className="border border-line bg-surface/40 p-5 sm:p-7">
+          <RolePicker dict={dict.onboarding} />
+        </div>
+      </div>
     </section>
   );
 }

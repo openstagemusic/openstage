@@ -6,8 +6,13 @@ import { useState } from "react";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { createClient } from "@/lib/supabase/client";
 
-const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
+import {
+  authErrorClass,
+  authInputClass,
+  authLabelClass,
+  authNoticeClass,
+  authPrimaryButtonClass,
+} from "@/components/auth/formStyles";
 
 export type AccountArtist = {
   id: string;
@@ -102,9 +107,9 @@ export default function AccountForm({
   const venue = subject.kind === "venue" ? (values as AccountVenue) : null;
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+    <form onSubmit={handleSubmit} className="mt-6 space-y-5">
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm text-muted">
+        <label htmlFor="name" className={authLabelClass}>
           {dict.name}
         </label>
         <input
@@ -113,12 +118,12 @@ export default function AccountForm({
           required
           value={values.name}
           onChange={(event) => set("name", event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
       <div>
-        <label htmlFor="city" className="mb-1 block text-sm text-muted">
+        <label htmlFor="city" className={authLabelClass}>
           {dict.city}
         </label>
         <input
@@ -126,14 +131,14 @@ export default function AccountForm({
           type="text"
           value={values.city}
           onChange={(event) => set("city", event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
       {artist ? (
         <>
           <div>
-            <label htmlFor="genre" className="mb-1 block text-sm text-muted">
+            <label htmlFor="genre" className={authLabelClass}>
               {dict.genre}
             </label>
             <input
@@ -141,12 +146,12 @@ export default function AccountForm({
               type="text"
               value={artist.genre}
               onChange={(event) => set("genre", event.target.value)}
-              className={inputClass}
+              className={authInputClass}
             />
           </div>
 
           <div>
-            <label htmlFor="spotify" className="mb-1 block text-sm text-muted">
+            <label htmlFor="spotify" className={authLabelClass}>
               {dict.spotifyUrl}
             </label>
             <input
@@ -154,12 +159,12 @@ export default function AccountForm({
               type="url"
               value={artist.spotifyUrl}
               onChange={(event) => set("spotifyUrl", event.target.value)}
-              className={inputClass}
+              className={authInputClass}
             />
           </div>
 
           <div>
-            <label htmlFor="bio" className="mb-1 block text-sm text-muted">
+            <label htmlFor="bio" className={authLabelClass}>
               {dict.bio}
             </label>
             <textarea
@@ -167,7 +172,7 @@ export default function AccountForm({
               rows={5}
               value={artist.bio}
               onChange={(event) => set("bio", event.target.value)}
-              className={inputClass}
+              className={authInputClass}
             />
           </div>
         </>
@@ -176,7 +181,7 @@ export default function AccountForm({
       {venue ? (
         <>
           <div>
-            <label htmlFor="address" className="mb-1 block text-sm text-muted">
+            <label htmlFor="address" className={authLabelClass}>
               {dict.address}
             </label>
             <input
@@ -184,12 +189,12 @@ export default function AccountForm({
               type="text"
               value={venue.address}
               onChange={(event) => set("address", event.target.value)}
-              className={inputClass}
+              className={authInputClass}
             />
           </div>
 
           <div>
-            <label htmlFor="website" className="mb-1 block text-sm text-muted">
+            <label htmlFor="website" className={authLabelClass}>
               {dict.website}
             </label>
             <input
@@ -197,12 +202,12 @@ export default function AccountForm({
               type="url"
               value={venue.website}
               onChange={(event) => set("website", event.target.value)}
-              className={inputClass}
+              className={authInputClass}
             />
           </div>
 
           <div>
-            <label htmlFor="capacity" className="mb-1 block text-sm text-muted">
+            <label htmlFor="capacity" className={authLabelClass}>
               {dict.capacity}
             </label>
             <input
@@ -211,19 +216,27 @@ export default function AccountForm({
               min={1}
               value={venue.capacity}
               onChange={(event) => set("capacity", event.target.value)}
-              className={inputClass}
+              className={authInputClass}
             />
           </div>
         </>
       ) : null}
 
-      {error ? <p className="text-sm text-pink">{error}</p> : null}
-      {saved ? <p className="text-sm text-cyan">{dict.saved}</p> : null}
+      {error ? (
+        <p role="alert" aria-live="polite" className={authErrorClass}>
+          {error}
+        </p>
+      ) : null}
+      {saved ? (
+        <p role="status" aria-live="polite" className={authNoticeClass}>
+          {dict.saved}
+        </p>
+      ) : null}
 
       <button
         type="submit"
         disabled={loading}
-        className="rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className={`${authPrimaryButtonClass} sm:w-auto`}
       >
         {loading ? dict.saving : dict.save}
       </button>

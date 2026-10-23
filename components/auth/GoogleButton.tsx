@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
+import { authSecondaryButtonClass } from "./formStyles";
+
 export default function GoogleButton({ label, next = "/" }: { label: string; next?: string }) {
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +29,8 @@ export default function GoogleButton({ label, next = "/" }: { label: string; nex
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:opacity-60"
+      aria-busy={loading}
+      className={authSecondaryButtonClass}
     >
       {label}
     </button>

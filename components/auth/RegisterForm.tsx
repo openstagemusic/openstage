@@ -12,11 +12,15 @@ import { createClient } from "@/lib/supabase/client";
 
 import GoogleButton from "./GoogleButton";
 import TurnstileWidget from "./TurnstileWidget";
+import {
+  authErrorClass,
+  authInputClass,
+  authLabelClass,
+  authNoticeClass,
+  authPrimaryButtonClass,
+} from "./formStyles";
 
 type Role = "fan" | "artist" | "venue";
-
-const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
 
 export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   const router = useRouter();
@@ -35,7 +39,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
 
   if (!configured) {
     return (
-      <p className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-muted">
+      <p className="mt-6 border-l-2 border-line-strong bg-white/[0.03] px-3 py-3 text-sm text-muted">
         {dict.notConfigured}
       </p>
     );
@@ -93,9 +97,9 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+    <form onSubmit={handleSubmit} className="mt-5 space-y-5">
       <div>
-        <label htmlFor="fullName" className="mb-1 block text-sm text-muted">
+        <label htmlFor="fullName" className={authLabelClass}>
           {dict.fullName}
         </label>
         <input
@@ -105,12 +109,12 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
           autoComplete="name"
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-1 block text-sm text-muted">
+        <label htmlFor="email" className={authLabelClass}>
           {dict.email}
         </label>
         <input
@@ -120,12 +124,12 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
           autoComplete="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="mb-1 block text-sm text-muted">
+        <label htmlFor="password" className={authLabelClass}>
           {dict.password}
         </label>
         <input
@@ -136,19 +140,19 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
           autoComplete="new-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className={inputClass}
+          className={authInputClass}
         />
       </div>
 
       <div>
-        <label htmlFor="role" className="mb-1 block text-sm text-muted">
+        <label htmlFor="role" className={authLabelClass}>
           {dict.role}
         </label>
         <select
           id="role"
           value={role}
           onChange={(event) => setRole(event.target.value as Role)}
-          className={inputClass}
+          className={authInputClass}
         >
           <option value="fan">{dict.roleFan}</option>
           <option value="artist">{dict.roleArtist}</option>
@@ -156,23 +160,31 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
         </select>
       </div>
 
-      {siteKey ? <TurnstileWidget siteKey={siteKey} onToken={setToken} /> : null}
+      {siteKey ? (
+        <div className="min-h-[65px] overflow-hidden">
+          <TurnstileWidget siteKey={siteKey} onToken={setToken} />
+        </div>
+      ) : null}
 
-      {error ? <p className="text-sm text-pink">{error}</p> : null}
-      {notice ? <p className="text-sm text-cyan">{notice}</p> : null}
+      {error ? (
+        <p role="alert" aria-live="polite" className={authErrorClass}>
+          {error}
+        </p>
+      ) : null}
+      {notice ? (
+        <p role="status" aria-live="polite" className={authNoticeClass}>
+          {notice}
+        </p>
+      ) : null}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-xl bg-violet-strong px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-      >
+      <button type="submit" disabled={loading} className={authPrimaryButtonClass}>
         {loading ? dict.loading : dict.registerSubmit}
       </button>
 
-      <div className="flex items-center gap-3 text-xs text-muted">
-        <span className="h-px flex-1 bg-white/10" />
+      <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+        <span className="h-px flex-1 bg-line" />
         {dict.orContinueWith}
-        <span className="h-px flex-1 bg-white/10" />
+        <span className="h-px flex-1 bg-line" />
       </div>
 
       <GoogleButton label={dict.google} />
