@@ -240,20 +240,59 @@ devono sembrare lo stesso prodotto, ma restare più leggibili e più sobrie.
 - Filtri e paginazione restano funzionali e visibili; il restyling non li
   nasconde.
 
-### 5.5D — Guscio dashboard
+### 5.5D — Guscio dashboard, panoramica e pagine esistenti
 
 - Un solo guscio per artista, locale e fan; i moduli cambiano, la struttura no.
 - Menu laterale desktop e pannello mobile già esistenti: si ripuliscono, non si
-  reinventano.
-- La panoramica usa solo numeri reali già disponibili (bozze, pubblicati,
-  annullati, preferiti). Niente statistiche finte.
-- I moduli funzionali ruolo-specifici arrivano nella Fase 10, non nella 5.5D.
+  reinventano. Niente glass generico: bordo `line`, fondo `surface`, etichette
+  mono e voce attiva riconoscibile.
+- **Voce attiva**: vince la rotta più specifica. Su `/dashboard/events/new` non
+  devono risultare attive insieme “I miei eventi” e “Crea evento”; su
+  `/dashboard/events/[id]` resta attiva “I miei eventi”.
+- **Panoramica**: numeri reali già disponibili (bozze, pubblicati, annullati,
+  preferiti), KPI cliccabili e scorciatoie. Niente gradienti decorativi, niente
+  statistiche finte.
+- **I miei eventi**: sezioni “In programma”, “Bozze”, “Annullate”, “Passate” con
+  la stessa gerarchia delle righe pubbliche; stato sempre testo + colore; azioni
+  esistenti (modifica, pubblica, annulla, elimina, vedi pagina) leggibili e non
+  tutte uguali. L'eliminazione resta l'ultima strada e usa la conferma attuale.
+- **Preferiti**: griglia di card evento coerente con la 5.5B/5.5C, stato vuoto
+  editoriale e, se l'azione esiste già, rimozione rapida. I filtri e il calendario
+  `.ics` restano nella Fase 10/7B.
+- **Profilo**: `/account` è già rifatto nella 5.5A e resta la pagina canonica.
+  Dal guscio deve essere chiaro come tornarci e come tornare alla dashboard: o
+  la voce apre una pagina dentro il guscio, o `/account` mostra un ritorno
+  esplicito. Non si duplica la pagina.
+- I moduli funzionali ruolo-specifici e le funzioni nuove arrivano nella
+  **Fase 10**, non nella 5.5D.
+
+### 5.5E — Editor eventi (crea/modifica)
+
+- Stesso linguaggio della 5.5D: sezioni numerate, etichette mono, bordi `line`,
+  focus ciano, niente card dentro card.
+- Il form resta **unico e reale**: titolo, tipo, genere, data/ora/fuso, luogo,
+  mappa, artista, prezzo, biglietti, copertina, descrizione e doppioni.
+- Desktop: form a sinistra, anteprima sticky a destra. Mobile: anteprima dopo il
+  form o in un pannello richiudibile, senza duplicare i campi.
+- Barra azioni chiara: salva bozza, pubblica, torna agli eventi. Su mobile resta
+  raggiungibile senza attraversare tutto il form.
+- Riepilogo errori in alto, errore vicino al campo, messaggi di successo con
+  `role="status"`.
+- Avviso “modifiche non salvate” prima di uscire, se il form è sporco.
+- Niente nuovi campi, niente migration: `ends_at`, serie e festival restano
+  **B41/Fase 12**; lineup, età e accessibilità richiedono una decisione di
+  schema e non entrano qui.
+- Il doppione resta un avviso, non un blocco: la scelta “crea comunque” è già
+  nel codice.
 
 ### Confine con il resto
 
 - **7A**: logica email e auth, non restyling. Se la 5.5A non è pronta, la 7A
-  tocca solo copy e flussi.
+  tocca solo copy e flussi. La sezione sicurezza del profilo (password/email)
+  arriva qui.
 - **7B**: coda, webhook, preferenze e Area Fan dentro il guscio della 5.5D.
+- **Fase 10**: moduli ruolo-specifici e funzioni nuove della dashboard (filtri,
+  ricerca, duplica evento, azioni multiple, completezza profilo).
 - **Fase 8**: pannello admin con lo stesso linguaggio visivo, senza rifare la
   struttura da zero.
 - **Fase 13**: rifiniture, OG, favicon, legale e polish. Non rifà le pagine
