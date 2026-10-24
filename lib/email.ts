@@ -6,6 +6,14 @@ type SendEmailInput = {
   text: string;
   html?: string;
   replyTo?: string;
+  /** Override per il worker; di default usa `EMAIL_FROM`. */
+  from?: string;
+};
+
+export type SendEmailResult = {
+  ok: boolean;
+  id?: string;
+  error?: string;
 };
 
 function escapeHtml(value: string): string {
@@ -24,13 +32,13 @@ function escapeHtml(value: string): string {
  * far perdere il messaggio già scritto nel database. Restituisce `false` e
  * logga l'errore, così il chiamante decide se mostrare un avviso.
  */
-export async function sendEmail(input: SendEmailInput): Promise<boolean> {
+export async function sendEmailDetailed(input: SendEmailInput): Promise<SendEmailResult> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim() || "OpenStage <noreply@getopenstage.it>";
+  const from = input.from?.trim() || process.env.EMAIL_FROM?.trim() || "OpenStage <noreply@getopenstage.it>";
 
   if (!apiKey) {
     console.error("[email] RESEND_API_KEY non configurata");
-    return false;
+    return { ok: false, error: "missing_api_key" };
   }
 
   try {
@@ -54,14 +62,20 @@ export async function sendEmail(input: SendEmailInput): Promise<boolean> {
     if (!response.ok) {
       const body = await response.text().catch(() => "");
       console.error("[email] Resend", response.status, body.slice(0, 300));
-      return false;
+      return { ok: false, error: `resend_${response.status}` };
     }
 
-    return true;
+    const payload = (await response.json().catch(() => ({}))) as { id?: string };
+    return { ok: true, id: payload.id };
   } catch (error) {
-    console.error("[email] send failed:", error instanceof Error ? error.message : error);
-    return false;
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[email] send failed:", message);
+    return { ok: false, error: message };
   }
+}
+
+export async function sendEmail(input: SendEmailInput): Promise<boolean> {
+  return (await sendEmailDetailed(input)).ok;
 }
 
 type ContactNotification = {
