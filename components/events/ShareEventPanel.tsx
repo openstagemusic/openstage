@@ -37,6 +37,7 @@ type ShareEventPanelProps = {
   photoUrl: string | null;
   cancelled: boolean;
   labels: ShareLabels;
+  className?: string;
 };
 
 /**
@@ -61,6 +62,7 @@ export default function ShareEventPanel({
   photoUrl,
   cancelled,
   labels,
+  className,
 }: ShareEventPanelProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const previewRef = useRef<string | null>(null);
@@ -220,7 +222,10 @@ export default function ShareEventPanel({
       <button
         type="button"
         onClick={openPanel}
-        className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-white/25 hover:text-white"
+        className={cn(
+          "inline-flex items-center justify-center gap-2 border border-line bg-white/[0.03] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan/50 hover:text-cyan",
+          className
+        )}
       >
         <span aria-hidden="true">↗</span>
         {labels.share}
@@ -231,7 +236,7 @@ export default function ShareEventPanel({
         onClose={() => setOpen(false)}
         onClick={onDialogClick}
         aria-labelledby="share-panel-title"
-        className="w-[min(94vw,34rem)] max-h-[92vh] overflow-y-auto rounded-3xl border border-white/10 bg-[#0b0b14] p-0 text-white backdrop:bg-black/75 backdrop:backdrop-blur-sm"
+        className="w-[min(94vw,34rem)] max-h-[92vh] overflow-y-auto border border-line bg-surface p-0 text-white backdrop:bg-black/75 backdrop:backdrop-blur-sm"
       >
         <div className="p-5">
           <div className="flex items-start justify-between gap-4">

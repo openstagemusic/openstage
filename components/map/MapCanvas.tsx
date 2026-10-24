@@ -325,6 +325,8 @@ export type MapCanvasProps = {
   popupEnabled: boolean;
   /** Lascia spazio al player fisso in basso (attribuzione e controlli). */
   bottomInset?: boolean;
+  /** Spazio sopra il popup per non finire sotto la ricerca/filtri. */
+  popupTopInset?: number;
   /** Etichetta accessibile della regione mappa. */
   ariaLabel: string;
   onSelect: (selection: MapSelection | null) => void;
@@ -349,6 +351,7 @@ export default function MapCanvas({
   locale,
   popupEnabled,
   bottomInset = false,
+  popupTopInset = 220,
   ariaLabel,
   onSelect,
 }: MapCanvasProps) {
@@ -563,11 +566,11 @@ export default function MapCanvas({
       // Il pop-up desktop sta **sopra** il pin, il bottom sheet mobile **sotto**:
       // il margine va dal lato giusto, altrimenti la scheda esce dalla mappa.
       padding: popupEnabled
-        ? { top: 220, bottom: 40, left: 0, right: 0 }
+        ? { top: popupTopInset, bottom: 40, left: 0, right: 0 }
         : { top: 0, bottom: 280, left: 0, right: 0 },
       duration: 700,
     });
-  }, [selection, selectionCoordinates, styleReady, popupEnabled, popupNode]);
+  }, [selection, selectionCoordinates, styleReady, popupEnabled, popupNode, popupTopInset]);
 
   // --- Posizione dell'utente ("Vicino a me") -------------------------------
   useEffect(() => {

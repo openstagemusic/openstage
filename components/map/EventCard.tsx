@@ -23,7 +23,10 @@ type EventCardProps = {
 };
 
 const secondaryButtonClass =
-  "inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-white/30 hover:text-white";
+  "inline-flex min-h-11 items-center justify-center gap-1.5 border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white";
+
+const primaryButtonClass =
+  "inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet";
 
 /**
  * Scheda di un evento con tutte le azioni del pop-up: pagina evento, biglietti,
@@ -73,7 +76,7 @@ export default function EventCard({
   return (
     <article
       className={cn(
-        "glass w-full overflow-hidden border border-white/10 text-left",
+        "w-full overflow-hidden border border-line-strong bg-surface/95 text-left backdrop-blur",
         isSheet ? "rounded-3xl" : "rounded-2xl"
       )}
     >
@@ -84,7 +87,7 @@ export default function EventCard({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full border border-white/10 px-3 py-1 text-xs text-muted"
+              className="min-h-11 border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
             >
               {dict.map.close}
             </button>
@@ -93,43 +96,41 @@ export default function EventCard({
       ) : null}
 
       {isSheet && event.coverImageUrl ? (
-        <EventCover src={event.coverImageUrl} className="mt-3 aspect-[4/3] w-full" />
-      ) : (
-        <div className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent" aria-hidden="true" />
-      )}
+        <EventCover src={event.coverImageUrl} className="mt-3 aspect-[4/3] w-full border-y border-line" />
+      ) : null}
 
       <div className="p-4">
         <div className="flex gap-3">
           {!isSheet && event.coverImageUrl ? (
             <EventCover
               src={event.coverImageUrl}
-              className="h-14 w-14 shrink-0 rounded-xl border border-white/10"
+              className="h-16 w-16 shrink-0 border border-line"
             />
           ) : null}
 
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-1.5 text-xs">
-              <span className="rounded-full border border-violet/40 bg-violet/10 px-2 py-0.5 text-white">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="border border-violet/40 bg-violet/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
                 {kindLabel}
               </span>
               {whenLabel ? (
-                <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 text-white">
+                <span className="border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
                   {whenLabel}
                 </span>
               ) : null}
               {event.isFree || event.priceText ? (
-                <span className="rounded-full border border-white/15 px-2 py-0.5 text-muted">
+                <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                   {event.isFree ? t.freeEntry : event.priceText}
                 </span>
               ) : null}
               {event.genre ? (
-                <span className="rounded-full border border-white/10 px-2 py-0.5 text-muted">
+                <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                   {event.genre}
                 </span>
               ) : null}
             </div>
 
-            <h3 className="mt-2 font-display text-base font-semibold leading-tight">
+            <h3 className="mt-2 font-display text-lg font-semibold leading-tight">
               {event.title}
             </h3>
 
@@ -139,24 +140,37 @@ export default function EventCard({
           </div>
         </div>
 
-        <p className="mt-2 text-sm text-muted">
-          <span className="text-white/80">{when.full}</span>
-          {where ? ` · ${where}` : ""}
-        </p>
+        <div className="mt-3 grid gap-1 border-t border-line pt-3 text-sm">
+          <p className="text-white/85">
+            <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.12em] text-cyan">
+              {t.when}
+            </span>
+            {when.full}
+          </p>
+          {where ? (
+            <p className="text-muted">
+              <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.12em] text-cyan">
+                {t.where}
+              </span>
+              {where}
+            </p>
+          ) : null}
+        </div>
 
         {event.locationPrecision === "approximate" ? (
-          <p className="mt-1.5 text-xs text-cyan">{t.approximateNote}</p>
+          <p className="mt-2 border-l-2 border-cyan/50 pl-2 text-xs text-cyan">
+            {t.approximateNote}
+          </p>
         ) : null}
 
         {event.isUnclaimed ? (
-          <p className="mt-1.5 text-xs text-muted">{t.unclaimedNote}</p>
+          <p className="mt-2 border-l-2 border-line-strong pl-2 text-xs text-muted">
+            {t.unclaimedNote}
+          </p>
         ) : null}
 
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Link
-            href={eventPath(event)}
-            className="rounded-full bg-violet-strong px-3.5 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
-          >
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Link href={eventPath(event)} className={primaryButtonClass}>
             {t.eventPage}
           </Link>
 

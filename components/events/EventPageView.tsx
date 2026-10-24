@@ -109,18 +109,21 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
   };
 
   return (
-    <article className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
+    <article className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-14">
       <JsonLd data={data} />
 
-      <Link href="/" className="text-sm text-muted transition-colors hover:text-white">
+      <Link
+        href="/"
+        className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-cyan"
+      >
         ← {t.backToExplore}
       </Link>
 
       {/* La notizia prima della locandina: chi apre il link deve sapere subito
           che la serata non si tiene, senza leggere il poster per intero. */}
       {cancelled ? (
-        <section className="mt-6 rounded-2xl border border-pink/40 bg-pink/10 p-5">
-          <p className="font-display text-sm font-semibold uppercase tracking-wide text-white">
+        <section className="mt-6 border-l-2 border-pink bg-pink/10 px-4 py-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-pink">
             {t.cancelledBadge}
           </p>
           <p className="mt-2 text-sm text-white/90">{t.cancelledText}</p>
@@ -138,8 +141,8 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       <header
         className={
           event.coverImageUrl
-            ? "mt-6 grid gap-6 md:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] md:items-start"
-            : "mt-6"
+            ? "mt-8 grid gap-8 md:grid-cols-[minmax(0,21rem)_minmax(0,1fr)] md:items-start"
+            : "mt-8"
         }
       >
         {event.coverImageUrl ? (
@@ -147,41 +150,34 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           // del riquadro lo riempie la stessa foto sfocata.
           <EventCover
             src={event.coverImageUrl}
-            className="aspect-[4/5] w-full rounded-card border border-line"
+            className="aspect-[4/5] w-full border border-line bg-surface"
           />
         ) : null}
 
         <div>
-          {event.coverImageUrl ? null : (
-            <div
-              className="mb-6 h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
-              aria-hidden="true"
-            />
-          )}
-
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="border border-violet/40 bg-violet/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white">
               {kindLabel}
             </span>
             {event.genre ? (
-              <span className="rounded-full border border-line px-2.5 py-1 text-muted">
+              <span className="border border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                 {event.genre}
               </span>
             ) : null}
             {priceLabel ? (
-              <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-white">
+              <span className="border border-cyan/40 bg-cyan/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white">
                 {priceLabel}
               </span>
             ) : null}
           </div>
 
-          <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-5xl">
+          <h1 className="mt-5 text-balance font-poster text-[clamp(2.6rem,7vw,4.8rem)] uppercase leading-[0.92] tracking-[-0.02em]">
             {event.title}
           </h1>
 
           {event.artist && !artistRepeatsTitle(event) ? (
             <p className="mt-3 text-lg text-white/80">
-              <Link href={artistPath(event.artist)} className="transition-colors hover:text-white">
+              <Link href={artistPath(event.artist)} className="transition-colors hover:text-cyan">
                 {event.artist.name}
               </Link>
             </p>
@@ -190,7 +186,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           {cancelled ? null : (
             <EventCountdown
               startsAt={event.startsAt}
-              className="mt-4"
+              className="mt-5"
               labels={{
                 in: t.countdownIn,
                 days: t.countdownDays,
@@ -200,106 +196,116 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
               }}
             />
           )}
-        </div>
-      </header>
 
-      <dl className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="glass rounded-2xl border border-white/10 p-5">
-          <dt className="text-xs uppercase tracking-wide text-muted">{t.when}</dt>
-          <dd className="mt-1 text-sm text-white">
-            {formatEventDateLong(event.startsAt, event.timezone, locale)}
+          <dl className="mt-8 border-t border-line">
+        <div className="grid gap-2 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+          <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-cyan">
+            {t.when}
+          </dt>
+          <dd className="text-sm text-white">
+            <span className="block">
+              {formatEventDateLong(event.startsAt, event.timezone, locale)}
+            </span>
+            <span className="mt-1 block text-xs text-muted">
+              {timeZoneName(event.timezone, locale)}
+            </span>
           </dd>
-          <dd className="mt-1 text-xs text-muted">{timeZoneName(event.timezone, locale)}</dd>
         </div>
 
-        <div className="glass rounded-2xl border border-white/10 p-5">
-          <dt className="text-xs uppercase tracking-wide text-muted">{t.where}</dt>
-          <dd className="mt-1 text-sm text-white">
-            {event.venue ? (
-              <Link href={venuePath(event.venue)} className="transition-colors hover:text-cyan">
-                {event.venue.name}
-              </Link>
-            ) : event.city ? (
-              <Link href={cityPath(event.city)} className="transition-colors hover:text-cyan">
-                {event.city}
-              </Link>
-            ) : (
-              "—"
-            )}
-            {event.venue && event.city ? (
-              <>
-                {" · "}
+        <div className="grid gap-2 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+          <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-cyan">
+            {t.where}
+          </dt>
+          <dd className="text-sm text-white">
+            <span className="block">
+              {event.venue ? (
+                <Link href={venuePath(event.venue)} className="transition-colors hover:text-cyan">
+                  {event.venue.name}
+                </Link>
+              ) : event.city ? (
                 <Link href={cityPath(event.city)} className="transition-colors hover:text-cyan">
                   {event.city}
                 </Link>
-              </>
+              ) : (
+                "—"
+              )}
+              {event.venue && event.city ? (
+                <>
+                  {" · "}
+                  <Link href={cityPath(event.city)} className="transition-colors hover:text-cyan">
+                    {event.city}
+                  </Link>
+                </>
+              ) : null}
+            </span>
+            {event.venue?.address ? (
+              <span className="mt-1 block text-xs text-muted">{event.venue.address}</span>
+            ) : null}
+            {event.directionsText ? (
+              <span className="mt-4 block border-t border-line pt-4">
+                <span className="block font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                  {t.howToGetThere}
+                </span>
+                <span className="mt-1 block whitespace-pre-line text-sm text-white/90">
+                  {event.directionsText}
+                </span>
+              </span>
+            ) : null}
+            {mapsUrl || event.venue?.website ? (
+              <span className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+                {mapsUrl ? (
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-opacity hover:opacity-80"
+                  >
+                    {t.openInMaps}
+                  </a>
+                ) : null}
+                {event.venue?.website ? (
+                  <a
+                    href={event.venue.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-opacity hover:opacity-80"
+                  >
+                    {t.venueWebsite}
+                  </a>
+                ) : null}
+              </span>
             ) : null}
           </dd>
-          {event.venue?.address ? (
-            <dd className="mt-1 text-xs text-muted">{event.venue.address}</dd>
-          ) : null}
-          {event.directionsText ? (
-            <dd className="mt-3 border-t border-white/10 pt-3">
-              <span className="block text-xs uppercase tracking-wide text-muted">
-                {t.howToGetThere}
-              </span>
-              <span className="mt-1 block whitespace-pre-line text-sm text-white/90">
-                {event.directionsText}
-              </span>
-            </dd>
-          ) : null}
-          {mapsUrl || event.venue?.website ? (
-            <dd className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-              {mapsUrl ? (
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-cyan transition-opacity hover:opacity-80"
-                >
-                  {t.openInMaps}
-                </a>
-              ) : null}
-              {event.venue?.website ? (
-                <a
-                  href={event.venue.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-cyan transition-opacity hover:opacity-80"
-                >
-                  {t.venueWebsite}
-                </a>
-              ) : null}
-            </dd>
-          ) : null}
         </div>
       </dl>
+        </div>
+      </header>
 
       {event.description ? (
-        <p className="mt-8 whitespace-pre-line text-sm leading-relaxed text-muted">
+        <p className="mt-8 max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted">
           {event.description}
         </p>
       ) : null}
 
       {event.locationPrecision === "approximate" ? (
-        <p className="mt-6 rounded-2xl border border-cyan/30 bg-cyan/5 p-4 text-xs text-cyan">
+        <p className="mt-6 border-l-2 border-cyan/60 bg-cyan/5 px-4 py-3 text-xs leading-relaxed text-cyan">
           {t.approximateNote}
         </p>
       ) : null}
 
       {event.isUnclaimed ? (
-        <p className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-muted">
+        <p className="mt-4 border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-xs leading-relaxed text-muted">
           {t.unclaimedNote}
         </p>
       ) : null}
 
-      <div className="mt-8 flex flex-wrap items-center gap-3">
+      <div className="mt-10 flex flex-col gap-2 border-t border-line pt-6 sm:flex-row sm:flex-wrap sm:items-center">
         {!cancelled && event.ticketUrl ? (
           <a
             href={event.ticketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="w-full border border-violet-strong bg-violet-strong px-5 py-3 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan sm:w-auto"
           >
             {t.tickets}
           </a>
@@ -314,7 +320,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             initiallySaved={savedIds.has(event.id)}
             isAuthenticated={Boolean(session)}
             labels={{ save: t.save, saved: t.saved, loginToSave: t.loginToSave, pending: t.saving }}
-            className="px-4 py-2.5 text-sm"
+            className="w-full justify-center px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em] sm:w-auto"
           />
         )}
 
@@ -323,6 +329,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             googleUrl={googleCalendarUrl(event, pageUrl, { free: t.freeEntry })}
             icsUrl={`/api/events/${event.id}/ical`}
             labels={{ add: t.addToCalendar, google: t.googleCalendar, apple: t.appleCalendar }}
+            className="w-full justify-center sm:w-auto"
           />
         )}
 
@@ -352,6 +359,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             cancelledNote: t.shareCancelledNote,
             close: t.shareClose,
           }}
+          className="w-full justify-center sm:w-auto"
         />
 
         {/* Segnalare serve su una serata che si tiene: su una annullata non c'è

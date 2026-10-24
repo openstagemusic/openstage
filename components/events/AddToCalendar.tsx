@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 type AddToCalendarProps = {
   /** Già costruito dal server: contiene i dati della serata e il link alla scheda. */
   googleUrl: string;
@@ -8,6 +10,7 @@ type AddToCalendarProps = {
     google: string;
     apple: string;
   };
+  className?: string;
 };
 
 /**
@@ -18,27 +21,27 @@ type AddToCalendarProps = {
  * Il menu è un `<details>` del browser, quindi funziona anche se lo script non
  * parte — e non c'è niente da chiudere a mano: si apre, si sceglie, si va.
  */
-export default function AddToCalendar({ googleUrl, icsUrl, labels }: AddToCalendarProps) {
+export default function AddToCalendar({ googleUrl, icsUrl, labels, className }: AddToCalendarProps) {
   return (
-    <details className="relative">
-      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white transition-colors hover:border-cyan/40 hover:text-cyan [&::-webkit-details-marker]:hidden">
+    <details className={cn("relative", className)}>
+      <summary className="flex w-full cursor-pointer list-none items-center justify-center gap-2 border border-line bg-white/[0.03] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan/50 hover:text-cyan [&::-webkit-details-marker]:hidden">
         <span aria-hidden="true">＋</span>
         {labels.add}
       </summary>
 
-      <div className="absolute left-0 z-30 mt-2 w-60 rounded-2xl border border-white/10 bg-[#0b0b14] p-1.5 shadow-2xl">
+      <div className="absolute left-0 z-30 mt-2 w-64 border border-line bg-surface p-1.5 shadow-2xl">
         <a
           href={googleUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="block rounded-xl px-3 py-2 text-sm text-white/90 transition-colors hover:bg-white/5 hover:text-cyan"
+          className="block px-3 py-2.5 text-sm text-white/90 transition-colors hover:bg-white/5 hover:text-cyan"
         >
           {labels.google}
         </a>
         <a
           href={icsUrl}
           download
-          className="block rounded-xl px-3 py-2 text-sm text-white/90 transition-colors hover:bg-white/5 hover:text-cyan"
+          className="block px-3 py-2.5 text-sm text-white/90 transition-colors hover:bg-white/5 hover:text-cyan"
         >
           {labels.apple}
         </a>

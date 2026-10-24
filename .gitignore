@@ -46,3 +46,6 @@ next-env.d.ts
 
 # worker di MapLibre (copiato da node_modules da `npm run prebuild`)
 public/maplibre-gl-worker.mjs
+
+.vercel
+.env*

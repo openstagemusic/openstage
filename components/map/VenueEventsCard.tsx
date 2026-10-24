@@ -19,7 +19,10 @@ type VenueEventsCardProps = {
 };
 
 const NAV_BUTTON =
-  "flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-base leading-none text-white transition-colors hover:border-white/30 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35";
+  "flex h-11 w-11 items-center justify-center border border-line text-lg leading-none text-white transition-colors hover:border-line-strong hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35";
+
+const SECONDARY_ACTION =
+  "inline-flex min-h-11 items-center justify-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white";
 
 /**
  * Scheda di un locale con più serate: il pin è uno solo, qui le date si
@@ -65,7 +68,7 @@ export default function VenueEventsCard({
   return (
     <article
       className={cn(
-        "glass w-full border border-white/10 text-left",
+        "w-full border border-line-strong bg-surface/95 text-left backdrop-blur",
         isSheet
           ? // Rete di sicurezza: il bottom sheet non può superare lo schermo.
             "max-h-[70vh] overflow-x-hidden overflow-y-auto rounded-3xl"
@@ -79,24 +82,23 @@ export default function VenueEventsCard({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full border border-white/10 px-3 py-1 text-xs text-muted"
+              className="min-h-11 border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
             >
               {dict.map.close}
             </button>
           ) : null}
         </div>
       ) : (
-        <div
-          className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
-          aria-hidden="true"
-        />
+        <div className="border-b border-line px-4 pt-3">
+          <span className="block h-0.5 w-10 bg-cyan" aria-hidden="true" />
+        </div>
       )}
 
       <div className="p-4">
-        <h3 className="font-display text-base font-semibold leading-tight">
+        <h3 className="font-display text-lg font-semibold leading-tight">
           {where || dict.map.title}
         </h3>
-        <p className="mt-1 text-xs text-cyan">
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
           {total} {total === 1 ? dict.map.eventInProgram : dict.map.eventsInProgram}
         </p>
 
@@ -104,15 +106,15 @@ export default function VenueEventsCard({
           <div className="mt-3">
             <Link
               href={eventPath(current)}
-              className="block rounded-2xl border border-white/10 bg-white/[0.03] p-3 transition-colors hover:border-white/25"
+              className="block border border-line bg-white/[0.03] p-3 transition-colors hover:border-cyan/50"
             >
-              <p className="text-xs text-white/80">
+              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                 {when?.isToday ? `${t.tonight} · ${when.time}` : when?.full}
               </p>
-              <p className="mt-0.5 font-display text-sm font-semibold leading-tight">
+              <p className="mt-1 font-display text-sm font-semibold leading-tight">
                 {current.title}
               </p>
-              <p className="mt-0.5 text-xs text-muted">
+              <p className="mt-1 text-xs text-muted">
                 {[t.kinds[current.kind] ?? t.kinds.other, current.genre]
                   .filter(Boolean)
                   .join(" · ")}
@@ -125,7 +127,7 @@ export default function VenueEventsCard({
             </Link>
 
             {total > 1 ? (
-              <div className="mt-2 flex items-center justify-between gap-2">
+              <div className="mt-3 flex items-center justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => step(-1)}
@@ -136,7 +138,7 @@ export default function VenueEventsCard({
                   ‹
                 </button>
 
-                <span className="text-xs tabular-nums text-muted" aria-live="polite">
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] tabular-nums text-muted" aria-live="polite">
                   {safeIndex + 1} / {total}
                 </span>
 
@@ -154,11 +156,11 @@ export default function VenueEventsCard({
           </div>
         ) : null}
 
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           {current ? (
             <Link
               href={eventPath(current)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-violet-strong px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
+              className="inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
             >
               {t.viewEvent}
             </Link>
@@ -168,7 +170,7 @@ export default function VenueEventsCard({
             href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-white/30 hover:text-white"
+            className={SECONDARY_ACTION}
           >
             {t.openInMaps}
           </a>

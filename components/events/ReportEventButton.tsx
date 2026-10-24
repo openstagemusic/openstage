@@ -80,7 +80,7 @@ export default function ReportEventButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs text-muted underline underline-offset-4 transition-colors hover:text-white"
+        className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted underline underline-offset-4 transition-colors hover:text-cyan"
       >
         {labels.open}
       </button>
@@ -88,18 +88,18 @@ export default function ReportEventButton({
   }
 
   return (
-    <div className="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="w-full border border-line bg-white/[0.03] p-4">
       <p className="font-display text-sm font-semibold text-white">{labels.title}</p>
       <p className="mt-1 text-xs text-muted">{labels.hint}</p>
 
-      <label htmlFor="report-reason" className="mt-3 block text-xs text-muted">
+      <label htmlFor="report-reason" className="mt-3 block font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
         {labels.reason}
       </label>
       <select
         id="report-reason"
         value={reason}
         onChange={(event) => setReason(event.target.value)}
-        className="mt-1 w-full rounded-xl border border-white/10 bg-[#0d0d1a] px-3 py-2 text-sm text-white outline-none focus:border-cyan/60"
+        className="mt-1 w-full border border-line bg-surface px-3 py-2.5 text-sm text-white outline-none focus:border-cyan/60"
       >
         {Object.entries(labels.reasons).map(([value, text]) => (
           <option key={value} value={value}>
@@ -108,7 +108,7 @@ export default function ReportEventButton({
         ))}
       </select>
 
-      <label htmlFor="report-note" className="mt-3 block text-xs text-muted">
+      <label htmlFor="report-note" className="mt-3 block font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
         {labels.note}
       </label>
       <textarea
@@ -118,7 +118,7 @@ export default function ReportEventButton({
         maxLength={500}
         rows={3}
         placeholder={labels.notePlaceholder}
-        className="mt-1 w-full rounded-xl border border-white/10 bg-[#0d0d1a] px-3 py-2 text-sm text-white outline-none focus:border-cyan/60"
+        className="mt-1 w-full border border-line bg-surface px-3 py-2.5 text-sm text-white outline-none focus:border-cyan/60"
       />
 
       {error ? <p className="mt-2 text-xs text-pink">{error}</p> : null}
@@ -128,14 +128,14 @@ export default function ReportEventButton({
           type="button"
           onClick={() => void send()}
           disabled={busy}
-          className="rounded-full bg-violet-strong px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+          className="border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-60"
         >
           {busy ? labels.sending : labels.send}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-xs text-muted transition-colors hover:text-white"
+          className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white"
         >
           {labels.close}
         </button>
