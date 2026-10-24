@@ -1,6 +1,6 @@
 # Fase 7B — Email Engine, Area Fan e notifiche in-app
 
-> **Stato: 7B.1 e 7B.2 completate; 7B.3 da fare.**
+> **Stato: 7B.1, 7B.2 e 7B.3a completate; restano digest e Area Fan (7B.3b/7B.3c).**
 > La 7B è troppo grande per un solo blocco: si divide in tre parti indipendenti,
 > ognuna con build e QA. La politica di riferimento resta
 > `docs/notifications-email-policy.md`.
