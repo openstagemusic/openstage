@@ -80,7 +80,7 @@ export async function setEventStatusAction(input: {
 }
 
 /**
- * Elimina definitivamente una serata creata da questo profilo.
+ * Elimina definitivamente una serata che il profilo può amministrare.
  *
  * L'annullamento è un'altra cosa: quello lascia la pagina viva con il motivo,
  * così chi l'aveva salvata capisce. Qui invece la riga sparisce, e con lei i
@@ -88,8 +88,10 @@ export async function setEventStatusAction(input: {
  * l'interfaccia chiede conferma e, se la serata non si fa, suggerisce di
  * annullarla.
  *
- * Il filtro su `created_by` è esplicito: l'admin non elimina da qui (in
- * moderazione ha gli strumenti giusti) e nessuno cancella le serate altrui.
+ * La regola di proprietà vive nella RLS (`events_delete_own`): creata da questo
+ * profilo, oppure collegata al locale/artista che amministra. Non si aggiunge
+ * un filtro `created_by` qui, altrimenti gli eventi importati dal claim
+ * resterebbero visibili ma non eliminabili.
  */
 export async function deleteEventAction(input: { eventId: string }): Promise<EventActionResult> {
   const supabase = await createClient();
@@ -100,8 +102,7 @@ export async function deleteEventAction(input: { eventId: string }): Promise<Eve
   const { error } = await supabase
     .from("events")
     .delete()
-    .eq("id", input.eventId)
-    .eq("created_by", session.id);
+    .eq("id", input.eventId);
 
   revalidatePath("/dashboard");
   revalidatePath("/");

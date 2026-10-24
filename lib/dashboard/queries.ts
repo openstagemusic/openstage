@@ -1,5 +1,6 @@
 import { cache } from "react";
 
+import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { EVENT_SELECT, toPublicEvent, type EventRow } from "@/lib/events/queries";
 import type { PublicEvent } from "@/lib/events/types";
 import { cityKey, preferredCityLabel } from "@/lib/geo/city";
@@ -8,11 +9,10 @@ import { createClient } from "@/lib/supabase/server";
 /**
  * Lettura degli eventi della dashboard.
  *
- * Regola di fondo: la visibilità la decide il database (`events_select_public`),
- * quindi qui non c'è nessun controllo di permessi da tenere allineato. Il filtro
- * su `created_by` serve a un'altra cosa: gli eventi **pubblicati** sono
- * leggibili da chiunque, e senza filtro finirebbero nell'elenco "i miei eventi"
- * anche quelli inseriti da altri.
+ * Un evento è “mio” in tre casi: l'ho creato, si tiene nel mio locale reclamato
+ * o è di un artista che amministro. Il claim non cambia `events.created_by`
+ * degli eventi già esistenti, quindi senza questi legami la dashboard
+ * nasconderebbe proprio le serate che il claim dovrebbe portare con sé.
  */
 
 export type DashboardStatus = "draft" | "published" | "cancelled";
@@ -25,14 +25,29 @@ export type DashboardEvent = PublicEvent & {
 
 type DashboardRow = EventRow & { status: DashboardStatus; updated_at: string };
 
-/** Gli eventi creati da questo profilo, in ordine di data (i prossimi per primi). */
+/** I filtri PostgREST per “eventi miei”: creati, del mio locale o del mio artista. */
+async function myEventFilters(profileId: string): Promise<string[]> {
+  const [venue, artist] = await Promise.all([
+    getVenueByProfileId(profileId),
+    getArtistByProfileId(profileId),
+  ]);
+
+  const filters = [`created_by.eq.${profileId}`];
+  if (venue) filters.push(`venue_id.eq.${venue.id}`);
+  if (artist) filters.push(`artist_id.eq.${artist.id}`);
+
+  return filters;
+}
+
+/** Gli eventi creati o collegati a questo profilo, in ordine di data. */
 export const listMyEvents = cache(async (profileId: string): Promise<DashboardEvent[]> => {
   const supabase = await createClient();
+  const filters = await myEventFilters(profileId);
 
   const { data, error } = await supabase
     .from("events")
     .select(`${EVENT_SELECT}, updated_at`)
-    .eq("created_by", profileId)
+    .or(filters.join(","))
     .order("starts_at", { ascending: true });
 
   if (error) {
@@ -94,19 +109,20 @@ export const listSavedEvents = cache(async (): Promise<PublicEvent[]> => {
 /**
  * Un proprio evento, per la pagina di modifica.
  *
- * Il filtro su `created_by` è esplicito: senza di esso un admin potrebbe aprire
- * dal proprio pannello l'evento di un altro, e la modifica diventerebbe un
- * effetto collaterale di un indirizzo scritto a mano.
+ * “Proprio” significa creato da questo profilo **oppure** collegato al locale o
+ * all'artista che il profilo amministra. Il claim non riscrive l'autore degli
+ * eventi già esistenti: il legame con la scheda è la seconda via d'accesso.
  */
 export const getMyEvent = cache(
   async (id: string, profileId: string): Promise<DashboardEvent | null> => {
     const supabase = await createClient();
+    const filters = await myEventFilters(profileId);
 
     const { data, error } = await supabase
       .from("events")
       .select(`${EVENT_SELECT}, updated_at`)
       .eq("id", id)
-      .eq("created_by", profileId)
+      .or(filters.join(","))
       .maybeSingle();
 
     if (error || !data) {
