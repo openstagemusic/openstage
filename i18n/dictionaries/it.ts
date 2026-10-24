@@ -779,8 +779,12 @@ export const it: Dictionary = {
   directory: {
     artistsIntro:
       "Progetti indipendenti, band di zona e solisti: le schede nascono dai loro concerti reali.",
+    artistsHeadline: "La scena",
+    artistsAccent: "indipendente.",
     venuesIntro:
       "Club, teatri, pub e spazi che ospitano musica dal vivo: chi suona, e dove.",
+    venuesHeadline: "I luoghi",
+    venuesAccent: "della musica.",
     searchLabel: "Cerca per nome",
     searchArtist: "Nome dell'artista o della band…",
     searchVenue: "Nome del locale…",

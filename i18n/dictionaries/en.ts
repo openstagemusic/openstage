@@ -781,7 +781,11 @@ export const en = {
   directory: {
     artistsIntro:
       "Independent projects, local bands and solo acts: every page starts from their real gigs.",
+    artistsHeadline: "The independent",
+    artistsAccent: "scene.",
     venuesIntro: "Clubs, theatres, pubs and spaces hosting live music: who plays, and where.",
+    venuesHeadline: "The places",
+    venuesAccent: "for live music.",
     searchLabel: "Search by name",
     searchArtist: "Artist or band name…",
     searchVenue: "Venue name…",
