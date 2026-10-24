@@ -1,6 +1,6 @@
 # Fase 5.5E — Editor eventi (crea e modifica)
 
-> **Stato: piano da approvare.** Scritto il 23 ottobre 2026.
+> **Stato: completata e in produzione il 24 ottobre 2026.**
 > Blocco visivo e UX della Fase 5.5. Nessun campo nuovo, nessuna migration,
 > nessun servizio esterno. L'editor continua a salvare gli stessi dati.
 

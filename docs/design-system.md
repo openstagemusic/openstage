@@ -273,6 +273,8 @@ devono sembrare lo stesso prodotto, ma restare più leggibili e più sobrie.
 
 ### 5.5E — Editor eventi (crea/modifica)
 
+- **Stato: applicata il 24 ottobre 2026** (crea e modifica evento).
+
 - Stesso linguaggio della 5.5D: sezioni numerate, etichette mono, bordi `line`,
   focus ciano, niente card dentro card.
 - Il form resta **unico e reale**: titolo, tipo, genere, data/ora/fuso, luogo,
