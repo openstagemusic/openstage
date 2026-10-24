@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import Link from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { authErrorMessage } from "@/lib/auth/error-messages";
@@ -94,9 +95,20 @@ export default function LoginForm({
       </div>
 
       <div>
-        <label htmlFor="password" className={authLabelClass}>
-          {dict.password}
-        </label>
+        <div className="mb-2 flex items-baseline justify-between gap-3">
+          <label
+            htmlFor="password"
+            className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted"
+          >
+            {dict.password}
+          </label>
+          <Link
+            href="/forgot-password"
+            className="font-mono text-[10px] uppercase tracking-[0.12em] text-cyan hover:underline"
+          >
+            {dict.forgotPassword}
+          </Link>
+        </div>
         <input
           id="password"
           type="password"
