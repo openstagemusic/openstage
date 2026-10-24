@@ -91,8 +91,8 @@ interagito si fidano di quel profilo.
 
 1. Nella pagina **Accedi** clicca **Password dimenticata?**.
 2. Inserisci l'email dell'account e completa il captcha.
-3. Apri il link che arriva da `noreply@getopenstage.it` **nello stesso browser** in cui hai
-   fatto la richiesta.
+3. Apri il link che arriva da `noreply@getopenstage.it`. Funziona anche se lo apri da un
+   browser o da un dispositivo diverso da quello della richiesta.
 4. Scegli la nuova password (almeno 8 caratteri) e salva.
 5. Torna al login e accedi con la nuova password.
 

@@ -418,6 +418,9 @@ verificato lato server.
   `siteverify`. Il widget ha action `signup`, `login`, `reset_password` e si resetta dopo un
   errore.
 - Callback OAuth corretto: i cookie di sessione vengono applicati alla redirect response.
+- Conferma e reset cross-browser: template Supabase con `token_hash` verso `/auth/confirm`,
+  così il link funziona anche se Gmail lo apre in un browser diverso.
+- Dopo il login, chi non ha ancora scelto il ruolo viene mandato a `/onboarding/role`.
 
 **Decisioni e perché**
 

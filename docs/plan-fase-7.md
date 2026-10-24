@@ -1,6 +1,8 @@
 # Fase 7A - Email reale, conferma account, reset password e risposta ai messaggi
 
 > **Stato: autenticazione completata e testata in produzione il 24 ottobre 2026.**
+> Conferma e reset usano `token_hash` + `/auth/confirm`, quindi funzionano anche se il link
+> viene aperto da un browser diverso (es. richiesta in Opera, link in Chrome).
 > Restano da chiudere **B48** (risposta ai messaggi senza `mailto:`) e il cambio
 > email dal profilo. La Fase 7 è divisa in due blocchi. Questo documento copre
 > **solo la 7A**: infrastruttura di invio, conferma email, reset password e

@@ -49,6 +49,30 @@ Inserire i nomi senza il dominio se il pannello Aruba li aggiunge automaticament
 
 Dettagli completi: `docs/notifications-email-policy.md`.
 
+## Template Supabase: conferma e reset senza dipendere dal browser
+
+Per far funzionare i link anche quando Gmail li apre in un browser diverso da quello della
+richiesta, **non usare `{{ .ConfirmationURL }}`**. Usa `{{ .TokenHash }}` e la route
+`/auth/confirm`:
+
+**Confirm signup**
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup&amp;next=/onboarding/role">
+  Conferma il tuo account OpenStage
+</a>
+```
+
+**Reset password**
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery&amp;next=/reset-password">
+  Reimposta la password di OpenStage
+</a>
+```
+
+La route `/auth/confirm` verifica il token lato server, crea la sessione e reindirizza alla
+pagina giusta. Funziona da Chrome, Opera, Safari o da un altro telefono, perché non usa il
+`code_verifier` PKCE salvato nel browser di partenza.
+
 ## Note
 
 - Non attivare “Receiving” in Resend: il MX principale del dominio deve restare quello di Aruba.
