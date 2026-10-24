@@ -1,9 +1,9 @@
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { isLocale, localeFromCountry, LOCALE_COOKIE, type Locale } from "@/lib/i18n/config";
 import { withLocale } from "@/lib/i18n/locale-path";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/env";
 
 /**
  * OAuth / email-confirmation callback.
@@ -24,7 +24,21 @@ export async function GET(request: NextRequest) {
     : localeFromCountry(request.headers.get("x-vercel-ip-country"));
 
   if (code && isSupabaseConfigured()) {
-    const supabase = await createClient();
+    // I cookie di sessione devono finire sulla redirect response: crearli con
+    // `cookies()` e restituire un `NextResponse.redirect` nuovo li perde.
+    const pendingCookies: { name: string; value: string; options?: CookieOptions }[] = [];
+
+    const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          pendingCookies.splice(0, pendingCookies.length, ...cookiesToSet);
+        },
+      },
+    });
+
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
@@ -34,10 +48,20 @@ export async function GET(request: NextRequest) {
       // Il reset password non deve passare dall'onboarding: l'utente esiste già.
       const isPasswordReset = next.startsWith("/reset-password");
       if (!isPasswordReset && !data.user?.user_metadata?.role) {
-        return NextResponse.redirect(`${origin}${withLocale(locale, "/onboarding/role")}`);
+        const redirect = NextResponse.redirect(
+          `${origin}${withLocale(locale, "/onboarding/role")}`
+        );
+        pendingCookies.forEach(({ name, value, options }) =>
+          redirect.cookies.set(name, value, options)
+        );
+        return redirect;
       }
 
-      return NextResponse.redirect(`${origin}${withLocale(locale, next)}`);
+      const redirect = NextResponse.redirect(`${origin}${withLocale(locale, next)}`);
+      pendingCookies.forEach(({ name, value, options }) =>
+        redirect.cookies.set(name, value, options)
+      );
+      return redirect;
     }
   }
 

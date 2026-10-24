@@ -145,6 +145,8 @@ export const it: Dictionary = {
     haveAccount: "Hai già un account?",
     noAccount: "Non hai un account?",
     checkEmail: "Controlla la tua email per confermare l'account, poi accedi.",
+    checkEmailTitle: "Controlla la tua email",
+    close: "Chiudi",
     errors: {
       alreadyRegistered:
         "Questa email è già registrata. Accedi — se ti sei iscritto con Google, usa «Continua con Google».",
@@ -186,6 +188,7 @@ export const it: Dictionary = {
     resetSuccess: "Password aggiornata. Ora puoi accedere.",
     resetMismatch: "Le password non coincidono.",
     resetTooShort: "La password deve avere almeno 8 caratteri.",
+    resetChecking: "Verifica del link in corso.",
     resetSessionMissing:
       "Il link è scaduto o non è valido. Richiedi un nuovo reset.",
     resetError: "Non è stato possibile aggiornare la password. Riprova.",

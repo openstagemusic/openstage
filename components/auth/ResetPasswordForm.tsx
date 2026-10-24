@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import Link from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -17,6 +18,8 @@ import {
   authPrimaryButtonClass,
 } from "./formStyles";
 
+type SessionState = "checking" | "ready" | "missing";
+
 export default function ResetPasswordForm({ dict }: { dict: Dictionary["auth"] }) {
   const router = useRouter();
   const locale = useLocale();
@@ -25,8 +28,42 @@ export default function ResetPasswordForm({ dict }: { dict: Dictionary["auth"] }
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sessionState, setSessionState] = useState<SessionState>("checking");
 
   const configured = isSupabaseConfigured();
+
+  // Il link di recovery di Supabase arriva con i token nel fragment/query.
+  // `createBrowserClient` li legge e crea la sessione: qui aspettiamo che
+  // finisca, invece di rimandare subito al login.
+  useEffect(() => {
+    if (!configured) return;
+
+    const supabase = createClient();
+    let cancelled = false;
+    const timeout = window.setTimeout(() => {
+      if (!cancelled) {
+        setSessionState((state) => (state === "checking" ? "missing" : state));
+      }
+    }, 2500);
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return;
+      if (session) setSessionState("ready");
+    });
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      if (data.session) setSessionState("ready");
+    });
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
+  }, [configured]);
 
   if (!configured) {
     return (
@@ -57,7 +94,7 @@ export default function ResetPasswordForm({ dict }: { dict: Dictionary["auth"] }
     setLoading(false);
 
     if (updateError) {
-      setError(dict.resetError);
+      setError(dict.resetSessionMissing);
       return;
     }
 
@@ -68,6 +105,27 @@ export default function ResetPasswordForm({ dict }: { dict: Dictionary["auth"] }
       router.push(withLocale(locale, "/login"));
       router.refresh();
     }, 1200);
+  }
+
+  if (sessionState === "checking") {
+    return (
+      <p role="status" className={`${authNoticeClass} mt-6`}>
+        {dict.resetChecking}
+      </p>
+    );
+  }
+
+  if (sessionState === "missing") {
+    return (
+      <div className="mt-6 space-y-4">
+        <p role="alert" className={authErrorClass}>
+          {dict.resetSessionMissing}
+        </p>
+        <Link href="/forgot-password" className="text-sm text-cyan hover:underline">
+          {dict.forgotPassword}
+        </Link>
+      </div>
+    );
   }
 
   return (

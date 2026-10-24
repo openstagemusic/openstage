@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 import AuthShell from "@/components/auth/AuthShell";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
-import { getSessionProfile } from "@/lib/supabase/session";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function ResetPasswordPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
-  const session = await getSessionProfile();
-
-  if (!session) redirect(withLocale(locale, "/forgot-password"));
 
   return (
     <AuthShell

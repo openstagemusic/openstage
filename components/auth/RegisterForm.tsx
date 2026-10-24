@@ -16,7 +16,6 @@ import {
   authErrorClass,
   authInputClass,
   authLabelClass,
-  authNoticeClass,
   authPrimaryButtonClass,
 } from "./formStyles";
 
@@ -91,6 +90,10 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
         return;
       }
 
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setRole("fan");
       setNotice(dict.checkEmail);
       resetCaptcha();
       return;
@@ -106,7 +109,8 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-5 space-y-5">
+    <>
+      <form onSubmit={handleSubmit} className="mt-5 space-y-5">
       <div>
         <label htmlFor="fullName" className={authLabelClass}>
           {dict.fullName}
@@ -185,11 +189,6 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
           {error}
         </p>
       ) : null}
-      {notice ? (
-        <p role="status" aria-live="polite" className={authNoticeClass}>
-          {notice}
-        </p>
-      ) : null}
 
       <button type="submit" disabled={loading} className={authPrimaryButtonClass}>
         {loading ? dict.loading : dict.registerSubmit}
@@ -202,6 +201,33 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       </div>
 
       <GoogleButton label={dict.google} />
-    </form>
+      </form>
+
+      {notice ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="check-email-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+        >
+          <div className="w-full max-w-sm border border-line bg-surface p-6 shadow-2xl shadow-black/40">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+              OpenStage
+            </p>
+            <h3 id="check-email-title" className="mt-2 font-display text-xl font-semibold">
+              {dict.checkEmailTitle}
+            </h3>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{notice}</p>
+            <button
+              type="button"
+              onClick={() => setNotice(null)}
+              className={`${authPrimaryButtonClass} mt-5`}
+            >
+              {dict.close}
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }

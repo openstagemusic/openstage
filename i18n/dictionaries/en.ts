@@ -149,6 +149,8 @@ export const en = {
     haveAccount: "Already have an account?",
     noAccount: "Don't have an account?",
     checkEmail: "Check your email to confirm your account, then log in.",
+    checkEmailTitle: "Check your email",
+    close: "Close",
     errors: {
       alreadyRegistered:
         "This email is already registered. Log in — if you signed up with Google, use “Continue with Google”.",
@@ -189,6 +191,7 @@ export const en = {
     resetSuccess: "Password updated. You can log in now.",
     resetMismatch: "The passwords do not match.",
     resetTooShort: "The password must be at least 8 characters long.",
+    resetChecking: "Checking the link.",
     resetSessionMissing:
       "This link is expired or invalid. Request a new reset link.",
     resetError: "The password could not be updated. Please try again.",
