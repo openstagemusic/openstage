@@ -1,6 +1,6 @@
 # Fase 5.5D — Guscio dashboard, panoramica, I miei eventi e Preferiti
 
-> **Stato: piano da approvare.** Scritto il 23 ottobre 2026.
+> **Stato: completata e in produzione il 24 ottobre 2026.**
 > Blocco visivo della Fase 5.5. Nessuna nuova funzione, nessuna migration,
 > nessun servizio esterno. La logica esistente resta quella.
 

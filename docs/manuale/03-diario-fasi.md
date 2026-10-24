@@ -479,6 +479,28 @@ invariati; italiano e inglese; nessuna modifica a database o RLS.
 
 **Rimandato:** guscio dashboard (5.5D) ed editor eventi (5.5E).
 
+## Fase 5.5D - Guscio dashboard e pagine esistenti
+
+**Obiettivo:** riportare dashboard, panoramica, I miei eventi e Preferiti al linguaggio della
+Home 5.4 senza cambiare le funzioni.
+
+**Cosa è stato costruito**
+
+- Guscio con sidebar desktop e pannello mobile squadrati, etichette mono e voce attiva
+  calcolata sulla rotta **più specifica** (`/dashboard/events/new` non attiva più anche
+  “I miei eventi”).
+- Panoramica con etichetta mono, titolo-poster, email, KPI reali cliccabili e scorciatoie.
+- “I miei eventi” con sezioni In programma, Bozze, Annullate e Passate, stato in mono,
+  azioni squadrate e motivo di annullamento nello stesso linguaggio.
+- “Preferiti” con card evento coerenti e stato vuoto editoriale.
+- `/account` mostra un ritorno esplicito alla dashboard.
+
+**Verifiche superate:** build verde; screenshot desktop e mobile con sessione reale;
+voce attiva corretta su panoramica, I miei eventi e Crea evento; KPI e azioni invariati;
+italiano e inglese; nessuna modifica a database o RLS.
+
+**Rimandato:** editor eventi (5.5E) e le funzioni nuove della dashboard (Fase 10).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

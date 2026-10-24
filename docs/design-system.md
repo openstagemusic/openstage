@@ -245,6 +245,8 @@ devono sembrare lo stesso prodotto, ma restare più leggibili e più sobrie.
 
 ### 5.5D — Guscio dashboard, panoramica e pagine esistenti
 
+- **Stato: applicata il 24 ottobre 2026** (guscio, panoramica, I miei eventi, Preferiti).
+
 - Un solo guscio per artista, locale e fan; i moduli cambiano, la struttura no.
 - Menu laterale desktop e pannello mobile già esistenti: si ripuliscono, non si
   reinventano. Niente glass generico: bordo `line`, fondo `surface`, etichette
