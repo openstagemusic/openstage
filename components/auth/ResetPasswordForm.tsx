@@ -44,13 +44,13 @@ export default function ResetPasswordForm({ dict }: { dict: Dictionary["auth"] }
       if (!cancelled) {
         setSessionState((state) => (state === "checking" ? "missing" : state));
       }
-    }, 2500);
+    }, 10000);
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (cancelled) return;
-      if (session) setSessionState("ready");
+      if (session || event === "PASSWORD_RECOVERY") setSessionState("ready");
     });
 
     supabase.auth.getSession().then(({ data }) => {

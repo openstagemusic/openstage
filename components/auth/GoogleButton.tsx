@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
+import { OAUTH_NEXT_COOKIE } from "@/lib/auth/oauth-next";
 
 import { authSecondaryButtonClass } from "./formStyles";
 
@@ -11,11 +12,12 @@ export default function GoogleButton({ label, next = "/" }: { label: string; nex
 
   async function handleClick() {
     setLoading(true);
+    document.cookie = `${OAUTH_NEXT_COOKIE}=${encodeURIComponent(next)}; path=/; max-age=600; samesite=lax`;
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 

@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { isLocale, localeFromCountry, LOCALE_COOKIE, type Locale } from "@/lib/i18n/config";
 import { withLocale } from "@/lib/i18n/locale-path";
+import { OAUTH_NEXT_COOKIE } from "@/lib/auth/oauth-next";
 import { isSupabaseConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/env";
 
 /**
@@ -16,7 +17,13 @@ import { isSupabaseConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/sup
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const cookieNext = request.cookies.get(OAUTH_NEXT_COOKIE)?.value;
+  const rawNext =
+    searchParams.get("next") ??
+    (cookieNext ? decodeURIComponent(cookieNext) : null) ??
+    "/";
+  // Solo percorsi interni: evita redirect aperti verso altri domini.
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
 
   const stored = request.cookies.get(LOCALE_COOKIE)?.value;
   const locale: Locale = isLocale(stored)
@@ -54,6 +61,7 @@ export async function GET(request: NextRequest) {
         pendingCookies.forEach(({ name, value, options }) =>
           redirect.cookies.set(name, value, options)
         );
+        redirect.cookies.set(OAUTH_NEXT_COOKIE, "", { path: "/", maxAge: 0 });
         return redirect;
       }
 
@@ -61,9 +69,14 @@ export async function GET(request: NextRequest) {
       pendingCookies.forEach(({ name, value, options }) =>
         redirect.cookies.set(name, value, options)
       );
+      redirect.cookies.set(OAUTH_NEXT_COOKIE, "", { path: "/", maxAge: 0 });
       return redirect;
     }
   }
 
-  return NextResponse.redirect(`${origin}${withLocale(locale, "/login?error=auth")}`);
+  const redirect = NextResponse.redirect(
+    `${origin}${withLocale(locale, "/login?error=auth")}`
+  );
+  redirect.cookies.set(OAUTH_NEXT_COOKIE, "", { path: "/", maxAge: 0 });
+  return redirect;
 }

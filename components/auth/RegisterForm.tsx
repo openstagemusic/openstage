@@ -19,15 +19,12 @@ import {
   authPrimaryButtonClass,
 } from "./formStyles";
 
-type Role = "fan" | "artist" | "venue";
-
 export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   const router = useRouter();
   const locale = useLocale();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<Role>("fan");
   const [token, setToken] = useState("");
   const [captchaReset, setCaptchaReset] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +64,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: { full_name: fullName, role },
+        data: { full_name: fullName },
         captchaToken: token || undefined,
       },
     });
@@ -93,18 +90,12 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       setFullName("");
       setEmail("");
       setPassword("");
-      setRole("fan");
       setNotice(dict.checkEmail);
       resetCaptcha();
       return;
     }
 
-    router.push(
-      withLocale(
-        locale,
-        role === "artist" ? "/onboarding/artist" : role === "venue" ? "/onboarding/venue" : "/"
-      )
-    );
+    router.push(withLocale(locale, "/onboarding/role"));
     router.refresh();
   }
 
@@ -155,22 +146,6 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
           onChange={(event) => setPassword(event.target.value)}
           className={authInputClass}
         />
-      </div>
-
-      <div>
-        <label htmlFor="role" className={authLabelClass}>
-          {dict.role}
-        </label>
-        <select
-          id="role"
-          value={role}
-          onChange={(event) => setRole(event.target.value as Role)}
-          className={authInputClass}
-        >
-          <option value="fan">{dict.roleFan}</option>
-          <option value="artist">{dict.roleArtist}</option>
-          <option value="venue">{dict.roleVenue}</option>
-        </select>
       </div>
 
       {siteKey ? (
