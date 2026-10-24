@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
+import { sendContactNotification } from "@/lib/email";
 import { createClient } from "@/lib/supabase/server";
 
 const TOPICS = new Set(["general", "artist", "venue", "report", "privacy", "other"]);
@@ -17,9 +18,10 @@ function text(formData: FormData, key: string): string {
 /**
  * Il modulo contatti è pubblico e scrive nel database.
  *
- * Non ci sono servizi email in questa fase: il messaggio resta in
- * `contact_messages`, dove l'admin lo legge. La validazione qui è la stessa
- * dei vincoli della tabella; il database resta comunque l'ultima autorità.
+ * Dopo l'insert avvisa la casella ufficiale (`ciao@`) con Resend. L'email è un
+ * di più: se Resend non risponde, il messaggio resta comunque in
+ * `contact_messages` e l'admin lo vede. La validazione qui è la stessa dei
+ * vincoli della tabella; il database resta comunque l'ultima autorità.
  */
 export async function submitContact(formData: FormData): Promise<never> {
   const locale = await getLocale();
@@ -64,6 +66,8 @@ export async function submitContact(formData: FormData): Promise<never> {
     console.error("[contact] insert:", error.message);
     fail("invio");
   }
+
+  await sendContactNotification({ name, email, topic, message, locale });
 
   redirect(withLocale(locale, "/contatti?stato=inviato"));
 }

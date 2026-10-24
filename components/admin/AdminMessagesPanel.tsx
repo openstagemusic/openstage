@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { adminSetMessageStatusAction } from "@/app/actions/messages";
+import { adminReplyToMessageAction, adminSetMessageStatusAction } from "@/app/actions/messages";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type {
@@ -43,6 +43,12 @@ export default function AdminMessagesPanel({
   const [filter, setFilter] = useState<Filter>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [replyId, setReplyId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replyBusy, setReplyBusy] = useState(false);
+  const [replyNotice, setReplyNotice] = useState<string | null>(null);
+  const [replyDoneId, setReplyDoneId] = useState<string | null>(null);
+  const [replyError, setReplyError] = useState<string | null>(null);
 
   const dateTime = new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
     dateStyle: "medium",
@@ -93,6 +99,28 @@ export default function AdminMessagesPanel({
       return;
     }
 
+    router.refresh();
+  }
+
+  async function sendReply(messageId: string) {
+    setReplyBusy(true);
+    setReplyError(null);
+    setReplyNotice(null);
+    setReplyDoneId(null);
+
+    const outcome = await adminReplyToMessageAction({ messageId, body: replyText });
+
+    setReplyBusy(false);
+
+    if (!outcome.ok) {
+      setReplyError(dict.messagesReplyFailed);
+      return;
+    }
+
+    setReplyText("");
+    setReplyId(null);
+    setReplyNotice(dict.messagesReplySent);
+    setReplyDoneId(messageId);
     router.refresh();
   }
 
@@ -170,17 +198,79 @@ export default function AdminMessagesPanel({
                     </a>
                   </div>
 
-                  <a
-                    href={mailto}
-                    className="rounded-full border border-cyan/40 px-3 py-1.5 text-xs text-cyan transition-colors hover:bg-cyan/10"
-                  >
-                    {dict.messagesReply}
-                  </a>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplyId(message.id);
+                        setReplyText("");
+                        setReplyError(null);
+                        setReplyNotice(null);
+                        setReplyDoneId(null);
+                      }}
+                      className="rounded-full border border-cyan/40 px-3 py-1.5 text-xs text-cyan transition-colors hover:bg-cyan/10"
+                    >
+                      {dict.messagesReplyInline}
+                    </button>
+                    <a
+                      href={mailto}
+                      className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-muted transition-colors hover:text-white"
+                    >
+                      {dict.messagesReply}
+                    </a>
+                  </div>
                 </div>
 
                 <p className="mt-4 whitespace-pre-line break-words text-sm leading-relaxed text-white/90">
                   {message.message}
                 </p>
+
+                {replyId === message.id ? (
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void sendReply(message.id);
+                    }}
+                    className="mt-4 border border-line bg-white/[0.03] p-3"
+                  >
+                    <label
+                      htmlFor={`reply-${message.id}`}
+                      className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted"
+                    >
+                      {dict.messagesReplyInline}
+                    </label>
+                    <textarea
+                      id={`reply-${message.id}`}
+                      className="mt-2 w-full border border-line bg-surface px-3 py-2 text-sm text-white outline-none focus:border-cyan/60"
+                      rows={4}
+                      maxLength={4000}
+                      value={replyText}
+                      onChange={(event) => setReplyText(event.target.value)}
+                      placeholder={dict.messagesReplyPlaceholder}
+                    />
+                    {replyError ? <p className="mt-2 text-xs text-pink">{replyError}</p> : null}
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <button
+                        type="submit"
+                        disabled={replyBusy || replyText.trim().length < 10}
+                        className="rounded-full bg-violet-strong px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                      >
+                        {replyBusy ? dict.messagesReplySending : dict.messagesReplySend}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReplyId(null)}
+                        className="text-xs text-muted transition-colors hover:text-white"
+                      >
+                        {dict.moderationCancel}
+                      </button>
+                    </div>
+                  </form>
+                ) : null}
+
+                {replyDoneId === message.id && replyNotice ? (
+                  <p className="mt-3 text-xs text-cyan">{replyNotice}</p>
+                ) : null}
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   {message.status === "new" ? (
