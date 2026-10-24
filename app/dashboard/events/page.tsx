@@ -36,8 +36,11 @@ export default async function MyEventsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold tracking-tight">{t.eventsTitle}</h1>
-      <p className="mt-2 text-sm text-muted">{t.eventsText}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">{t.navEvents}</p>
+      <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em]">
+        {t.eventsTitle}
+      </h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.eventsText}</p>
 
       <div className="mt-8">
         <MyEvents events={events} verified={verified} dict={t} />

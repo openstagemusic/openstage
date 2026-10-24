@@ -90,7 +90,14 @@ export default async function AccountPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
-      <header className="border-b border-line pb-8">
+      <LocaleLink
+        href="/dashboard"
+        className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-cyan"
+      >
+        ← {dict.dashboard.title}
+      </LocaleLink>
+
+      <header className="mt-6 border-b border-line pb-8">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">{t.eyebrow}</p>
 
         <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">

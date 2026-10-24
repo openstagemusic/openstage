@@ -27,11 +27,11 @@ type MyEventsProps = {
 };
 
 const primaryButton =
-  "rounded-full bg-violet-strong px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
 const ghostButton =
-  "rounded-full border border-white/15 px-3 py-1.5 text-xs text-muted transition-colors hover:text-white disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white disabled:opacity-50";
 const dangerButton =
-  "rounded-full border border-pink/40 px-3 py-1.5 text-xs text-pink transition-colors hover:bg-pink/10 disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center border border-pink/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-pink transition-colors hover:bg-pink/10 disabled:opacity-50";
 
 /** "I miei eventi": bozze, pubblicati e annullati, con le azioni di ognuno. */
 export default function MyEvents({ events, verified, dict }: MyEventsProps) {
@@ -81,12 +81,12 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
 
   if (events.length === 0) {
     return (
-      <section className="glass rounded-3xl border border-white/10 p-6">
+      <section className="border border-line bg-surface/60 p-6">
         <h2 className="font-display text-xl font-semibold">{dict.emptyEventsTitle}</h2>
         <p className="mt-2 text-sm text-muted">{dict.emptyEventsText}</p>
         <LocaleLink
           href="/dashboard/events/new"
-          className="mt-4 inline-block rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          className="mt-4 inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
         >
           {dict.emptyEventsCta}
         </LocaleLink>
@@ -134,7 +134,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
   };
 
   const statusClass: Record<DashboardStatus, string> = {
-    draft: "border-white/15 text-muted",
+    draft: "border-line text-muted",
     published: "border-cyan/40 bg-cyan/10 text-white",
     cancelled: "border-pink/40 bg-pink/10 text-white",
   };
@@ -142,11 +142,11 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
   return (
     <div className="space-y-8">
       {error ? (
-        <p className="rounded-2xl border border-pink/40 bg-pink/10 p-4 text-sm text-white">{error}</p>
+        <p className="border-l-2 border-pink bg-pink/10 px-4 py-3 text-sm text-white">{error}</p>
       ) : null}
 
       {!verified ? (
-        <p className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-muted">
+        <p className="border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-sm leading-relaxed text-muted">
           {dict.unverifiedNote}
         </p>
       ) : null}
@@ -156,9 +156,12 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
         if (list.length === 0) return null;
 
         return (
-          <section key={section.key}>
+          <section key={section.key} id={section.key}>
             <h2 className="font-display text-xl font-semibold">
-              {section.label} <span className="text-muted">({list.length})</span>
+              {section.label}{" "}
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                ({list.length})
+              </span>
             </h2>
 
             <div className="mt-4 space-y-3">
@@ -169,20 +172,20 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                 const archived = event.status === "published" && isPast(event);
 
                 return (
-                  <article key={event.id} className="glass rounded-2xl border border-white/10 p-4">
+                  <article key={event.id} className="border border-line bg-surface/60 p-4">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <h3 className="font-display text-base font-semibold">{event.title}</h3>
                       <span
                         className={cn(
-                          "rounded-full border px-2.5 py-1 text-xs",
-                          archived ? "border-white/15 text-muted" : statusClass[event.status]
+                          "border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
+                          archived ? "border-line text-muted" : statusClass[event.status]
                         )}
                       >
                         {archived ? dict.statusPast : statusLabel[event.status]}
                       </span>
                     </div>
 
-                    <p className="mt-1 text-sm text-muted">
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                       {[when.full, where].filter(Boolean).join(" · ")}
                     </p>
 
@@ -276,17 +279,17 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                     </div>
 
                     {cancellingId === event.id ? (
-                      <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                      <div className="mt-3 border border-line bg-white/[0.03] p-3">
                         <label
                           htmlFor={`cancel-reason-${event.id}`}
-                          className="text-xs text-muted"
+                          className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted"
                         >
                           {dict.cancelReasonLabel}
                         </label>
 
                         <textarea
                           id={`cancel-reason-${event.id}`}
-                          className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d1a] px-3 py-2 text-sm text-white outline-none focus:border-cyan/60"
+                          className="mt-2 w-full border border-line bg-surface px-3 py-2 text-sm text-white outline-none focus:border-cyan/60"
                           rows={2}
                           maxLength={CANCEL_REASON_MAX}
                           value={reason}

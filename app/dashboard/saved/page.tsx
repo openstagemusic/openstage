@@ -29,22 +29,25 @@ export default async function SavedEventsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold tracking-tight">{t.savedTitle}</h1>
-      <p className="mt-2 text-sm text-muted">{t.savedText}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">{t.navSaved}</p>
+      <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em]">
+        {t.savedTitle}
+      </h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.savedText}</p>
 
       {saved.length === 0 ? (
-        <section className="glass mt-8 rounded-3xl border border-white/10 p-6">
+        <section className="mt-8 border border-line bg-surface/60 p-6">
           <h2 className="font-display text-xl font-semibold">{t.emptySavedTitle}</h2>
           <p className="mt-2 text-sm text-muted">{t.emptySavedText}</p>
           <LocaleLink
             href="/"
-            className="mt-4 inline-block rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:bg-white/5"
+            className="mt-4 inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
           >
             {dict.events.backToExplore}
           </LocaleLink>
         </section>
       ) : (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {saved.map((event) => (
             <EventTeaser key={event.id} event={event} locale={locale} dict={dict} />
           ))}

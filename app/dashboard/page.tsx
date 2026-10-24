@@ -37,9 +37,9 @@ export default async function DashboardPage() {
   const cards = [
     ...(canManage
       ? [
-          { label: t.statDrafts, value: count("draft"), href: "/dashboard/events" },
-          { label: t.statPublished, value: count("published"), href: "/dashboard/events" },
-          { label: t.statCancelled, value: count("cancelled"), href: "/dashboard/events" },
+          { label: t.statDrafts, value: count("draft"), href: "/dashboard/events#drafts" },
+          { label: t.statPublished, value: count("published"), href: "/dashboard/events#upcoming" },
+          { label: t.statCancelled, value: count("cancelled"), href: "/dashboard/events#cancelled" },
         ]
       : []),
     { label: t.statSaved, value: saved.length, href: "/dashboard/saved" },
@@ -47,27 +47,29 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <div
-        className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
-        aria-hidden="true"
-      />
+      <header className="border-b border-line pb-6">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">{t.title}</p>
+        <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em] sm:text-5xl">
+          {t.overviewTitle}
+        </h1>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.overviewText}</p>
+        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+          {session.email}
+        </p>
+      </header>
 
-      <h1 className="mt-6 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-        {t.overviewTitle}
-      </h1>
-      <p className="mt-2 text-sm text-muted">{t.overviewText}</p>
-      <p className="mt-1 text-xs text-muted">{session.email}</p>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <LocaleLink
             key={card.label}
             href={card.href}
-            className="glass rounded-3xl border border-white/10 p-5 transition-colors hover:border-white/25"
+            className="border border-line bg-surface/60 p-5 transition-colors hover:border-cyan/50"
           >
-            <p className="font-display text-3xl font-bold">{card.value}</p>
-            <p className="mt-1 text-sm text-muted">{card.label}</p>
-            <p className="mt-3 text-xs text-cyan">
+            <p className="font-poster text-4xl leading-none">{card.value}</p>
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+              {card.label}
+            </p>
+            <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
               {t.statHint} <span aria-hidden="true">→</span>
             </p>
           </LocaleLink>
@@ -75,16 +77,16 @@ export default async function DashboardPage() {
       </div>
 
       {canManage ? (
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-col gap-2 border-t border-line pt-6 sm:flex-row sm:flex-wrap">
           <LocaleLink
             href="/dashboard/events/new"
-            className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
           >
             {t.navNew}
           </LocaleLink>
           <LocaleLink
             href="/dashboard/events"
-            className="rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:bg-white/5"
+            className="inline-flex min-h-11 items-center justify-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
           >
             {t.navEvents}
           </LocaleLink>

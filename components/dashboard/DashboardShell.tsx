@@ -27,8 +27,15 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
   const [open, setOpen] = useState(false);
   const pathname = stripLocale(usePathname());
 
-  const isActive = (href: string) =>
-    href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
+  // La rotta più specifica vince: /dashboard/events/new non deve attivare
+  // anche "I miei eventi".
+  const activeHref = items
+    .filter((item) =>
+      item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href)
+    )
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+
+  const isActive = (href: string) => href === activeHref;
 
   const current = items.find((item) => isActive(item.href));
 
@@ -40,10 +47,10 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "block rounded-xl px-3 py-2 text-sm transition-colors",
+              "block border-l-2 px-3 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
               isActive(item.href)
-                ? "bg-white/10 text-white"
-                : "text-muted hover:bg-white/5 hover:text-white"
+                ? "border-cyan bg-white/[0.04] text-white"
+                : "border-transparent text-muted hover:border-line-strong hover:text-white"
             )}
           >
             {item.label}
@@ -56,7 +63,10 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
   return (
     <div className="mx-auto flex w-full max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-10">
       <aside className="hidden w-56 shrink-0 lg:block">
-        <nav aria-label={dict.menu} className="glass sticky top-24 rounded-3xl border border-white/10 p-3">
+        <nav
+          aria-label={dict.menu}
+          className="sticky top-24 border border-line bg-surface/60 p-3"
+        >
           {list()}
         </nav>
       </aside>
@@ -67,14 +77,18 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
             type="button"
             onClick={() => setOpen(true)}
             aria-expanded={open}
-            className="rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:bg-white/5"
+            className="inline-flex min-h-11 items-center border border-line bg-surface/60 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
           >
             <span className="mr-2 inline-block align-middle" aria-hidden="true">
               ☰
             </span>
             {dict.menu}
           </button>
-          {current ? <span className="truncate text-sm text-muted">{current.label}</span> : null}
+          {current ? (
+            <span className="truncate font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+              {current.label}
+            </span>
+          ) : null}
         </div>
 
         {children}
@@ -89,13 +103,13 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
             className="absolute inset-0 bg-black/70"
           />
 
-          <div className="glass absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto border-r border-white/10 p-4">
+          <div className="absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto border-r border-line bg-surface p-4">
             <div className="flex items-center justify-between gap-2">
               <span className="font-display text-base font-semibold">{dict.title}</span>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-full border border-white/15 px-3 py-1.5 text-xs text-muted transition-colors hover:text-white"
+                className="inline-flex min-h-11 items-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
               >
                 {dict.closeMenu}
               </button>
