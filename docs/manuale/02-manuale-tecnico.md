@@ -12,9 +12,9 @@ social funzionano sempre e non esiste una "SPA" vuota da riempire nel browser.
 | Stile | Tailwind CSS | v4 | Utility-first, tema custom con i token del brand |
 | Animazioni | CSS + `IntersectionObserver` | — | Reveal, stagger e hover leggeri. **Framer Motion** è stato valutato in Fase 5 e rimandato alla Fase 13: per un fade aggiungeva ~45 KB gzip |
 | Database + Auth | Supabase (Postgres) | eu-north-1 | RLS nativa sull'`auth.uid()`; un solo fornitore per dati e login |
-| Anti-bot | Cloudflare Turnstile | — | Captcha invisibile su registrazione e login |
+| Anti-bot | Cloudflare Turnstile + Supabase Auth | — | Captcha su registrazione, login e reset; la verifica `siteverify` è lato Supabase |
 | Mappe | MapLibre GL JS + **OpenFreeMap** | 6.14.0 | Mappa e globo degli eventi: **nessuna chiave API, nessun account** (Fase 2) |
-| Email | Resend | *in arrivo* | Email transazionali (fasi successive) |
+| Email | Resend + Aruba | — | Invio transazionale `eu-west-1`; ricezione sulle caselle Aruba (`noreply@`, `ciao@`) |
 | Pagamenti | PayPal | *in arrivo* | Solo funzioni opzionali: il piano base resta gratuito |
 | Hosting | Vercel | Hobby | Deploy continuo da GitHub |
 | Repository | GitHub | `openstagemusic/openstage` | Ramo principale `main` |
@@ -70,6 +70,8 @@ app/                     Pagine (App Router) e server action
   citta/                 Indice città e pagina /citta/[city], generate dai dati reali
   per-gli-artisti/ per-le-venue/ about/ contatti/ faq/ privacy/ terms/ cookies/
   login/ register/       Accesso e registrazione
+  forgot-password/       Richiesta del link di recupero
+  reset-password/        Nuova password dopo il link di recovery
   auth/callback/         Ritorno da Google: crea/aggiorna la sessione
   api/suggest/           Endpoint dei suggerimenti di ricerca
   api/geocode/           Geocodifica e controllo pin/città (Photon)
@@ -131,6 +133,10 @@ quando ne aggiungi una, impostala su tutti e tre.
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API | Chiave di servizio: **solo server**, usata dal client admin per operazioni di manutenzione. Non va mai esposta al browser |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare → Turnstile | Chiave pubblica del captcha |
 | `TURNSTILE_SECRET_KEY` | Cloudflare → Turnstile | Verifica lato server (Supabase la usa per il captcha) |
+| `RESEND_API_KEY` | Resend → API Keys (`openstage-vercel`) | Invio email transazionali dall'app |
+| `RESEND_SMTP_URL` | Resend → Domains → SMTP | Configurazione SMTP di Supabase Auth (host `smtp.resend.com`, porta 587, utente `resend`) |
+| `EMAIL_FROM` | Scelta interna | Mittente, es. `OpenStage <noreply@getopenstage.it>` |
+| `EMAIL_REPLY_TO` | Scelta interna | Risposte, es. `ciao@getopenstage.it` |
 | `ADMIN_EMAIL` | Scelta interna | Email dello staff: deve combaciare con `settings.admin_email` |
 | `NEXT_PUBLIC_SITE_URL` | Dominio di produzione | URL canonico per SEO e link di ritorno |
 | `NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID` | URL della playlist (la parte dopo `/playlist/`) | Player Spotify in fondo alle pagine. **Oggi è vuota**: senza un id il player non compare affatto (nessun contenuto finto, nessun player vuoto) |
@@ -154,11 +160,16 @@ produzione.
 ## Come funziona l'accesso
 
 ```text
-Email + password:  form → Supabase Auth → trigger handle_new_user() crea la riga in profiles
-                                        → il ruolo arriva dai metadati del form (fan|artist|venue)
+Email + password:  form → Supabase Auth (CAPTCHA) → email di conferma → /auth/callback
+                                        → trigger handle_new_user() crea la riga in profiles
+                                        → se manca il ruolo, si passa da /onboarding/role
+                                        → il ruolo viene salvato in profiles e user_metadata
 
 Google:            bottone → Google → /auth/callback → sessione
                                         → se manca il ruolo, si passa da /onboarding/role
+
+Reset password:    /forgot-password → Supabase (CAPTCHA) → email Resend
+                                        → link → /reset-password → updateUser({ password })
 ```
 
 Punti importanti:
@@ -452,7 +463,9 @@ Punti tecnici da ricordare:
    campo: un locale con molte serate mostra **una serata alla volta** con le frecce numerate
    (altezza costante), e il margine della mappa va **dal lato giusto** (in alto per il pop-up
    desktop, che sta sopra il pin; in basso per il pannello mobile, che sta sotto). Senza queste
-   due cose la scheda esce dalla mappa e viene tagliata.
+   due cose la scheda esce dalla mappa e viene tagliata. Nella 5.5B il margine superiore del
+   popup è stato portato a **340 px** quando c'è il pannello ricerca/filtri, per non finire
+   sotto l'overlay della pagina `/mappa`.
 4. **Il globo è una proiezione nativa** di MapLibre: nessuna libreria aggiuntiva (Globe.gl è
    stato scartato proprio per questo).
 5. **Su mobile le gesture sono "cooperative"** (`cooperativeGestures: true`): un dito scorre la
@@ -510,12 +523,14 @@ Scelte da non perdere:
 | --- | --- | --- |
 | Il deploy su Vercel si rompe senza un errore di codice | Preset del framework impostato su "Other" | Riportare il preset a **Next.js** e ricreare il deploy di produzione |
 | In locale la build va, su Vercel no (o viceversa) | Variabile d'ambiente mancante in uno dei tre ambienti | Impostarla su Production, Preview e Development |
-| Login/registrazione dall'API falliscono con errore captcha | Turnstile è attivo su Supabase: serve un token vero | Provare da browser, non con chiamate dirette |
+| Login/registrazione dall'API falliscono con errore captcha | Turnstile è attivo su Supabase: serve un token vero | Provare da browser, non con chiamate dirette. Il server deve chiamare `siteverify`; Supabase lo fa se CAPTCHA è attivo |
 | `supabase migration list` non mostra le migrazioni | Manca la riga in `supabase_migrations.schema_migrations` | Inserire la voce `(version, name)` corrispondente al file |
 | Un test RLS "mente" (una modifica bloccata sembra passata) | I claim JWT erano rimasti attivi da un test precedente | `set local request.jwt.claims = ''` prima del test |
 | L'URL di autorizzazione OAuth arriva rotto (`client_id: invalid`) | I parametri `&` vengono corrotti aprendolo da terminale/chat | Incollare l'URL a mano nella barra degli indirizzi |
 | Il selettore di lingua non cambia nulla | La scelta manuale è nel cookie `NEXT_LOCALE` | Svuotare il cookie o usare lo switcher (non l'URL) |
-| L'email di conferma non arriva | In questa fase l'autoconferma è attiva: l'account è già utilizzabile | Nessuna azione: arriverà con Resend |
+| L'email di conferma o di reset non arriva | SMTP o dominio Resend non configurati, oppure email in spam | Controllare Resend → Domains (verified), Supabase → Auth → SMTP, e la cartella spam |
+| Il link di reset porta al login o dice "scaduto" | Il link è stato aperto in un browser diverso da quello della richiesta (PKCE), oppure l'URL non è tra i Redirect URLs | Aprire il link nello stesso browser; in Supabase → Auth → URL Configuration aggiungere `https://getopenstage.it/**`, `https://getopenstage.it/reset-password`, `https://getopenstage.it/auth/callback`, `http://localhost:3000/**` |
+| Google torna alla Home da scollegato | I cookie di sessione non vengono applicati alla redirect del callback | Il callback deve impostare i cookie sulla `NextResponse.redirect` (non solo su `cookies()`); verificare anche i Redirect URLs Supabase |
 | La lista degli eventi in Home è **sempre vuota** | Una costante importata da un modulo `"use client"` dentro un Server Component arriva `undefined` | Tenere le costanti condivise in un file neutro: `lib/pagination.ts`. **Regola**: mai importare valori da un modulo `"use client"` in un componente server |
 | `?page=2` mostra una pagina vuota | Il numero di pagina richiesto supera l'ultima disponibile | Riportare la pagina all'ultimo valore valido invece di mostrare il vuoto |
 | Il pop-up di un locale con più serate esce dalla mappa e si taglia | La scheda cresce con il numero di date, e il pop-up desktop sta **sopra** il pin | Una serata alla volta con le frecce (altezza costante) + margine della mappa dal lato giusto |
@@ -576,8 +591,10 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 3 | ✅ Directory artisti/locali, reclamo, dashboard, editor eventi, condivisione, preferiti |
 | 4 | ✅ Qualità dei dati, serate collegate, segnalazioni e moderazione, serate passate |
 | 5.4 | ✅ Remake grafico della Home: muro di locandine, lista a righe, mappa a tutta pagina, guscio |
+| 5.5A · 5.5B | ✅ Restyling login/registrazione/account/onboarding e scheda evento + popup/bottom sheet mappa |
 | 6 | ✅ Pagine pubbliche ed editoriali, `/citta` e schede città, modulo contatti reale e coda messaggi admin; sezione Città in Home e Dashboard evidenziata |
-| 7 | Email transazionali (Resend), conferma email, reset password, area fan e notifiche. **Prossima fase**, bloccata dal dominio |
+| 7A | ✅ Email transazionali (Resend), conferma email, reset password, Turnstile lato Supabase. Resta `B48` (risposta ai contatti) |
+| 7B | Area fan, notifiche in-app, coda email, webhook, digest. **Prossima dopo la 5.5** |
 | 8 | Pannello admin completo, 2FA e claim a invito |
 | 9 | Community: "segui" e inviti virali |
 | 10 | Spotify e area artista |

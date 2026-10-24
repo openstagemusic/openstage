@@ -1,10 +1,11 @@
-# Fase 7A — Email reale, conferma account, reset password e risposta ai messaggi
+# Fase 7A - Email reale, conferma account, reset password e risposta ai messaggi
 
-> **Stato: piano da approvare.** Scritto il 23 ottobre 2026.
-> La Fase 7 è divisa in due blocchi. Questo documento copre **solo la 7A**:
-> infrastruttura di invio, conferma email, reset password e risposta integrata
-> ai messaggi di contatto. Coda, worker, webhook, preferenze e Area Fan restano
-> nella **7B**.
+> **Stato: autenticazione completata e testata in produzione il 24 ottobre 2026.**
+> Restano da chiudere **B48** (risposta ai messaggi senza `mailto:`) e il cambio
+> email dal profilo. La Fase 7 è divisa in due blocchi. Questo documento copre
+> **solo la 7A**: infrastruttura di invio, conferma email, reset password e
+> risposta integrata ai messaggi di contatto. Coda, worker, webhook, preferenze
+> e Area Fan restano nella **7B**.
 >
 > Nessun codice verrà scritto prima dell'ok al piano e della verifica del
 > dominio `getopenstage.it`.

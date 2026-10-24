@@ -1,6 +1,6 @@
 # Fase 5.5B — Scheda evento e popup mappa
 
-> **Stato: piano da approvare.** Scritto il 24 ottobre 2026.
+> **Stato: completata e in produzione il 24 ottobre 2026.**
 > Blocco visivo della Fase 5.5. Nessuna nuova funzione, nessuna migration,
 > nessun servizio esterno. I dati e i flussi esistenti restano identici.
 

@@ -5,13 +5,14 @@
 ## Stato
 
 - Dominio: **getopenstage.it**, acquistato su Aruba con bundle “Dominio con email”.
-- Attivazione Aruba: **in corso**.
-- Resend: dominio aggiunto, verifica DNS **da completare**.
+- Attivazione Aruba: **completata**; caselle `noreply@getopenstage.it` e `ciao@getopenstage.it` create.
+- Resend: dominio **verificato** in `eu-west-1`; DNS DKIM/SPF/Return-Path attivi.
 - Resend API key: **due chiavi create e salvate nel gestore password** (valori non nel repository):
   - `openstage-vercel` per app/Edge Function;
   - `openstage-supabase-smtp` per l’SMTP di Supabase Auth.
 - Casella ufficiale: Aruba (5 caselle da 1 GB). Resend serve solo per l’invio.
-- Supabase “Confirm email”: **ancora disattivato** finché SMTP e dominio non sono verificati.
+- Supabase “Confirm email”: **attivo**; SMTP Resend configurato.
+- Turnstile: **attivo lato Supabase** su registrazione, login e reset.
 
 ## Impostazioni Resend
 
@@ -28,10 +29,10 @@ Inserire i nomi senza il dominio se il pannello Aruba li aggiunge automaticament
 
 | Tipo | Nome | Valore | TTL | Stato |
 | --- | --- | --- | --- | --- |
-| CNAME | `rsend` | `rsend-euw1.forge.rmta.net` | Auto | da aggiungere |
-| CNAME | `send` | `send.forge.rmta.net` | Auto | da aggiungere |
-| TXT | `_dmarc` | `v=DMARC1; p=none;` | Auto | da aggiungere |
-| TXT | `resend._domainkey` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbl3pqasNhL8LUEPJyRDCIq1/xr9uL54N5cRkU0dDebqMUv8k6PndDGkZCSw206zS25KwdS0vLGy1viecYDrQOGZxMem2NU2LISlOP65q0Vqkt5h7QM8F/IfnR4XxsKXJU9F+0O7BaOjwns/SKsSP9cJL1oZ4bw6WwHzWZvjPN6wIDAQAB` | Auto | da aggiungere |
+| CNAME | `rsend` | `rsend-euw1.forge.rmta.net` | Auto | ✅ attivo |
+| CNAME | `send` | `send.forge.rmta.net` | Auto | ✅ attivo |
+| TXT | `_dmarc` | `v=DMARC1; p=none; adkim=r; aspf=r;` | Auto | ✅ attivo |
+| TXT | `resend._domainkey` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbl3pqasNhL8LUEPJyRDCIq1/xr9uL54N5cRkU0dDebqMUv8k6PndDGkZCSw206zS25KwdS0vLGy1viecYDrQOGZxMem2NU2LISlOP65q0Vqkt5h7QM8F/IfnR4XxsKXJU9F+0O7BaOjwns/SKsSP9cJL1oZ4bw6WwHzWZvjPN6wIDAQAB` | Auto | ✅ attivo |
 
 > Il record DKIM è una chiave pubblica: può stare nel repository. Non è un segreto.
 
@@ -53,4 +54,4 @@ Dettagli completi: `docs/notifications-email-policy.md`.
 - Non attivare “Receiving” in Resend: il MX principale del dominio deve restare quello di Aruba.
 - DMARC parte in modalità monitoraggio (`p=none`); si potrà passare a `quarantine` dopo aver controllato i report.
 - Le API key Resend non vanno salvate nel repository: andranno in `.env.local` e nelle variabili Vercel.
-- Dopo la verifica: creare la API key `openstage-vercel` con permesso “Sending access”, configurare SMTP Supabase e testare conferma email/reset password.
+- Dopo la verifica: la API key `openstage-vercel` è quella usata dall’app; la `openstage-supabase-smtp` è configurata in Supabase Auth. Conferma email e reset password sono stati testati in produzione.

@@ -221,6 +221,7 @@ devono sembrare lo stesso prodotto, ma restare più leggibili e più sobrie.
 
 ### 5.5B — Scheda evento e popup mappa
 
+- **Stato: applicata il 24 ottobre 2026** (evento, popup desktop e bottom sheet mobile).
 - Scheda evento: copertina-first quando esiste; titolo grande, metadati in
   righe, azioni principali in basso su mobile. Il dettaglio non è una griglia di
   card tutte uguali.

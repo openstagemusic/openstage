@@ -19,19 +19,20 @@ I quattro principi che guidano ogni decisione (anche tecnica) sono:
 
 ## A che punto siamo
 
-**Fatto e online:** identità e accesso (email e Google), ruoli con regole definitive, design
-system, doppia lingua IT/EN con indirizzi `/it` e `/en`, **directory reali di artisti e
-locali** con filtri e schede pubbliche, **reclamo della scheda**, **dashboard** per artisti e
-locali, **editor degli eventi** con bozze e locandine, **mappa interattiva** con pin e globo,
+**Fatto e online:** identità e accesso (email e Google), **conferma email reale**, **recupero
+password**, **Turnstile verificato lato server**, ruoli con regole definitive, design system,
+doppia lingua IT/EN con indirizzi `/it` e `/en`, **directory reali di artisti e locali** con
+filtri e schede pubbliche, **reclamo della scheda**, **dashboard** per artisti e locali,
+**editor degli eventi** con bozze e locandine, **mappa interattiva** con pin e globo,
 **pagine evento** con calendario e condivisione, **ricerca con suggerimenti**, **filtri
 rapidi**, **pagina dei preferiti**, **segnalazioni e moderazione**, **Home poster wall** con
 **sezione Città**, **pagine pubbliche reali** (Chi siamo, Per gli artisti, Per le venue,
 Contatti, FAQ), **indice e pagine città**, **modulo contatti che scrive nel database** con
 coda messaggi per lo staff, database con sicurezza a livello di riga, deploy continuo.
 
-**In arrivo nelle prossime fasi:** email transazionali (Resend), conferma email e recupero
-password, community e "segui", Spotify, pagamenti opzionali, testi legali definitivi e
-rifiniture SEO.
+**In arrivo nelle prossime fasi:** community e "segui", Spotify, pagamenti opzionali, testi
+legali definitivi e rifiniture SEO. La risposta integrata ai messaggi di contatto (`B48`)
+resta l'ultimo pezzo della 7A.
 
 **Da sapere oggi:** gli eventi presenti sono **reali**. Possono essere inseriti dalla
 redazione oppure pubblicati direttamente da artisti e locali dopo il reclamo della scheda;
@@ -75,20 +76,34 @@ interagito si fidano di quel profilo.
 ## Con email e password
 
 1. Vai su **Registrati** dalla barra in alto.
-2. Inserisci nome, email, password e scegli il ruolo (Fan, Artista, Locale).
+2. Inserisci nome, email e password.
 3. Conferma il **captcha** (protezione anti-bot Cloudflare Turnstile).
-4. Sei dentro. Se hai scelto **Artista**, vieni portato direttamente alla compilazione del
-   profilo artista; altrimenti torni alla home.
+4. Premi **Crea account**: riceverai un'email da `noreply@getopenstage.it`.
+5. Apri il link di conferma. Dopo la conferma scegli il **ruolo** (Fan, Artista, Locale).
+6. Se hai scelto **Artista** o **Locale**, compila la scheda del profilo; altrimenti torni
+   alla Home da utente autenticato.
 
-> In questa fase la **conferma via email è disattivata**: l'account è attivo subito. Nelle
-> fasi successive verrà attivata con le email transazionali.
+> La conferma email è **obbligatoria**: senza il link l'account non può accedere. Controlla
+> anche la cartella spam. Il ruolo si sceglie **dopo** la conferma, non nel form di
+> registrazione.
+
+## Password dimenticata
+
+1. Nella pagina **Accedi** clicca **Password dimenticata?**.
+2. Inserisci l'email dell'account e completa il captcha.
+3. Apri il link che arriva da `noreply@getopenstage.it` **nello stesso browser** in cui hai
+   fatto la richiesta.
+4. Scegli la nuova password (almeno 8 caratteri) e salva.
+5. Torna al login e accedi con la nuova password.
+
+Se il link è scaduto, richiedine un altro dalla pagina **Password dimenticata?**.
 
 ## Con Google
 
 1. Clicca **Continua con Google** nella pagina di accesso o registrazione.
 2. Scegli il tuo account Google.
-3. Google **non** trasmette a OpenStage il ruolo scelto prima dell'accesso: per questo, al
-   primo ingresso, compare una **schermata di scelta del ruolo**. Da quel momento la regola
+3. Google ha già verificato l'email: **non arriva nessuna email di conferma**.
+4. Al primo ingresso compare la **schermata di scelta del ruolo**. Da quel momento la regola
    dei ruoli definitivi vale esattamente come per l'email.
 
 ## La barra in alto quando sei dentro
@@ -146,11 +161,15 @@ server, così i link sono condivisibili e le anteprime social funzionano).
   Se il tuo sistema chiede "meno animazioni", la rotazione non parte nemmeno.
 - I **pin** sono gli eventi futuri. Più serate nello **stesso locale** diventano **un pin
   solo** con il numero delle date, per non avere tre puntini sovrapposti.
-- Toccando un pin si apre la **scheda**: data e ora nel fuso dell'evento, titolo, locale,
-  genere, tipo e ingresso gratuito. Se il locale ha più serate, le scorri **una alla volta**
-  con le frecce e il contatore `‹ 1 / 3 ›`.
+- Toccando un pin si apre una **scheda compatta**: data e ora nel fuso dell'evento, titolo,
+  locale, genere, tipo e ingresso. Su desktop è un popup ancorato al pin; su mobile è un
+  **bottom sheet** che sale dal basso.
+- Se il locale ha più serate, le scorri **una alla volta** con le frecce e il contatore
+  `‹ 1 / 3 ›`; la scheda resta della stessa altezza e non esce dalla mappa.
 - Dalla scheda: **Pagina evento**, **Biglietti** (se ci sono), **Apri in Google Maps**,
-  **Salva** e **Condividi**.
+  **Salva** e **Condividi**. I pulsanti hanno un'area di tocco di almeno 44 px.
+- Il popup desktop lascia spazio alla ricerca e ai filtri: non finisce più sotto il pannello
+  dei filtri quando la mappa è a tutto schermo.
 - Gli eventi che dichiarano una posizione **approssimata** mostrano un'area invece di un
   punto, e la pagina evento lo spiega.
 - **A tutto schermo** (voce "Mappa" nella barra, oppure il pulsante sulla mappa) la mappa
@@ -321,9 +340,10 @@ esplorare tutto e salvare i preferiti: le funzioni da fan restano disponibili.
 **Ho scelto Locale ma sono un musicista: posso cambiare?**
 No, il ruolo è definitivo. Scrivi allo staff: solo l'admin può correggere.
 
-**Perché mi ha chiesto il ruolo dopo l'accesso con Google?**
-Perché Google non può trasportare quell'informazione. È il passaggio in più che sostituisce la
-scelta fatta al momento della registrazione via email.
+**Perché mi ha chiesto il ruolo dopo la conferma email o dopo Google?**
+Il ruolo si sceglie **dopo** aver verificato l'email, così un errore di battitura non crea un
+profilo artista o locale sbagliato. Con Google non arriva nessuna email di conferma perché
+Google ha già verificato l'indirizzo; la schermata del ruolo è quindi il primo passaggio.
 
 **Devo pagare qualcosa?**
 No. Il piano base è gratuito per fan, artisti e locali: è un principio del progetto.

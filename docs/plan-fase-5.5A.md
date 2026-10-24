@@ -1,8 +1,8 @@
 # Fase 5.5A — Login, registrazione, account e onboarding
 
-> **Stato: completata il 23 ottobre 2026, build verde.** Blocco visivo della Fase 5.5.
-> Nessuna nuova funzione, nessun dato finto, nessun servizio esterno. I test con account
-> reali restano da fare in produzione.
+> **Stato: completata il 23 ottobre 2026, build verde e testata in produzione il 24 ottobre 2026.**
+> Blocco visivo della Fase 5.5. Nessuna nuova funzione, nessun dato finto, nessun servizio esterno. I test con account
+> reali sono stati fatti in produzione.
 > Riferimenti: `docs/design-system.md` §12, `AGENTS.md`, Home 5.4.
 
 ## Obiettivo

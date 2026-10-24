@@ -385,6 +385,75 @@ Lighthouse su Home, città e contatti.
 **Rimandato:** email transazionali, conferma email e reset password (Fase 7); risposta
 integrata ai messaggi (`B48`); alcune voci di audit (`B08`, `B26`, `B28`, `B43`).
 
+## Fase 5.5A - Coerenza visiva: accesso e account
+
+**Obiettivo:** riportare login, registrazione, account e onboarding al linguaggio della Home
+5.4 senza cambiare la logica.
+
+**Cosa è stato costruito**
+
+- Nuovo guscio editoriale condiviso `AuthShell`: titolo-poster a sinistra, pannello sobrio a
+  destra, etichette mono e valori reali del prodotto.
+- Stili condivisi per input, label, pulsanti ed errori (`components/auth/formStyles.ts`).
+- Restyling di `/login`, `/register`, `/account` e delle pagine di onboarding artista/locale.
+- Ruolo rimosso dal form di registrazione: si sceglie **dopo** la conferma email, così il
+  profilo non nasce con un ruolo scelto per errore.
+
+**Verifiche superate:** build verde; layout a 320, 390 e 1280 px; italiano e inglese; form
+reali; Turnstile presente; screenshot desktop/mobile controllati.
+
+## Fase 7A - Email reale, conferma e recupero password
+
+**Obiettivo:** chiudere l'accesso affidabile con dominio, Resend, SMTP Supabase e Turnstile
+verificato lato server.
+
+**Cosa è stato costruito**
+
+- Dominio `getopenstage.it` su Aruba per la ricezione; Resend `eu-west-1` per l'invio.
+- Caselle `noreply@getopenstage.it` e `ciao@getopenstage.it`; SMTP Supabase configurato.
+- Conferma email obbligatoria; dopo la conferma si sceglie il ruolo.
+- Link **Password dimenticata?**, pagina `/forgot-password`, pagina `/reset-password` e
+  aggiornamento password con Supabase.
+- CAPTCHA Supabase attivo: le richieste senza token vengono rifiutate e il server chiama
+  `siteverify`. Il widget ha action `signup`, `login`, `reset_password` e si resetta dopo un
+  errore.
+- Callback OAuth corretto: i cookie di sessione vengono applicati alla redirect response.
+
+**Decisioni e perché**
+
+- **Aruba riceve, Resend invia:** si tengono separati ricezione e invio transazionale.
+- **Ruolo dopo la conferma:** un'email sbagliata non deve creare un profilo artista/locale.
+- **Nessuna email per Google:** Google ha già verificato l'indirizzo; resta solo la scelta del
+  ruolo.
+- **Turnstile lato Supabase:** evita una seconda verifica e sfrutta il backend di auth già
+  esistente.
+
+**Verifiche superate:** email di conferma ricevuta; reset password funzionante; Google con
+ruolo salvato; signup senza token rifiutato con `captcha_failed`; build e deploy verdi.
+
+**Rimandato:** risposta integrata ai messaggi (`B48`) e cambio email dal profilo.
+
+## Fase 5.5B - Scheda evento e popup mappa
+
+**Obiettivo:** portare scheda evento e popup/bottom sheet al linguaggio editoriale, senza
+nuove funzioni.
+
+**Cosa è stato costruito**
+
+- Scheda evento copertina-first, titolo-poster, badge mono, metadati in righe separate e
+  azioni in fondo (larghezza piena su mobile).
+- Popup desktop compatto con bordo `line-strong`, fondo scuro e gerarchia chiara; margine
+  superiore aumentato per non finire sotto ricerca e filtri.
+- Bottom sheet mobile con copertina più grande, chiusura esplicita e target ≥ 44 px.
+- Gruppo locale con una serata alla volta, frecce e contatore.
+- Pulsanti calendario, condivisione, salvataggio e segnalazione allineati al nuovo stile.
+
+**Verifiche superate:** build verde; screenshot desktop/mobile della scheda evento; popup
+desktop aperto su un pin reale; italiano e inglese; nessuna modifica a database o RLS.
+
+**Rimandato:** directory artisti/locali (5.5C), guscio dashboard (5.5D) ed editor eventi
+(5.5E).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato
