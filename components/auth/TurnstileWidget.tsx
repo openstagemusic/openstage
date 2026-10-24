@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 type TurnstileOptions = {
   sitekey: string;
   theme?: "light" | "dark" | "auto";
+  action?: string;
   callback?: (token: string) => void;
   "expired-callback"?: () => void;
   "error-callback"?: () => void;
@@ -13,6 +14,7 @@ type TurnstileOptions = {
 type TurnstileApi = {
   render: (container: HTMLElement, options: TurnstileOptions) => string;
   remove: (widgetId: string) => void;
+  reset: (widgetId?: string) => void;
 };
 
 declare global {
@@ -31,13 +33,19 @@ export default function TurnstileWidget({
   siteKey,
   onToken,
   theme = "dark",
+  action,
+  resetKey,
 }: {
   siteKey: string;
   onToken: (token: string) => void;
   theme?: "light" | "dark" | "auto";
+  action?: string;
+  /** Cambia questo valore per far ripartire il widget dopo un errore. */
+  resetKey?: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const resetMountedRef = useRef(false);
   const onTokenRef = useRef(onToken);
   onTokenRef.current = onToken;
 
@@ -56,6 +64,7 @@ export default function TurnstileWidget({
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
         theme,
+        action,
         callback: (token: string) => onTokenRef.current(token),
         "expired-callback": () => onTokenRef.current(""),
         "error-callback": () => onTokenRef.current(""),
@@ -83,7 +92,17 @@ export default function TurnstileWidget({
       cancelled = true;
       cleanup();
     };
-  }, [siteKey, theme]);
+  }, [siteKey, theme, action]);
+
+  // Un token Turnstile è monouso: dopo un errore il form deve ripartire da zero.
+  useEffect(() => {
+    if (!resetMountedRef.current) {
+      resetMountedRef.current = true;
+      return;
+    }
+    if (resetKey === undefined || !widgetIdRef.current || !window.turnstile) return;
+    window.turnstile.reset(widgetIdRef.current);
+  }, [resetKey]);
 
   return <div ref={containerRef} />;
 }

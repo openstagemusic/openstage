@@ -32,6 +32,7 @@ export default function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -66,6 +67,8 @@ export default function LoginForm({
 
     if (signInError) {
       setError(authErrorMessage(signInError.message, dict));
+      setToken("");
+      setCaptchaReset((value) => value + 1);
       return;
     }
 
@@ -107,7 +110,12 @@ export default function LoginForm({
 
       {siteKey ? (
         <div className="min-h-[65px] overflow-hidden">
-          <TurnstileWidget siteKey={siteKey} onToken={setToken} />
+          <TurnstileWidget
+            siteKey={siteKey}
+            onToken={setToken}
+            action="login"
+            resetKey={captchaReset}
+          />
         </div>
       ) : null}
 

@@ -30,12 +30,18 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("fan");
   const [token, setToken] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const configured = isSupabaseConfigured();
+
+  function resetCaptcha() {
+    setToken("");
+    setCaptchaReset((value) => value + 1);
+  }
 
   if (!configured) {
     return (
@@ -70,6 +76,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
 
     if (signUpError) {
       setError(authErrorMessage(signUpError.message, dict));
+      resetCaptcha();
       return;
     }
 
@@ -80,10 +87,12 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       // che non arriverà mai.
       if ((data.user?.identities?.length ?? 0) === 0) {
         setError(dict.errors.alreadyRegistered);
+        resetCaptcha();
         return;
       }
 
       setNotice(dict.checkEmail);
+      resetCaptcha();
       return;
     }
 
@@ -162,7 +171,12 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
 
       {siteKey ? (
         <div className="min-h-[65px] overflow-hidden">
-          <TurnstileWidget siteKey={siteKey} onToken={setToken} />
+          <TurnstileWidget
+            siteKey={siteKey}
+            onToken={setToken}
+            action="signup"
+            resetKey={captchaReset}
+          />
         </div>
       ) : null}
 
