@@ -95,7 +95,65 @@ Solo numeri dal database, nessun dato finto:
 - Eventuale comunicazione manuale solo con conferma e target esplicito.
 - Nessun broadcast senza dry run.
 
-## Moduli candidati (da confermare con il proprietario)
+### 8.8 — Automazioni AI assistite (non autonome)
+
+L'AI è un **assistente dell'admin**, non un decisore. Nessuna azione distruttiva,
+nessuna pubblicazione, nessuna verifica e nessuna email partono senza conferma
+umana. Se l'AI non risponde o sbaglia, il flusso manuale resta sempre disponibile.
+
+**Moduli previsti**
+
+- **8.8.1 — Bozze di risposta ai ticket/contatti.** L'AI legge il messaggio e i
+  testi approvati (FAQ, termini, linee guida) e prepara una bozza. L'admin la
+  modifica e la invia. Nessun invio automatico.
+- **8.8.2 — Import evento da testo o link pubblico.** L'admin incolla testo/URL;
+  l'AI restituisce un JSON strutturato (titolo, artista, data, ora, genere,
+  indirizzo, descrizione). L'admin vede l'anteprima, corregge e salva. Niente
+  scraping di pagine social autenticate; fetch con protezione SSRF e limiti.
+- **8.8.3 — Verifica schede: riepilogo delle prove.** Prima si eseguono controlli
+  deterministici (P.IVA/VIES, dominio, email, indirizzo, link pubblici); poi l'AI
+  produce un riepilogo delle prove e delle incoerenze. Il punteggio è un'indicazione,
+  non una verità: l'approvazione resta umana.
+- **8.8.4 — Qualità dati e doppioni.** L'AI suggerisce campi mancanti, date o
+  prezzi sospetti e possibili duplicati; l'admin decide se correggere o unire.
+- **8.8.5 — Triage delle segnalazioni (facoltativo).** Classifica priorità e
+  motivo, propone una coda; nessuna sospensione automatica.
+
+**Regole di sicurezza**
+
+- Human-in-the-loop obbligatorio per ogni scrittura.
+- Input minimizzato: niente dati non necessari; P.IVA, email e messaggi solo
+  quando servono al task.
+- Prompt injection: il contenuto dell'utente è **dato**, non istruzione; output
+  validato con Zod e schema chiuso.
+- Nessun segreto o errore grezzo del provider nell'interfaccia.
+- Audit di ogni esecuzione: task, modello, versione prompt, token/costo, esito,
+  admin che ha approvato.
+- Budget giornaliero e rate limit; fallback manuale se il provider è giù.
+- Provider con retention/DPA compatibili; preferire Vercel AI Gateway con budget
+  e osservabilità, oppure OpenRouter/OpenAI solo se scelti esplicitamente.
+
+### 8.9 — Architettura AI
+
+```text
+lib/ai/
+  client.ts            modello, timeout, retry, errori normalizzati
+  schemas.ts           Zod input/output per ogni task
+  prompts/             prompt versionati (id + versione)
+  tasks/
+    draft-reply.ts     bozza risposta ticket
+    parse-event.ts     import evento
+    verify-page.ts     riepilogo prove verifica
+    audit-event.ts     qualità dati e doppioni
+  limits.ts            rate limit, token cap, budget
+  audit.ts             ai_runs: log e costi, senza input sensibili
+  fetch-public.ts      fetch URL con protezione SSRF
+```
+
+Le Server Action/API Route ricevono input già validati, chiamano un solo task,
+validano l'output e restituiscono una bozza. Nessun task scrive direttamente sul
+database: la scrittura avviene dopo l'approvazione dell'admin.
+
 
 | Gruppo | Moduli |
 | --- | --- |
@@ -118,7 +176,8 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 5. 8.4 claim a invito.
 6. 8.5 centro assistenza.
 7. 8.6 comunicazione, 8.7 notifiche.
-8. QA, build, deploy, commit **“Fase 8”**.
+8. **8.8 AI assistita**: partire da 8.8.1 (bozze risposta), poi 8.8.2 (import evento), poi 8.8.3/8.8.4; 8.8.5 solo se serve.
+9. QA, build, deploy, commit **“Fase 8”**.
 
 ## Dipendenze
 
@@ -145,3 +204,6 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 2. La priorità tra i moduli, se non si fa tutto in un blocco.
 3. Conferma che la control room è **solo admin** (nessun accesso artista/locale).
 4. Conferma delle soglie di quota e delle azioni che richiedono 2FA.
+5. Per l'AI: provider scelto (consiglio **Vercel AI Gateway**), budget mensile,
+   modello fast/smart, retention dati e conferma che ogni scrittura resta
+   subordinata all'approvazione dell'admin.
