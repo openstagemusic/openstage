@@ -16,7 +16,7 @@ export default function VerifiedBadge({
   return (
     <span
       className={cn(
-        "rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-xs text-white",
+        "border border-cyan/40 bg-cyan/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white",
         className
       )}
     >

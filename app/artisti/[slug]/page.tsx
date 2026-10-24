@@ -20,6 +20,17 @@ type ArtistPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function initials(name: string) {
+  return (
+    name
+      .split(/\s+/)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "?"
+  );
+}
+
 export async function generateMetadata({ params }: ArtistPageProps): Promise<Metadata> {
   const { slug } = await params;
   const artist = await getArtistBySlug(slug);
@@ -102,55 +113,66 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <JsonLd data={data} />
 
-      <Link href="/artisti" className="text-sm text-muted transition-colors hover:text-white">
+      <Link
+        href="/artisti"
+        className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-cyan"
+      >
         ← {t.backToArtists}
       </Link>
 
-      <div
-        className="mt-6 h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
-        aria-hidden="true"
-      />
+      <header className="mt-8 grid gap-6 border-t border-line pt-8 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-start">
+        <span
+          aria-hidden="true"
+          className="flex h-32 w-32 items-center justify-center border border-violet/30 bg-violet/10 font-poster text-6xl leading-none text-violet"
+        >
+          {initials(artist.name)}
+        </span>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2 text-xs">
-        {artist.genre ? (
-          <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
-            {artist.genre}
-          </span>
-        ) : null}
-        {artist.city ? (
-          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
-            {artist.city}
-          </span>
-        ) : null}
-        {artist.verified ? (
-          <VerifiedBadge dict={t} />
-        ) : artist.claimed ? null : (
-          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
-            {t.badgeUnclaimed}
-          </span>
-        )}
-      </div>
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            {artist.genre ? (
+              <span className="border border-violet/40 bg-violet/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
+                {artist.genre}
+              </span>
+            ) : null}
+            {artist.city ? (
+              <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                {artist.city}
+              </span>
+            ) : null}
+            {artist.verified ? (
+              <VerifiedBadge dict={t} />
+            ) : artist.claimed ? null : (
+              <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                {t.badgeUnclaimed}
+              </span>
+            )}
+          </div>
 
-      <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-5xl">
-        {artist.name}
-      </h1>
+          <h1 className="mt-4 text-balance font-poster text-4xl uppercase leading-[0.92] tracking-[-0.02em] sm:text-6xl">
+            {artist.name}
+          </h1>
 
-      {artist.spotifyUrl ? (
-        <p className="mt-4">
-          <a
-            href={artist.spotifyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-cyan transition-opacity hover:opacity-80"
-          >
-            {t.spotify}
-          </a>
-        </p>
-      ) : null}
+          {artist.spotifyUrl ? (
+            <p className="mt-5">
+              <a
+                href={artist.spotifyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center border border-line bg-white/[0.03] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-colors hover:border-cyan/50"
+              >
+                {t.spotify}
+              </a>
+            </p>
+          ) : null}
 
-      {artist.bio ? (
-        <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-muted">{artist.bio}</p>
-      ) : null}
+          {artist.bio ? (
+            <p className="mt-6 max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted">
+              {artist.bio}
+            </p>
+          ) : null}
+        </div>
+      </header>
 
       <ClaimPanel
         subjectType="artist"
@@ -162,23 +184,23 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         dict={dict.claims}
       />
 
-      <h2 className="mt-12 font-display text-xl font-semibold">{t.upcomingTitle}</h2>
+      <h2 className="mt-12 font-display text-2xl font-semibold">{t.upcomingTitle}</h2>
 
       {events.length > 0 ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
             <EventTeaser key={event.id} event={event} locale={locale} dict={dict} />
           ))}
         </div>
       ) : (
-        <p className="mt-5 text-sm text-muted">{t.upcomingEmpty}</p>
+        <p className="mt-5 border-l-2 border-line-strong pl-3 text-sm text-muted">{t.upcomingEmpty}</p>
       )}
 
       {past.length > 0 ? (
         <>
-          <h2 className="mt-12 font-display text-xl font-semibold">{t.pastTitle}</h2>
+          <h2 className="mt-12 font-display text-2xl font-semibold">{t.pastTitle}</h2>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {past.map((event) => (
               <EventTeaser key={event.id} event={event} locale={locale} dict={dict} />
             ))}

@@ -73,16 +73,16 @@ export default function DirectoryFilters({
   };
 
   const selectClass =
-    "rounded-full border border-white/15 bg-bg/70 px-3 py-1.5 text-xs font-medium text-white outline-none transition-colors hover:border-white/30";
+    "min-h-11 border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white outline-none transition-colors hover:border-line-strong focus:border-cyan";
 
   return (
     <form
       onSubmit={submit}
       role="search"
-      className={cn("glass rounded-3xl border border-white/10 p-4", className)}
+      className={cn("border border-line bg-surface/60 p-3", className)}
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-white/15 bg-bg/70 px-4 py-2 focus-within:border-white/30">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex min-h-11 min-w-0 flex-1 items-center gap-2 border border-line bg-bg px-3 py-2 focus-within:border-cyan">
           <span aria-hidden="true" className="text-muted">
             ⌕
           </span>
@@ -140,7 +140,7 @@ export default function DirectoryFilters({
 
         <button
           type="submit"
-          className="rounded-full bg-violet-strong px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-90"
+          className="min-h-11 border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
         >
           {t.apply}
         </button>
@@ -152,7 +152,7 @@ export default function DirectoryFilters({
               setValue("");
               apply({ q: null, city: null, genre: null });
             }}
-            className="rounded-full border border-white/15 px-3.5 py-2 text-xs font-medium text-muted transition-colors hover:border-white/30 hover:text-white"
+            className="min-h-11 border border-line px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
           >
             {t.reset}
           </button>

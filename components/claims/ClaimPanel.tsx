@@ -8,7 +8,7 @@ import LocaleLink from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
+  "w-full border border-line bg-surface px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-cyan";
 
 /**
  * Cosa vede chi arriva sulla scheda di un artista o di un locale che non è suo:
@@ -73,7 +73,7 @@ export default function ClaimPanel({
 
   if (state === "claimed") {
     return (
-      <p className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-muted">
+      <p className="mt-6 border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-xs leading-relaxed text-muted">
         {isArtist ? dict.claimedArtist : dict.claimedVenue}
       </p>
     );
@@ -81,7 +81,7 @@ export default function ClaimPanel({
 
   if (state === "pending") {
     return (
-      <p className="mt-6 rounded-2xl border border-cyan/30 bg-cyan/5 p-4 text-xs text-white">
+      <p className="mt-6 border-l-2 border-cyan/50 bg-cyan/5 px-4 py-3 text-xs leading-relaxed text-white">
         {dict.pending}
       </p>
     );
@@ -89,11 +89,11 @@ export default function ClaimPanel({
 
   if (state === "pendingElsewhere") {
     return (
-      <div className="mt-6 rounded-2xl border border-cyan/30 bg-cyan/5 p-4">
-        <p className="text-xs text-white">{dict.pendingElsewhere}</p>
+      <div className="mt-6 border-l-2 border-cyan/50 bg-cyan/5 px-4 py-3">
+        <p className="text-xs leading-relaxed text-white">{dict.pendingElsewhere}</p>
         <LocaleLink
           href="/account"
-          className="mt-4 inline-block rounded-full border border-cyan/40 px-4 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+          className="mt-4 inline-flex min-h-11 items-center border border-cyan/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-cyan/10"
         >
           {dict.pendingElsewhereCta}
         </LocaleLink>
@@ -103,7 +103,7 @@ export default function ClaimPanel({
 
   if (state === "owned") {
     return (
-      <p className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-muted">
+      <p className="mt-6 border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-xs leading-relaxed text-muted">
         {isArtist ? dict.ownedArtist : dict.ownedVenue}
       </p>
     );
@@ -111,14 +111,14 @@ export default function ClaimPanel({
 
   if (state === "wrongRole") {
     return (
-      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
-        <p className="text-xs text-muted">
+      <div className="mt-6 border-l-2 border-line-strong bg-white/[0.03] px-4 py-3">
+        <p className="text-xs leading-relaxed text-muted">
           {isArtist ? dict.wrongRoleArtist : dict.wrongRoleVenue}
         </p>
         {canUpgradeRole ? (
           <LocaleLink
             href="/onboarding/role"
-            className="mt-4 inline-block rounded-full border border-cyan/40 px-4 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+            className="mt-4 inline-flex min-h-11 items-center border border-cyan/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-cyan/10"
           >
             {isArtist ? dict.wrongRoleCtaArtist : dict.wrongRoleCtaVenue}
           </LocaleLink>
@@ -156,11 +156,11 @@ export default function ClaimPanel({
   }
 
   return (
-    <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
-      <p className="text-xs text-muted">{intro}</p>
+    <div className="mt-6 border-l-2 border-violet/50 bg-white/[0.03] px-4 py-4">
+      <p className="text-xs leading-relaxed text-muted">{intro}</p>
 
       {replaceName ? (
-        <div className="mt-3 rounded-xl border border-pink/40 bg-pink/10 p-3">
+        <div className="mt-3 border-l-2 border-pink/50 bg-pink/10 px-3 py-2">
           <p className="text-xs text-white">
             {isArtist ? dict.replaceArtist : dict.replaceVenue}
           </p>
@@ -195,14 +195,14 @@ export default function ClaimPanel({
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50"
               >
                 {loading ? dict.submitting : dict.submit}
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-full border border-white/15 px-4 py-2 text-sm text-muted transition-colors hover:text-white"
+                className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
               >
                 {dict.cancel}
               </button>
@@ -212,7 +212,7 @@ export default function ClaimPanel({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="mt-4 rounded-full border border-cyan/40 px-4 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+            className="mt-4 inline-flex min-h-11 items-center border border-cyan/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-cyan/10"
           >
             {actionLabel}
           </button>
@@ -220,7 +220,7 @@ export default function ClaimPanel({
       ) : (
         <LocaleLink
           href="/login"
-          className="mt-4 inline-block rounded-full border border-cyan/40 px-4 py-2 text-sm text-white transition-colors hover:bg-cyan/10"
+          className="mt-4 inline-flex min-h-11 items-center border border-cyan/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-cyan/10"
         >
           {dict.loginCta}
         </LocaleLink>

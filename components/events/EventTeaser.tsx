@@ -28,31 +28,34 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
   const cancelled = isCancelled(event);
 
   return (
-    <article className="group glass h-full overflow-hidden rounded-card border border-line transition-[border-color,box-shadow,transform] duration-200 hover:border-line-strong hover:shadow-glow focus-within:border-cyan/50 focus-within:ring-2 focus-within:ring-cyan/40 motion-safe:hover:-translate-y-0.5">
-      <Link href={eventPath(event)} className="flex h-full flex-col focus-visible:outline-none">
+    <article className="group h-full border border-line bg-surface/60 transition-colors hover:border-cyan/50 focus-within:border-cyan/60">
+      <Link
+        href={eventPath(event)}
+        className="flex h-full flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/40"
+      >
         <EventCover
           src={event.coverImageUrl}
           className="aspect-square w-full transition-transform duration-500 ease-out-expo motion-safe:group-hover:scale-[1.02]"
         />
 
         <div className="flex flex-1 flex-col p-4">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5">
             {cancelled ? (
-              <span className="rounded-full border border-pink/40 bg-pink/10 px-2.5 py-1 text-white">
+              <span className="border border-pink/40 bg-pink/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
                 {dict.events.cancelledBadge}
               </span>
             ) : (
-              <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
+              <span className="border border-violet/40 bg-violet/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
                 {kindLabel}
               </span>
             )}
             {whenLabel ? (
-              <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-white">
+              <span className="border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
                 {whenLabel}
               </span>
             ) : null}
             {event.isFree || event.priceText ? (
-              <span className="rounded-full border border-line px-2.5 py-1 text-muted">
+              <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                 {event.isFree ? dict.events.freeEntry : event.priceText}
               </span>
             ) : null}

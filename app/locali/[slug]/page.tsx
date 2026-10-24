@@ -20,6 +20,17 @@ type VenuePageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function initials(name: string) {
+  return (
+    name
+      .split(/\s+/)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "?"
+  );
+}
+
 export async function generateMetadata({ params }: VenuePageProps): Promise<Metadata> {
   const { slug } = await params;
   const venue = await getVenueBySlug(slug);
@@ -120,63 +131,74 @@ export default async function VenuePage({ params }: VenuePageProps) {
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <JsonLd data={data} />
 
-      <Link href="/locali" className="text-sm text-muted transition-colors hover:text-white">
+      <Link
+        href="/locali"
+        className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-cyan"
+      >
         ← {t.backToVenues}
       </Link>
 
-      <div
-        className="mt-6 h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
-        aria-hidden="true"
-      />
+      <header className="mt-8 grid gap-6 border-t border-line pt-8 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-start">
+        <span
+          aria-hidden="true"
+          className="flex h-32 w-32 items-center justify-center border border-cyan/30 bg-cyan/10 font-poster text-6xl leading-none text-cyan"
+        >
+          {initials(venue.name)}
+        </span>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2 text-xs">
-        {venue.city ? (
-          <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
-            {venue.city}
-          </span>
-        ) : null}
-        {venue.capacity ? (
-          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
-            {t.capacity}: {venue.capacity} {t.capacityPeople}
-          </span>
-        ) : null}
-        {venue.verified ? (
-          <VerifiedBadge dict={t} />
-        ) : venue.claimed ? null : (
-          <span className="rounded-full border border-line px-2.5 py-1 text-muted">
-            {t.badgeUnclaimed}
-          </span>
-        )}
-      </div>
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            {venue.city ? (
+              <span className="border border-violet/40 bg-violet/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
+                {venue.city}
+              </span>
+            ) : null}
+            {venue.capacity ? (
+              <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                {t.capacity}: {venue.capacity} {t.capacityPeople}
+              </span>
+            ) : null}
+            {venue.verified ? (
+              <VerifiedBadge dict={t} />
+            ) : venue.claimed ? null : (
+              <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                {t.badgeUnclaimed}
+              </span>
+            )}
+          </div>
 
-      <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-5xl">
-        {venue.name}
-      </h1>
+          <h1 className="mt-4 text-balance font-poster text-4xl uppercase leading-[0.92] tracking-[-0.02em] sm:text-6xl">
+            {venue.name}
+          </h1>
+        </div>
+      </header>
 
-      <dl className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="glass rounded-2xl border border-line p-5">
-          <dt className="text-xs uppercase tracking-wide text-muted">{t.address}</dt>
-          <dd className="mt-1 text-sm text-white">
-            {[venue.address, venue.city].filter(Boolean).join(" · ") || "—"}
-          </dd>
-          {mapsUrl ? (
-            <dd className="mt-2">
+      <dl className="mt-8 border-t border-line">
+        <div className="grid gap-2 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+          <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-cyan">
+            {t.address}
+          </dt>
+          <dd className="text-sm text-white">
+            <span className="block">{[venue.address, venue.city].filter(Boolean).join(" · ") || "—"}</span>
+            {mapsUrl ? (
               <a
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-cyan transition-opacity hover:opacity-80"
+                className="mt-3 inline-block font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-opacity hover:opacity-80"
               >
                 {dict.events.openInMaps}
               </a>
-            </dd>
-          ) : null}
+            ) : null}
+          </dd>
         </div>
 
         {venue.website ? (
-          <div className="glass rounded-2xl border border-line p-5">
-            <dt className="text-xs uppercase tracking-wide text-muted">{t.website}</dt>
-            <dd className="mt-1">
+          <div className="grid gap-2 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+            <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-cyan">
+              {t.website}
+            </dt>
+            <dd>
               <a
                 href={venue.website}
                 target="_blank"
@@ -200,23 +222,23 @@ export default async function VenuePage({ params }: VenuePageProps) {
         dict={dict.claims}
       />
 
-      <h2 className="mt-12 font-display text-xl font-semibold">{t.upcomingTitle}</h2>
+      <h2 className="mt-12 font-display text-2xl font-semibold">{t.upcomingTitle}</h2>
 
       {events.length > 0 ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
             <EventTeaser key={event.id} event={event} locale={locale} dict={dict} />
           ))}
         </div>
       ) : (
-        <p className="mt-5 text-sm text-muted">{t.upcomingEmpty}</p>
+        <p className="mt-5 border-l-2 border-line-strong pl-3 text-sm text-muted">{t.upcomingEmpty}</p>
       )}
 
       {past.length > 0 ? (
         <>
-          <h2 className="mt-12 font-display text-xl font-semibold">{t.pastTitle}</h2>
+          <h2 className="mt-12 font-display text-2xl font-semibold">{t.pastTitle}</h2>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {past.map((event) => (
               <EventTeaser key={event.id} event={event} locale={locale} dict={dict} />
             ))}

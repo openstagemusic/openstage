@@ -69,10 +69,13 @@ export default async function VenuesPage({
       <JsonLd data={itemList} />
 
       <header className="max-w-2xl">
-        <h1 className="text-balance font-display text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+          {dict.nav.venues}
+        </p>
+        <h1 className="mt-3 text-balance font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em] sm:text-5xl">
           {dict.pages.venues.title}
         </h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted">{t.venuesIntro}</p>
+        <p className="mt-4 text-sm leading-relaxed text-muted">{t.venuesIntro}</p>
       </header>
 
       <Suspense fallback={<div className="mt-6 h-[76px]" />}>
@@ -84,18 +87,18 @@ export default async function VenuesPage({
         />
       </Suspense>
 
-      <p className="mt-4 text-xs uppercase tracking-wide text-muted" aria-live="polite">
+      <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-muted" aria-live="polite">
         {total} {total === 1 ? t.resultOne : t.resultMany}
       </p>
 
       {items.length > 0 ? (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((venue) => (
             <VenueCard key={venue.id} venue={venue} locale={locale} />
           ))}
         </div>
       ) : (
-        <div className="glass mt-6 rounded-card border border-line p-8">
+        <div className="mt-5 border border-line bg-surface/60 p-8">
           <h2 className="font-display text-lg font-semibold">{t.noResultsTitle}</h2>
           <p className="mt-2 text-sm text-muted">{t.noResultsText}</p>
         </div>
