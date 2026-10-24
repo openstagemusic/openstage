@@ -1095,6 +1095,13 @@ export const en = {
     preferencesSaved: "Preferences saved.",
     preferencesFailed: "Saving failed. Try again.",
     preferencesNote: "Confirmation, password reset and security emails are always on.",
+    unsubscribeTitle: "Unsubscribe from digest",
+    unsubscribeText: "Do you want to stop receiving the weekly digest? Security emails stay on.",
+    unsubscribeButton: "Turn off digest",
+    unsubscribeDone: "Digest turned off.",
+    unsubscribeFailed: "The digest could not be turned off.",
+    unsubscribeMissing: "Invalid link.",
+    unsubscribeBack: "Back to OpenStage",
     types: {
       event_cancelled: "Event cancelled",
       event_updated: "Event updated",

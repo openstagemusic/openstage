@@ -1094,6 +1094,13 @@ export const it: Dictionary = {
     preferencesSaved: "Preferenze salvate.",
     preferencesFailed: "Salvataggio non riuscito. Riprova.",
     preferencesNote: "Le email di conferma, reset password e sicurezza restano sempre attive.",
+    unsubscribeTitle: "Disiscrizione digest",
+    unsubscribeText: "Vuoi smettere di ricevere il digest settimanale? Le email di sicurezza restano attive.",
+    unsubscribeButton: "Disattiva digest",
+    unsubscribeDone: "Digest disattivato.",
+    unsubscribeFailed: "Non è stato possibile disattivare il digest.",
+    unsubscribeMissing: "Link non valido.",
+    unsubscribeBack: "Torna a OpenStage",
     types: {
       event_cancelled: "Evento annullato",
       event_updated: "Evento modificato",
