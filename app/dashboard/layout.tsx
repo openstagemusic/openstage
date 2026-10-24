@@ -33,6 +33,7 @@ export default async function DashboardLayout({
       : []),
     { href: "/dashboard/saved", label: t.navSaved },
     { href: "/dashboard/notifiche", label: t.navNotifications },
+    { href: "/dashboard/impostazioni", label: t.navSettings },
     { href: "/account", label: t.navProfile },
   ];
 
