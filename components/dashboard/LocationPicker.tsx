@@ -141,7 +141,7 @@ export default function LocationPicker({
       ref={containerRef}
       role="region"
       aria-label={ariaLabel}
-      className="h-64 w-full overflow-hidden rounded-2xl border border-white/10"
+      className="h-64 w-full overflow-hidden border border-line"
     />
   );
 }

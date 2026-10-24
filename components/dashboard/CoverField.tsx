@@ -41,9 +41,9 @@ type CoverFieldProps = {
 };
 
 const buttonClass =
-  "rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:bg-white/5 disabled:opacity-50";
+  "inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong disabled:opacity-50";
 const primaryClass =
-  "rounded-full bg-violet-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
+  "inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
 
 /** Il titolo diventa il nome del file: niente caratteri strani per i sistemi. */
 function fileBase(title: string): string {
@@ -154,7 +154,7 @@ export default function CoverField({ value, onChange, title, buildFlyer, labels 
 
   return (
     <div>
-      <div className="overflow-hidden rounded-2xl border border-white/10">
+      <div className="overflow-hidden border border-line">
         {value ? (
           <EventCover src={value} className="aspect-[4/3] w-full" />
         ) : (
@@ -179,7 +179,7 @@ export default function CoverField({ value, onChange, title, buildFlyer, labels 
             type="button"
             onClick={remove}
             disabled={busy !== null}
-            className="rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-white disabled:opacity-50"
+            className="inline-flex min-h-11 items-center px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white disabled:opacity-50"
           >
             {labels.remove}
           </button>
@@ -208,12 +208,12 @@ export default function CoverField({ value, onChange, title, buildFlyer, labels 
       />
 
       {/* --- Locandina da condividere ---------------------------------------- */}
-      <h3 className="mt-8 font-display text-base font-semibold">{labels.posterTitle}</h3>
+      <h3 className="mt-8 font-display text-lg font-semibold">{labels.posterTitle}</h3>
       <p className="mt-2 text-xs text-muted">{labels.posterHint}</p>
 
       {poster ? (
         <div className="mt-3">
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-surface">
+          <div className="overflow-hidden border border-line bg-surface">
             {/* eslint-disable-next-line @next/next/no-img-element -- anteprima di un file locale */}
             <img src={poster.url} alt="" className="aspect-[4/5] w-full" />
           </div>

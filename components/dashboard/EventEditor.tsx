@@ -31,17 +31,18 @@ import type { GeocodePlace } from "@/lib/geo/geocoder";
 const LocationPicker = dynamic(() => import("@/components/dashboard/LocationPicker"), {
   ssr: false,
   loading: () => (
-    <div className="h-64 w-full animate-pulse rounded-2xl border border-white/10 bg-white/5" />
+    <div className="h-64 w-full animate-pulse border border-line bg-surface" />
   ),
 });
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-violet/60";
-const labelClass = "mb-1 block text-sm text-muted";
+  "w-full border border-line bg-surface px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-cyan";
+const labelClass =
+  "mb-2 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted";
 const primaryButton =
-  "rounded-full bg-violet-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
 const secondaryButton =
-  "rounded-full border border-white/15 px-5 py-2.5 text-sm text-white transition-colors hover:bg-white/5 disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center border border-line px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong disabled:opacity-50";
 
 type EventEditorProps = {
   mode: "create" | "edit";
@@ -86,6 +87,15 @@ function Field({
       {children}
       {hint ? <p className="mt-1 text-xs text-muted">{hint}</p> : null}
       {error ? <p className="mt-1 text-xs text-pink">{error}</p> : null}
+    </div>
+  );
+}
+
+function SectionHeading({ step, title }: { step: string; title: string }) {
+  return (
+    <div className="mt-10 flex items-baseline gap-3 border-t border-line pt-6">
+      <span className="font-mono text-[10px] tracking-[0.14em] text-cyan">{step}</span>
+      <h2 className="font-display text-xl font-semibold">{title}</h2>
     </div>
   );
 }
@@ -181,6 +191,20 @@ export default function EventEditor({
   const [locationWarning, setLocationWarning] = useState<
     "far" | "empty" | "impossible" | null
   >(null);
+  /** Istantanea dell'ultima versione salvata: serve solo all'avviso di uscita. */
+  const savedSnapshot = useRef(JSON.stringify(initial));
+
+  useEffect(() => {
+    if (JSON.stringify(values) === savedSnapshot.current) return;
+
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [values]);
 
   // Città e pin si scambiano informazioni (chi cerca un posto muove il pin, chi
   // trascina il pin riempie la città): letti una volta sola, con un nome chiaro.
@@ -527,6 +551,7 @@ export default function EventEditor({
 
     // La riga è cambiata: il prossimo salvataggio parte da questa versione.
     if (outcome.updatedAt) setUpdatedAt(outcome.updatedAt);
+    savedSnapshot.current = JSON.stringify(values);
 
     if (mode === "create") {
       router.push("/dashboard/events");
@@ -583,8 +608,8 @@ export default function EventEditor({
           <p
             className={
               message.tone === "ok"
-                ? "mb-6 rounded-2xl border border-cyan/40 bg-cyan/10 p-4 text-sm text-white"
-                : "mb-6 rounded-2xl border border-pink/40 bg-pink/10 p-4 text-sm text-white"
+                ? "mb-6 border-l-2 border-cyan bg-cyan/10 px-4 py-3 text-sm text-white"
+                : "mb-6 border-l-2 border-pink bg-pink/10 px-4 py-3 text-sm text-white"
             }
             role="status"
           >
@@ -593,19 +618,40 @@ export default function EventEditor({
         ) : null}
 
         {errorCount > 0 ? (
-          <p className="mb-6 rounded-2xl border border-pink/40 bg-pink/10 p-4 text-sm text-white" role="alert">
+          <p className="mb-6 border-l-2 border-pink bg-pink/10 px-4 py-3 text-sm text-white" role="alert">
             {t.errorsSummary}
           </p>
         ) : null}
 
         {!verified ? (
-          <p className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-muted">
+          <p className="mb-6 border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-sm leading-relaxed text-muted">
             {t.unverifiedNote}
           </p>
         ) : null}
 
+        {/* Su mobile le azioni restano vicine all'inizio del modulo. */}
+        <div className="mb-6 flex flex-col gap-2 border-y border-line py-3 sm:flex-row lg:hidden">
+          <button type="submit" disabled={busy !== null} className={secondaryButton}>
+            {busy === "draft" || busy === "cancelled"
+              ? t.saving
+              : mode === "create"
+                ? t.saveDraft
+                : t.save}
+          </button>
+          {verified && currentStatus !== "published" ? (
+            <button
+              type="button"
+              onClick={() => void submit("published")}
+              disabled={busy !== null}
+              className={primaryButton}
+            >
+              {busy === "published" ? t.saving : t.publish}
+            </button>
+          ) : null}
+        </div>
+
         {/* --- La serata ------------------------------------------------- */}
-        <h2 className="font-display text-lg font-semibold">{t.sectionWhat}</h2>
+        <SectionHeading step="01" title={t.sectionWhat} />
 
         <div className="mt-3 grid gap-4">
           <Field id="event-title" label={t.title} error={errors.title ? t.errors[errors.title] : null}>
@@ -655,7 +701,7 @@ export default function EventEditor({
         </div>
 
         {/* --- Quando ---------------------------------------------------- */}
-        <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionWhen}</h2>
+        <SectionHeading step="02" title={t.sectionWhen} />
 
         <div className="mt-3 grid gap-4 sm:grid-cols-3">
           <Field id="event-date" label={t.date} error={errors.date ? t.errors[errors.date] : null}>
@@ -699,10 +745,10 @@ export default function EventEditor({
         </div>
 
         {/* --- Dove ------------------------------------------------------ */}
-        <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionWhere}</h2>
+        <SectionHeading step="03" title={t.sectionWhere} />
 
         {linkedVenue ? (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-cyan/40 bg-cyan/10 px-4 py-3">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border border-cyan/40 bg-cyan/5 px-4 py-3">
             <span className="text-sm text-white">
               <span className="text-muted">{t.venueLinked}: </span>
               {linkedVenue.name}
@@ -710,7 +756,7 @@ export default function EventEditor({
             <button
               type="button"
               onClick={unlinkVenue}
-              className="rounded-full border border-white/15 px-3 py-1 text-xs text-muted transition-colors hover:text-white"
+              className="inline-flex min-h-11 items-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
             >
               {t.venueUnlink}
             </button>
@@ -733,7 +779,7 @@ export default function EventEditor({
             </Field>
 
             {results.length > 0 ? (
-              <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0d0d1a] shadow-xl">
+              <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface shadow-xl">
                 {results.map((venue) => (
                   <li key={venue.id}>
                     <button
@@ -759,7 +805,7 @@ export default function EventEditor({
 
         {/* --- Chi suona ------------------------------------------------- */}
         {artistLocked ? (
-          <div className="mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+          <div className="mt-4 border border-line bg-white/[0.03] px-4 py-3">
             <span className="text-sm text-white">
               <span className="text-muted">{t.artistLinked}: </span>
               {artist?.name ?? t.artistYou}
@@ -767,7 +813,7 @@ export default function EventEditor({
             <p className="mt-1 text-xs text-muted">{t.artistLockedHint}</p>
           </div>
         ) : artist ? (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-violet/40 bg-violet/10 px-4 py-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border border-violet/40 bg-violet/5 px-4 py-3">
             <span className="text-sm text-white">
               <span className="text-muted">{t.artistLinked}: </span>
               {artist.name}
@@ -775,7 +821,7 @@ export default function EventEditor({
             <button
               type="button"
               onClick={unlinkArtist}
-              className="rounded-full border border-white/15 px-3 py-1 text-xs text-muted transition-colors hover:text-white"
+              className="inline-flex min-h-11 items-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
             >
               {t.artistUnlink}
             </button>
@@ -799,7 +845,7 @@ export default function EventEditor({
             </Field>
 
             {artistResults.length > 0 ? (
-              <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0d0d1a] shadow-xl">
+              <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface shadow-xl">
                 {artistResults.map((option) => (
                   <li key={option.id}>
                     <button
@@ -865,7 +911,7 @@ export default function EventEditor({
               />
 
               {showCitySuggestions ? (
-                <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0d0d1a] shadow-xl">
+                <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface shadow-xl">
                   {places.map((place) => (
                     <li key={place.id}>
                       <button
@@ -928,7 +974,7 @@ export default function EventEditor({
           {!errors.location && locationWarning ? (
             <p
               className={`mt-1 text-xs ${
-                locationWarning === "far" ? "text-amber-300" : "text-pink"
+                locationWarning === "far" ? "text-cyan" : "text-pink"
               }`}
             >
               {locationWarning === "far"
@@ -996,7 +1042,7 @@ export default function EventEditor({
         </div>
 
         {/* --- Ingresso -------------------------------------------------- */}
-        <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionMoney}</h2>
+        <SectionHeading step="04" title={t.sectionMoney} />
         <div className="mt-3 grid gap-4">
           <label className="flex items-center gap-3 text-sm text-white">
             <input
@@ -1039,7 +1085,7 @@ export default function EventEditor({
         </div>
 
         {/* --- Immagine e locandina ---------------------------------------- */}
-        <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionCover}</h2>
+        <SectionHeading step="05" title={t.sectionCover} />
 
         <div className="mt-3">
           <CoverField
@@ -1070,7 +1116,7 @@ export default function EventEditor({
         </div>
 
         {/* --- Descrizione ----------------------------------------------- */}
-        <h2 className="mt-8 font-display text-lg font-semibold">{t.sectionMore}</h2>
+        <SectionHeading step="06" title={t.sectionMore} />
 
         <div className="mt-3">
           <Field
@@ -1090,7 +1136,7 @@ export default function EventEditor({
         </div>
 
         {duplicates.length > 0 ? (
-          <div className="mt-8 rounded-2xl border border-amber-300/40 bg-amber-300/10 p-4">
+          <div className="mt-8 border border-cyan/40 bg-cyan/5 p-4">
             <p className="font-display text-sm font-semibold text-white">{t.duplicatesTitle}</p>
             <p className="mt-1 text-xs text-muted">{t.duplicatesHint}</p>
 
@@ -1098,7 +1144,7 @@ export default function EventEditor({
               {duplicates.map((item) => (
                 <li
                   key={item.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-black/20 px-3 py-2"
+                  className="flex flex-wrap items-center justify-between gap-2 border border-line bg-surface px-3 py-2"
                 >
                   <span className="text-sm text-white">
                     {item.title}
@@ -1170,9 +1216,11 @@ export default function EventEditor({
       </form>
 
       <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-        <p className="mb-2 text-xs uppercase tracking-wide text-muted">{t.previewTitle}</p>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-cyan">
+          {t.previewTitle}
+        </p>
         <EventPreviewCard values={values} locale={locale} dict={dict} />
-        <p className="mt-2 text-xs text-muted">{t.previewHint}</p>
+        <p className="mt-2 text-xs leading-relaxed text-muted">{t.previewHint}</p>
       </aside>
     </div>
   );

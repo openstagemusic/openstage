@@ -86,8 +86,15 @@ export default async function NewEventPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold tracking-tight">{dict.editor.newTitle}</h1>
-      <p className="mt-2 text-sm text-muted">{dict.editor.newSubtitle}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+        {dict.dashboard.navNew}
+      </p>
+      <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em]">
+        {dict.editor.newTitle}
+      </h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
+        {dict.editor.newSubtitle}
+      </p>
 
       <div className="mt-8">
         <EventEditor

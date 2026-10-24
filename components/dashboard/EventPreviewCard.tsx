@@ -35,28 +35,25 @@ export default function EventPreviewCard({ values, locale, dict }: EventPreviewC
   const price = values.isFree ? dict.events.freeEntry : values.priceText.trim();
 
   return (
-    <div className="glass overflow-hidden rounded-3xl border border-white/10">
+    <div className="overflow-hidden border border-line bg-surface/60">
       {values.coverImageUrl ? (
         <EventCover src={values.coverImageUrl} className="aspect-square w-full" />
       ) : (
-        <div
-          className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
-          aria-hidden="true"
-        />
+        <div className="h-2 w-full bg-cyan/30" aria-hidden="true" />
       )}
 
       <div className="p-5">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="border border-violet/40 bg-violet/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
             {kindLabel}
           </span>
           {values.genre.trim() ? (
-            <span className="rounded-full border border-white/10 px-2.5 py-1 text-muted">
+            <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
               {values.genre.trim()}
             </span>
           ) : null}
           {price ? (
-            <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-white">
+            <span className="border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
               {price}
             </span>
           ) : null}
@@ -66,7 +63,9 @@ export default function EventPreviewCard({ values, locale, dict }: EventPreviewC
           {values.title.trim() || t.previewEmptyTitle}
         </h3>
 
-        <p className="mt-2 text-sm text-white/80">{when ? when.full : t.previewEmptyWhen}</p>
+        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+          {when ? when.full : t.previewEmptyWhen}
+        </p>
         <p className="mt-1 text-sm text-muted">{place || t.previewEmptyWhere}</p>
 
         {values.description.trim() ? (
