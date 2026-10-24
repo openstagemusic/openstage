@@ -10,6 +10,7 @@ import SpotifyPlayerDock from "@/components/layout/SpotifyPlayerDock";
 import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getCurrentPath, getLocale } from "@/lib/i18n/server";
+import { getUnreadNotificationCount } from "@/lib/notifications/queries";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 // Every public page is server-rendered (SSR) — never a client-only SPA.
@@ -99,6 +100,7 @@ export default async function RootLayout({
 
   // Un'unica lettura per richiesta (React `cache`): utente + ruolo dal database.
   const session = await getSessionProfile();
+  const notificationCount = session ? await getUnreadNotificationCount(session.id) : 0;
 
   return (
     <html
@@ -115,12 +117,17 @@ export default async function RootLayout({
             dict={dict.nav}
             userEmail={session?.email ?? null}
             userRole={session?.role ?? null}
+            notificationCount={notificationCount}
           />
           <main id="contenuto" tabIndex={-1} className="flex-1 pt-16 outline-none">
             {children}
           </main>
           <Footer dict={dict.footer} />
-          <MobileTabBar dict={dict.nav} userEmail={session?.email ?? null} />
+          <MobileTabBar
+            dict={dict.nav}
+            userEmail={session?.email ?? null}
+            notificationCount={notificationCount}
+          />
           <SpotifyPlayerDock />
         </LocaleProvider>
       </body>

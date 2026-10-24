@@ -8,11 +8,12 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import { stripLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
 
-type TabName = "explore" | "map" | "artists" | "venues" | "profile";
+type TabName = "explore" | "map" | "artists" | "venues" | "profile" | "notifications";
 
 type MobileTabBarProps = {
   dict: Dictionary["nav"];
   userEmail: string | null;
+  notificationCount: number;
 };
 
 /** Le aree di lavoro non hanno la barra: lì si scrive, non si scopre. */
@@ -59,6 +60,12 @@ const ICON_PATHS: Record<TabName, ReactNode> = {
       <path d="M4.5 21c0-4 3.4-6.8 7.5-6.8s7.5 2.8 7.5 6.8" />
     </>
   ),
+  notifications: (
+    <>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M10 21h4" />
+    </>
+  ),
 };
 
 function TabIcon({ name }: { name: TabName }) {
@@ -78,7 +85,7 @@ function TabIcon({ name }: { name: TabName }) {
   );
 }
 
-export default function MobileTabBar({ dict, userEmail }: MobileTabBarProps) {
+export default function MobileTabBar({ dict, userEmail, notificationCount }: MobileTabBarProps) {
   const pathname = stripLocale(usePathname());
 
   const hidden = HIDDEN_PREFIXES.some(
@@ -91,7 +98,9 @@ export default function MobileTabBar({ dict, userEmail }: MobileTabBarProps) {
 
   const items: Array<{ href: string; label: string; icon: TabName }> = [
     { href: "/", label: dict.explore, icon: "explore" },
-    { href: "/mappa", label: dict.map, icon: "map" },
+    ...(userEmail
+      ? [{ href: "/dashboard/notifiche", label: dict.notifications, icon: "notifications" as const }]
+      : [{ href: "/mappa", label: dict.map, icon: "map" as const }]),
     { href: "/artisti", label: dict.artists, icon: "artists" },
     { href: "/locali", label: dict.venues, icon: "venues" },
     {
@@ -131,6 +140,11 @@ export default function MobileTabBar({ dict, userEmail }: MobileTabBarProps) {
                   )}
                 />
                 <TabIcon name={item.icon} />
+                {item.icon === "notifications" && notificationCount > 0 ? (
+                  <span className="absolute right-4 top-1.5 min-w-3.5 border border-bg bg-pink px-1 text-center font-mono text-[8px] leading-3.5 text-white">
+                    {notificationCount > 9 ? "9+" : notificationCount}
+                  </span>
+                ) : null}
                 <span className="max-w-full truncate">{item.label}</span>
               </Link>
             </li>

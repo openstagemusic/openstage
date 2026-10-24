@@ -17,6 +17,7 @@ type NavbarProps = {
   dict: Dictionary["nav"];
   userEmail: string | null;
   userRole: UserRole | null;
+  notificationCount: number;
 };
 
 const roleBadgeClass: Record<UserRole, string> = {
@@ -26,7 +27,7 @@ const roleBadgeClass: Record<UserRole, string> = {
   admin: "border-pink/40 bg-pink/10 text-white",
 };
 
-export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProps) {
+export default function Navbar({ locale, dict, userEmail, userRole, notificationCount }: NavbarProps) {
   const [open, setOpen] = useState(false);
   // Il percorso può mostrare il prefisso di lingua (`/it/locali`): per capire
   // quale voce è attiva serve la parte che viene dopo.
@@ -96,6 +97,30 @@ export default function Navbar({ locale, dict, userEmail, userRole }: NavbarProp
                   {dict[ROLE_LABEL_KEY[userRole]]}
                 </span>
               ) : null}
+              <Link
+                href="/dashboard/notifiche"
+                aria-label={`${dict.notifications}${notificationCount > 0 ? ` (${notificationCount})` : ""}`}
+                className="relative inline-flex h-9 w-9 items-center justify-center border border-line text-muted transition-colors hover:border-cyan/60 hover:text-white"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                  <path d="M10 21h4" />
+                </svg>
+                {notificationCount > 0 ? (
+                  <span className="absolute -right-2 -top-2 min-w-4 border border-bg bg-pink px-1 text-center font-mono text-[9px] leading-4 text-white">
+                    {notificationCount > 9 ? "9+" : notificationCount}
+                  </span>
+                ) : null}
+              </Link>
               <Link
                 href="/dashboard"
                 aria-current={isActive("/dashboard") ? "page" : undefined}
