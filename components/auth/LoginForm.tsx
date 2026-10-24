@@ -59,7 +59,7 @@ export default function LoginForm({
 
     setLoading(true);
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
       options: { captchaToken: token || undefined },
@@ -73,7 +73,10 @@ export default function LoginForm({
       return;
     }
 
-    router.push(withLocale(locale, nextPath ?? "/"));
+    // Chi ha confermato l'email da un altro browser non è passato dal callback:
+    // se il ruolo non è ancora stato scelto, lo mandiamo qui prima della Home.
+    const needsRole = !data.user?.user_metadata?.role;
+    router.push(withLocale(locale, needsRole ? "/onboarding/role" : (nextPath ?? "/")));
     router.refresh();
   }
 
