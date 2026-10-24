@@ -232,6 +232,8 @@ devono sembrare lo stesso prodotto, ma restare più leggibili e più sobrie.
 
 ### 5.5C — Directory artisti e locali
 
+- **Stato: applicata il 24 ottobre 2026** (`/artisti`, `/locali` e schede).
+
 - Card con copertina reale quando esiste; altrimenti monogramma tipografico o
   poster tipografico, mai foto stock.
 - Nome, città e genere/indirizzo devono leggersi subito; il badge di verifica

@@ -8,6 +8,7 @@
 | 1.3 | 22 ottobre 2026 | 1 · 1.2 · 1.3 · 2 · 3 · 4 · 5.4 · 6 (6.1 → 6.3) | Fase 6: pagine pubbliche reali (`/about`, `/per-gli-artisti`, `/per-le-venue`, `/contatti`, `/faq`), indice e pagine città con soglia `noindex`, modulo contatti che scrive in database e coda messaggi admin. Aggiunte la sezione Città in Home (massimo sei città in ordine alfabetico) e l'evidenza del pulsante Dashboard. Aggiornati struttura del progetto, migration `0028`, RLS, roadmap e diario |
 | 1.4 | 24 ottobre 2026 | 1 · 1.2 · 1.3 · 2 · 3 · 4 · 5.4 · 5.5A · 5.5B · 6 · 7A | Fase 5.5A: restyling login/registrazione/account/onboarding. Fase 7A: dominio, Aruba, Resend, SMTP Supabase, conferma email, reset password, Turnstile lato Supabase e callback OAuth. Fase 5.5B: scheda evento e popup/bottom sheet mappa. Aggiornati guida utente, manuale tecnico, diario, roadmap, variabili d'ambiente e risoluzione errori |
 | 1.5 | 24 ottobre 2026 | 1 · 1.2 · 1.3 · 2 · 3 · 4 · 5.4 · 5.5A · 5.5B · 6 · 7A | Corretto il flusso email cross-browser: conferma account e reset password usano `token_hash` e `/auth/confirm`, quindi funzionano anche se il link viene aperto da Chrome/Gmail dopo una richiesta fatta in Opera. Aggiunto il controllo del ruolo al login per chi non è passato dal callback |
+| 1.6 | 24 ottobre 2026 | 1 · 1.2 · 1.3 · 2 · 3 · 4 · 5.4 · 5.5A · 5.5B · 5.5C · 6 · 7A | Fase 5.5C: directory artisti/locali e schede con card tipografiche, monogrammi, filtri squadrati e metadati in righe. Aggiornati diario, roadmap e PDF |
 
 ## Come si aggiorna
 

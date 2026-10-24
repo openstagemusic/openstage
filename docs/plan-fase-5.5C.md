@@ -1,6 +1,6 @@
 # Fase 5.5C — Directory artisti e locali
 
-> **Stato: in corso.** Scritto il 24 ottobre 2026.
+> **Stato: completata e in produzione il 24 ottobre 2026.**
 > Blocco visivo della Fase 5.5. Nessuna nuova funzione, nessuna migration,
 > nessun servizio esterno. I dati e i filtri esistenti restano identici.
 

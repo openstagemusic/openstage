@@ -1,9 +1,9 @@
 {
   "titolo": "OpenStage",
   "sottotitolo": "Manuale tecnico e guida utente",
-  "versione": "1.5",
+  "versione": "1.6",
   "data": "24 ottobre 2026",
-  "copre": "Fase 1 · Fase 1.2 · Fase 1.3 · Fase 2 · Fase 3 · Fase 4 · Fase 5.4 · Fase 5.5A · Fase 5.5B · Fase 6 · Fase 7A",
+  "copre": "Fase 1 · Fase 1.2 · Fase 1.3 · Fase 2 · Fase 3 · Fase 4 · Fase 5.4 · Fase 5.5A · Fase 5.5B · Fase 5.5C · Fase 6 · Fase 7A",
   "autore": "OpenStage - documento interno",
   "nota": "Documento generato automaticamente dai sorgenti in docs/manuale. Non modificare il PDF a mano: si aggiorna con npm run manuale."
 }

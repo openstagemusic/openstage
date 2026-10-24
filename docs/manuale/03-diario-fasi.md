@@ -457,6 +457,28 @@ desktop aperto su un pin reale; italiano e inglese; nessuna modifica a database 
 **Rimandato:** directory artisti/locali (5.5C), guscio dashboard (5.5D) ed editor eventi
 (5.5E).
 
+## Fase 5.5C - Directory artisti e locali
+
+**Obiettivo:** riportare `/artisti`, `/locali` e le schede al linguaggio editoriale della
+Home 5.4, senza toccare filtri, query o dati.
+
+**Cosa è stato costruito**
+
+- Testata editoriale con etichetta mono, titolo-poster e introduzione.
+- Filtri squadrati e visibili: ricerca, città, genere per gli artisti; contatore risultati
+  in mono.
+- Card con monogramma tipografico grande, nome leggibile e città/genere o indirizzo in
+  etichetta mono; badge verificato/non reclamato discreto.
+- Schede artista/locale con monogramma, nome-poster, metadati in righe `border-line`,
+  claim panel sobrio ed eventi in arrivo/passati con card editoriale.
+- `EventTeaser` allineato al nuovo linguaggio, riusato anche nei Preferiti.
+
+**Verifiche superate:** build verde; screenshot desktop di `/artisti`, `/locali`,
+`/artisti/[slug]` e `/locali/[slug]`; layout mobile delle directory; filtri e paginazione
+invariati; italiano e inglese; nessuna modifica a database o RLS.
+
+**Rimandato:** guscio dashboard (5.5D) ed editor eventi (5.5E).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato
