@@ -2,27 +2,18 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import AdminMetrics from "@/components/admin/AdminMetrics";
-import AdminQueue from "@/components/admin/AdminQueue";
-import Link from "@/components/i18n/LocaleLink";
 import { getAdminMetrics } from "@/lib/admin/queries";
-import {
-  isCurrentUserAdmin,
-  listClaimsToVerify,
-  listDraftEvents,
-  listPendingClaims,
-  listUnverifiedProfiles,
-  listVerifiedProfiles,
-} from "@/lib/claims/queries";
+import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
-import { countNewContactMessages } from "@/lib/messages/queries";
 
 /**
- * Coda di moderazione: reclami, verifiche ed eventi in bozza.
+ * Panoramica della control room: ricerca, numeri reali e niente duplicazioni.
  *
- * Chi non è l'admin riceve un 404, non un "accesso negato": la pagina non deve
- * nemmeno rivelare di esistere. Il permesso lo decide `is_admin()` nel
- * database, la stessa funzione che poi autorizza ogni azione.
+ * Le code di moderazione vivono nelle schede che le gestiscono (claim, utenti,
+ * artisti, locali, bozze, segnalazioni). Qui resta solo ciò che serve per
+ * orientarsi e cercare.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -40,28 +31,8 @@ export default async function AdminPage() {
 
   const locale = await getLocale();
   const dict = getDictionary(locale);
-
-  const [pending, toVerify, unverified, verified, drafts, newMessages, metrics] =
-    await Promise.all([
-      listPendingClaims(),
-      listClaimsToVerify(),
-      listUnverifiedProfiles(),
-      listVerifiedProfiles(),
-      listDraftEvents(),
-      countNewContactMessages(),
-      getAdminMetrics(),
-    ]);
-
   const t = dict.admin;
-
-  const kpis: Array<{ label: string; value: number; href?: string }> = [
-    { label: t.kpiPending, value: pending.length, href: "/admin/claim" },
-    { label: t.kpiVerify, value: toVerify.length, href: "/admin/claim" },
-    { label: t.kpiUnverified, value: unverified.length, href: "/admin/utenti" },
-    { label: t.kpiDrafts, value: drafts.length, href: "/admin/bozze" },
-    { label: t.kpiMessages, value: newMessages, href: "/admin/messaggi" },
-    { label: t.kpiVerified, value: verified.length, href: "/admin/claim" },
-  ];
+  const metrics = await getAdminMetrics();
 
   return (
     <div>
@@ -70,51 +41,37 @@ export default async function AdminPage() {
           {t.controlRoom}
         </p>
         <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em] sm:text-5xl">
-          {t.overviewTitle}
+          {t.nav.overview}
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.overviewText}</p>
+
+        <form
+          action={withLocale(locale, "/admin/cerca")}
+          method="get"
+          className="mt-6 flex flex-col gap-2 sm:flex-row"
+        >
+          <label htmlFor="admin-search" className="sr-only">
+            {t.searchTitle}
+          </label>
+          <input
+            id="admin-search"
+            name="q"
+            type="search"
+            minLength={2}
+            required
+            placeholder={t.searchPlaceholder}
+            className="min-h-11 flex-1 border border-line bg-surface px-4 py-3 text-sm text-white outline-none placeholder:text-muted focus:border-cyan"
+          />
+          <button
+            type="submit"
+            className="inline-flex min-h-11 items-center justify-center border border-cyan bg-cyan px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-bg transition-colors hover:bg-cyan/90"
+          >
+            {t.searchButton}
+          </button>
+        </form>
       </header>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {kpis.map((kpi) => {
-          const content = (
-            <>
-              <p className="font-poster text-4xl leading-none">{kpi.value}</p>
-              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                {kpi.label}
-              </p>
-            </>
-          );
-
-          return kpi.href ? (
-            <Link
-              key={kpi.label}
-              href={kpi.href}
-              className="border border-line bg-surface/60 p-5 transition-colors hover:border-cyan/50"
-            >
-              {content}
-            </Link>
-          ) : (
-            <div key={kpi.label} className="border border-line bg-surface/60 p-5">
-              {content}
-            </div>
-          );
-        })}
-      </div>
-
       <AdminMetrics metrics={metrics} dict={t} />
-
-      <h2 className="mt-12 font-display text-2xl font-semibold">{t.queueTitle}</h2>
-      <div className="mt-5">
-        <AdminQueue
-          pending={pending}
-          toVerify={toVerify}
-          unverified={unverified}
-          verified={verified}
-          drafts={drafts}
-          dict={t}
-        />
-      </div>
     </div>
   );
 }

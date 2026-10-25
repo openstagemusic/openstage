@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import AdminDirectoryList from "@/components/admin/AdminDirectoryList";
+import AdminVerifyList from "@/components/admin/AdminVerifyList";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { listAdminVenues } from "@/lib/admin/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
+import { venuePath } from "@/lib/events/paths";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -15,6 +17,16 @@ export default async function AdminVenuesPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const rows = await listAdminVenues();
+
+  const toVerify = rows
+    .filter((row) => row.claimed && !row.verified && row.profileId)
+    .map((row) => ({
+      profileId: row.profileId as string,
+      name: row.name,
+      email: row.ownerEmail,
+      roleLabel: dict.admin.nav.venues,
+      href: venuePath({ slug: row.slug }),
+    }));
 
   return (
     <div>
@@ -29,6 +41,8 @@ export default async function AdminVenuesPage() {
           {dict.admin.venuesSubtitle}
         </p>
       </header>
+
+      <AdminVerifyList items={toVerify} dict={dict.admin} />
 
       <AdminDirectoryList rows={rows} kind="venue" dict={dict.admin} />
     </div>

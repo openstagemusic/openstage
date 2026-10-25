@@ -26,7 +26,9 @@ export default function AdminMfaPanel({
   const [enroll, setEnroll] = useState<EnrollData | null>(null);
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [done, setDone] = useState(aal2);
+  const [disabled, setDisabled] = useState(false);
 
   function verify(currentFactorId: string) {
     setError(null);
@@ -57,8 +59,31 @@ export default function AdminMfaPanel({
     });
   }
 
+  function disable(currentFactorId: string) {
+    if (!window.confirm(dict.mfaDisableConfirm)) return;
+
+    setError(null);
+    setNotice(null);
+    startTransition(async () => {
+      const supabase = createClient();
+      const result = await supabase.auth.mfa.unenroll({ factorId: currentFactorId });
+
+      if (result.error) {
+        setError(dict.mfaDisableFailed);
+        return;
+      }
+
+      setDone(false);
+      setDisabled(true);
+      setNotice(dict.mfaDisabled);
+      router.refresh();
+    });
+  }
+
   function startEnroll() {
     setError(null);
+    setNotice(null);
+    setDisabled(false);
     startTransition(async () => {
       const supabase = createClient();
       const result = await supabase.auth.mfa.enroll({
@@ -85,24 +110,48 @@ export default function AdminMfaPanel({
         <p className="border-l-2 border-cyan bg-cyan/10 px-4 py-3 text-sm text-white">
           {dict.mfaEnrolled}
         </p>
-        <button
-          type="button"
-          onClick={() => {
-            router.push("/admin");
-            router.refresh();
-          }}
-          className="mt-6 inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
-        >
-          {dict.mfaBack}
-        </button>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              router.push("/admin");
+              router.refresh();
+            }}
+            className="inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+          >
+            {dict.mfaBack}
+          </button>
+          {factorId ? (
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => disable(factorId)}
+              className="inline-flex min-h-11 items-center border border-pink/50 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-pink transition-colors hover:bg-pink/10 disabled:opacity-50"
+            >
+              {dict.mfaDisable}
+            </button>
+          ) : null}
+        </div>
+        <p className="mt-4 text-xs leading-relaxed text-muted">{dict.mfaDisableHint}</p>
+        {error ? (
+          <p role="alert" className="mt-4 border-l-2 border-pink bg-pink/10 px-4 py-3 text-sm text-white">
+            {error}
+          </p>
+        ) : null}
       </div>
     );
   }
 
-  const activeFactor = enroll?.id ?? factorId;
+  const activeFactor = disabled ? null : (enroll?.id ?? factorId);
 
   return (
     <div className="max-w-2xl">
+      {notice ? (
+        <p className="mb-4 border-l-2 border-cyan bg-cyan/10 px-4 py-3 text-sm text-white">
+          {notice}
+        </p>
+      ) : null}
+
       {!activeFactor ? (
         <>
           <p className="text-sm leading-relaxed text-muted">{dict.mfaEnrollHint}</p>

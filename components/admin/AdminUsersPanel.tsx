@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { setUserSuspendedAction } from "@/app/actions/admin";
+import { setProfileVerifiedAction } from "@/app/actions/claims";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { AdminUser } from "@/lib/admin/queries";
@@ -27,6 +28,23 @@ export default function AdminUsersPanel({
   const date = new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
     dateStyle: "medium",
   });
+
+  async function unverify(user: AdminUser) {
+    setBusy(user.id);
+    setError(null);
+    setNotice(null);
+
+    const outcome = await setProfileVerifiedAction({ profileId: user.id, verified: false });
+    setBusy(null);
+
+    if (!outcome.ok) {
+      setError(dict.userActionFailed);
+      return;
+    }
+
+    setNotice(dict.userUnverifiedNotice);
+    router.refresh();
+  }
 
   async function toggle(user: AdminUser) {
     const suspending = user.suspendedAt === null;
@@ -126,22 +144,34 @@ export default function AdminUsersPanel({
                   </td>
                   <td className="px-3 py-3 text-right">
                     {user.role === "admin" ? null : (
-                      <button
-                        type="button"
-                        disabled={busy === user.id}
-                        onClick={() => void toggle(user)}
-                        className={
-                          suspended
-                            ? "inline-flex min-h-9 items-center border border-cyan/50 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-cyan transition-colors hover:bg-cyan/10 disabled:opacity-50"
-                            : "inline-flex min-h-9 items-center border border-pink/50 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-pink transition-colors hover:bg-pink/10 disabled:opacity-50"
-                        }
-                      >
-                        {busy === user.id
-                          ? dict.working
-                          : suspended
-                            ? dict.userRestore
-                            : dict.userSuspend}
-                      </button>
+                      <div className="flex flex-wrap justify-end gap-1.5">
+                        {user.verifiedAt && (user.role === "artist" || user.role === "venue") ? (
+                          <button
+                            type="button"
+                            disabled={busy === user.id}
+                            onClick={() => void unverify(user)}
+                            className="inline-flex min-h-9 items-center border border-line-strong px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted transition-colors hover:text-white disabled:opacity-50"
+                          >
+                            {busy === user.id ? dict.working : dict.unverify}
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          disabled={busy === user.id}
+                          onClick={() => void toggle(user)}
+                          className={
+                            suspended
+                              ? "inline-flex min-h-9 items-center border border-cyan/50 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-cyan transition-colors hover:bg-cyan/10 disabled:opacity-50"
+                              : "inline-flex min-h-9 items-center border border-pink/50 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-pink transition-colors hover:bg-pink/10 disabled:opacity-50"
+                          }
+                        >
+                          {busy === user.id
+                            ? dict.working
+                            : suspended
+                              ? dict.userRestore
+                              : dict.userSuspend}
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>

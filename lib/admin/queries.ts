@@ -119,6 +119,8 @@ export type AdminDirectoryRow = {
   claimed: boolean;
   verified: boolean;
   suspended: boolean;
+  profileId: string | null;
+  ownerEmail: string | null;
   eventCount: number;
 };
 
@@ -130,7 +132,7 @@ type DirectoryRow = {
   genre?: string | null;
   created_at: string;
   profile_id: string | null;
-  profiles: { verified_at: string | null; suspended_at: string | null } | null;
+  profiles: { id: string; email: string | null; verified_at: string | null; suspended_at: string | null } | null;
   events: { count: number }[] | null;
 };
 
@@ -141,8 +143,8 @@ async function listDirectory(
   const supabase = await createClient();
   const select =
     table === "artists"
-      ? "id, name, slug, city, genre, created_at, profile_id, profiles!artists_profile_id_fkey ( verified_at, suspended_at ), events ( count )"
-      : "id, name, slug, city, created_at, profile_id, profiles!venues_profile_id_fkey ( verified_at, suspended_at ), events ( count )";
+      ? "id, name, slug, city, genre, created_at, profile_id, profiles!artists_profile_id_fkey ( id, email, verified_at, suspended_at ), events ( count )"
+      : "id, name, slug, city, created_at, profile_id, profiles!venues_profile_id_fkey ( id, email, verified_at, suspended_at ), events ( count )";
 
   const { data, error } = await supabase
     .from(table)
@@ -168,6 +170,8 @@ async function listDirectory(
       claimed: row.profile_id !== null,
       verified: profile?.verified_at != null,
       suspended: profile?.suspended_at != null,
+      profileId: profile?.id ?? null,
+      ownerEmail: profile?.email ?? null,
       eventCount: row.events?.[0]?.count ?? 0,
     };
   });

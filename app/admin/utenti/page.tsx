@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import AdminUsersPanel from "@/components/admin/AdminUsersPanel";
-import { isCurrentUserAdmin } from "@/lib/claims/queries";
+import AdminVerifyList from "@/components/admin/AdminVerifyList";
+import { isCurrentUserAdmin, listUnverifiedProfiles } from "@/lib/claims/queries";
 import { listAdminUsers } from "@/lib/admin/queries";
 import type { UserRole } from "@/lib/auth/roles";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
+import { artistPath, venuePath } from "@/lib/events/paths";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -16,6 +18,7 @@ export default async function AdminUsersPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const users = await listAdminUsers();
+  const unverified = await listUnverifiedProfiles();
 
   const roleLabels: Record<UserRole, string> = {
     fan: dict.nav.roleFan,
@@ -23,6 +26,19 @@ export default async function AdminUsersPage() {
     venue: dict.nav.roleVenue,
     admin: dict.nav.roleAdmin,
   };
+
+  const toVerify = unverified.map((profile) => ({
+    profileId: profile.id,
+    name: profile.subjectName ?? profile.email ?? dict.admin.unknownEmail,
+    email: profile.email,
+    roleLabel: profile.role === "artist" ? dict.nav.roleArtist : dict.nav.roleVenue,
+    href:
+      profile.subjectType && profile.subjectSlug
+        ? profile.subjectType === "artist"
+          ? artistPath({ slug: profile.subjectSlug })
+          : venuePath({ slug: profile.subjectSlug })
+        : undefined,
+  }));
 
   return (
     <div>
@@ -37,6 +53,8 @@ export default async function AdminUsersPage() {
           {dict.admin.usersSubtitle}
         </p>
       </header>
+
+      <AdminVerifyList items={toVerify} dict={dict.admin} />
 
       <AdminUsersPanel users={users} roleLabels={roleLabels} dict={dict.admin} />
     </div>

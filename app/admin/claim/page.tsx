@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import AdminClaimsPanel from "@/components/admin/AdminClaimsPanel";
-import { isCurrentUserAdmin, listActiveClaims } from "@/lib/claims/queries";
+import { isCurrentUserAdmin, listActiveClaims, listPendingClaims } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 
@@ -14,6 +14,7 @@ export default async function AdminClaimsPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const claims = await listActiveClaims();
+  const pending = await listPendingClaims();
 
   return (
     <div>
@@ -29,7 +30,7 @@ export default async function AdminClaimsPage() {
         </p>
       </header>
 
-      <AdminClaimsPanel claims={claims} dict={dict.admin} />
+      <AdminClaimsPanel claims={claims} pending={pending} dict={dict.admin} />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { revokeClaimAction } from "@/app/actions/claims";
+import { decideClaimAction, revokeClaimAction, setProfileVerifiedAction } from "@/app/actions/claims";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -12,9 +12,11 @@ import { artistPath, venuePath } from "@/lib/events/paths";
 
 export default function AdminClaimsPanel({
   claims,
+  pending,
   dict,
 }: {
   claims: ClaimRecord[];
+  pending: ClaimRecord[];
   dict: Dictionary["admin"];
 }) {
   const router = useRouter();
@@ -28,6 +30,40 @@ export default function AdminClaimsPanel({
   const date = new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
     dateStyle: "medium",
   });
+
+  async function decide(claim: ClaimRecord, approve: boolean) {
+    setBusy(claim.id);
+    setError(null);
+    setNotice(null);
+
+    const outcome = await decideClaimAction({ claimId: claim.id, approve });
+    setBusy(null);
+
+    if (!outcome.ok) {
+      setError(dict.errorGeneric);
+      return;
+    }
+
+    setNotice(approve ? dict.claimApproved : dict.claimRejected);
+    router.refresh();
+  }
+
+  async function verify(claim: ClaimRecord) {
+    setBusy(claim.id);
+    setError(null);
+    setNotice(null);
+
+    const outcome = await setProfileVerifiedAction({ profileId: claim.profileId, verified: true });
+    setBusy(null);
+
+    if (!outcome.ok) {
+      setError(dict.errorGeneric);
+      return;
+    }
+
+    setNotice(dict.claimVerifiedNotice);
+    router.refresh();
+  }
 
   async function revoke(claim: ClaimRecord) {
     if (!window.confirm(dict.claimRevokeConfirm)) return;
@@ -50,24 +86,96 @@ export default function AdminClaimsPanel({
     router.refresh();
   }
 
-  if (claims.length === 0) {
-    return <p className="mt-5 border-l-2 border-line-strong pl-3 text-sm text-muted">{dict.claimsEmpty}</p>;
-  }
-
-  return (
-    <div className="mt-6">
+  const notices = (
+    <>
       {notice ? (
         <p className="mb-4 border-l-2 border-cyan bg-cyan/10 px-4 py-3 text-sm text-white">
           {notice}
         </p>
       ) : null}
       {error ? (
-        <p className="mb-4 border-l-2 border-pink bg-pink/10 px-4 py-3 text-sm text-white">
+        <p role="alert" className="mb-4 border-l-2 border-pink bg-pink/10 px-4 py-3 text-sm text-white">
           {error}
         </p>
       ) : null}
+    </>
+  );
 
-      <ul className="border-t border-line">
+  return (
+    <div className="mt-6">
+      {notices}
+
+      <section className="border border-line bg-surface/40 p-4">
+        <h2 className="font-display text-lg font-semibold">
+          {dict.pendingTitle} <span className="text-muted">({pending.length})</span>
+        </h2>
+        <p className="mt-1 text-xs leading-relaxed text-muted">{dict.pendingText}</p>
+
+        {pending.length === 0 ? (
+          <p className="mt-3 text-sm text-muted">{dict.empty}</p>
+        ) : (
+          <ul className="mt-3 divide-y divide-line border-t border-line">
+            {pending.map((claim) => {
+              const href =
+                claim.subjectType === "artist"
+                  ? artistPath({ slug: claim.subjectSlug })
+                  : venuePath({ slug: claim.subjectSlug });
+
+              return (
+                <li key={claim.id} className="py-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <LocaleLink href={href} className="font-display text-base font-semibold hover:text-cyan">
+                        {claim.subjectName}
+                      </LocaleLink>
+                      <p className="mt-0.5 text-xs text-muted">
+                        {claim.subjectType === "artist" ? dict.kindArtist : dict.kindVenue} ·{" "}
+                        {claim.email ?? dict.unknownEmail} · {date.format(new Date(claim.createdAt))}
+                      </p>
+                      <a
+                        href={claim.proofUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block break-all text-xs text-cyan hover:opacity-80"
+                      >
+                        {claim.proofUrl}
+                      </a>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={busy === claim.id}
+                        onClick={() => void decide(claim, true)}
+                        className="inline-flex min-h-9 items-center border border-cyan/50 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-cyan transition-colors hover:bg-cyan/10 disabled:opacity-50"
+                      >
+                        {busy === claim.id ? dict.working : dict.approve}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busy === claim.id}
+                        onClick={() => void decide(claim, false)}
+                        className="inline-flex min-h-9 items-center border border-line-strong px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted transition-colors hover:text-white disabled:opacity-50"
+                      >
+                        {busy === claim.id ? dict.working : dict.reject}
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <h2 className="mt-10 font-display text-xl font-semibold">
+        {dict.claimsTitle} <span className="text-muted">({claims.length})</span>
+      </h2>
+      <p className="mt-1 text-sm text-muted">{dict.claimsSubtitle}</p>
+
+      {claims.length === 0 ? (
+        <p className="mt-5 border-l-2 border-line-strong pl-3 text-sm text-muted">{dict.claimsEmpty}</p>
+      ) : (
+        <ul className="mt-4 border-t border-line">
         {claims.map((claim) => {
           const href =
             claim.subjectType === "artist"
@@ -116,18 +224,30 @@ export default function AdminClaimsPanel({
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenId(openId === claim.id ? null : claim.id);
-                    setNote("");
-                    setError(null);
-                    setNotice(null);
-                  }}
-                  className="inline-flex min-h-11 items-center border border-pink/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-pink transition-colors hover:bg-pink/10"
-                >
-                  {dict.claimRevoke}
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  {!claim.verified ? (
+                    <button
+                      type="button"
+                      disabled={busy === claim.id}
+                      onClick={() => void verify(claim)}
+                      className="inline-flex min-h-11 items-center border border-cyan/50 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-colors hover:bg-cyan/10 disabled:opacity-50"
+                    >
+                      {busy === claim.id ? dict.working : dict.verify}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenId(openId === claim.id ? null : claim.id);
+                      setNote("");
+                      setError(null);
+                      setNotice(null);
+                    }}
+                    className="inline-flex min-h-11 items-center border border-pink/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-pink transition-colors hover:bg-pink/10"
+                  >
+                    {dict.claimRevoke}
+                  </button>
+                </div>
               </div>
 
               {openId === claim.id ? (
@@ -169,7 +289,8 @@ export default function AdminClaimsPanel({
             </li>
           );
         })}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 }
