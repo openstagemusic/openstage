@@ -39,6 +39,7 @@ export const ADMIN_MODULES: AdminModule[] = [
     labelKey: "notifications",
   },
   { key: "audit", href: "/admin/audit", group: "system", status: "soon", labelKey: "audit" },
+  { key: "security", href: "/admin/sicurezza", group: "system", status: "active", labelKey: "security" },
   { key: "settings", href: "/admin/impostazioni", group: "system", status: "soon", labelKey: "settings" },
   { key: "jobs", href: "/admin/jobs", group: "system", status: "soon", labelKey: "jobs" },
   { key: "ai", href: "/admin/ai", group: "ai", status: "soon", labelKey: "ai" },
