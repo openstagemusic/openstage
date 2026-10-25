@@ -501,6 +501,149 @@ italiano e inglese; nessuna modifica a database o RLS.
 
 **Rimandato:** editor eventi (5.5E) e le funzioni nuove della dashboard (Fase 10).
 
+## Fase 5.5E - Editor eventi
+
+**Obiettivo:** portare creazione e modifica evento al linguaggio editoriale, senza campi
+nuovi e senza cambiare le regole di salvataggio.
+
+**Cosa è stato costruito**
+
+- Form a sezioni numerate, anteprima sticky su desktop e barra azioni su mobile.
+- Riepilogo errori, avviso modifiche non salvate, conferma doppioni e stato reale dopo il
+  salvataggio.
+- Copertina, mappa, artista/locale collegato e prezzi nello stesso linguaggio della scheda
+  evento.
+
+**Verifiche superate:** build verde; creazione e modifica con dati reali; controlli di
+duplicato, link biglietti e posizione; screenshot desktop/mobile.
+
+**Rimandato:** campi avanzati (lineup, età minima, più giorni) alla Fase 12.
+
+## Fase 7B - Email engine, notifiche e Area Fan
+
+**Obiettivo:** completare il sistema email e dare agli utenti un centro notifiche vero,
+senza trasformare OpenStage in una newsletter.
+
+**Cosa è stato costruito**
+
+- Tabella `notifications`, badge in navbar, centro notifiche e preferenze.
+- Coda `email_queue` con worker, tetto di invio, retry, webhook Resend e registro consegne.
+- Trigger per annullamenti e aggiornamenti, digest settimanale opt-in, disiscrizione senza
+  login e Area Fan "Per te".
+- Messaggi di contatto con risposta integrata da Resend.
+
+**Decisioni e perché:** notifica in-app come canale principale; email solo per conferme,
+risposte 1:1 e digest scelto dall'utente. Nessuna metrica di vanità.
+
+**Verifiche superate:** coda e webhook end-to-end; conferma email e reset cross-browser;
+preferenze e unsubscribe; build e deploy verdi.
+
+**Rimandato:** push PWA e community/follow alla Fase 13.
+
+## Fase 8.0 - Control room
+
+**Obiettivo:** una control room unica per l'admin, separata dal sito pubblico.
+
+**Cosa è stato costruito**
+
+- Guscio admin con sidebar desktop, menu mobile e registro moduli.
+- Panoramica "Da fare adesso", ricerca globale, KPI reali e collegamenti alle code.
+- Accesso admin diretto alla control room; navbar pubblica con "Control room" al posto di
+  Dashboard/Crea evento; barra mobile e player nascosti per l'admin.
+
+**Verifiche superate:** build verde; accesso admin da password e Google; pagine admin
+protette; layout desktop/mobile.
+
+**Rimandato:** moduli persone/contenuti, 2FA e audit alle sotto-fasi successive.
+
+## Fase 8.1 - Sicurezza, audit e revoca claim
+
+**Obiettivo:** proteggere la control room e rendere tracciabili le azioni distruttive.
+
+**Cosa è stato costruito**
+
+- 2FA TOTP obbligatoria (AAL2) con pagina `/admin/sicurezza`.
+- Sospensione temporanea della 2FA senza cancellare il fattore, con banner e scadenza.
+- Tabella `admin_audit_log` e modulo `/admin/claim` con revoca motivata.
+- La revoca azzera `profile_id` e `verified_at`, quindi la scheda torna a OpenStage.
+- Sospensione/ripristino account con notifica in-app ed email transazionale.
+
+**Verifiche superate:** redirect AAL1, enrollment TOTP, revoca in transazione, sospensione e
+ripristino, audit scritto.
+
+**Rimandato:** pannello comunicazione e automazioni AI.
+
+## Fase 8.2 e 8.3 - Metriche, persone e contenuti
+
+**Obiettivo:** sostituire le stime con numeri reali e dare all'admin le schede operative.
+
+**Cosa è stato costruito**
+
+- `admin_metrics()` con utenti, schede, eventi, preferiti, messaggi, segnalazioni, claim ed
+  email.
+- Pagine `/admin/utenti`, `/admin/artisti`, `/admin/locali`, `/admin/bozze`,
+  `/admin/segnalazioni`, `/admin/audit` e ricerca globale.
+- Sospensione utenti, chiusura/riapertura segnalazioni, verifica e rimozione verifica.
+- Grafici CSS compatti nella panoramica, leggibili su telefono.
+
+**Verifiche superate:** query reali, azioni in transazione, layout mobile, build e deploy.
+
+**Rimandato:** filtrare le bozze personali degli autori verificati (B68); filtri, paginazione
+ed export delle liste (B52).
+
+## Fase 8.4 - Claim a invito
+
+**Obiettivo:** invitare una persona a reclamare una scheda senza farle creare una scheda
+doppia.
+
+**Cosa è stato costruito**
+
+- Tabella `claim_invites` con token monouso salvato solo come hash, scadenza 7 giorni e
+  revoca.
+- Invito dalla riga artista/locale non reclamata; email se l'account non esiste, notifica
+  in-app se esiste.
+- Pagina pubblica `/claim/[token]`, login/registrazione con ritorno all'invito.
+- Accettazione: scheda al profilo, verifica automatica, ruolo artista/locale se l'utente era
+  fan, claim approvato creato per la coda admin.
+
+**Verifiche superate:** token monouso, accettazione con email corretta, claim visibile in
+"Claim attivi", eventi pubblicabili subito dopo l'accettazione.
+
+## Fase 8.5 - Centro assistenza
+
+**Obiettivo:** trasformare i messaggi del form contatti in ticket gestibili.
+
+**Cosa è stato costruito**
+
+- Priorità, assegnazione a un admin, storico risposte e stato letto/chiuso.
+- Risposta integrata: email Resend, registrazione della risposta e notifica in-app se il
+  mittente ha un account.
+- "Non trovi il locale? Segnalacelo" nella directory locali, con argomento già selezionato.
+
+**Verifiche superate:** priorità e assegnazione, risposta registrata, notifica, build e
+deploy.
+
+**Rimandato:** pannello comunicazione con quota, retry e export (Fase 8.6).
+
+## Fase 8.6a e 8.6b - Avvisi Telegram
+
+**Obiettivo:** avvisare l'admin sul telefono quando qualcosa richiede attenzione.
+
+**Cosa è stato costruito**
+
+- Primo bot per le code admin: ticket, richieste locali, claim da verificare, segnalazioni,
+  bozze da revisione ed email fallite.
+- Secondo bot separato per l'attività: nuove registrazioni e nuovi eventi, con totale utenti
+  ed eventi.
+- Token e chat in Supabase Vault; trigger che chiamano una rotta Vercel protetta; dedupe per
+  non ricevere doppioni.
+- Pannello `/admin/impostazioni` con stato e test per entrambi i bot.
+
+**Verifiche superate:** route protetta, invio reale, trigger ticket, doppio canale, build e
+deploy.
+
+**Rimandato:** pannello comunicazione completo, quota Resend e export; AI assistita.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

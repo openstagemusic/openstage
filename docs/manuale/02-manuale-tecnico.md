@@ -141,6 +141,13 @@ quando ne aggiungi una, impostala su tutti e tre.
 | `NEXT_PUBLIC_SITE_URL` | Dominio di produzione | URL canonico per SEO e link di ritorno |
 | `NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID` | URL della playlist (la parte dopo `/playlist/`) | Player Spotify in fondo alle pagine. **Oggi è vuota**: senza un id il player non compare affatto (nessun contenuto finto, nessun player vuoto) |
 | `GEOCODER_TIMEOUT_MS` | Facoltativa, solo per le prove locali | Tempo massimo di attesa di Photon. In produzione il valore predefinito è 5 s; in locale si può alzare per non far fallire il controllo del pin |
+| `RESEND_WEBHOOK_SECRET` | Resend → Webhooks | Firma del webhook consegne/errori |
+| `UNSUBSCRIBE_SECRET` | Scelta interna | Firma i link di disiscrizione senza login |
+| `EMAIL_WORKER_SECRET` | Scelta interna | Protegge il worker della coda email |
+| `TELEGRAM_BOT_TOKEN` | BotFather | Bot Telegram per le code admin |
+| `TELEGRAM_ADMIN_CHAT_ID` | Telegram / @userinfobot | Chat che riceve gli avvisi admin |
+| `TELEGRAM_ACTIVITY_BOT_TOKEN` | BotFather | Secondo bot per registrazioni ed eventi |
+| `TELEGRAM_ACTIVITY_CHAT_ID` | Telegram / @userinfobot | Chat che riceve gli avvisi attività |
 
 > `.env.local` **non deve mai** finire su Git: il file è già escluso. Il modello da copiare è
 > `.env.example`.
@@ -154,6 +161,10 @@ OpenFreeMap e la geocodifica usa Photon, che non richiedono chiavi API né accou
 regola generale: quando una fase introduce un servizio nuovo, la variabile va impostata su
 **tutti e tre** gli ambienti Vercel (Production, Preview, Development) prima del test in
 produzione.
+
+Il bot Telegram usa token e chat anche da **Supabase Vault**, perché i trigger del database
+non leggono le variabili di Vercel: il database chiama una rotta protetta, che invia il
+messaggio con le env del progetto. Se cambi bot, aggiorna sia Vercel sia Vault.
 
 # Autenticazione e gestione del ruolo
 
@@ -247,6 +258,29 @@ eliminando la bozza.
 **`settings`** — parametri interni chiave/valore. Oggi contiene `admin_email` = email dello
 staff. È leggibile solo dall'admin.
 
+**`notifications`** - centro notifiche in-app: tipo, titolo, corpo, link, lettura,
+scadenza, priorità e chiave di deduplica. RLS sul proprietario.
+
+**`email_queue` / `email_log`** - coda e registro delle email: categoria, stato, tentativi,
+errore, provider id, idempotenza e webhook Resend.
+
+**`notification_preferences` / `digest`** - preferenze per tipo e digest settimanale opt-in;
+la disiscrizione usa un token firmato.
+
+**`claim_invites`** - inviti a reclamare una scheda: token solo come hash, scadenza, stato,
+canale (email o notifica), chi ha invitato e chi ha accettato.
+
+**`admin_audit_log`** - registro delle azioni admin: attore, azione, soggetto, metadata e
+data. Nessuna modifica manuale dall'interfaccia.
+
+**`contact_messages` / `contact_message_replies`** - ticket dal form contatti, priorità,
+assegnazione e storico delle risposte.
+
+**`telegram_alert_log`** - deduplica degli avvisi Telegram già inviati.
+
+**`profiles.mfa_bypass_until`** - finestra breve di sospensione della 2FA; il fattore TOTP
+resta in Supabase Auth.
+
 ## Funzioni e trigger
 
 | Oggetto | Cosa fa |
@@ -262,7 +296,17 @@ staff. È leggibile solo dall'admin.
 | `city_key(...)` | Minuscolo, senza accenti e senza provincia: "Milano" e "milano (MI)" sono la stessa città |
 | `event_daily_limit(...)` | Tetto anti-spam per account, predefinito 10 serate nelle 24 ore |
 | `reports_apply_threshold()` | Alla terza segnalazione da persone diverse e verificate mette la serata in pausa (bozza) |
-| Trigger | `on_auth_user_created` (su `auth.users`), `profiles_guard`, `artists_touch`, `venues_touch`, `events_touch`, `settings_touch`, `events_rate_limit`, `events_log_creation`, `reports_apply_threshold` |
+| `admin_publish_event(...)` | Pubblica una bozza e verifica l'autore, in una transazione |
+| `revoke_claim(...)`, `set_profile_verified(...)` | Revoca una scheda e gestisce la verifica |
+| `admin_metrics()` | Numeri reali della control room in un solo giro |
+| `admin_search(...)` | Ricerca globale admin su persone, schede, eventi, messaggi, email e segnalazioni |
+| `admin_set_user_suspended(...)`, `admin_resolve_report(...)` | Sospensione account e gestione segnalazioni, con audit |
+| `admin_set_mfa_bypass(...)`, `admin_clear_mfa_bypass()` | Sospensione temporanea della 2FA senza cancellare il fattore |
+| `admin_create_claim_invite(...)`, `accept_claim_invite(...)`, `admin_revoke_claim_invite(...)` | Invito, accettazione e revoca del claim |
+| `admin_update_contact_ticket(...)`, `admin_log_contact_reply(...)` | Priorità/assegnazione ticket, risposta e notifica in-app |
+| `notify_admin_telegram(...)`, `notify_activity_telegram(...)` | Avvisi Telegram con dedupe, via rotta Vercel protetta |
+| `claim_email_batch(...)` | Worker della coda email |
+| Trigger | `on_auth_user_created`, `profiles_guard`, `artists_touch`, `venues_touch`, `events_touch`, `settings_touch`, `events_rate_limit`, `events_log_creation`, `events_require_review`, `events_require_page`, `events_block_suspended`, `reports_apply_threshold`, `telegram_on_*` |
 
 ## Indici
 
@@ -317,6 +361,26 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0026_reports.sql` | Segnalazioni, auto-pausa e pannello di moderazione |
 | `0027_merge_admin_check.sql` | `merge_event` usa `is_admin()`, una sola definizione di admin |
 | `0028_contact_messages.sql` | Tabella, indici e RLS dei messaggi dal modulo contatti |
+
+| `0029_event_claim_ownership.sql` | Proprietà degli eventi reclamati |
+| `0030_notifications.sql` | Centro notifiche in-app |
+| `0031_event_publish_claim.sql` | Pubblicazione e verifica per schede reclamate |
+| `0032_email_queue.sql` | Coda e worker email |
+| `0033_notification_preferences.sql` | Preferenze notifiche |
+| `0034_weekly_digest.sql` | Digest settimanale |
+| `0035_unsubscribe_digest.sql` | Disiscrizione senza login |
+| `0036_notification_cancel_cycle.sql` | Annullamenti e notifiche |
+| `0037_admin_audit_revoke.sql` | Audit admin e revoca claim |
+| `0038_admin_metrics_people.sql` | Metriche, sospensione utenti, segnalazioni |
+| `0039_admin_search_suspend_notify.sql` | Ricerca admin e notifica sospensione |
+| `0040_events_require_page.sql` | Senza scheda non si creano eventi |
+| `0041_admin_mfa_bypass.sql` | Sospensione temporanea 2FA |
+| `0042_claim_invites.sql` | Inviti a reclamare |
+| `0043_claim_invite_claim_row.sql` | Claim creato all'accettazione dell'invito |
+| `0044_support_tickets.sql` | Ticket, priorità, assegnazione e risposte |
+| `0045_telegram_alerts.sql` | Avvisi Telegram admin |
+| `0046_telegram_via_vercel.sql` | Telegram tramite rotta Vercel |
+| `0047_activity_telegram.sql` | Bot Telegram attività |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0028`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
@@ -493,6 +557,35 @@ Scelte da non perdere:
 | Suggerimenti **dal nostro database**, non da un geocoder esterno | Coerenza con "niente dati finti", nessun costo, nessun servizio da configurare |
 | `scroll: false` su ogni navigazione di filtro | Chi sta filtrando guarda i filtri: la pagina non deve tornare in cima |
 
+# Control room, sicurezza e Telegram
+
+La control room vive sotto `/admin` e usa un layout separato dal sito pubblico. Il controllo
+di accesso è doppio: `is_admin()` nel database e 2FA AAL2 nella sessione. La pagina
+`/admin/sicurezza` resta raggiungibile a AAL1 per completare l'enrollment o la verifica.
+
+| Rotta | Funzione |
+| --- | --- |
+| `/admin` | Panoramica, "Da fare adesso", metriche, ricerca |
+| `/admin/utenti` | Persone, verifica, sospensione |
+| `/admin/artisti`, `/admin/locali` | Schede, claim e inviti |
+| `/admin/claim` | Richieste, verifiche, revoca, inviti |
+| `/admin/eventi`, `/admin/bozze` | Serate e revisione |
+| `/admin/segnalazioni` | Segnalazioni eventi |
+| `/admin/messaggi` | Ticket, priorità, assegnazione, risposte |
+| `/admin/audit` | Registro azioni |
+| `/admin/sicurezza` | 2FA e sospensione temporanea |
+| `/admin/impostazioni` | Bot Telegram e test |
+
+**Telegram.** Due bot separati: uno per le code admin, uno per registrazioni ed eventi. I
+trigger del database non chiamano Telegram direttamente: inseriscono un avviso con dedupe e
+chiamano `/api/admin/telegram/alert` o `/api/admin/telegram/activity`, protette da un header
+con il token del bot. Le rotte inviano il messaggio con le variabili Vercel; i token sono
+anche in Supabase Vault per autorizzare le chiamate dal database.
+
+**Cosa non c'è ancora.** Pannello comunicazione completo (quota Resend, dry run, retry a
+lotti, export), pannello notifiche admin aggregato e automazioni AI. Sono le prossime
+sotto-fasi.
+
 # Deploy e rilascio
 
 1. Il codice vive su GitHub (`openstagemusic/openstage`, ramo `main`).
@@ -593,15 +686,16 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 5.4 | ✅ Remake grafico della Home: muro di locandine, lista a righe, mappa a tutta pagina, guscio |
 | 5.5A · 5.5B | ✅ Restyling login/registrazione/account/onboarding e scheda evento + popup/bottom sheet mappa |
 | 6 | ✅ Pagine pubbliche ed editoriali, `/citta` e schede città, modulo contatti reale e coda messaggi admin; sezione Città in Home e Dashboard evidenziata |
-| 7A | ✅ Email transazionali (Resend), conferma email, reset password, Turnstile lato Supabase. Resta `B48` (risposta ai contatti) |
-| 7B | Area fan, notifiche in-app, coda email, webhook, digest. **Prossima dopo la 5.5** |
-| 8 | Pannello admin completo, 2FA e claim a invito |
-| 9 | Community: "segui" e inviti virali |
-| 10 | Spotify e area artista |
-| 11 | Monetizzazione opzionale (PayPal): richiede Vercel Pro e partita fiscale |
-| 12 | Serie, locali chiusi, bacheca ingaggi |
-| 13 | SEO, legal, audit, polish finale e remake parte 2 |
-
-> L'ordine dalla 6 in poi è indicativo e viene dettagliato una fase per volta, con un piano
-> scritto prima di scrivere codice. La roadmap approvata è in `docs/roadmap.md`; se questo
-> manuale dice altro, vale la roadmap.
+| 7A | ✅ Email transazionali (Resend), conferma email, reset password, Turnstile lato Supabase, risposta ai contatti |
+| 7B | ✅ Coda email, webhook, notifiche in-app, preferenze, digest, unsubscribe e Area Fan |
+| 8.0 | ✅ Control room modulare, registro moduli, ricerca globale, "Da fare adesso" |
+| 8.1 | ✅ 2FA AAL2, audit, revoca claim, sospensione temporanea 2FA |
+| 8.2 | ✅ Metriche reali e grafici compatti |
+| 8.3 | ✅ Utenti, artisti, locali, bozze, segnalazioni, audit |
+| 8.4 | ✅ Claim a invito con token monouso |
+| 8.5 | ✅ Centro assistenza: ticket, priorità, assegnazione, storico, risposte |
+| 8.6a | ✅ Avvisi Telegram per le code admin |
+| 8.6b | ✅ Secondo bot Telegram per registrazioni ed eventi |
+| 8.6 (resto) | ⏳ Pannello comunicazione: quota Resend, dry run, retry a lotti, export |
+| 8.7 | ⏳ Pannello notifiche admin aggregato |
+| 8.8 | ⏳ Automazioni AI assistite, sempre con approvazione umana |

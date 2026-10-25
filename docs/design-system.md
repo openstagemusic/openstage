@@ -356,13 +356,15 @@ con il proprietario prima della Fase 8 (`docs/plan-fase-8.md`).
 
 ### Sicurezza e azioni
 
-- 2FA (AAL2) obbligatoria per l'admin.
+- **Spunta verificato**: cerchio con gradiente ciano→viola, alone luminoso e check bianco; il testo resta per screen reader e tooltip. Sostituisce il badge quadrato ovunque compaia la verifica.
+- 2FA (AAL2) obbligatoria per l'admin; sospensione temporanea senza cancellare il fattore.
 - Audit log per ogni azione che cambia dati.
 - Conferma esplicita per eliminare, sospendere, annullare o inviare in massa.
 - “Retry failed” a lotti, con dry run e controllo quota; mai 542 invii in un
   clic.
 - Errori del provider sanitizzati: niente URL, token o API key nell'interfaccia.
 - Nessun dato personale in più di quanto serve; export tracciati.
+- **Telegram**: due bot separati (code admin, attività). Messaggi solo con tipo evento e totale; mai email, nomi o titoli.
 
 ## 14. Notifiche in-app
 

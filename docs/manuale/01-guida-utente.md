@@ -19,26 +19,22 @@ I quattro principi che guidano ogni decisione (anche tecnica) sono:
 
 ## A che punto siamo
 
-**Fatto e online:** identità e accesso (email e Google), **conferma email reale**, **recupero
-password**, **Turnstile verificato lato server**, ruoli con regole definitive, design system,
-doppia lingua IT/EN con indirizzi `/it` e `/en`, **directory reali di artisti e locali** con
-filtri e schede pubbliche, **reclamo della scheda**, **dashboard** per artisti e locali,
-**editor degli eventi** con bozze e locandine, **mappa interattiva** con pin e globo,
-**pagine evento** con calendario e condivisione, **ricerca con suggerimenti**, **filtri
-rapidi**, **pagina dei preferiti**, **segnalazioni e moderazione**, **Home poster wall** con
-**sezione Città**, **pagine pubbliche reali** (Chi siamo, Per gli artisti, Per le venue,
-Contatti, FAQ), **indice e pagine città**, **modulo contatti che scrive nel database** con
-coda messaggi per lo staff, database con sicurezza a livello di riga, deploy continuo.
+**Fatto e online:** identità e accesso (email e Google), conferma email e recupero password,
+Turnstile verificato lato server, ruoli definitivi, design system, doppia lingua IT/EN,
+directory reali di artisti e locali, reclamo della scheda anche tramite invito, dashboard per
+artisti e locali, editor eventi con bozze e locandine, mappa interattiva, pagine evento con
+calendario e condivisione, ricerca con suggerimenti, preferiti, segnalazioni e moderazione,
+Home poster wall, pagine pubbliche, indice e pagine città, modulo contatti che diventa ticket,
+email transazionali, centro notifiche e digest, Area Fan, control room admin con 2FA e audit,
+claim a invito, centro assistenza e avvisi Telegram.
 
-**In arrivo nelle prossime fasi:** community e "segui", Spotify, pagamenti opzionali, testi
-legali definitivi e rifiniture SEO. La risposta integrata ai messaggi di contatto (`B48`)
-resta l'ultimo pezzo della 7A.
+**In arrivo:** pannello comunicazione con quota Resend e dry run, notifiche admin aggregate,
+automazioni AI assistite, community e follow, Spotify, pagamenti opzionali e rifiniture SEO.
 
-**Da sapere oggi:** gli eventi presenti sono **reali**. Possono essere inseriti dalla
-redazione oppure pubblicati direttamente da artisti e locali dopo il reclamo della scheda;
-finché nessuno dei due ha reclamato, la scheda evento lo dice. La Home mostra solo le serate
-in programma; le serate passate restano nelle pagine di artista, locale e nella dashboard di
-chi le ha pubblicate.
+**Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
+oppure pubblicati da artisti e locali dopo il reclamo della scheda. La Home mostra le serate
+in programma; le passate restano nelle pagine di artista, locale e dashboard. Chi non ha una
+scheda attiva non può creare eventi: prima deve creare o reclamare la propria pagina.
 
 # I ruoli e le loro regole
 
@@ -249,6 +245,16 @@ La verifica non è un badge decorativo: è il permesso che consente la pubblicaz
 delle serate. Il primo evento di un account appena verificato può passare dalla revisione
 dello staff; dopo, le pubblicazioni sono automatiche.
 
+## Se ricevi un invito
+
+Lo staff può invitarti a reclamare una scheda che esiste già. Ricevi un link via email oppure
+una notifica nell'account. Il link è personale, vale una sola volta e scade dopo 7 giorni.
+
+Aprendolo vedi la scheda e l'indirizzo email a cui è destinato. Se non hai un account puoi
+crearlo; se ce l'hai, accedi con quell'indirizzo. Accettando, la scheda passa al tuo profilo,
+il profilo viene verificato e, se eri un fan, prendi il ruolo artista o locale. Da quel momento
+puoi pubblicare eventi.
+
 # Pubblicare una serata
 
 La dashboard è il posto dove gestisci il tuo profilo e le tue date.
@@ -277,15 +283,16 @@ qualsiasi scheda.
 
 # Scrivere allo staff
 
-La pagina **Contatti** (`/contatti`) ha un modulo vero: il messaggio viene salvato nel
-database, non affidato a un semplice link `mailto:`. Servono nome, email, un argomento
-(domanda generale, artista, locale, segnalazione, privacy o altro) e il testo; il modulo ha un
-campo nascosto anti-bot e limiti di lunghezza.
+La pagina **Contatti** ha un modulo vero: il messaggio viene salvato nel database e diventa
+un **ticket** per lo staff. Servono nome, email, argomento e testo; il modulo ha un campo
+anti-bot e limiti di lunghezza.
 
-Dopo l'invio vedi una conferma. Lo staff legge i messaggi in **Admin → Messaggi**
-(`/admin/messaggi`), li filtra per **nuovi**, **letti** e **chiusi** e può rispondere via email.
-In questa fase **non parte un'email automatica**: la risposta usa il client di posta di chi
-gestisce la coda. La casella ufficiale e la risposta integrata arriveranno con la Fase 7.
+Dopo l'invio vedi una conferma. Lo staff gestisce i ticket da **Admin → Ticket e messaggi**:
+può dare una priorità, assegnarli a sé stesso, leggere lo storico e rispondere direttamente.
+La risposta parte via email; se il mittente ha un account riceve anche una notifica in-app.
+
+Nella pagina Locali, quando una ricerca non trova nulla, c'è **"Non trovi il locale?
+Segnalacelo"**: apre il modulo con l'argomento "locale" già selezionato.
 
 # Segnalare una serata
 
@@ -294,6 +301,29 @@ serata** e scegliere un motivo (informazioni sbagliate, spam, contenuto offensiv
 segnalazione arriva solo allo staff: **non è una recensione e non è pubblica**. Dopo tre
 segnalazioni da persone diverse e verificate, la serata va in pausa automaticamente e aspetta
 un controllo umano; l'admin può rimetterla online, annullarla o sospendere l'autore.
+
+# La control room (solo staff)
+
+L'admin non usa la dashboard pubblica: dopo il login entra nella **control room** e da lì
+gestisce tutto. La 2FA è obbligatoria; se serve, può essere sospesa temporaneamente per una
+finestra breve senza cancellare la chiave TOTP.
+
+| Modulo | Cosa permette |
+| --- | --- |
+| **Panoramica** | "Da fare adesso", metriche reali, ricerca globale |
+| **Utenti** | Ruolo, verifica, sospensione, schede collegate |
+| **Artisti / Locali** | Claim, verifica, schede senza eventi, inviti |
+| **Claim e verifiche** | Richieste, schede da verificare, revoca |
+| **Eventi / Bozze** | Serate pubblicate e bozze da revisione |
+| **Segnalazioni** | Risoluzione, archiviazione, riapertura |
+| **Ticket e messaggi** | Priorità, assegnazione, storico e risposta email |
+| **Audit** | Registro delle azioni admin |
+| **Sicurezza** | 2FA e sospensione temporanea |
+| **Impostazioni** | Stato e test dei due bot Telegram |
+
+Ogni azione distruttiva chiede conferma e finisce nell'audit. Telegram avvisa l'admin quando
+arriva un ticket, una richiesta, una segnalazione, una bozza da revisione o un'email fallita;
+un secondo bot avvisa nuove registrazioni e nuovi eventi con i totali aggiornati.
 
 # Navigare il sito
 

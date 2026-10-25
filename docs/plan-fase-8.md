@@ -221,3 +221,14 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 5. Per l'AI: provider scelto (consiglio **Vercel AI Gateway**), budget mensile,
    modello fast/smart, retention dati e conferma che ogni scrittura resta
    subordinata all'approvazione dell'admin.
+
+## Stato al 25 ottobre 2026
+
+**Fatto:** 8.0 control room, 8.1 2FA/audit/revoca, 8.2 metriche, 8.3 persone/contenuti,
+8.4 claim a invito, 8.5 centro assistenza, 8.6a avvisi Telegram admin, 8.6b bot attività.
+
+**Prossimo blocco:** 8.6 comunicazione completa — registro email, coda, quota Resend, dry run,
+retry a lotti, export CSV/JSON. Poi 8.7 notifiche admin e 8.8 AI assistita.
+
+**Debito aperto prima della chiusura:** B68 (bozze solo prime pubblicazioni), B52 (filtri,
+paginazione, export), backup e notice & takedown.

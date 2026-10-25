@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OpenStage
 
-## Getting Started
+Piattaforma per scoprire eventi di musica dal vivo, con focus su artisti indipendenti e locali.
+Next.js App Router, Supabase (Auth + Postgres + RLS), Tailwind, MapLibre, Resend e Vercel.
 
-First, run the development server:
+## Comandi
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # sviluppo su http://localhost:3000
+npm run build      # build di produzione
+npm run start      # build locale
+npm run manuale    # rigenera docs/manuale/OpenStage-Manuale.pdf
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configurazione
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copia `.env.example` in `.env.local` e compila i valori.
+2. Applica le migrazioni in `supabase/migrations/` in ordine.
+3. Verifica che `settings.admin_email` nel database coincida con `ADMIN_EMAIL`.
+4. Su Vercel imposta le stesse variabili su Production, Preview e Development.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Le variabili principali sono Supabase, Turnstile, Resend e la coda email, Telegram (due bot:
+code admin e attività), URL del sito e, facoltativamente, Spotify e Photon.
 
-## Learn More
+## Struttura
 
-To learn more about Next.js, take a look at the following resources:
+| Percorso | Contenuto |
+| --- | --- |
+| `app/` | pagine, route handler e server action |
+| `components/` | UI pubblica, dashboard, admin e claim |
+| `lib/` | query, auth, email, Telegram, AI e utility |
+| `supabase/migrations/` | schema, RLS, funzioni e trigger |
+| `docs/` | roadmap, piani, backlog, design system e manuale |
+| `docs/manuale/` | sorgenti Markdown e PDF del manuale |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentazione
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `docs/roadmap.md` — fasi e stato.
+- `docs/plan-fase-8.md` — control room, claim a invito, assistenza e AI.
+- `docs/backlog.md` — cose rimandate.
+- `docs/design-system.md` — linguaggio visivo.
+- `docs/manuale/OpenStage-Manuale.pdf` — manuale completo (sorgenti in `docs/manuale/`).
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Il deploy di produzione passa da GitHub → Vercel. Dopo ogni fase: build verde, deploy e commit
+con il nome della fase.
