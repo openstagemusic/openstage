@@ -97,6 +97,8 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
+  const currentPath = await getCurrentPath();
+  const isAdmin = currentPath.startsWith("/admin");
 
   // Un'unica lettura per richiesta (React `cache`): utente + ruolo dal database.
   const session = await getSessionProfile();
@@ -112,23 +114,31 @@ export default async function RootLayout({
           {dict.nav.skipToContent}
         </a>
         <LocaleProvider locale={locale}>
-          <Navbar
-            locale={locale}
-            dict={dict.nav}
-            userEmail={session?.email ?? null}
-            userRole={session?.role ?? null}
-            notificationCount={notificationCount}
-          />
-          <main id="contenuto" tabIndex={-1} className="flex-1 pt-16 outline-none">
+          {isAdmin ? null : (
+            <Navbar
+              locale={locale}
+              dict={dict.nav}
+              userEmail={session?.email ?? null}
+              userRole={session?.role ?? null}
+              notificationCount={notificationCount}
+            />
+          )}
+          <main
+            id="contenuto"
+            tabIndex={-1}
+            className={`flex-1 outline-none ${isAdmin ? "" : "pt-16"}`}
+          >
             {children}
           </main>
-          <Footer dict={dict.footer} />
-          <MobileTabBar
-            dict={dict.nav}
-            userEmail={session?.email ?? null}
-            notificationCount={notificationCount}
-          />
-          <SpotifyPlayerDock />
+          {isAdmin ? null : <Footer dict={dict.footer} />}
+          {isAdmin ? null : (
+            <MobileTabBar
+              dict={dict.nav}
+              userEmail={session?.email ?? null}
+              notificationCount={notificationCount}
+            />
+          )}
+          {isAdmin ? null : <SpotifyPlayerDock />}
         </LocaleProvider>
       </body>
     </html>

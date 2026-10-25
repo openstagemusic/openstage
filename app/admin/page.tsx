@@ -48,46 +48,65 @@ export default async function AdminPage() {
     countNewContactMessages(),
   ]);
 
+  const t = dict.admin;
+
+  const kpis: Array<{ label: string; value: number; href?: string }> = [
+    { label: t.kpiPending, value: pending.length },
+    { label: t.kpiVerify, value: toVerify.length },
+    { label: t.kpiUnverified, value: unverified.length },
+    { label: t.kpiDrafts, value: drafts.length, href: "/admin/eventi" },
+    { label: t.kpiMessages, value: newMessages, href: "/admin/messaggi" },
+    { label: t.kpiVerified, value: verified.length },
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
-      <div
-        className="h-px w-full bg-gradient-to-r from-violet/70 via-cyan/40 to-transparent"
-        aria-hidden="true"
-      />
+    <div>
+      <header className="border-b border-line pb-6">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+          {t.controlRoom}
+        </p>
+        <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em] sm:text-5xl">
+          {t.overviewTitle}
+        </h1>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.overviewText}</p>
+      </header>
 
-      <h1 className="mt-6 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-        {dict.admin.title}
-      </h1>
-      <p className="mt-2 text-sm text-muted">{dict.admin.subtitle}</p>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {kpis.map((kpi) => {
+          const content = (
+            <>
+              <p className="font-poster text-4xl leading-none">{kpi.value}</p>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                {kpi.label}
+              </p>
+            </>
+          );
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Link
-          href="/admin/eventi"
-          className="inline-flex rounded-full border border-cyan/40 bg-cyan/10 px-4 py-2 text-xs text-white transition-colors hover:bg-cyan/20"
-        >
-          {dict.admin.moderationLink}
-        </Link>
-        <Link
-          href="/admin/messaggi"
-          className="inline-flex rounded-full border border-violet/40 bg-violet/10 px-4 py-2 text-xs text-white transition-colors hover:bg-violet/20"
-        >
-          {dict.admin.messagesLink}
-          {newMessages > 0 ? (
-            <span className="ml-2 rounded-full bg-violet-strong px-2 py-0.5 text-[0.65rem] text-white">
-              {newMessages}
-            </span>
-          ) : null}
-        </Link>
+          return kpi.href ? (
+            <Link
+              key={kpi.label}
+              href={kpi.href}
+              className="border border-line bg-surface/60 p-5 transition-colors hover:border-cyan/50"
+            >
+              {content}
+            </Link>
+          ) : (
+            <div key={kpi.label} className="border border-line bg-surface/60 p-5">
+              {content}
+            </div>
+          );
+        })}
       </div>
 
-      <div className="mt-10">
+      <h2 className="mt-10 font-display text-2xl font-semibold">{t.queueTitle}</h2>
+      <div className="mt-5">
         <AdminQueue
           pending={pending}
           toVerify={toVerify}
           unverified={unverified}
           verified={verified}
           drafts={drafts}
-          dict={dict.admin}
+          dict={t}
         />
       </div>
     </div>
