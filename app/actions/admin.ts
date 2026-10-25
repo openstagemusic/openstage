@@ -153,3 +153,17 @@ export async function sendTelegramTestAction(): Promise<TelegramTestResult> {
 
   return result;
 }
+
+/** Invia il messaggio di prova dal server Vercel (secondo bot). */
+export async function sendTelegramActivityTestAction(): Promise<TelegramTestResult> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+
+  const result = await sendTelegramMessage(
+    "✅ OpenStage Activity: notifiche attive." +
+      "\nDa ora ricevi qui nuove registrazioni e nuovi eventi." +
+      "\nhttps://getopenstage.it/it/admin",
+    "activity"
+  );
+
+  return result;
+}

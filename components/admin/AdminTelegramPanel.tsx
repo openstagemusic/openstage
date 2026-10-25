@@ -2,15 +2,17 @@
 
 import { useState, useTransition } from "react";
 
-import { sendTelegramTestAction } from "@/app/actions/admin";
+import { sendTelegramActivityTestAction, sendTelegramTestAction } from "@/app/actions/admin";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
 export default function AdminTelegramPanel({
   configured,
   dict,
+  kind = "admin",
 }: {
   configured: boolean;
   dict: Dictionary["admin"];
+  kind?: "admin" | "activity";
 }) {
   const [pending, startTransition] = useTransition();
   const [notice, setNotice] = useState<string | null>(null);
@@ -21,11 +23,18 @@ export default function AdminTelegramPanel({
     setError(null);
 
     startTransition(async () => {
-      const outcome = await sendTelegramTestAction();
+      const outcome =
+        kind === "activity"
+          ? await sendTelegramActivityTestAction()
+          : await sendTelegramTestAction();
 
       if (!outcome.ok) {
         setError(
-          outcome.error === "not_configured" ? dict.telegramNotConfiguredHint : dict.telegramTestFailed
+          outcome.error === "not_configured"
+            ? kind === "activity"
+              ? dict.telegramActivityNotConfiguredHint
+              : dict.telegramNotConfiguredHint
+            : dict.telegramTestFailed
         );
         return;
       }
@@ -37,7 +46,9 @@ export default function AdminTelegramPanel({
   return (
     <section className="mt-8 border border-line bg-surface/40 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-lg font-semibold">{dict.telegramTitle}</h2>
+        <h2 className="font-display text-lg font-semibold">
+          {kind === "activity" ? dict.telegramActivityTitle : dict.telegramTitle}
+        </h2>
         <span
           className={
             configured
@@ -49,13 +60,19 @@ export default function AdminTelegramPanel({
         </span>
       </div>
 
-      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{dict.telegramText}</p>
-      <p className="mt-3 max-w-2xl text-xs leading-relaxed text-muted">{dict.telegramAlertsList}</p>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+        {kind === "activity" ? dict.telegramActivityText : dict.telegramText}
+      </p>
+      <p className="mt-3 max-w-2xl text-xs leading-relaxed text-muted">
+        {kind === "activity" ? dict.telegramActivityAlertsList : dict.telegramAlertsList}
+      </p>
       <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted">{dict.telegramNoPersonal}</p>
 
       {!configured ? (
         <p className="mt-4 border-l-2 border-pink bg-pink/10 px-3 py-2 text-sm text-white">
-          {dict.telegramNotConfiguredHint}
+          {kind === "activity"
+            ? dict.telegramActivityNotConfiguredHint
+            : dict.telegramNotConfiguredHint}
         </p>
       ) : null}
 

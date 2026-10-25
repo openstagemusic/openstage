@@ -30,6 +30,11 @@ export default async function AdminSettingsPage() {
       </header>
 
       <AdminTelegramPanel configured={isTelegramConfigured()} dict={dict.admin} />
+      <AdminTelegramPanel
+        configured={isTelegramConfigured("activity")}
+        dict={dict.admin}
+        kind="activity"
+      />
     </div>
   );
 }
