@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { artistPath } from "@/lib/events/paths";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
@@ -41,13 +42,17 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
       return;
     }
 
-    const { error: insertError } = await supabase.from("artists").insert({
-      profile_id: user.id,
-      name,
-      city: city || null,
-      genre: genre || null,
-      spotify_url: spotifyUrl || null,
-    });
+    const { data: created, error: insertError } = await supabase
+      .from("artists")
+      .insert({
+        profile_id: user.id,
+        name,
+        city: city || null,
+        genre: genre || null,
+        spotify_url: spotifyUrl || null,
+      })
+      .select("id, slug")
+      .single();
 
     if (insertError) {
       setLoading(false);
@@ -55,7 +60,11 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
       return;
     }
 
-    router.push(withLocale(locale, "/events/new"));
+    // La scheda appena creata è il profilo: si prosegue da lì, non dal modulo
+    // evento. Chi vuole pubblicare trova "Crea evento" dentro la sua dashboard.
+    router.push(
+      withLocale(locale, created?.slug ? artistPath({ slug: created.slug }) : "/account")
+    );
     router.refresh();
   }
 

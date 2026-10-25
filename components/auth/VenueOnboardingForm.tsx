@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { venuePath } from "@/lib/events/paths";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
@@ -47,14 +48,18 @@ export default function VenueOnboardingForm({ dict }: { dict: Dictionary["onboar
       return;
     }
 
-    const { error: insertError } = await supabase.from("venues").insert({
-      profile_id: user.id,
-      name,
-      city: city || null,
-      address: address || null,
-      website: website || null,
-      capacity: capacity ? Number(capacity) : null,
-    });
+    const { data: created, error: insertError } = await supabase
+      .from("venues")
+      .insert({
+        profile_id: user.id,
+        name,
+        city: city || null,
+        address: address || null,
+        website: website || null,
+        capacity: capacity ? Number(capacity) : null,
+      })
+      .select("id, slug")
+      .single();
 
     if (insertError) {
       setLoading(false);
@@ -62,7 +67,10 @@ export default function VenueOnboardingForm({ dict }: { dict: Dictionary["onboar
       return;
     }
 
-    router.push(withLocale(locale, "/account"));
+    // Dopo la creazione si apre la pagina del locale, non un'altra schermata.
+    router.push(
+      withLocale(locale, created?.slug ? venuePath({ slug: created.slug }) : "/account")
+    );
     router.refresh();
   }
 
