@@ -1,9 +1,10 @@
 # Fase 8 — Control room, claim a invito e centro assistenza
 
 > **Stato: in corso.** Scritto il 23 ottobre 2026.
-> **8.0 (guscio + registro + overview) e 8.1a (audit + revoca claim) fatti.**
-> Restano 2FA, moduli persone/contenuti, claim a invito, centro assistenza,
-> comunicazione e AI assistita.
+> **Fatti: 8.0 (guscio + registro + overview), 8.1 (2FA AAL2, audit, revoca
+> claim), 8.2 (metriche reali) e 8.3 (utenti, artisti, locali, bozze,
+> segnalazioni, audit).** Restano claim a invito, centro assistenza,
+> comunicazione e AI assistita, più "crea per conto di".
 
 ## Obiettivo
 

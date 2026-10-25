@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminQueue from "@/components/admin/AdminQueue";
 import Link from "@/components/i18n/LocaleLink";
+import { getAdminMetrics } from "@/lib/admin/queries";
 import {
   isCurrentUserAdmin,
   listClaimsToVerify,
@@ -39,24 +41,26 @@ export default async function AdminPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
 
-  const [pending, toVerify, unverified, verified, drafts, newMessages] = await Promise.all([
-    listPendingClaims(),
-    listClaimsToVerify(),
-    listUnverifiedProfiles(),
-    listVerifiedProfiles(),
-    listDraftEvents(),
-    countNewContactMessages(),
-  ]);
+  const [pending, toVerify, unverified, verified, drafts, newMessages, metrics] =
+    await Promise.all([
+      listPendingClaims(),
+      listClaimsToVerify(),
+      listUnverifiedProfiles(),
+      listVerifiedProfiles(),
+      listDraftEvents(),
+      countNewContactMessages(),
+      getAdminMetrics(),
+    ]);
 
   const t = dict.admin;
 
   const kpis: Array<{ label: string; value: number; href?: string }> = [
-    { label: t.kpiPending, value: pending.length },
-    { label: t.kpiVerify, value: toVerify.length },
-    { label: t.kpiUnverified, value: unverified.length },
-    { label: t.kpiDrafts, value: drafts.length, href: "/admin/eventi" },
+    { label: t.kpiPending, value: pending.length, href: "/admin/claim" },
+    { label: t.kpiVerify, value: toVerify.length, href: "/admin/claim" },
+    { label: t.kpiUnverified, value: unverified.length, href: "/admin/utenti" },
+    { label: t.kpiDrafts, value: drafts.length, href: "/admin/bozze" },
     { label: t.kpiMessages, value: newMessages, href: "/admin/messaggi" },
-    { label: t.kpiVerified, value: verified.length },
+    { label: t.kpiVerified, value: verified.length, href: "/admin/claim" },
   ];
 
   return (
@@ -98,7 +102,9 @@ export default async function AdminPage() {
         })}
       </div>
 
-      <h2 className="mt-10 font-display text-2xl font-semibold">{t.queueTitle}</h2>
+      <AdminMetrics metrics={metrics} dict={t} />
+
+      <h2 className="mt-12 font-display text-2xl font-semibold">{t.queueTitle}</h2>
       <div className="mt-5">
         <AdminQueue
           pending={pending}

@@ -20,13 +20,13 @@ export type AdminModule = {
  */
 export const ADMIN_MODULES: AdminModule[] = [
   { key: "overview", href: "/admin", group: "today", status: "active", labelKey: "overview" },
-  { key: "users", href: "/admin/utenti", group: "people", status: "soon", labelKey: "users" },
-  { key: "artists", href: "/admin/artisti", group: "people", status: "soon", labelKey: "artists" },
-  { key: "venues", href: "/admin/locali", group: "people", status: "soon", labelKey: "venues" },
+  { key: "users", href: "/admin/utenti", group: "people", status: "active", labelKey: "users" },
+  { key: "artists", href: "/admin/artisti", group: "people", status: "active", labelKey: "artists" },
+  { key: "venues", href: "/admin/locali", group: "people", status: "active", labelKey: "venues" },
   { key: "claims", href: "/admin/claim", group: "people", status: "active", labelKey: "claims" },
   { key: "events", href: "/admin/eventi", group: "content", status: "active", labelKey: "events" },
-  { key: "drafts", href: "/admin/bozze", group: "content", status: "soon", labelKey: "drafts" },
-  { key: "reports", href: "/admin/segnalazioni", group: "content", status: "soon", labelKey: "reports" },
+  { key: "drafts", href: "/admin/bozze", group: "content", status: "active", labelKey: "drafts" },
+  { key: "reports", href: "/admin/segnalazioni", group: "content", status: "active", labelKey: "reports" },
   { key: "messages", href: "/admin/messaggi", group: "community", status: "active", labelKey: "messages" },
   { key: "tickets", href: "/admin/ticket", group: "community", status: "soon", labelKey: "tickets" },
   { key: "email", href: "/admin/email", group: "communication", status: "soon", labelKey: "email" },
@@ -38,7 +38,7 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "soon",
     labelKey: "notifications",
   },
-  { key: "audit", href: "/admin/audit", group: "system", status: "soon", labelKey: "audit" },
+  { key: "audit", href: "/admin/audit", group: "system", status: "active", labelKey: "audit" },
   { key: "security", href: "/admin/sicurezza", group: "system", status: "active", labelKey: "security" },
   { key: "settings", href: "/admin/impostazioni", group: "system", status: "soon", labelKey: "settings" },
   { key: "jobs", href: "/admin/jobs", group: "system", status: "soon", labelKey: "jobs" },
@@ -56,5 +56,5 @@ export const ADMIN_GROUP_ORDER: AdminGroup[] = [
 ];
 
 export function adminGroupLabel(group: AdminGroup, dict: Dictionary["admin"]["nav"]): string {
-  return dict[group === "today" ? "overview" : group];
+  return group === "ai" ? dict.aiGroup : dict[group];
 }
