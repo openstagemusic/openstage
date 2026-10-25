@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { resolveAdminDestinationAction } from "@/app/actions/auth";
 import Link from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -70,6 +71,14 @@ export default function LoginForm({
       setError(authErrorMessage(signInError.message, dict));
       setToken("");
       setCaptchaReset((value) => value + 1);
+      return;
+    }
+
+    // L'admin non passa dalla Home: entra direttamente nella control room.
+    const adminDestination = await resolveAdminDestinationAction();
+    if (adminDestination) {
+      router.push(withLocale(locale, adminDestination));
+      router.refresh();
       return;
     }
 

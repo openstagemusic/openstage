@@ -13,6 +13,7 @@ type TabName = "explore" | "map" | "artists" | "venues" | "profile" | "notificat
 type MobileTabBarProps = {
   dict: Dictionary["nav"];
   userEmail: string | null;
+  userRole: string | null;
   notificationCount: number;
 };
 
@@ -85,14 +86,19 @@ function TabIcon({ name }: { name: TabName }) {
   );
 }
 
-export default function MobileTabBar({ dict, userEmail, notificationCount }: MobileTabBarProps) {
+export default function MobileTabBar({
+  dict,
+  userEmail,
+  userRole,
+  notificationCount,
+}: MobileTabBarProps) {
   const pathname = stripLocale(usePathname());
 
   const hidden = HIDDEN_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
 
-  if (hidden) {
+  if (hidden || userRole === "admin") {
     return null;
   }
 

@@ -121,32 +121,43 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
                   </span>
                 ) : null}
               </Link>
-              <Link
-                href="/dashboard"
-                aria-current={isActive("/dashboard") ? "page" : undefined}
-                className={cn(
-                  "inline-flex items-center whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors",
-                  isActive("/dashboard")
-                    ? "border-cyan bg-cyan text-bg"
-                    : "border-cyan/50 bg-cyan/10 text-white hover:border-cyan hover:bg-cyan/20"
-                )}
-              >
-                {dict.dashboard}
-              </Link>
-              {canManageEvents(userRole) ? (
+              {userRole === "admin" ? (
                 <Link
-                  href="/dashboard/events/new"
-                  className="border border-violet/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet/10"
+                  href="/admin"
+                  className="inline-flex items-center whitespace-nowrap border border-cyan bg-cyan px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-bg transition-colors hover:bg-cyan/90"
                 >
-                  {dict.createEvent}
+                  {dict.controlRoom}
                 </Link>
               ) : (
-                <Link
-                  href="/onboarding/role"
-                  className="border border-cyan/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-cyan/10"
-                >
-                  {dict.upgrade}
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard"
+                    aria-current={isActive("/dashboard") ? "page" : undefined}
+                    className={cn(
+                      "inline-flex items-center whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors",
+                      isActive("/dashboard")
+                        ? "border-cyan bg-cyan text-bg"
+                        : "border-cyan/50 bg-cyan/10 text-white hover:border-cyan hover:bg-cyan/20"
+                    )}
+                  >
+                    {dict.dashboard}
+                  </Link>
+                  {canManageEvents(userRole) ? (
+                    <Link
+                      href="/dashboard/events/new"
+                      className="border border-violet/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet/10"
+                    >
+                      {dict.createEvent}
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/onboarding/role"
+                      className="border border-cyan/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-cyan/10"
+                    >
+                      {dict.upgrade}
+                    </Link>
+                  )}
+                </>
               )}
               <LogoutButton label={dict.logout} />
             </>

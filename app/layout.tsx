@@ -135,6 +135,7 @@ export default async function RootLayout({
             <MobileTabBar
               dict={dict.nav}
               userEmail={session?.email ?? null}
+              userRole={session?.role ?? null}
               notificationCount={notificationCount}
             />
           )}

@@ -49,6 +49,24 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // L'admin entra direttamente nella control room.
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .maybeSingle();
+
+        if (profile?.role === "admin") {
+          const redirect = NextResponse.redirect(`${origin}${withLocale(locale, "/admin")}`);
+          pendingCookies.forEach(({ name, value, options }) =>
+            redirect.cookies.set(name, value, options)
+          );
+          redirect.cookies.set(OAUTH_NEXT_COOKIE, "", { path: "/", maxAge: 0 });
+          return redirect;
+        }
+      }
+
       // Google (like every OAuth provider) cannot carry sign-up metadata, so the
       // profile is created with the default `fan` role: on the first access we
       // ask for the real role instead of silently keeping the default.

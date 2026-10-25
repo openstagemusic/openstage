@@ -22,6 +22,7 @@ export const it: Dictionary = {
     account: "Account",
     dashboard: "Dashboard",
     notifications: "Notifiche",
+    controlRoom: "Control room",
     openMenu: "Apri menu",
     closeMenu: "Chiudi menu",
     language: "Lingua",

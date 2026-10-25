@@ -24,6 +24,7 @@ export const en = {
     account: "Account",
     dashboard: "Dashboard",
     notifications: "Notifications",
+    controlRoom: "Control room",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     language: "Language",
