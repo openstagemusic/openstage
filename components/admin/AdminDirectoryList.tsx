@@ -1,4 +1,5 @@
 import LocaleLink from "@/components/i18n/LocaleLink";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { AdminDirectoryRow } from "@/lib/admin/queries";
 import { artistPath, venuePath } from "@/lib/events/paths";
@@ -46,11 +47,7 @@ export default function AdminDirectoryList({
                   >
                     {row.claimed ? dict.directoryClaimed : dict.directoryUnclaimed}
                   </span>
-                  {row.verified ? (
-                    <span className="border border-violet/40 bg-violet/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-white">
-                      {dict.userVerified}
-                    </span>
-                  ) : null}
+                  {row.verified ? <VerifiedBadge label={dict.userVerified} /> : null}
                   {row.suspended ? (
                     <span className="border border-pink/50 bg-pink/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-pink">
                       {dict.userSuspended}

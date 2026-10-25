@@ -141,7 +141,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
               </span>
             ) : null}
             {artist.verified ? (
-              <VerifiedBadge dict={t} />
+              <VerifiedBadge label={t.badgeVerified} />
             ) : artist.claimed ? null : (
               <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                 {t.badgeUnclaimed}

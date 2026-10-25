@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { decideClaimAction, revokeClaimAction, setProfileVerifiedAction } from "@/app/actions/claims";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -196,15 +197,13 @@ export default function AdminClaimsPanel({
                     <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
                       {claim.subjectType === "artist" ? dict.kindArtist : dict.kindVenue}
                     </span>
-                    <span
-                      className={
-                        claim.verified
-                          ? "border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-white"
-                          : "border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted"
-                      }
-                    >
-                      {claim.verified ? dict.claimVerified : dict.claimNotVerified}
-                    </span>
+                    {claim.verified ? (
+                      <VerifiedBadge label={dict.claimVerified} />
+                    ) : (
+                      <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                        {dict.claimNotVerified}
+                      </span>
+                    )}
                   </div>
 
                   <p className="mt-2 font-mono text-[10px] tracking-[0.08em] text-muted">

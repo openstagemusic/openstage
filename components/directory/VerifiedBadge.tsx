@@ -1,26 +1,43 @@
-import type { Dictionary } from "@/i18n/dictionaries/en";
 import { cn } from "@/lib/utils";
 
 /**
- * Il badge "Verificato": dice che la scheda è di un profilo che OpenStage ha
- * controllato. Compare solo quando il fatto è vero (`profiles.verified_at`),
- * mai come decorazione.
+ * La spunta "Verificato".
+ *
+ * Un cerchio neon con la spunta, non un'etichetta quadrata: si riconosce a
+ * colpo d'occhio anche in una card piccola. Il testo resta per screen reader e
+ * tooltip, così il significato non si perde.
  */
 export default function VerifiedBadge({
-  dict,
+  label,
   className,
 }: {
-  dict: Dictionary["directory"];
+  label: string;
   className?: string;
 }) {
   return (
     <span
+      role="img"
+      aria-label={label}
+      title={label}
       className={cn(
-        "border border-cyan/40 bg-cyan/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white",
+        "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+        "bg-[linear-gradient(135deg,#22D3EE_0%,#8B5CF6_100%)] text-white",
+        "shadow-[0_0_14px_rgba(34,211,238,0.45)] ring-1 ring-white/30",
         className
       )}
     >
-      {dict.badgeVerified}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-3.5 w-3.5"
+      >
+        <path d="m5 12.5 4.2 4.2L19 6.8" />
+      </svg>
     </span>
   );
 }

@@ -159,7 +159,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
               </span>
             ) : null}
             {venue.verified ? (
-              <VerifiedBadge dict={t} />
+              <VerifiedBadge label={t.badgeVerified} />
             ) : venue.claimed ? null : (
               <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                 {t.badgeUnclaimed}

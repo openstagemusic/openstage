@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import LocaleLink from "@/components/i18n/LocaleLink";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import NeedsPageNotice from "@/components/dashboard/NeedsPageNotice";
 import { canManageEvents } from "@/lib/auth/roles";
 import { listMyEvents, listSavedEvents } from "@/lib/dashboard/queries";
@@ -25,7 +26,8 @@ export default async function DashboardPage() {
 
   if (!session) redirect(withLocale(locale, "/login"));
 
-  const t = getDictionary(locale).dashboard;
+  const dict = getDictionary(locale);
+  const t = dict.dashboard;
   const canManage = canManageEvents(session.role);
 
   const [events, saved, artistPage, venuePage] = await Promise.all([
@@ -56,9 +58,12 @@ export default async function DashboardPage() {
     <div>
       <header className="border-b border-line pb-6">
         <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">{t.title}</p>
-        <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em] sm:text-5xl">
-          {t.overviewTitle}
-        </h1>
+        <div className="mt-3 flex items-center gap-3">
+          <h1 className="font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em] sm:text-5xl">
+            {t.overviewTitle}
+          </h1>
+          {session.verified ? <VerifiedBadge label={dict.directory.badgeVerified} /> : null}
+        </div>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.overviewText}</p>
         <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
           {session.email}

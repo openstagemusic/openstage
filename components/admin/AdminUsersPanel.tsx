@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { setUserSuspendedAction } from "@/app/actions/admin";
 import { setProfileVerifiedAction } from "@/app/actions/claims";
+import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { AdminUser } from "@/lib/admin/queries";
@@ -136,9 +137,13 @@ export default function AdminUsersPanel({
                         {suspended ? dict.userSuspended : dict.userActive}
                       </span>
                       {user.role === "artist" || user.role === "venue" ? (
-                        <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
-                          {user.verifiedAt ? dict.userVerified : dict.userNotVerified}
-                        </span>
+                        user.verifiedAt ? (
+                          <VerifiedBadge label={dict.userVerified} />
+                        ) : (
+                          <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                            {dict.userNotVerified}
+                          </span>
+                        )
                       ) : null}
                     </div>
                   </td>

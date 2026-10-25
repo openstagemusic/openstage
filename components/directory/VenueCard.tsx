@@ -40,7 +40,7 @@ export default function VenueCard({ venue, locale }: { venue: PublicVenue; local
           </span>
 
           {venue.verified ? (
-            <VerifiedBadge dict={t} />
+            <VerifiedBadge label={t.badgeVerified} />
           ) : venue.claimed ? null : (
             <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
               {t.badgeUnclaimed}

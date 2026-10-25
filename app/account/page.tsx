@@ -102,9 +102,12 @@ export default async function AccountPage() {
 
         <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div>
-            <h1 className="font-poster text-[clamp(3rem,9vw,5.5rem)] uppercase leading-[0.9] tracking-[-0.02em]">
-              {t.title}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="font-poster text-[clamp(3rem,9vw,5.5rem)] uppercase leading-[0.9] tracking-[-0.02em]">
+                {t.title}
+              </h1>
+              {verified ? <VerifiedBadge label={dict.directory.badgeVerified} /> : null}
+            </div>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">{t.subtitle}</p>
           </div>
 
@@ -151,7 +154,7 @@ export default async function AccountPage() {
               </h2>
 
               {verified ? (
-                <VerifiedBadge dict={dict.directory} />
+                <VerifiedBadge label={dict.directory.badgeVerified} />
               ) : (
                 <span className="border border-line-strong px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
                   {t.statusPending}

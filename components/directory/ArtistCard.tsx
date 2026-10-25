@@ -39,7 +39,7 @@ export default function ArtistCard({ artist, locale }: { artist: PublicArtist; l
           </span>
 
           {artist.verified ? (
-            <VerifiedBadge dict={dict.directory} />
+            <VerifiedBadge label={dict.directory.badgeVerified} />
           ) : artist.claimed ? null : (
             <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
               {dict.directory.badgeUnclaimed}
