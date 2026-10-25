@@ -108,3 +108,4 @@ fatta dentro la fase indicata · **🟠 da decidere** = importante ma senza una 
 | B63 | **Verifica schede assistita** | 🟠 | Fase 8.8.3 | Controlli deterministici (P.IVA/VIES, dominio, email, indirizzo, link) + riepilogo AI delle prove. Il punteggio è un'indicazione, l'approvazione resta umana |
 | B64 | **Qualità dati e doppioni con AI** | 🟠 | Fase 8.8.4 | Suggerimenti su campi mancanti, date/prezzi sospetti e possibili duplicati; l'admin decide correzione o unione. Nessuna scrittura automatica |
 | B65 | **Triage AI delle segnalazioni** | 🟡 | Fase 8.8.5 | Classifica priorità e motivo e propone una coda; nessuna sospensione automatica. Solo se il volume lo giustifica |
+| B66 | **Revoca claim da admin** | ✅ fatta | Fase 8.1a | **Fatta il 25 ottobre 2026**: modulo `/admin/claim`, conferma e motivo, `revoke_claim` azzera `profile_id` e `verified_at`, la scheda torna a OpenStage e l'azione finisce in `admin_audit_log` |

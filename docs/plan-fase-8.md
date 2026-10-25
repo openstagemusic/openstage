@@ -1,9 +1,9 @@
 # Fase 8 — Control room, claim a invito e centro assistenza
 
-> **Stato: piano preliminare, da completare con il proprietario.** Scritto il
-> 23 ottobre 2026. Non si costruisce nulla prima della 7A, della 7B e della 5.5D.
-> La lista dei pannelli e delle funzioni si chiude insieme prima dell'apertura
-> della fase.
+> **Stato: in corso.** Scritto il 23 ottobre 2026.
+> **8.0 (guscio + registro + overview) e 8.1a (audit + revoca claim) fatti.**
+> Restano 2FA, moduli persone/contenuti, claim a invito, centro assistenza,
+> comunicazione e AI assistita.
 
 ## Obiettivo
 
