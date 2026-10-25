@@ -3,9 +3,9 @@
 > **Stato: in corso.** Scritto il 23 ottobre 2026.
 > **Fatti: 8.0 (guscio + registro + overview), 8.1 (2FA AAL2, audit, revoca
 > claim), 8.2 (metriche reali), 8.3 (utenti, artisti, locali, bozze,
-> segnalazioni, audit), 8.4 (claim a invito), 8.5 (ticket e messaggi) e
-> 8.6a (avvisi Telegram).** Restano il resto della comunicazione e l'AI
-> assistita, più "crea per conto di".
+> segnalazioni, audit), 8.4 (claim a invito), 8.5 (ticket e messaggi),
+> 8.6a (avvisi Telegram admin) e 8.6b (bot attività).** Restano il resto
+> della comunicazione e l'AI assistita, più "crea per conto di".
 
 ## Obiettivo
 
