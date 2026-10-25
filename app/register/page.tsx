@@ -12,9 +12,18 @@ export const generateMetadata = () =>
     description: dict.auth.registerSubtitle,
   }));
 
-export default async function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
+  const params = await searchParams;
+  const nextPath =
+    params.next && params.next.startsWith("/") && !params.next.startsWith("//")
+      ? params.next
+      : null;
 
   return (
     <AuthShell
@@ -27,7 +36,10 @@ export default async function RegisterPage() {
       footer={
         <p>
           {dict.auth.haveAccount}{" "}
-          <Link href="/login" className="text-cyan hover:underline">
+          <Link
+            href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"}
+            className="text-cyan hover:underline"
+          >
             {dict.nav.login}
           </Link>
         </p>
@@ -45,7 +57,7 @@ export default async function RegisterPage() {
 
       <p className="mt-4 text-xs leading-relaxed text-muted">{dict.auth.registerPanelText}</p>
 
-      <RegisterForm dict={dict.auth} />
+      <RegisterForm dict={dict.auth} nextPath={nextPath} />
     </AuthShell>
   );
 }

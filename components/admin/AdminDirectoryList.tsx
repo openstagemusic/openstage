@@ -1,3 +1,4 @@
+import AdminInviteButton from "@/components/admin/AdminInviteButton";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -61,13 +62,23 @@ export default function AdminDirectoryList({
                 </p>
               </div>
 
-              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
-                {row.eventCount === 0
-                  ? dict.directoryNoEvents
-                  : `${row.eventCount} ${
-                      row.eventCount === 1 ? dict.directoryEventSingular : dict.directoryEvents
-                    }`}
-              </p>
+              <div className="text-right">
+                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+                  {row.eventCount === 0
+                    ? dict.directoryNoEvents
+                    : `${row.eventCount} ${
+                        row.eventCount === 1 ? dict.directoryEventSingular : dict.directoryEvents
+                      }`}
+                </p>
+                {!row.claimed ? (
+                  <AdminInviteButton
+                    subjectType={kind}
+                    subjectId={row.id}
+                    subjectName={row.name}
+                    dict={dict}
+                  />
+                ) : null}
+              </div>
             </div>
           </li>
         );

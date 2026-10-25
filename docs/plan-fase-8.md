@@ -2,8 +2,8 @@
 
 > **Stato: in corso.** Scritto il 23 ottobre 2026.
 > **Fatti: 8.0 (guscio + registro + overview), 8.1 (2FA AAL2, audit, revoca
-> claim), 8.2 (metriche reali) e 8.3 (utenti, artisti, locali, bozze,
-> segnalazioni, audit).** Restano claim a invito, centro assistenza,
+> claim), 8.2 (metriche reali), 8.3 (utenti, artisti, locali, bozze,
+> segnalazioni, audit) e 8.4 (claim a invito).** Restano centro assistenza,
 > comunicazione e AI assistita, più "crea per conto di".
 
 ## Obiettivo
@@ -71,6 +71,18 @@ Solo numeri dal database, nessun dato finto:
   l'account esiste, notifica in-app.
 - L'admin vede lo stato dell'invito e può revocarlo.
 - Nessun invito massivo senza dry run.
+
+**Decisioni operative (25 ottobre 2026)**
+
+- Token casuale da 32 byte, salvato solo come hash SHA-256, scadenza 7 giorni,
+  monouso; nessun token in chiaro nel database.
+- L'invito si crea dalla riga della scheda artista/locale non reclamata.
+- Se l'email ha già un account: notifica in-app con il link. Se non ce l'ha:
+  email transazionale in coda con il link.
+- Accettando l'invito la scheda passa al profilo, il profilo viene verificato
+  (l'admin lo ha invitato) e, se era fan, prende il ruolo artista/locale.
+- L'admin vede inviti, stato e scadenza in /admin/claim e può revocarli.
+- Nessun invio massivo: un invito per scheda/email, con audit.
 
 ### 8.5 — Centro assistenza
 

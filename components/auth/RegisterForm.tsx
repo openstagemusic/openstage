@@ -19,7 +19,13 @@ import {
   authPrimaryButtonClass,
 } from "./formStyles";
 
-export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
+export default function RegisterForm({
+  dict,
+  nextPath,
+}: {
+  dict: Dictionary["auth"];
+  nextPath?: string | null;
+}) {
   const router = useRouter();
   const locale = useLocale();
   const [fullName, setFullName] = useState("");
@@ -63,7 +69,9 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback${
+          nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""
+        }`,
         data: { full_name: fullName },
         captchaToken: token || undefined,
       },
@@ -95,7 +103,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
       return;
     }
 
-    router.push(withLocale(locale, "/onboarding/role"));
+    router.push(withLocale(locale, nextPath ?? "/onboarding/role"));
     router.refresh();
   }
 
@@ -175,7 +183,7 @@ export default function RegisterForm({ dict }: { dict: Dictionary["auth"] }) {
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      <GoogleButton label={dict.google} />
+      <GoogleButton label={dict.google} next={nextPath ?? "/"} />
       </form>
 
       {notice ? (

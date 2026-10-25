@@ -132,3 +132,28 @@ export async function publishEventAction(eventId: string): Promise<ClaimActionRe
 
   return result(error);
 }
+
+export type AcceptInviteResult = {
+  ok: boolean;
+  error?: string;
+  subjectType?: "artist" | "venue";
+  slug?: string;
+};
+
+/** Accetta un invito a reclamare una scheda. Il token è monouso. */
+export async function acceptClaimInviteAction(input: {
+  token: string;
+}): Promise<AcceptInviteResult> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("accept_claim_invite", {
+    p_token: input.token,
+  });
+
+  if (error || !data) {
+    console.error("[claims] acceptClaimInvite:", error?.message);
+    return { ok: false, error: error?.message };
+  }
+
+  const result = data as unknown as { subjectType: "artist" | "venue"; slug: string };
+  return { ok: true, subjectType: result.subjectType, slug: result.slug };
+}

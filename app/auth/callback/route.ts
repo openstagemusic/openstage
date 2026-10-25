@@ -71,8 +71,11 @@ export async function GET(request: NextRequest) {
       // profile is created with the default `fan` role: on the first access we
       // ask for the real role instead of silently keeping the default.
       // Il reset password non deve passare dall'onboarding: l'utente esiste già.
-      const isPasswordReset = next.startsWith("/reset-password");
-      if (!isPasswordReset && !data.user?.user_metadata?.role) {
+      // `next` può arrivare già con il prefisso di lingua (/it, /en).
+      const nextWithoutLocale = next.replace(/^\/(it|en)(?=\/|$)/, "") || "/";
+      const isPasswordReset = nextWithoutLocale.startsWith("/reset-password");
+      const isClaimInvite = nextWithoutLocale.startsWith("/claim/");
+      if (!isPasswordReset && !isClaimInvite && !data.user?.user_metadata?.role) {
         const redirect = NextResponse.redirect(
           `${origin}${withLocale(locale, "/onboarding/role")}`
         );

@@ -38,7 +38,10 @@ export default async function LoginPage({
       footer={
         <p>
           {dict.auth.noAccount}{" "}
-          <Link href="/register" className="text-cyan hover:underline">
+          <Link
+            href={nextPath ? `/register?next=${encodeURIComponent(nextPath)}` : "/register"}
+            className="text-cyan hover:underline"
+          >
             {dict.nav.register}
           </Link>
         </p>

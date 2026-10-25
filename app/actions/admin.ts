@@ -87,3 +87,49 @@ export async function clearMfaBypassAction(): Promise<AdminActionResult> {
 
   return result(error);
 }
+
+export type ClaimInviteActionResult = {
+  ok: boolean;
+  accountExists?: boolean;
+  error?: string;
+};
+
+/** Crea un invito a reclamare una scheda. L'email/notifica parte dal database. */
+export async function createClaimInviteAction(input: {
+  subjectType: "artist" | "venue";
+  subjectId: string;
+  email: string;
+}): Promise<ClaimInviteActionResult> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("admin_create_claim_invite", {
+    p_subject_type: input.subjectType,
+    p_subject_id: input.subjectId,
+    p_email: input.email,
+  });
+
+  if (error || !data) {
+    console.error("[admin] createClaimInvite:", error?.message);
+    return { ok: false, error: error?.message };
+  }
+
+  revalidatePath("/admin/claim");
+
+  const result = data as unknown as { accountExists?: boolean };
+  return { ok: true, accountExists: result.accountExists === true };
+}
+
+/** Revoca un invito ancora in attesa. */
+export async function revokeClaimInviteAction(input: {
+  inviteId: string;
+}): Promise<AdminActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_revoke_claim_invite", {
+    p_invite_id: input.inviteId,
+  });
+
+  if (!error) {
+    revalidatePath("/admin/claim");
+  }
+
+  return result(error);
+}

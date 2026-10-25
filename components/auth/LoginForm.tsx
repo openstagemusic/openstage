@@ -159,7 +159,7 @@ export default function LoginForm({
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      <GoogleButton label={dict.google} />
+      <GoogleButton label={dict.google} next={nextPath ?? "/"} />
     </form>
   );
 }
