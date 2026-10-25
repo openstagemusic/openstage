@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import AdminMetrics from "@/components/admin/AdminMetrics";
+import AdminTodo from "@/components/admin/AdminTodo";
 import { getAdminMetrics } from "@/lib/admin/queries";
-import { isCurrentUserAdmin } from "@/lib/claims/queries";
+import { isCurrentUserAdmin, listUnverifiedProfiles } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -32,7 +33,7 @@ export default async function AdminPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const t = dict.admin;
-  const metrics = await getAdminMetrics();
+  const [metrics, unverified] = await Promise.all([getAdminMetrics(), listUnverifiedProfiles()]);
 
   return (
     <div>
@@ -70,6 +71,8 @@ export default async function AdminPage() {
           </button>
         </form>
       </header>
+
+      <AdminTodo metrics={metrics} profilesToVerify={unverified.length} dict={t} />
 
       <AdminMetrics metrics={metrics} dict={t} />
     </div>
