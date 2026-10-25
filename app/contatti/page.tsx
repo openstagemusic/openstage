@@ -14,7 +14,7 @@ export const generateMetadata = (): Promise<Metadata> =>
   getPageMetadata((dict) => dict.pages.contact);
 
 type ContactPageProps = {
-  searchParams: Promise<{ stato?: string; errore?: string }>;
+  searchParams: Promise<{ stato?: string; errore?: string; argomento?: string }>;
 };
 
 const TOPIC_KEYS = ["general", "artist", "venue", "report", "privacy", "other"] as const;
@@ -29,6 +29,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const params = await searchParams;
   const sent = params.stato === "inviato";
   const error = typeof params.errore === "string" ? params.errore : null;
+  const topic = TOPIC_KEYS.includes(params.argomento as (typeof TOPIC_KEYS)[number])
+    ? (params.argomento as (typeof TOPIC_KEYS)[number])
+    : "general";
 
   const data = {
     "@context": "https://schema.org",
@@ -147,7 +150,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                   >
                     {t.fields.topic}
                   </label>
-                  <select id="topic" name="topic" required defaultValue="general" className={FIELD}>
+                  <select id="topic" name="topic" required defaultValue={topic} className={FIELD}>
                     {TOPIC_KEYS.map((key) => (
                       <option key={key} value={key}>
                         {t.topics[key]}

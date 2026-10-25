@@ -6,7 +6,7 @@ import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { sendContactReply } from "@/lib/email";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
-import type { ContactMessageStatus } from "@/lib/messages/queries";
+import type { ContactMessageStatus, ContactPriority } from "@/lib/messages/queries";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -22,12 +22,46 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 const STATUSES = new Set<ContactMessageStatus>(["new", "read", "closed"]);
+const PRIORITIES = new Set<ContactPriority>(["low", "normal", "high", "urgent"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type MessageOutcome = {
   ok: boolean;
   error?: "unauthorized" | "invalid" | "failed";
 };
+
+export async function adminUpdateTicketAction(input: {
+  messageId: string;
+  priority: ContactPriority;
+  assignedTo: string | null;
+}): Promise<MessageOutcome> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+
+  if (
+    !UUID.test(input.messageId) ||
+    !PRIORITIES.has(input.priority) ||
+    (input.assignedTo !== null && !UUID.test(input.assignedTo))
+  ) {
+    return { ok: false, error: "invalid" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_update_contact_ticket", {
+    p_message_id: input.messageId,
+    p_priority: input.priority,
+    p_assigned_to: input.assignedTo,
+  });
+
+  if (error) {
+    console.error("[messages] adminUpdateTicketAction:", error.message);
+    return { ok: false, error: "failed" };
+  }
+
+  revalidatePath("/admin/messaggi");
+  revalidatePath("/admin");
+
+  return { ok: true };
+}
 
 export async function adminSetMessageStatusAction(input: {
   messageId: string;
@@ -106,18 +140,14 @@ export async function adminReplyToMessageAction(input: {
 
   if (!sent) return { ok: false, error: "failed" };
 
-  const now = new Date().toISOString();
-  const patch =
-    message.status === "closed"
-      ? { read_at: message.read_at ?? now }
-      : { status: "read" as const, read_at: message.read_at ?? now };
+  // L'email è partita: ora si registra la risposta, si aggiorna il ticket e,
+  // se l'indirizzo ha un account, si crea la notifica in-app.
+  const { error: logError } = await supabase.rpc("admin_log_contact_reply", {
+    p_message_id: message.id,
+    p_body: body,
+  });
 
-  const { error: updateError } = await supabase
-    .from("contact_messages")
-    .update(patch)
-    .eq("id", message.id);
-
-  if (updateError) console.error("[messages] reply update:", updateError.message);
+  if (logError) console.error("[messages] reply log:", logError.message);
 
   revalidatePath("/admin/messaggi");
   revalidatePath("/admin");

@@ -6,7 +6,7 @@ import Link from "@/components/i18n/LocaleLink";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
-import { listContactMessages } from "@/lib/messages/queries";
+import { listAdminAssignees, listContactMessages, listContactReplies } from "@/lib/messages/queries";
 
 /**
  * I messaggi del modulo contatti, visti dall'admin.
@@ -31,7 +31,11 @@ export default async function AdminMessagesPage() {
 
   const locale = await getLocale();
   const dict = getDictionary(locale);
-  const messages = await listContactMessages();
+  const [messages, replies, admins] = await Promise.all([
+    listContactMessages(),
+    listContactReplies(),
+    listAdminAssignees(),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
@@ -46,6 +50,8 @@ export default async function AdminMessagesPage() {
 
       <AdminMessagesPanel
         messages={messages}
+        replies={replies}
+        admins={admins}
         dict={dict.admin}
         topics={dict.pages.contact.topics}
       />

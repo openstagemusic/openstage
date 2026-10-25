@@ -3,22 +3,28 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { adminReplyToMessageAction, adminSetMessageStatusAction } from "@/app/actions/messages";
+import {
+  adminReplyToMessageAction,
+  adminSetMessageStatusAction,
+  adminUpdateTicketAction,
+} from "@/app/actions/messages";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type {
   ContactMessage,
   ContactMessageStatus,
+  ContactPriority,
+  ContactReply,
   ContactTopic,
 } from "@/lib/messages/queries";
 
 /**
- * La coda dei messaggi dal modulo contatti.
+ * I ticket nati dal modulo contatti.
  *
- * Non c'è una risposta integrata: si risponde dalla propria email, con il
- * pulsante `mailto`. Il database serve a non perdere nulla e a sapere cosa è
- * ancora da leggere. Gli stati sono `new`, `read` e `closed`; riaprire un
- * messaggio lo rimette in coda senza cancellarlo.
+ * Priorità, assegnazione, storico risposte e risposta integrata. Lo stato resta
+ * `new`, `read` o `closed`; riaprire un ticket lo rimette in coda senza
+ * cancellare nulla. La risposta parte da Resend e viene registrata nel database
+ * dalla funzione `admin_log_contact_reply`.
  */
 
 type Filter = "all" | ContactMessageStatus;
@@ -31,10 +37,14 @@ const statusBadge: Record<ContactMessageStatus, string> = {
 
 export default function AdminMessagesPanel({
   messages,
+  replies,
+  admins,
   dict,
   topics,
 }: {
   messages: ContactMessage[];
+  replies: ContactReply[];
+  admins: Array<{ id: string; email: string | null }>;
   dict: Dictionary["admin"];
   topics: Dictionary["pages"]["contact"]["topics"];
 }) {
@@ -49,6 +59,8 @@ export default function AdminMessagesPanel({
   const [replyNotice, setReplyNotice] = useState<string | null>(null);
   const [replyDoneId, setReplyDoneId] = useState<string | null>(null);
   const [replyError, setReplyError] = useState<string | null>(null);
+  const [ticketBusy, setTicketBusy] = useState<string | null>(null);
+  const [ticketNotice, setTicketNotice] = useState<string | null>(null);
 
   const dateTime = new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
     dateStyle: "medium",
@@ -84,6 +96,45 @@ export default function AdminMessagesPanel({
 
   function topicLabel(topic: ContactTopic): string {
     return topics[topic] ?? topic;
+  }
+
+  function priorityLabel(priority: ContactPriority): string {
+    if (priority === "low") return dict.ticketPriorityLow;
+    if (priority === "high") return dict.ticketPriorityHigh;
+    if (priority === "urgent") return dict.ticketPriorityUrgent;
+    return dict.ticketPriorityNormal;
+  }
+
+  const priorityBadge: Record<ContactPriority, string> = {
+    low: "border-white/10 text-muted",
+    normal: "border-cyan/30 text-cyan",
+    high: "border-violet/40 text-violet-200",
+    urgent: "border-pink/50 bg-pink/10 text-pink",
+  };
+
+  async function updateTicket(
+    message: ContactMessage,
+    patch: { priority?: ContactPriority; assignedTo?: string | null }
+  ) {
+    setTicketBusy(message.id);
+    setError(null);
+    setTicketNotice(null);
+
+    const outcome = await adminUpdateTicketAction({
+      messageId: message.id,
+      priority: patch.priority ?? message.priority,
+      assignedTo: patch.assignedTo !== undefined ? patch.assignedTo : message.assignedTo,
+    });
+
+    setTicketBusy(null);
+
+    if (!outcome.ok) {
+      setError(dict.ticketUpdateFailed);
+      return;
+    }
+
+    setTicketNotice(dict.ticketUpdated);
+    router.refresh();
   }
 
   async function run(messageId: string, status: ContactMessageStatus) {
@@ -146,6 +197,7 @@ export default function AdminMessagesPanel({
       </div>
 
       {error ? <p className="mt-3 text-xs text-pink">{error}</p> : null}
+      {ticketNotice ? <p className="mt-3 text-xs text-cyan">{ticketNotice}</p> : null}
 
       {visible.length === 0 ? (
         <p className="mt-6 text-sm text-muted">
@@ -182,12 +234,20 @@ export default function AdminMessagesPanel({
                       <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-[0.65rem] text-muted">
                         {topicLabel(message.topic)}
                       </span>
+                      <span
+                        className={`rounded-full border px-2.5 py-0.5 text-[0.65rem] ${priorityBadge[message.priority]}`}
+                      >
+                        {priorityLabel(message.priority)}
+                      </span>
                     </div>
 
                     <p className="mt-1 text-xs text-muted">
                       {dict.messagesReceived}: {dateTime.format(new Date(message.createdAt))}
                       {" · "}
                       {dict.messagesLocale}: {message.locale.toUpperCase()}
+                      {" · "}
+                      {dict.ticketAssignedTo}:{" "}
+                      {message.assignedEmail ?? dict.ticketUnassigned}
                     </p>
 
                     <a
@@ -221,9 +281,81 @@ export default function AdminMessagesPanel({
                   </div>
                 </div>
 
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                      {dict.ticketPriority}
+                    </span>
+                    <select
+                      value={message.priority}
+                      disabled={ticketBusy === message.id}
+                      onChange={(event) =>
+                        void updateTicket(message, {
+                          priority: event.target.value as ContactPriority,
+                        })
+                      }
+                      className="mt-1 w-full border border-line bg-surface px-2 py-1.5 text-xs text-white outline-none focus:border-cyan/60"
+                    >
+                      {(["low", "normal", "high", "urgent"] as ContactPriority[]).map((priority) => (
+                        <option key={priority} value={priority}>
+                          {priorityLabel(priority)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                      {dict.ticketAssignedTo}
+                    </span>
+                    <select
+                      value={message.assignedTo ?? ""}
+                      disabled={ticketBusy === message.id}
+                      onChange={(event) =>
+                        void updateTicket(message, {
+                          assignedTo: event.target.value || null,
+                        })
+                      }
+                      className="mt-1 w-full border border-line bg-surface px-2 py-1.5 text-xs text-white outline-none focus:border-cyan/60"
+                    >
+                      <option value="">{dict.ticketUnassigned}</option>
+                      {admins.map((admin) => (
+                        <option key={admin.id} value={admin.id}>
+                          {admin.email ?? admin.id}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
                 <p className="mt-4 whitespace-pre-line break-words text-sm leading-relaxed text-white/90">
                   {message.message}
                 </p>
+
+                {(() => {
+                  const messageReplies = replies.filter((reply) => reply.messageId === message.id);
+                  if (messageReplies.length === 0) return null;
+
+                  return (
+                    <div className="mt-4 border-t border-line pt-3">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                        {dict.ticketRepliesTitle}
+                      </p>
+                      <ul className="mt-2 space-y-3">
+                        {messageReplies.map((reply) => (
+                          <li key={reply.id} className="border-l-2 border-cyan/40 pl-3">
+                            <p className="whitespace-pre-line break-words text-sm leading-relaxed text-white/90">
+                              {reply.body}
+                            </p>
+                            <p className="mt-1 font-mono text-[9px] tracking-[0.06em] text-muted">
+                              {dateTime.format(new Date(reply.sentAt))}
+                              {reply.adminEmail ? ` · ${reply.adminEmail}` : ""}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })()}
 
                 {replyId === message.id ? (
                   <form

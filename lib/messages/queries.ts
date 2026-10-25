@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export type ContactMessageStatus = "new" | "read" | "closed";
 
+export type ContactPriority = "low" | "normal" | "high" | "urgent";
+
 export type ContactTopic = "general" | "artist" | "venue" | "report" | "privacy" | "other";
 
 export type ContactMessage = {
@@ -20,6 +22,9 @@ export type ContactMessage = {
   message: string;
   locale: "it" | "en";
   status: ContactMessageStatus;
+  priority: ContactPriority;
+  assignedTo: string | null;
+  assignedEmail: string | null;
   createdAt: string;
   readAt: string | null;
   closedAt: string | null;
@@ -33,13 +38,17 @@ type Row = {
   message: string;
   locale: "it" | "en";
   status: ContactMessageStatus;
+  priority: ContactPriority;
+  assigned_to: string | null;
+  assigned: { email: string | null } | null;
   created_at: string;
   read_at: string | null;
   closed_at: string | null;
 };
 
 const MESSAGE_SELECT =
-  "id, name, email, topic, message, locale, status, created_at, read_at, closed_at";
+  "id, name, email, topic, message, locale, status, priority, assigned_to, created_at, read_at, closed_at, " +
+  "assigned:profiles!contact_messages_assigned_to_fkey ( email )";
 
 function toMessage(row: Row): ContactMessage {
   return {
@@ -50,6 +59,9 @@ function toMessage(row: Row): ContactMessage {
     message: row.message,
     locale: row.locale,
     status: row.status,
+    priority: row.priority,
+    assignedTo: row.assigned_to,
+    assignedEmail: row.assigned?.email ?? null,
     createdAt: row.created_at,
     readAt: row.read_at,
     closedAt: row.closed_at,
@@ -89,4 +101,61 @@ export async function countNewContactMessages(): Promise<number> {
   }
 
   return count ?? 0;
+}
+
+
+export type ContactReply = {
+  id: string;
+  messageId: string;
+  body: string;
+  sentAt: string;
+  adminEmail: string | null;
+};
+
+type ReplyRow = {
+  id: string;
+  message_id: string;
+  body: string;
+  sent_at: string;
+  admin: { email: string | null } | null;
+};
+
+/** Lo storico delle risposte, dalla più vecchia alla più recente. */
+export async function listContactReplies(limit = 1000): Promise<ContactReply[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("contact_message_replies")
+    .select("id, message_id, body, sent_at, admin:profiles!contact_message_replies_admin_id_fkey ( email )")
+    .order("sent_at", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    console.error("[messages] listContactReplies:", error.message);
+    return [];
+  }
+
+  return (data as unknown as ReplyRow[]).map((row) => ({
+    id: row.id,
+    messageId: row.message_id,
+    body: row.body,
+    sentAt: row.sent_at,
+    adminEmail: row.admin?.email ?? null,
+  }));
+}
+
+/** Gli admin a cui si può assegnare un ticket. */
+export async function listAdminAssignees(): Promise<Array<{ id: string; email: string | null }>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .eq("role", "admin")
+    .order("email", { ascending: true });
+
+  if (error) {
+    console.error("[messages] listAdminAssignees:", error.message);
+    return [];
+  }
+
+  return (data as unknown as Array<{ id: string; email: string | null }>) ?? [];
 }

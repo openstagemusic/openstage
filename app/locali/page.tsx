@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import DirectoryFilters from "@/components/directory/DirectoryFilters";
+import Link from "@/components/i18n/LocaleLink";
 import VenueCard from "@/components/directory/VenueCard";
 import PageHero from "@/components/pages/PageHero";
 import JsonLd from "@/components/seo/JsonLd";
@@ -103,6 +104,15 @@ export default async function VenuesPage({
           <div className="mt-5 border border-line bg-surface/60 p-8">
             <h2 className="font-display text-lg font-semibold">{t.noResultsTitle}</h2>
             <p className="mt-2 text-sm text-muted">{t.noResultsText}</p>
+            <p className="mt-4 border-t border-line pt-4 text-sm text-muted">
+              {t.suggestVenue}{" "}
+              <Link
+                href="/contatti?argomento=venue"
+                className="border-b border-line-strong pb-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-cyan transition-colors hover:border-cyan"
+              >
+                {t.suggestVenueCta}
+              </Link>
+            </p>
           </div>
         )}
 
