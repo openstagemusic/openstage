@@ -1194,6 +1194,10 @@ export const it: Dictionary = {
     closeMenu: "Chiudi il menu",
     overviewTitle: "La tua dashboard",
     overviewText: "I tuoi eventi e quello che hai salvato, in un posto solo.",
+    noPageTitle: "Prima crea la tua scheda",
+    noPageText: "Per inserire eventi devi avere una scheda attiva. Dopo un unclaim la scheda torna a OpenStage: creala o richiedila di nuovo per poter pubblicare.",
+    noPageArtistCta: "Crea la scheda artista",
+    noPageVenueCta: "Crea la scheda locale",
     statDrafts: "Bozze",
     statPublished: "Pubblicati",
     statCancelled: "Annullati",
@@ -1296,6 +1300,7 @@ export const it: Dictionary = {
   editor: {
     newTitle: "Crea un evento",
     newSubtitle: "Racconta la serata: l'anteprima qui accanto si aggiorna mentre scrivi.",
+    noPageCreate: "Prima crea la tua scheda: senza scheda non puoi inserire eventi.",
     editTitle: "Modifica l'evento",
     editSubtitle: "Cambia quello che serve: il resto resta come l'avevi scritto.",
     sectionWhat: "La serata",

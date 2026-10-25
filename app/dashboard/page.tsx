@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import LocaleLink from "@/components/i18n/LocaleLink";
+import NeedsPageNotice from "@/components/dashboard/NeedsPageNotice";
 import { canManageEvents } from "@/lib/auth/roles";
 import { listMyEvents, listSavedEvents } from "@/lib/dashboard/queries";
+import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -26,10 +28,15 @@ export default async function DashboardPage() {
   const t = getDictionary(locale).dashboard;
   const canManage = canManageEvents(session.role);
 
-  const [events, saved] = await Promise.all([
+  const [events, saved, artistPage, venuePage] = await Promise.all([
     canManage ? listMyEvents(session.id) : Promise.resolve([]),
     listSavedEvents(),
+    session.role === "artist" ? getArtistByProfileId(session.id) : Promise.resolve(null),
+    session.role === "venue" ? getVenueByProfileId(session.id) : Promise.resolve(null),
   ]);
+
+  const missingPage =
+    session.role === "artist" ? !artistPage : session.role === "venue" ? !venuePage : false;
 
   const count = (status: "draft" | "published" | "cancelled") =>
     events.filter((event) => event.status === status).length;
@@ -58,6 +65,15 @@ export default async function DashboardPage() {
         </p>
       </header>
 
+      {missingPage ? (
+        <div className="mt-8">
+          <NeedsPageNotice
+            role={session.role === "artist" ? "artist" : "venue"}
+            dict={t}
+          />
+        </div>
+      ) : null}
+
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <LocaleLink
@@ -76,7 +92,7 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {canManage ? (
+      {canManage && !missingPage ? (
         <div className="mt-8 flex flex-col gap-2 border-t border-line pt-6 sm:flex-row sm:flex-wrap">
           <LocaleLink
             href="/dashboard/events/new"

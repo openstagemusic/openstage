@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { canManageEvents } from "@/lib/auth/roles";
-import { getArtistByProfileId } from "@/lib/directory/queries";
+import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import {
   CANCEL_REASON_MAX,
   CLIENT_KEY_MAX,
@@ -125,6 +125,7 @@ export type SaveEventResult = {
     | "conflict"
     | "rateLimited"
     | "suspended"
+    | "noPage"
     | "saveFailed";
   /**
    * Serate che assomigliano a questa, quando si sta creando.
@@ -138,6 +139,8 @@ export type SaveEventResult = {
 
 /** Il salvataggio non è riuscito: si traduce il codice del database. */
 function saveErrorCode(error: { code?: string }): NonNullable<SaveEventResult["error"]> {
+  if (error.code === "OS422") return "noPage";
+
   const mapped = error.code ? SQLSTATE_TO_ERROR[error.code] : undefined;
 
   return mapped === "rateLimited" || mapped === "suspended" ? mapped : "saveFailed";
@@ -177,6 +180,18 @@ export async function saveEventAction(input: {
 
   if (!session || !canManageEvents(session.role)) {
     return { ok: false, error: "unauthorized" };
+  }
+
+  // Senza la propria scheda non si crea nulla: dopo un unclaim il ruolo resta
+  // ma la scheda torna a OpenStage. Il database ha lo stesso controllo.
+  const [ownArtist, ownVenue] = await Promise.all([
+    getArtistByProfileId(session.id),
+    session.role === "venue" ? getVenueByProfileId(session.id) : Promise.resolve(null),
+  ]);
+
+  if (input.eventId === null) {
+    if (session.role === "artist" && !ownArtist) return { ok: false, error: "noPage" };
+    if (session.role === "venue" && !ownVenue) return { ok: false, error: "noPage" };
   }
 
   // Una serata **nuova** non può stare nel passato (tranne le ultime ore: un
@@ -223,7 +238,6 @@ export async function saveEventAction(input: {
   // si discute: nessuno può attribuirsi un concerto altrui. Se a scriverla è un
   // locale (o l'admin), può **collegare** una scheda che esiste già — ed è così
   // che la serata compare anche sulla pagina dell'artista (B39).
-  const ownArtist = await getArtistByProfileId(session.id);
   let artistId: string | null = ownArtist?.id ?? null;
 
   if (!ownArtist && values.artistId) {

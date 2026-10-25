@@ -1195,6 +1195,10 @@ export const en = {
     closeMenu: "Close the menu",
     overviewTitle: "Your dashboard",
     overviewText: "Your events and everything you saved, in one place.",
+    noPageTitle: "Create your page first",
+    noPageText: "To add events you need an active page. After an unclaim the page returns to OpenStage: create or claim it again to publish.",
+    noPageArtistCta: "Create the artist page",
+    noPageVenueCta: "Create the venue page",
     statDrafts: "Drafts",
     statPublished: "Published",
     statCancelled: "Cancelled",
@@ -1297,6 +1301,7 @@ export const en = {
   editor: {
     newTitle: "Create an event",
     newSubtitle: "Tell the story of the night: the preview updates while you type.",
+    noPageCreate: "Create your page first: without a page you cannot add events.",
     editTitle: "Edit the event",
     editSubtitle: "Change what you need: everything else stays as you wrote it.",
     sectionWhat: "The night",

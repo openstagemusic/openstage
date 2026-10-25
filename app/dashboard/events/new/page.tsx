@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import EventEditor from "@/components/dashboard/EventEditor";
+import NeedsPageNotice from "@/components/dashboard/NeedsPageNotice";
 import { canManageEvents } from "@/lib/auth/roles";
 import { isProfileVerified, listCityOptions } from "@/lib/dashboard/queries";
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
@@ -33,9 +34,33 @@ export default async function NewEventPage() {
 
   const dict = getDictionary(locale);
 
-  const [venue, artist, verified, cities, genres, visitor] = await Promise.all([
+  const [venue, artist] = await Promise.all([
     getVenueByProfileId(session.id),
     getArtistByProfileId(session.id),
+  ]);
+
+  // Dopo un unclaim la scheda torna a OpenStage ma il ruolo resta: senza scheda
+  // non si crea nulla. Il database applica la stessa regola sul trigger.
+  const missingPage =
+    session.role === "artist" ? !artist : session.role === "venue" ? !venue : false;
+
+  if (missingPage) {
+    return (
+      <div>
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+          {dict.dashboard.navNew}
+        </p>
+        <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em]">
+          {dict.dashboard.noPageTitle}
+        </h1>
+        <div className="mt-8">
+          <NeedsPageNotice role={session.role === "artist" ? "artist" : "venue"} dict={dict.dashboard} />
+        </div>
+      </div>
+    );
+  }
+
+  const [verified, cities, genres, visitor] = await Promise.all([
     isProfileVerified(session.id),
     listCityOptions(),
     listGenres(),

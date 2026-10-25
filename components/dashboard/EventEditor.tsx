@@ -505,6 +505,7 @@ export default function EventEditor({
     conflict: t.conflict,
     rateLimited: t.tooManyEvents,
     suspended: t.suspendedAccount,
+    noPage: t.noPageCreate,
     saveFailed: t.saveFailed,
   };
 
