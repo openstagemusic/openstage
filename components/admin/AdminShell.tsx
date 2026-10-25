@@ -25,6 +25,8 @@ type AdminShellProps = {
   email: string | null;
   logoutLabel: string;
   closeMenuLabel: string;
+  /** Ora di scadenza se la 2FA è sospesa temporaneamente. */
+  mfaBypassLabel: string | null;
   children: React.ReactNode;
 };
 
@@ -35,6 +37,7 @@ export default function AdminShell({
   email,
   logoutLabel,
   closeMenuLabel,
+  mfaBypassLabel,
   children,
 }: AdminShellProps) {
   const [open, setOpen] = useState(false);
@@ -125,6 +128,22 @@ export default function AdminShell({
           </div>
         </div>
       </header>
+
+      {mfaBypassLabel ? (
+        <div className="border-b border-pink/40 bg-pink/10 px-4 py-2">
+          <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-2">
+            <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-pink">
+              {dict.mfaBypassBanner.replace("{time}", mfaBypassLabel)}
+            </p>
+            <Link
+              href="/admin/sicurezza"
+              className="font-mono text-[10px] uppercase tracking-[0.1em] text-white underline decoration-pink/60 underline-offset-4 hover:text-pink"
+            >
+              {dict.mfaBypassManage}
+            </Link>
+          </div>
+        </div>
+      ) : null}
 
       <div className="mx-auto flex w-full max-w-[1500px] gap-8 px-4 py-6 sm:px-6">
         <aside className="hidden w-64 shrink-0 lg:block">

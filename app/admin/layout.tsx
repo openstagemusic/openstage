@@ -20,10 +20,15 @@ export default async function AdminLayout({
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const path = await getCurrentPath();
+  const session = await getSessionProfile();
 
-  // 2FA obbligatoria: la pagina di sicurezza resta accessibile per completare
-  // l'enrollment o la verifica. Tutto il resto richiede AAL2.
-  if (path !== "/admin/sicurezza") {
+  // 2FA obbligatoria, con una sola eccezione: una sospensione temporanea
+  // decisa dall'admin. La chiave TOTP resta salvata, quindi alla scadenza si
+  // torna a chiedere il codice senza riconfigurare nulla.
+  const bypassUntil = session?.mfaBypassUntil ? new Date(session.mfaBypassUntil) : null;
+  const bypassActive = bypassUntil !== null && bypassUntil.getTime() > Date.now();
+
+  if (path !== "/admin/sicurezza" && !bypassActive) {
     const supabase = await createClient();
     const { data: assurance } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
@@ -32,7 +37,12 @@ export default async function AdminLayout({
     }
   }
 
-  const session = await getSessionProfile();
+  const bypassLabel = bypassActive
+    ? new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(bypassUntil)
+    : null;
 
   const modules: AdminNavModule[] = ADMIN_MODULES.map((module) => ({
     key: module.key,
@@ -55,6 +65,7 @@ export default async function AdminLayout({
       email={session?.email ?? null}
       logoutLabel={dict.nav.logout}
       closeMenuLabel={dict.nav.closeMenu}
+      mfaBypassLabel={bypassLabel}
     >
       {children}
     </AdminShell>

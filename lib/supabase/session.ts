@@ -14,6 +14,11 @@ export type SessionProfile = {
    * revisione (vedi `events_require_review` nella migration 0011).
    */
   verified: boolean;
+  /**
+   * Finestra breve in cui l'admin ha sospeso la 2FA senza cancellare il fattore.
+   * Alla scadenza la verifica torna obbligatoria (vedi `admin_set_mfa_bypass`).
+   */
+  mfaBypassUntil: string | null;
 };
 
 /**
@@ -39,7 +44,7 @@ export const getSessionProfile = cache(async (): Promise<SessionProfile | null> 
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, verified_at")
+    .select("role, verified_at, mfa_bypass_until")
     .eq("id", user.id)
     .single();
 
@@ -48,5 +53,6 @@ export const getSessionProfile = cache(async (): Promise<SessionProfile | null> 
     email: user.email ?? null,
     role: (profile?.role as UserRole | undefined) ?? null,
     verified: profile?.verified_at != null,
+    mfaBypassUntil: profile?.mfa_bypass_until ?? null,
   };
 });

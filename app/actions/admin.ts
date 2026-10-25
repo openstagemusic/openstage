@@ -58,3 +58,32 @@ export async function resolveReportAction(input: {
 
   return result(error);
 }
+
+/** Sospende la 2FA per una finestra breve, senza cancellare il fattore TOTP. */
+export async function setMfaBypassAction(input: {
+  minutes: number;
+}): Promise<AdminActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_set_mfa_bypass", {
+    p_minutes: input.minutes,
+    p_reason: null,
+  });
+
+  if (!error) {
+    revalidatePath("/admin", "layout");
+  }
+
+  return result(error);
+}
+
+/** Chiude subito la finestra di bypass. */
+export async function clearMfaBypassAction(): Promise<AdminActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_clear_mfa_bypass");
+
+  if (!error) {
+    revalidatePath("/admin", "layout");
+  }
+
+  return result(error);
+}
