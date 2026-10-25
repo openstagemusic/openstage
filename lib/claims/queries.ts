@@ -195,6 +195,24 @@ export async function listClaimsToVerify(): Promise<ClaimRecord[]> {
   return (data as unknown as ClaimRow[]).map(toRecord).filter((claim) => !claim.verified);
 }
 
+/** Tutti i claim approvati, anche già verificati: servono per la revoca admin. */
+export async function listActiveClaims(): Promise<ClaimRecord[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("claims")
+    .select(CLAIM_SELECT)
+    .eq("status", "approved")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("[claims] listActiveClaims:", error.message);
+    return [];
+  }
+
+  return (data as unknown as ClaimRow[]).map(toRecord);
+}
+
 export type DraftEvent = {  id: string;
   slug: string;
   title: string;
