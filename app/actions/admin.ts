@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { isCurrentUserAdmin } from "@/lib/claims/queries";
+import { sendTelegramMessage } from "@/lib/telegram";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -132,4 +134,22 @@ export async function revokeClaimInviteAction(input: {
   }
 
   return result(error);
+}
+
+export type TelegramTestResult = {
+  ok: boolean;
+  error?: "unauthorized" | "not_configured" | "failed";
+};
+
+/** Invia il messaggio di prova dal server Vercel (non passa dal browser). */
+export async function sendTelegramTestAction(): Promise<TelegramTestResult> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+
+  const result = await sendTelegramMessage(
+    "✅ OpenStage: notifiche Telegram attive." +
+      "\nDa ora ricevi qui gli avvisi delle code admin." +
+      "\nhttps://getopenstage.it/it/admin"
+  );
+
+  return result;
 }
