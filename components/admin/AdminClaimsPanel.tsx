@@ -4,6 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { decideClaimAction, revokeClaimAction, setProfileVerifiedAction } from "@/app/actions/claims";
+import {
+  analyzeClaimVerificationAction,
+  type VerificationAnalysisResult,
+} from "@/app/actions/ai";
+import AdminClaimVerification from "@/components/admin/AdminClaimVerification";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { useLocale } from "@/components/i18n/LocaleProvider";
@@ -27,6 +32,8 @@ export default function AdminClaimsPanel({
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<Record<string, VerificationAnalysisResult>>({});
 
   const date = new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
     dateStyle: "medium",
@@ -64,6 +71,22 @@ export default function AdminClaimsPanel({
 
     setNotice(dict.claimVerifiedNotice);
     router.refresh();
+  }
+
+  async function analyze(claim: ClaimRecord) {
+    setAiBusy(claim.id);
+    setError(null);
+    setNotice(null);
+
+    const outcome = await analyzeClaimVerificationAction({ claimId: claim.id });
+    setAiBusy(null);
+
+    if (!outcome.ok) {
+      setError(dict.aiVerifyFailed);
+      return;
+    }
+
+    setAnalysis((current) => ({ ...current, [claim.id]: outcome }));
   }
 
   async function revoke(claim: ClaimRecord) {
@@ -224,6 +247,14 @@ export default function AdminClaimsPanel({
                 </div>
 
                 <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={aiBusy === claim.id}
+                    onClick={() => void analyze(claim)}
+                    className="inline-flex min-h-11 items-center border border-line-strong px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan/50 disabled:opacity-50"
+                  >
+                    {aiBusy === claim.id ? dict.aiVerifyLoading : dict.aiVerifyButton}
+                  </button>
                   {!claim.verified ? (
                     <button
                       type="button"
@@ -248,6 +279,10 @@ export default function AdminClaimsPanel({
                   </button>
                 </div>
               </div>
+
+              {analysis[claim.id] ? (
+                <AdminClaimVerification analysis={analysis[claim.id]} dict={dict} />
+              ) : null}
 
               {openId === claim.id ? (
                 <div className="mt-4 border border-line bg-white/[0.03] p-3">

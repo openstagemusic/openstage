@@ -38,7 +38,7 @@ function isPrivateIpv6(address: string): boolean {
   );
 }
 
-async function assertPublicUrl(raw: string): Promise<URL> {
+export async function assertPublicUrl(raw: string): Promise<URL> {
   if (raw.length > MAX_URL_LENGTH) throw new Error("url_too_long");
 
   let url: URL;
@@ -150,4 +150,45 @@ export async function fetchPublicText(rawUrl: string): Promise<string> {
   }
 
   throw new Error("too_many_redirects");
+}
+
+export type PublicUrlCheck = {
+  ok: boolean;
+  status: number | null;
+  error: string | null;
+};
+
+/** Controllo leggero di un link pubblico, senza seguire redirect. */
+export async function checkPublicUrl(rawUrl: string): Promise<PublicUrlCheck> {
+  try {
+    const url = await assertPublicUrl(rawUrl);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        redirect: "manual",
+        signal: controller.signal,
+        headers: { "User-Agent": "OpenStageBot/1.0 (+https://getopenstage.it)" },
+        cache: "no-store",
+      });
+
+      await response.body?.cancel();
+
+      return {
+        ok: response.status < 400,
+        status: response.status,
+        error: response.status >= 400 ? "http_" + response.status : null,
+      };
+    } finally {
+      clearTimeout(timer);
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      status: null,
+      error: error instanceof Error ? error.message : "fetch_failed",
+    };
+  }
 }
