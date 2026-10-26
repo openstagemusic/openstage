@@ -14,6 +14,8 @@ type QueueRow = {
   category: "auth" | "transactional" | "digest" | "optional";
   attempts: number;
   max_attempts: number;
+  batch_id: string | null;
+  recipient_count: number;
 };
 
 function authorized(request: NextRequest): boolean {
@@ -30,23 +32,57 @@ async function runWorker(): Promise<NextResponse> {
 
   // Tetto giornaliero prudente. Le email di auth non passano da questa coda.
   const dailyLimit = Math.max(1, Number(process.env.EMAIL_DAILY_LIMIT ?? "100") || 100);
+  const monthlyLimit = Math.max(1, Number(process.env.EMAIL_MONTHLY_LIMIT ?? "3000") || 3000);
+  const reservePercent = Math.min(
+    80,
+    Math.max(0, Number(process.env.EMAIL_RESERVE_PERCENT ?? "20") || 20)
+  );
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
+  const startOfMonth = new Date();
+  startOfMonth.setUTCDate(1);
+  startOfMonth.setUTCHours(0, 0, 0, 0);
 
-  const { count } = await supabase
-    .from("email_log")
-    .select("id", { count: "exact", head: true })
-    .gte("created_at", startOfDay.toISOString())
-    .in("status", ["sent", "delivered"]);
+  const [dayCount, monthCount] = await Promise.all([
+    supabase
+      .from("email_log")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", startOfDay.toISOString())
+      .in("status", ["sent", "delivered"]),
+    supabase
+      .from("email_log")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", startOfMonth.toISOString())
+      .in("status", ["sent", "delivered"]),
+  ]);
 
-  if ((count ?? 0) >= dailyLimit) {
+  const sentToday = dayCount.count ?? 0;
+  const sentMonth = monthCount.count ?? 0;
+
+  if (sentToday >= dailyLimit || sentMonth >= monthlyLimit) {
     return NextResponse.json(
-      { ok: false, error: "daily_limit_reached", sentToday: count ?? 0 },
+      {
+        ok: false,
+        error: sentToday >= dailyLimit ? "daily_limit_reached" : "monthly_limit_reached",
+        sentToday,
+        sentMonth,
+      },
       { status: 429 }
     );
   }
 
-  const { data, error } = await supabase.rpc("claim_email_batch", { p_limit: 10 });
+  // La quota non si consuma tutta con digest/opzionali: una parte resta
+  // riservata alle email transazionali. Auth non passa dalla coda.
+  const reserveDaily = Math.ceil((dailyLimit * reservePercent) / 100);
+  const reserveMonthly = Math.ceil((monthlyLimit * reservePercent) / 100);
+  const reserveActive =
+    dailyLimit - sentToday <= reserveDaily || monthlyLimit - sentMonth <= reserveMonthly;
+  const categories = reserveActive ? ["transactional"] : null;
+
+  const { data, error } = await supabase.rpc("claim_email_batch", {
+    p_limit: 10,
+    p_categories: categories,
+  });
 
   if (error) {
     console.error("[email-worker] claim:", error.message);
@@ -87,6 +123,8 @@ async function runWorker(): Promise<NextResponse> {
         subject: item.subject,
         status: "sent",
         provider_id: result.id ?? null,
+        batch_id: item.batch_id ?? null,
+        recipient_count: item.recipient_count ?? 1,
       });
     } else {
       failed += 1;
@@ -110,6 +148,8 @@ async function runWorker(): Promise<NextResponse> {
         subject: item.subject,
         status: "failed",
         error: result.error?.slice(0, 500) ?? "unknown",
+        batch_id: item.batch_id ?? null,
+        recipient_count: item.recipient_count ?? 1,
       });
     }
 
@@ -122,7 +162,9 @@ async function runWorker(): Promise<NextResponse> {
     processed: batch.length,
     sent,
     failed,
-    sentToday: (count ?? 0) + sent,
+    sentToday: sentToday + sent,
+    sentMonth: sentMonth + sent,
+    reserveActive,
   });
 }
 

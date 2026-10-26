@@ -167,3 +167,48 @@ export async function sendTelegramActivityTestAction(): Promise<TelegramTestResu
 
   return result;
 }
+
+export type EmailRetryResult = {
+  ok: boolean;
+  count?: number;
+  categories?: Record<string, number>;
+  dryRun?: boolean;
+  error?: "unauthorized" | "failed";
+};
+
+/** Anteprima o retry reale delle email fallite, a lotti. */
+export async function retryFailedEmailsAction(input: {
+  ids?: string[];
+  dryRun: boolean;
+}): Promise<EmailRetryResult> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("admin_retry_email_queue", {
+    p_ids: input.ids && input.ids.length > 0 ? input.ids : null,
+    p_dry_run: input.dryRun,
+  });
+
+  if (error || !data) {
+    console.error("[admin] retryFailedEmails:", error?.message);
+    return { ok: false, error: "failed" };
+  }
+
+  const result = data as unknown as {
+    count?: number;
+    categories?: Record<string, number>;
+    dryRun?: boolean;
+  };
+
+  if (!input.dryRun) {
+    revalidatePath("/admin/email");
+    revalidatePath("/admin");
+  }
+
+  return {
+    ok: true,
+    count: result.count ?? 0,
+    categories: result.categories ?? {},
+    dryRun: result.dryRun === true,
+  };
+}
