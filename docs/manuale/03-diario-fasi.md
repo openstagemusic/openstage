@@ -625,6 +625,24 @@ deploy.
 
 **Rimandato:** pannello comunicazione con quota, retry e export (Fase 8.6).
 
+## Fase 8.6 - Comunicazione email
+
+**Obiettivo:** gestire la coda email dall'admin senza trasformarla in una newsletter.
+
+**Cosa è stato costruito**
+
+- Pannello `/admin/email` con coda, falliti, registro, categoria e stato.
+- Quota giornaliera e mensile, riserva per le email transazionali e blocco automatico sopra
+  soglia nel worker.
+- Retry a lotti con anteprima dry run, selezione delle singole email e audit.
+- Export CSV/JSON di coda e registro; nessun corpo email, nessun tracking.
+- Batch e numero destinatari nella coda e nel registro.
+
+**Verifiche superate:** statistiche reali, retry in transazione, export CSV, pagina admin,
+build e deploy.
+
+**Rimandato:** pannello notifiche admin aggregato (8.7) e AI assistita (8.8).
+
 ## Fase 8.6a e 8.6b - Avvisi Telegram
 
 **Obiettivo:** avvisare l'admin sul telefono quando qualcosa richiede attenzione.

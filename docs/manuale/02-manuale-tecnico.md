@@ -144,6 +144,9 @@ quando ne aggiungi una, impostala su tutti e tre.
 | `RESEND_WEBHOOK_SECRET` | Resend → Webhooks | Firma del webhook consegne/errori |
 | `UNSUBSCRIBE_SECRET` | Scelta interna | Firma i link di disiscrizione senza login |
 | `EMAIL_WORKER_SECRET` | Scelta interna | Protegge il worker della coda email |
+| `EMAIL_DAILY_LIMIT` | Scelta interna | Tetto giornaliero della coda (predefinito 100) |
+| `EMAIL_MONTHLY_LIMIT` | Scelta interna | Tetto mensile della coda (predefinito 3000) |
+| `EMAIL_RESERVE_PERCENT` | Scelta interna | Percentuale di quota riservata alle transazionali (predefinito 20) |
 | `TELEGRAM_BOT_TOKEN` | BotFather | Bot Telegram per le code admin |
 | `TELEGRAM_ADMIN_CHAT_ID` | Telegram / @userinfobot | Chat che riceve gli avvisi admin |
 | `TELEGRAM_ACTIVITY_BOT_TOKEN` | BotFather | Secondo bot per registrazioni ed eventi |
@@ -262,7 +265,7 @@ staff. È leggibile solo dall'admin.
 scadenza, priorità e chiave di deduplica. RLS sul proprietario.
 
 **`email_queue` / `email_log`** - coda e registro delle email: categoria, stato, tentativi,
-errore, provider id, idempotenza e webhook Resend.
+errore, provider id, idempotenza, `batch_id`, `recipient_count` e webhook Resend.
 
 **`notification_preferences` / `digest`** - preferenze per tipo e digest settimanale opt-in;
 la disiscrizione usa un token firmato.
@@ -305,7 +308,8 @@ resta in Supabase Auth.
 | `admin_create_claim_invite(...)`, `accept_claim_invite(...)`, `admin_revoke_claim_invite(...)` | Invito, accettazione e revoca del claim |
 | `admin_update_contact_ticket(...)`, `admin_log_contact_reply(...)` | Priorità/assegnazione ticket, risposta e notifica in-app |
 | `notify_admin_telegram(...)`, `notify_activity_telegram(...)` | Avvisi Telegram con dedupe, via rotta Vercel protetta |
-| `claim_email_batch(...)` | Worker della coda email |
+| `claim_email_batch(...)` | Worker della coda email, con filtro per categoria |
+| `admin_email_stats()`, `admin_retry_email_queue(...)` | Statistiche, quota e retry controllato delle email fallite |
 | Trigger | `on_auth_user_created`, `profiles_guard`, `artists_touch`, `venues_touch`, `events_touch`, `settings_touch`, `events_rate_limit`, `events_log_creation`, `events_require_review`, `events_require_page`, `events_block_suspended`, `reports_apply_threshold`, `telegram_on_*` |
 
 ## Indici
@@ -381,6 +385,7 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0045_telegram_alerts.sql` | Avvisi Telegram admin |
 | `0046_telegram_via_vercel.sql` | Telegram tramite rotta Vercel |
 | `0047_activity_telegram.sql` | Bot Telegram attività |
+| `0048_email_panel.sql` | Batch, RLS admin, statistiche e retry email |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0028`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
@@ -572,6 +577,7 @@ di accesso è doppio: `is_admin()` nel database e 2FA AAL2 nella sessione. La pa
 | `/admin/eventi`, `/admin/bozze` | Serate e revisione |
 | `/admin/segnalazioni` | Segnalazioni eventi |
 | `/admin/messaggi` | Ticket, priorità, assegnazione, risposte |
+| `/admin/email` | Coda, falliti, registro, quota, retry ed export |
 | `/admin/audit` | Registro azioni |
 | `/admin/sicurezza` | 2FA e sospensione temporanea |
 | `/admin/impostazioni` | Bot Telegram e test |
@@ -582,9 +588,8 @@ chiamano `/api/admin/telegram/alert` o `/api/admin/telegram/activity`, protette 
 con il token del bot. Le rotte inviano il messaggio con le variabili Vercel; i token sono
 anche in Supabase Vault per autorizzare le chiamate dal database.
 
-**Cosa non c'è ancora.** Pannello comunicazione completo (quota Resend, dry run, retry a
-lotti, export), pannello notifiche admin aggregato e automazioni AI. Sono le prossime
-sotto-fasi.
+**Cosa non c'è ancora.** Pannello notifiche admin aggregato e automazioni AI. Sono le
+prossime sotto-fasi.
 
 # Deploy e rilascio
 
@@ -696,6 +701,6 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 8.5 | ✅ Centro assistenza: ticket, priorità, assegnazione, storico, risposte |
 | 8.6a | ✅ Avvisi Telegram per le code admin |
 | 8.6b | ✅ Secondo bot Telegram per registrazioni ed eventi |
-| 8.6 (resto) | ⏳ Pannello comunicazione: quota Resend, dry run, retry a lotti, export |
+| 8.6 | ✅ Comunicazione: registro, coda, quota Resend, riserva, dry run, retry ed export |
 | 8.7 | ⏳ Pannello notifiche admin aggregato |
 | 8.8 | ⏳ Automazioni AI assistite, sempre con approvazione umana |

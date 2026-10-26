@@ -26,10 +26,10 @@ artisti e locali, editor eventi con bozze e locandine, mappa interattiva, pagine
 calendario e condivisione, ricerca con suggerimenti, preferiti, segnalazioni e moderazione,
 Home poster wall, pagine pubbliche, indice e pagine città, modulo contatti che diventa ticket,
 email transazionali, centro notifiche e digest, Area Fan, control room admin con 2FA e audit,
-claim a invito, centro assistenza e avvisi Telegram.
+claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram.
 
-**In arrivo:** pannello comunicazione con quota Resend e dry run, notifiche admin aggregate,
-automazioni AI assistite, community e follow, Spotify, pagamenti opzionali e rifiniture SEO.
+**In arrivo:** notifiche admin aggregate, automazioni AI assistite, community e follow,
+Spotify, pagamenti opzionali e rifiniture SEO.
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
 oppure pubblicati da artisti e locali dopo il reclamo della scheda. La Home mostra le serate
@@ -317,6 +317,7 @@ finestra breve senza cancellare la chiave TOTP.
 | **Eventi / Bozze** | Serate pubblicate e bozze da revisione |
 | **Segnalazioni** | Risoluzione, archiviazione, riapertura |
 | **Ticket e messaggi** | Priorità, assegnazione, storico e risposta email |
+| **Email** | Coda, falliti, registro, quota Resend, retry ed export |
 | **Audit** | Registro delle azioni admin |
 | **Sicurezza** | 2FA e sospensione temporanea |
 | **Impostazioni** | Stato e test dei due bot Telegram |
