@@ -6,8 +6,8 @@
 > segnalazioni, audit), 8.4 (claim a invito), 8.5 (ticket e messaggi),
 > 8.6 (comunicazione email con quota e retry), 8.6a (avvisi Telegram admin),
 > 8.6b (bot attività), 8.7 (notifiche admin), 8.8.1 (bozze AI), 8.8.2
-> (import evento) e 8.8.3 (verifica assistita).** Restano 8.8.4/8.8.5,
-> "crea per conto di" e i debiti B52/backup.
+> (import evento) e 8.8.3 (verifica assistita).** Restano B74 (crea per
+> conto di), B75 (copertina nell'import AI), 8.8.4/8.8.5 e i debiti B52/backup.
 
 ## Obiettivo
 
@@ -230,7 +230,9 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 8.4 claim a invito, 8.5 centro assistenza, 8.6a avvisi Telegram admin, 8.6b bot attività.
 
 **Fatto anche 8.8.3:** verifica schede con controlli deterministici e riepilogo AI, sempre
-subordinata all'approvazione umana. **Prossimo blocco:** 8.8.4 qualità dati e doppioni.
+subordinata all'approvazione umana. **Prossimo blocco:** B74 "crea per conto di" e B75
+copertina nell'import AI, perché l'import attuale crea una bozza admin che non rientra
+nella coda delle prime pubblicazioni. Poi 8.8.4 qualità dati e doppioni.
 
 **Debito aperto prima della chiusura:** B68 (bozze solo prime pubblicazioni), B52 (filtri,
 paginazione ed export delle altre liste), backup e notice & takedown.

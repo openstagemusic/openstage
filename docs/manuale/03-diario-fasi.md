@@ -662,6 +662,61 @@ deploy.
 
 **Rimandato:** pannello comunicazione completo, quota Resend e export; AI assistita.
 
+## Fase 8.8.1 - Assistente AI e bozze risposte
+
+**Obiettivo:** introdurre l'AI come assistente dell'admin, mai come decisore.
+
+**Cosa è stato costruito**
+
+- Client AI su Vercel AI Gateway con modello economico `amazon/nova-lite`.
+- Prompt versionati, schema Zod e registro `ai_runs` con token, costo stimato ed esito.
+- Budget mensile di 5 $ e limite giornaliero configurabili.
+- Pulsante **Bozza AI** nella risposta ai ticket: la bozza viene scritta nel campo, l'admin
+  la modifica e decide se inviarla.
+- Pannello uso AI in `/admin/impostazioni`.
+
+**Verifiche superate:** bozza reale generata su un ticket, costo registrato, nessun invio
+automatico, build e deploy.
+
+**Rimandato:** import evento con copertina, qualità dati/doppioni, triage segnalazioni.
+
+## Fase 8.8.2 - Import evento da testo o link
+
+**Obiettivo:** preparare i campi di un evento partendo da un testo o una pagina pubblica.
+
+**Cosa è stato costruito**
+
+- Pagina `/admin/ai` con testo libero e link pubblico opzionale.
+- Fetch protetto da SSRF: solo http/https, niente localhost/IP privati, redirect e timeout
+  limitati, tetto di byte.
+- Estrazione validata di titolo, artista, locale, città, indirizzo, data, ora, genere,
+  descrizione, prezzo e link biglietti.
+- Anteprima modificabile e salvataggio come bozza nell'editor eventi.
+
+**Verifiche superate:** estrazione reale da testo, bozza creata e poi rimossa, build e deploy.
+
+**Rimandato:** l'immagine di copertina non viene ancora importata (B75). L'import va inoltre
+agganciato al flusso "crea per conto di" (B74), altrimenti la bozza resta generica dell'admin
+e non entra nella coda delle prime pubblicazioni.
+
+## Fase 8.8.3 - Verifica schede assistita
+
+**Obiettivo:** affiancare all'admin una checklist oggettiva e un riepilogo AI, senza
+automatizzare l'approvazione.
+
+**Cosa è stato costruito**
+
+- Controlli deterministici su email, prova HTTPS/raggiungibile, città, indirizzo, coordinate,
+  sito, Spotify ed eventi esistenti.
+- Punteggio indicativo e riepilogo AI con possibili incoerenze.
+- Pulsante **Verifica assistita** in Claim e verifiche; l'approvazione resta manuale.
+- Ogni analisi viene registrata in `ai_runs`.
+
+**Verifiche superate:** analisi su una scheda reale, punteggio e criticità coerenti, build e
+deploy.
+
+**Rimandato:** qualità dati/doppioni (8.8.4) e triage segnalazioni (8.8.5).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

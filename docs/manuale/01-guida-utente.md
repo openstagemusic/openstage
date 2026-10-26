@@ -26,10 +26,11 @@ artisti e locali, editor eventi con bozze e locandine, mappa interattiva, pagine
 calendario e condivisione, ricerca con suggerimenti, preferiti, segnalazioni e moderazione,
 Home poster wall, pagine pubbliche, indice e pagine città, modulo contatti che diventa ticket,
 email transazionali, centro notifiche e digest, Area Fan, control room admin con 2FA e audit,
-claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram.
+claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram e assistente AI per bozze, import eventi e verifica schede.
 
-**In arrivo:** notifiche admin aggregate, automazioni AI assistite, community e follow,
-Spotify, pagamenti opzionali e rifiniture SEO.
+**In arrivo:** creazione eventi per conto di artisti/locali, import della copertina, qualità
+dati e doppioni, community e follow, Spotify, pagamenti opzionali, Help Center completo e
+rifiniture SEO.
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
 oppure pubblicati da artisti e locali dopo il reclamo della scheda. La Home mostra le serate
@@ -320,7 +321,8 @@ finestra breve senza cancellare la chiave TOTP.
 | **Email** | Coda, falliti, registro, quota Resend, retry ed export |
 | **Audit** | Registro delle azioni admin |
 | **Sicurezza** | 2FA e sospensione temporanea |
-| **Impostazioni** | Stato e test dei due bot Telegram |
+| **Impostazioni** | Stato e test dei due bot Telegram, uso AI |
+| **AI** | Bozze risposte, import evento, verifica schede |
 
 Ogni azione distruttiva chiede conferma e finisce nell'audit. Telegram avvisa l'admin quando
 arriva un ticket, una richiesta, una segnalazione, una bozza da revisione o un'email fallita;
