@@ -224,8 +224,10 @@ export type DraftEvent = {  id: string;
 };
 
 const DRAFT_SELECT =
-  "id, slug, title, starts_at, city, artists ( name ), venues ( name ), " +
-  "profiles!events_created_by_fkey ( email )";
+  "id, slug, title, starts_at, city, " +
+  "artists ( name, profiles!artists_profile_id_fkey ( verified_at ) ), " +
+  "venues ( name, profiles!venues_profile_id_fkey ( verified_at ) ), " +
+  "profiles!events_created_by_fkey ( email, verified_at )";
 
 type DraftRow = {
   id: string;
@@ -233,9 +235,9 @@ type DraftRow = {
   title: string;
   starts_at: string;
   city: string | null;
-  artists: { name: string } | null;
-  venues: { name: string } | null;
-  profiles: { email: string | null } | null;
+  artists: { name: string; profiles: { verified_at: string | null } | null } | null;
+  venues: { name: string; profiles: { verified_at: string | null } | null } | null;
+  profiles: { email: string | null; verified_at: string | null } | null;
 };
 
 /**
@@ -256,16 +258,26 @@ export async function listDraftEvents(): Promise<DraftEvent[]> {
     return [];
   }
 
-  return (data as unknown as DraftRow[]).map((row) => ({
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    startsAt: row.starts_at,
-    city: row.city,
-    authorEmail: row.profiles?.email ?? null,
-    artistName: row.artists?.name ?? null,
-    venueName: row.venues?.name ?? null,
-  }));
+  // Solo le bozze che aspettano davvero una revisione: se autore o
+  // proprietario della scheda collegata è verificato, la bozza è una scelta
+  // personale e resta fuori dalla coda admin (B68).
+  return (data as unknown as DraftRow[])
+    .filter(
+      (row) =>
+        row.profiles?.verified_at == null &&
+        row.artists?.profiles?.verified_at == null &&
+        row.venues?.profiles?.verified_at == null
+    )
+    .map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      startsAt: row.starts_at,
+      city: row.city,
+      authorEmail: row.profiles?.email ?? null,
+      artistName: row.artists?.name ?? null,
+      venueName: row.venues?.name ?? null,
+    }));
 }
 
 export type VerifiedProfile = {
