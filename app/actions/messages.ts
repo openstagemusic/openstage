@@ -7,6 +7,7 @@ import { sendContactReply } from "@/lib/email";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import type { ContactMessageStatus, ContactPriority } from "@/lib/messages/queries";
+import { draftReplyForTicket } from "@/lib/ai/tasks/draft-reply";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -153,4 +154,37 @@ export async function adminReplyToMessageAction(input: {
   revalidatePath("/admin");
 
   return { ok: true };
+}
+
+export type AiDraftOutcome = {
+  ok: boolean;
+  reply?: string;
+  error?: "unauthorized" | "invalid" | "not_configured" | "budget" | "failed";
+};
+
+/** Bozza AI per un ticket: nessun invio, l'admin la modifica e decide. */
+export async function draftReplyAction(input: {
+  messageId: string;
+}): Promise<AiDraftOutcome> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+  if (!UUID.test(input.messageId)) return { ok: false, error: "invalid" };
+
+  const supabase = await createClient();
+  const { data: message, error } = await supabase
+    .from("contact_messages")
+    .select("id, message, topic, locale")
+    .eq("id", input.messageId)
+    .maybeSingle();
+
+  if (error || !message) {
+    if (error) console.error("[messages] draftReply read:", error.message);
+    return { ok: false, error: "failed" };
+  }
+
+  return draftReplyForTicket({
+    messageId: message.id,
+    message: message.message,
+    topic: message.topic,
+    locale: message.locale === "en" ? "en" : "it",
+  });
 }

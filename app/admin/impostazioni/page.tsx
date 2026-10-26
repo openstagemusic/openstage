@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import AdminAiUsagePanel from "@/components/admin/AdminAiUsagePanel";
 import AdminTelegramPanel from "@/components/admin/AdminTelegramPanel";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { isTelegramConfigured } from "@/lib/telegram";
+import { getAiUsage, isAiConfigured } from "@/lib/ai/client";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -14,6 +16,7 @@ export default async function AdminSettingsPage() {
 
   const locale = await getLocale();
   const dict = getDictionary(locale);
+  const [aiUsage] = await Promise.all([getAiUsage()]);
 
   return (
     <div>
@@ -34,6 +37,11 @@ export default async function AdminSettingsPage() {
         configured={isTelegramConfigured("activity")}
         dict={dict.admin}
         kind="activity"
+      />
+      <AdminAiUsagePanel
+        configured={isAiConfigured()}
+        usage={aiUsage}
+        dict={dict.admin}
       />
     </div>
   );

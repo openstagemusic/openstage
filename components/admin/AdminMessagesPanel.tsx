@@ -7,6 +7,7 @@ import {
   adminReplyToMessageAction,
   adminSetMessageStatusAction,
   adminUpdateTicketAction,
+  draftReplyAction,
 } from "@/app/actions/messages";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -61,6 +62,9 @@ export default function AdminMessagesPanel({
   const [replyError, setReplyError] = useState<string | null>(null);
   const [ticketBusy, setTicketBusy] = useState<string | null>(null);
   const [ticketNotice, setTicketNotice] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState<string | null>(null);
+  const [aiNotice, setAiNotice] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const dateTime = new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
     dateStyle: "medium",
@@ -151,6 +155,30 @@ export default function AdminMessagesPanel({
     }
 
     router.refresh();
+  }
+
+  async function draftReply(messageId: string) {
+    setAiBusy(messageId);
+    setAiNotice(null);
+    setAiError(null);
+
+    const outcome = await draftReplyAction({ messageId });
+    setAiBusy(null);
+
+    if (!outcome.ok || !outcome.reply) {
+      setAiError(
+        outcome.error === "budget"
+          ? dict.aiDraftBudget
+          : outcome.error === "not_configured"
+            ? dict.aiDraftNotConfigured
+            : dict.aiDraftFailed
+      );
+      return;
+    }
+
+    setReplyId(messageId);
+    setReplyText(outcome.reply);
+    setAiNotice(dict.aiDraftReady);
   }
 
   async function sendReply(messageId: string) {
@@ -381,6 +409,19 @@ export default function AdminMessagesPanel({
                       placeholder={dict.messagesReplyPlaceholder}
                     />
                     {replyError ? <p className="mt-2 text-xs text-pink">{replyError}</p> : null}
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={aiBusy === message.id}
+                        onClick={() => void draftReply(message.id)}
+                        className="inline-flex min-h-9 items-center border border-cyan/50 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-cyan transition-colors hover:bg-cyan/10 disabled:opacity-50"
+                      >
+                        {aiBusy === message.id ? dict.aiDrafting : dict.aiDraftButton}
+                      </button>
+                      <span className="text-[10px] text-muted">{dict.aiDraftHint}</span>
+                    </div>
+                    {aiNotice ? <p className="mt-2 text-xs text-cyan">{aiNotice}</p> : null}
+                    {aiError ? <p className="mt-2 text-xs text-pink">{aiError}</p> : null}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <button
                         type="submit"
