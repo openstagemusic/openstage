@@ -33,7 +33,7 @@ export const ADMIN_MODULES: AdminModule[] = [
     key: "notifications",
     href: "/admin/notifiche",
     group: "communication",
-    status: "soon",
+    status: "active",
     labelKey: "notifications",
   },
   { key: "audit", href: "/admin/audit", group: "system", status: "active", labelKey: "audit" },

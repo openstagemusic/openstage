@@ -212,3 +212,84 @@ export async function retryFailedEmailsAction(input: {
     dryRun: result.dryRun === true,
   };
 }
+
+export type NotificationPreviewResult = {
+  ok: boolean;
+  count: number;
+  label?: string;
+  error?: "unauthorized" | "not_found" | "failed";
+};
+
+/** Anteprima del target: nessuna scrittura. */
+export async function previewNotificationTargetAction(input: {
+  mode: "user" | "role";
+  value: string;
+}): Promise<NotificationPreviewResult> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, count: 0, error: "unauthorized" };
+
+  const { resolveNotificationTarget } = await import("@/lib/admin/notifications");
+  const target = await resolveNotificationTarget(input);
+
+  if (!target.ok) {
+    return { ok: false, count: 0, error: target.error ?? "failed" };
+  }
+
+  return {
+    ok: true,
+    count: target.count,
+    label: input.mode === "user" ? target.email : input.value,
+  };
+}
+
+export type NotificationSendResult = {
+  ok: boolean;
+  count?: number;
+  error?: "unauthorized" | "invalid" | "failed";
+};
+
+/** Invia una notifica in-app a un utente o a un ruolo, con audit. */
+export async function sendManualNotificationAction(input: {
+  mode: "user" | "role";
+  value: string;
+  title: string;
+  body: string;
+  href?: string | null;
+}): Promise<NotificationSendResult> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+
+  const title = input.title.trim();
+  const body = input.body.trim();
+  const href = input.href?.trim() || null;
+
+  if (title.length < 3 || title.length > 120 || body.length < 5 || body.length > 1000) {
+    return { ok: false, error: "invalid" };
+  }
+
+  if (href && !href.startsWith("/")) return { ok: false, error: "invalid" };
+
+  const { resolveNotificationTarget } = await import("@/lib/admin/notifications");
+  const target = await resolveNotificationTarget(input);
+
+  if (!target.ok || target.count === 0) {
+    return { ok: false, error: target.error === "failed" ? "failed" : "invalid" };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("admin_send_manual_notification", {
+    p_user_id: input.mode === "user" ? target.userId ?? null : null,
+    p_role: input.mode === "role" ? input.value : null,
+    p_title: title,
+    p_body: body,
+    p_href: href,
+  });
+
+  if (error || data === null) {
+    console.error("[admin] sendManualNotification:", error?.message);
+    return { ok: false, error: "failed" };
+  }
+
+  revalidatePath("/admin/notifiche");
+  revalidatePath("/admin");
+
+  return { ok: true, count: Number(data) };
+}
