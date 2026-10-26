@@ -40,7 +40,7 @@ export const ADMIN_MODULES: AdminModule[] = [
   { key: "security", href: "/admin/sicurezza", group: "system", status: "active", labelKey: "security" },
   { key: "settings", href: "/admin/impostazioni", group: "system", status: "active", labelKey: "settings" },
   { key: "jobs", href: "/admin/jobs", group: "system", status: "soon", labelKey: "jobs" },
-  { key: "ai", href: "/admin/ai", group: "ai", status: "soon", labelKey: "ai" },
+  { key: "ai", href: "/admin/ai", group: "ai", status: "active", labelKey: "ai" },
 ];
 
 export const ADMIN_GROUP_ORDER: AdminGroup[] = [
