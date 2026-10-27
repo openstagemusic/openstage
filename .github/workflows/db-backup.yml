@@ -1,0 +1,127 @@
+name: Database backup
+
+on:
+  schedule:
+    # Ogni domenica alle 03:00 UTC (05:00 in Italia, ora legale).
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Dump, cifra e archivia
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+
+    steps:
+      - name: Controlla i secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in SUPABASE_DB_URL SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY BACKUP_PASSPHRASE; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error ::Manca il secret GitHub $name"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Installa il client PostgreSQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl ca-certificates gnupg lsb-release
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
+
+      - name: Crea il dump
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAMP="$(date -u +'%Y%m%d-%H%M%S')"
+          echo "STAMP=$STAMP" >> "$GITHUB_ENV"
+          FILE="openstage-$STAMP.dump"
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+            --no-owner \
+            --no-privileges \
+            --format=custom \
+            --file="$FILE"
+          test -s "$FILE"
+          /usr/lib/postgresql/17/bin/pg_restore --list "$FILE" > /dev/null
+          echo "Dump creato: $(du -h "$FILE" | cut -f1)"
+
+      - name: Cifra e calcola il checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="openstage-$STAMP.dump"
+          gpg --batch --yes --symmetric --cipher-algo AES256 \
+            --passphrase-fd 3 3<<<"$BACKUP_PASSPHRASE" "$FILE"
+          sha256sum "$FILE.gpg" > "$FILE.gpg.sha256"
+          test -s "$FILE.gpg"
+
+      - name: Archivia su GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_number }}
+          path: |
+            openstage-*.dump.gpg
+            openstage-*.dump.gpg.sha256
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Copia nel bucket Supabase
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="openstage-$STAMP.dump.gpg"
+          CHECKSUM="$FILE.sha256"
+          for local in "$FILE" "$CHECKSUM"; do
+            curl --fail --silent --show-error \
+              -X POST "$SUPABASE_URL/storage/v1/object/backups/$local" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+              -H "Content-Type: application/octet-stream" \
+              -H "x-upsert: false" \
+              --data-binary @"$local"
+          done
+
+      - name: Ruota i backup nel bucket
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            -X POST "$SUPABASE_URL/storage/v1/object/list/backups" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"prefix":"","limit":1000}' > backup-list.json
+          jq -r '.[] | select(.name | test("\\.dump\\.gpg$")) | .name' backup-list.json \
+            | sort | head -n -12 > backup-old.txt
+          while IFS= read -r old; do
+            [ -z "$old" ] && continue
+            curl --fail --silent --show-error -X DELETE \
+              "$SUPABASE_URL/storage/v1/object/backups/$old" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+            curl --silent --show-error -X DELETE \
+              "$SUPABASE_URL/storage/v1/object/backups/$old.sha256" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" || true
+          done < backup-old.txt
