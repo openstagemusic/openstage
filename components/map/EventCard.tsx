@@ -77,7 +77,9 @@ export default function EventCard({
     <article
       className={cn(
         "w-full overflow-hidden border border-line-strong bg-surface/95 text-left backdrop-blur",
-        isSheet ? "rounded-3xl" : "rounded-2xl"
+        isSheet
+          ? "rounded-3xl"
+          : "max-h-[min(65vh,360px)] overflow-y-auto rounded-2xl"
       )}
     >
       {isSheet ? (

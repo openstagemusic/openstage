@@ -545,6 +545,9 @@ export default function MapCanvas({
       popupRef.current = new Popup({
         closeButton: true,
         closeOnClick: false,
+        // Il pop-up desktop sta sopra il pin: senza l'ancoraggio esplicito
+        // MapLibre lo apriva sotto e la scheda finiva tagliata dal bordo.
+        anchor: "bottom",
         offset: 18,
         maxWidth: "22rem",
         className: "openstage-popup",

@@ -250,7 +250,7 @@ export default function GlobeMap({
             isAuthenticated={isAuthenticated}
             locale={locale}
             popupEnabled={!isMobile}
-            popupTopInset={overlay ? 340 : 220}
+            popupTopInset={overlay ? 560 : 360}
             bottomInset={variant === "fullscreen"}
             ariaLabel={dict.map.title}
             onSelect={setSelection}
