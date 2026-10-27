@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { artistPath } from "@/lib/events/paths";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { createClient } from "@/lib/supabase/client";
 
@@ -16,13 +15,17 @@ import {
   authPrimaryButtonClass,
 } from "./formStyles";
 
+/**
+ * Prima scheda dell'artista: basta il nome.
+ *
+ * Il resto (città, genere, Spotify, bio) si completa dal pannello profilo, dove
+ * si può correggere con calma. Il pulsante quindi porta a `/account`, non alla
+ * pagina pubblica: la scheda è appena nata e va rifinita.
+ */
 export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"] }) {
   const router = useRouter();
   const locale = useLocale();
   const [name, setName] = useState("");
-  const [city, setCity] = useState("");
-  const [genre, setGenre] = useState("");
-  const [spotifyUrl, setSpotifyUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -42,16 +45,10 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
       return;
     }
 
-    const { data: created, error: insertError } = await supabase
+    const { error: insertError } = await supabase
       .from("artists")
-      .insert({
-        profile_id: user.id,
-        name,
-        city: city || null,
-        genre: genre || null,
-        spotify_url: spotifyUrl || null,
-      })
-      .select("id, slug")
+      .insert({ profile_id: user.id, name })
+      .select("id")
       .single();
 
     if (insertError) {
@@ -60,11 +57,7 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
       return;
     }
 
-    // La scheda appena creata è il profilo: si prosegue da lì, non dal modulo
-    // evento. Chi vuole pubblicare trova "Crea evento" dentro la sua dashboard.
-    router.push(
-      withLocale(locale, created?.slug ? artistPath({ slug: created.slug }) : "/account")
-    );
+    router.push(withLocale(locale, "/account"));
     router.refresh();
   }
 
@@ -80,54 +73,6 @@ export default function OnboardingForm({ dict }: { dict: Dictionary["onboarding"
           required
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className={authInputClass}
-        />
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="city" className={authLabelClass}>
-            {dict.city}
-          </label>
-          <input
-            id="city"
-            type="text"
-            value={city}
-            onChange={(event) => setCity(event.target.value)}
-            className={authInputClass}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="genre" className={authLabelClass}>
-            {dict.genre}
-          </label>
-          <select
-            id="genre"
-            value={genre}
-            onChange={(event) => setGenre(event.target.value)}
-            className={authInputClass}
-          >
-            <option value="">{dict.genrePlaceholder}</option>
-            {dict.genres.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="spotifyUrl" className={authLabelClass}>
-          {dict.spotifyUrl}
-        </label>
-        <input
-          id="spotifyUrl"
-          type="url"
-          placeholder="https://open.spotify.com/artist/..."
-          value={spotifyUrl}
-          onChange={(event) => setSpotifyUrl(event.target.value)}
           className={authInputClass}
         />
       </div>

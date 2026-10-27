@@ -57,9 +57,30 @@ export async function analyzeEventAction(input: {
   return { ok: true, data: parsed.data, imageUrl };
 }
 
+export type PageMatch = { id: string; name: string; city: string | null };
+
+export type NewPageInput = {
+  name: string;
+  city?: string | null;
+  address?: string | null;
+  /** L'admin ha visto un possibile doppione e conferma comunque la scheda nuova. */
+  allowDuplicate?: boolean;
+};
+
 export type CreateAdminEventResult =
-  | { ok: true; eventId: string; coverImported: boolean; coverRequested: boolean }
-  | { ok: false; error: "unauthorized" | "invalid" | "failed" };
+  | {
+      ok: true;
+      eventId: string;
+      pageId: string;
+      pageCreated: boolean;
+      coverImported: boolean;
+      coverRequested: boolean;
+    }
+  | {
+      ok: false;
+      error: "unauthorized" | "invalid" | "failed" | "duplicate";
+      matches?: PageMatch[];
+    };
 
 function validHttpUrl(value: string | null): string | null {
   if (!value) return null;
@@ -71,10 +92,71 @@ function validHttpUrl(value: string | null): string | null {
   }
 }
 
-/** Crea una bozza o pubblica un evento per conto di un artista/locale. */
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => "\\" + char);
+}
+
+/** Schede con un nome simile: servono a fermare i doppioni prima di crearne una nuova. */
+async function findPageMatches(
+  ownerType: "artist" | "venue",
+  name: string,
+  city: string | null
+): Promise<PageMatch[]> {
+  const term = name.trim();
+  if (!term) return [];
+
+  const supabase = await createClient();
+  const table = ownerType === "artist" ? "artists" : "venues";
+  const { data, error } = await supabase
+    .from(table)
+    .select("id, name, city")
+    .ilike("name", "%" + escapeLike(term) + "%")
+    .limit(8);
+
+  if (error) {
+    console.error("[ai] findPageMatches:", error.message);
+    return [];
+  }
+
+  const wantedCity = city?.trim().toLowerCase() || null;
+
+  return ((data as unknown as PageMatch[] | null) ?? [])
+    .sort((a, b) => {
+      const aSame = wantedCity && a.city?.trim().toLowerCase() === wantedCity ? 0 : 1;
+      const bSame = wantedCity && b.city?.trim().toLowerCase() === wantedCity ? 0 : 1;
+      return aSame - bSame || a.name.localeCompare(b.name);
+    })
+    .slice(0, 5);
+}
+
+/** Controllo doppioni richiesto dalla schermata prima della conferma. */
+export async function findPageMatchesAction(input: {
+  ownerType: "artist" | "venue";
+  name: string;
+  city?: string | null;
+}): Promise<
+  { ok: true; matches: PageMatch[] } | { ok: false; error: "unauthorized" | "invalid" }
+> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
+  if (!input.name.trim()) return { ok: false, error: "invalid" };
+
+  return {
+    ok: true,
+    matches: await findPageMatches(input.ownerType, input.name, input.city ?? null),
+  };
+}
+
+/**
+ * Crea una bozza o pubblica un evento per conto di un artista/locale.
+ *
+ * Se `ownerId` c'è, l'evento si aggancia a quella scheda e basta. Se manca,
+ * viene creata una scheda **libera** (`profile_id` nullo): non appartiene a
+ * nessuno, quindi l'artista o il locale può reclamarla in seguito.
+ */
 export async function createAdminEventAction(input: {
   ownerType: "artist" | "venue";
-  ownerId: string;
+  ownerId?: string | null;
+  newPage?: NewPageInput | null;
   status: "draft" | "published";
   data: ParsedEvent;
   coverSourceUrl?: string | null;
@@ -111,13 +193,61 @@ export async function createAdminEventAction(input: {
 
   const supabase = await createClient();
   const ownerTable = input.ownerType === "artist" ? "artists" : "venues";
-  const { data: owner, error: ownerError } = await supabase
-    .from(ownerTable)
-    .select("id, name, city")
-    .eq("id", input.ownerId)
-    .maybeSingle();
 
-  if (ownerError || !owner) return { ok: false, error: "invalid" };
+  let owner: { id: string; name: string; city: string | null } | null = null;
+  let pageCreated = false;
+
+  if (input.ownerId) {
+    const { data: found, error: ownerError } = await supabase
+      .from(ownerTable)
+      .select("id, name, city")
+      .eq("id", input.ownerId)
+      .maybeSingle();
+
+    if (ownerError || !found) return { ok: false, error: "invalid" };
+    owner = found;
+  } else {
+    const pageName = (input.newPage?.name ?? "").trim();
+    if (!pageName) return { ok: false, error: "invalid" };
+
+    const pageCity = input.newPage?.city?.trim() || data.city?.trim() || null;
+    const pageAddress = input.newPage?.address?.trim() || data.address?.trim() || null;
+
+    // La città serve anche a pubblicare: si controlla prima di creare la scheda,
+    // altrimenti un errore lascerebbe una scheda libera senza evento.
+    if (input.status === "published" && !data.city?.trim() && !pageCity) {
+      return { ok: false, error: "invalid" };
+    }
+
+    // Il controllo si ripete qui: tra la conferma nell'interfaccia e il salvataggio
+    // può essere nata un'altra scheda con lo stesso nome.
+    const matches = await findPageMatches(input.ownerType, pageName, pageCity);
+
+    if (matches.length > 0 && !input.newPage?.allowDuplicate) {
+      return { ok: false, error: "duplicate", matches };
+    }
+
+    const created =
+      input.ownerType === "artist"
+        ? await supabase
+            .from("artists")
+            .insert({ profile_id: null, name: pageName, city: pageCity, genre: data.genre })
+            .select("id, name, city")
+            .single()
+        : await supabase
+            .from("venues")
+            .insert({ profile_id: null, name: pageName, city: pageCity, address: pageAddress })
+            .select("id, name, city")
+            .single();
+
+    if (created.error || !created.data) {
+      console.error("[ai] createAdminPage:", created.error?.message);
+      return { ok: false, error: "failed" };
+    }
+
+    owner = created.data;
+    pageCreated = true;
+  }
 
   const city = data.city?.trim() || owner.city?.trim() || null;
   if (input.status === "published" && !city) return { ok: false, error: "invalid" };
@@ -179,6 +309,18 @@ export async function createAdminEventAction(input: {
 
   if (error || !event) {
     console.error("[ai] createAdminEvent:", error?.message);
+
+    // Se la scheda è nata in questa stessa operazione e l'evento non è stato
+    // salvato, non la lasciamo orfana sulla piattaforma.
+    if (pageCreated && owner) {
+      const { error: cleanupError } = await supabase
+        .from(ownerTable)
+        .delete()
+        .eq("id", owner.id);
+
+      if (cleanupError) console.error("[ai] cleanup page:", cleanupError.message);
+    }
+
     return { ok: false, error: "failed" };
   }
 
@@ -187,9 +329,16 @@ export async function createAdminEventAction(input: {
   revalidatePath("/admin/ai");
   revalidatePath("/dashboard/events");
 
+  if (pageCreated) {
+    revalidatePath("/admin/artisti");
+    revalidatePath("/admin/locali");
+  }
+
   return {
     ok: true,
     eventId: event.id,
+    pageId: owner.id,
+    pageCreated,
     coverImported: coverImageUrl !== null,
     coverRequested,
   };

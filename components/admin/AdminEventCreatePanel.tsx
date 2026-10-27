@@ -3,7 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { analyzeEventAction, createAdminEventAction } from "@/app/actions/ai";
+import {
+  analyzeEventAction,
+  createAdminEventAction,
+  findPageMatchesAction,
+  type PageMatch,
+} from "@/app/actions/ai";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { ParsedEvent } from "@/lib/ai/schemas";
@@ -27,6 +32,18 @@ const EMPTY: ParsedEvent = {
   ticketUrl: null,
 };
 
+type PageDraft = { name: string; city: string; address: string };
+
+function draftFromEvent(data: ParsedEvent, ownerType: "artist" | "venue"): PageDraft {
+  const name = ownerType === "venue" ? data.venue : data.artist;
+
+  return {
+    name: (name ?? "").trim(),
+    city: (data.city ?? "").trim(),
+    address: (data.address ?? "").trim(),
+  };
+}
+
 export default function AdminEventCreatePanel({
   owners,
   dict,
@@ -43,6 +60,11 @@ export default function AdminEventCreatePanel({
   const [url, setUrl] = useState("");
   const [preview, setPreview] = useState<ParsedEvent | null>(null);
   const [coverSourceUrl, setCoverSourceUrl] = useState<string | null>(null);
+  const [pageDraft, setPageDraft] = useState<PageDraft>({ name: "", city: "", address: "" });
+  const [pageConfirmed, setPageConfirmed] = useState(false);
+  const [matches, setMatches] = useState<PageMatch[] | null>(null);
+  const [allowDuplicate, setAllowDuplicate] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [busy, setBusy] = useState<"analyze" | "draft" | "publish" | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,12 +85,31 @@ export default function AdminEventCreatePanel({
     setError(null);
   }
 
+  function draftField(key: keyof PageDraft, value: string) {
+    setPageDraft((current) => ({ ...current, [key]: value }));
+    // I dati confermati non sono più quelli scritti: si riconferma.
+    setPageConfirmed(false);
+    setMatches(null);
+    setAllowDuplicate(false);
+    setError(null);
+  }
+
+  function syncDraft(data: ParsedEvent, type: "artist" | "venue") {
+    setPageDraft(draftFromEvent(data, type));
+    setPageConfirmed(false);
+    setMatches(null);
+    setAllowDuplicate(false);
+  }
+
   async function analyze() {
     setBusy("analyze");
     setNotice(null);
     setError(null);
     setPreview(null);
     setCoverSourceUrl(null);
+    setMatches(null);
+    setPageConfirmed(false);
+    setAllowDuplicate(false);
 
     const outcome = await analyzeEventAction({ text, url });
     setBusy(null);
@@ -90,27 +131,73 @@ export default function AdminEventCreatePanel({
 
     setPreview(outcome.data);
     setCoverSourceUrl(outcome.imageUrl);
+    syncDraft(outcome.data, ownerType);
     setNotice(dict.aiImportPreview);
   }
 
   function manual() {
     setPreview({ ...EMPTY });
     setCoverSourceUrl(null);
+    setMatches(null);
+    setPageConfirmed(false);
+    setAllowDuplicate(false);
+    setPageDraft({ name: "", city: "", address: "" });
     setNotice(dict.aiCreateManual);
     setError(null);
   }
 
+  async function confirmPage(checked: boolean) {
+    setPageConfirmed(checked);
+    setAllowDuplicate(false);
+    setMatches(null);
+    setError(null);
+
+    if (!checked) return;
+
+    const name = pageDraft.name.trim();
+    if (!name) return;
+
+    setChecking(true);
+    const outcome = await findPageMatchesAction({
+      ownerType,
+      name,
+      city: pageDraft.city.trim() || null,
+    });
+    setChecking(false);
+
+    if (outcome.ok) setMatches(outcome.matches);
+  }
+
   async function save(status: "draft" | "published") {
     if (!preview) return;
-    if (!ownerId) {
-      setError(dict.aiCreateOwnerRequired);
-      return;
-    }
+
     if (!preview.title.trim() || !preview.date || !preview.time) {
       setError(dict.aiImportRequired);
       return;
     }
-    if (status === "published" && !preview.city?.trim()) {
+
+    if (!ownerId) {
+      if (!pageDraft.name.trim()) {
+        setError(dict.aiCreatePageNameRequired);
+        return;
+      }
+      if (!pageConfirmed) {
+        setError(dict.aiCreatePageRequired);
+        return;
+      }
+      if (matches && matches.length > 0 && !allowDuplicate) {
+        setError(dict.aiCreatePageDuplicateRequired);
+        return;
+      }
+      if (
+        status === "published" &&
+        !pageDraft.city.trim() &&
+        !preview.city?.trim()
+      ) {
+        setError(dict.aiCreatePublishCity);
+        return;
+      }
+    } else if (status === "published" && !preview.city?.trim()) {
       setError(dict.aiCreatePublishCity);
       return;
     }
@@ -121,7 +208,15 @@ export default function AdminEventCreatePanel({
 
     const outcome = await createAdminEventAction({
       ownerType,
-      ownerId,
+      ownerId: ownerId || null,
+      newPage: ownerId
+        ? null
+        : {
+            name: pageDraft.name,
+            city: pageDraft.city || null,
+            address: ownerType === "venue" ? pageDraft.address || null : null,
+            allowDuplicate,
+          },
       status,
       data: preview,
       coverSourceUrl,
@@ -130,6 +225,14 @@ export default function AdminEventCreatePanel({
     setBusy(null);
 
     if (!outcome.ok) {
+      if (outcome.error === "duplicate") {
+        setMatches(outcome.matches ?? []);
+        setAllowDuplicate(false);
+        setPageConfirmed(false);
+        setError(dict.aiCreatePageDuplicateRequired);
+        return;
+      }
+
       setError(dict.aiImportFailed);
       return;
     }
@@ -156,9 +259,14 @@ export default function AdminEventCreatePanel({
             <select
               value={ownerType}
               onChange={(event) => {
-                setOwnerType(event.target.value as "artist" | "venue");
+                const next = event.target.value as "artist" | "venue";
+                setOwnerType(next);
                 setOwnerId("");
                 setOwnerQuery("");
+                setMatches(null);
+                setPageConfirmed(false);
+                setAllowDuplicate(false);
+                if (preview) syncDraft(preview, next);
               }}
               className={FIELD}
             >
@@ -179,10 +287,16 @@ export default function AdminEventCreatePanel({
             />
             <select
               value={ownerId}
-              onChange={(event) => setOwnerId(event.target.value)}
+              onChange={(event) => {
+                setOwnerId(event.target.value);
+                setMatches(null);
+                setPageConfirmed(false);
+                setAllowDuplicate(false);
+                setError(null);
+              }}
               className={FIELD}
             >
-              <option value="">—</option>
+              <option value="">{dict.aiCreatePageOptional}</option>
               {filtered.map((owner) => (
                 <option key={owner.id} value={owner.id}>
                   {owner.name}
@@ -190,6 +304,9 @@ export default function AdminEventCreatePanel({
                 </option>
               ))}
             </select>
+            <span className="mt-1 block text-[10px] text-muted">
+              {ownerId ? dict.aiCreateOwnerSelected : dict.aiCreatePageOptionalHint}
+            </span>
             {filtered.length === 0 ? (
               <span className="mt-1 block text-[10px] text-muted">{dict.aiCreateNoOwners}</span>
             ) : null}
@@ -385,6 +502,125 @@ export default function AdminEventCreatePanel({
               />
             </label>
           </div>
+
+          {!ownerId ? (
+            <div className="mt-5 border border-cyan/30 bg-cyan/[0.04] p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <h3 className="font-display text-base font-semibold">
+                    {dict.aiCreatePageTitle}
+                  </h3>
+                  <p className="mt-1 max-w-xl text-[11px] leading-relaxed text-muted">
+                    {dict.aiCreatePageHint}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => syncDraft(preview, ownerType)}
+                  className="inline-flex min-h-9 items-center border border-line px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted hover:text-white"
+                >
+                  {dict.aiCreatePageSync}
+                </button>
+              </div>
+
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <label className="block sm:col-span-2">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                    {dict.aiCreatePageName}
+                  </span>
+                  <input
+                    value={pageDraft.name}
+                    onChange={(event) => draftField("name", event.target.value)}
+                    className={FIELD}
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                    {dict.aiCreatePageCity}
+                  </span>
+                  <input
+                    value={pageDraft.city}
+                    onChange={(event) => draftField("city", event.target.value)}
+                    className={FIELD}
+                  />
+                </label>
+
+                {ownerType === "venue" ? (
+                  <label className="block">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                      {dict.aiCreatePageAddress}
+                    </span>
+                    <input
+                      value={pageDraft.address}
+                      onChange={(event) => draftField("address", event.target.value)}
+                      className={FIELD}
+                    />
+                  </label>
+                ) : null}
+              </div>
+
+              <label className="mt-3 flex items-start gap-2 text-xs text-white">
+                <input
+                  type="checkbox"
+                  checked={pageConfirmed}
+                  onChange={(event) => void confirmPage(event.target.checked)}
+                  className="mt-0.5"
+                />
+                <span>{dict.aiCreatePageConfirm}</span>
+              </label>
+
+              {checking ? (
+                <p className="mt-2 text-[10px] text-muted">{dict.aiCreatePageChecking}</p>
+              ) : null}
+
+              {matches && matches.length > 0 ? (
+                <div className="mt-3 border-l-2 border-pink bg-pink/10 px-3 py-2">
+                  <p className="text-xs text-white">{dict.aiCreatePageDuplicate}</p>
+                  <ul className="mt-2 space-y-1">
+                    {matches.map((match) => (
+                      <li
+                        key={match.id}
+                        className="flex flex-wrap items-center justify-between gap-2"
+                      >
+                        <span className="text-xs text-white">
+                          {match.name}
+                          {match.city ? ` · ${match.city}` : ""}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOwnerId(match.id);
+                            setOwnerQuery(match.name);
+                            setPageConfirmed(false);
+                            setMatches(null);
+                            setAllowDuplicate(false);
+                            setError(null);
+                          }}
+                          className="inline-flex min-h-8 items-center border border-cyan/40 bg-cyan/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-white"
+                        >
+                          {dict.aiCreatePageDuplicateUse}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <label className="mt-2 flex items-start gap-2 text-xs text-white">
+                    <input
+                      type="checkbox"
+                      checked={allowDuplicate}
+                      onChange={(event) => setAllowDuplicate(event.target.checked)}
+                      className="mt-0.5"
+                    />
+                    <span>{dict.aiCreatePageDuplicateConfirm}</span>
+                  </label>
+                </div>
+              ) : null}
+
+              {pageConfirmed && matches && matches.length === 0 ? (
+                <p className="mt-2 text-[10px] text-cyan">{dict.aiCreatePageNoDuplicate}</p>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="mt-4 border-t border-line pt-4">
             <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">

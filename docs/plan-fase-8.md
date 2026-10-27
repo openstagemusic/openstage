@@ -7,7 +7,7 @@
 > 8.6 (comunicazione email con quota e retry), 8.6a (avvisi Telegram admin),
 > 8.6b (bot attività), 8.7 (notifiche admin), 8.8.1 (bozze AI), 8.8.2
 > (import evento), 8.8.3 (verifica assistita), B74 (crea per conto di) e B75
-> (copertina AI).** Restano 8.8.4/8.8.5 e i debiti B52/backup.
+> (copertina AI), B76 (scheda libera e onboarding al solo nome).** Restano 8.8.4/8.8.5 e i debiti B52/backup.
 
 ## Obiettivo
 
@@ -229,9 +229,11 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 **Fatto:** 8.0 control room, 8.1 2FA/audit/revoca, 8.2 metriche, 8.3 persone/contenuti,
 8.4 claim a invito, 8.5 centro assistenza, 8.6a avvisi Telegram admin, 8.6b bot attività.
 
-**Fatti anche B74 e B75:** creazione per conto di artista/locale con import AI o manuale,
-salvataggio bozza o pubblicazione, cover scaricata e salvata su Storage. **Prossimo blocco:**
-8.8.4 qualità dati e doppioni.
+**Fatti anche B74, B75 e B76:** creazione per conto di artista/locale con import AI o manuale,
+salvataggio bozza o pubblicazione, cover su Storage e **scheda libera** quando non ne esiste
+una (con conferma dei campi e controllo doppioni). **Fatto anche l'onboarding al solo nome:**
+artista e locale creano la scheda con il nome e completano tutto da `/account`. **Prossimo
+blocco:** 8.8.4 qualità dati e doppioni.
 
 **Debito aperto prima della chiusura:** B68 (bozze solo prime pubblicazioni), B52 (filtri,
 paginazione ed export delle altre liste), backup e notice & takedown.
