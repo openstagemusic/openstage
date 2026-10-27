@@ -6,7 +6,6 @@ import { useState, useTransition } from "react";
 import { acceptClaimInviteAction } from "@/app/actions/claims";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { artistPath, venuePath } from "@/lib/events/paths";
 import { withLocale } from "@/lib/i18n/locale-path";
 
 export default function ClaimInviteAccept({
@@ -26,17 +25,14 @@ export default function ClaimInviteAccept({
     startTransition(async () => {
       const outcome = await acceptClaimInviteAction({ token });
 
-      if (!outcome.ok || !outcome.subjectType || !outcome.slug) {
+      if (!outcome.ok) {
         setError(outcome.error ?? dict.inviteError);
         return;
       }
 
-      const path =
-        outcome.subjectType === "artist"
-          ? artistPath({ slug: outcome.slug })
-          : venuePath({ slug: outcome.slug });
-
-      router.push(withLocale(locale, path));
+      // Dopo il claim si va al pannello profilo, non alla scheda pubblica:
+      // nome, città e gli altri dati si correggono subito da lì.
+      router.push(withLocale(locale, "/account"));
       router.refresh();
     });
   }
