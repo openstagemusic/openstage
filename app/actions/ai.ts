@@ -225,6 +225,8 @@ export async function createAdminEventAction(input: {
   status: "draft" | "published";
   data: ParsedEvent;
   coverSourceUrl?: string | null;
+  /** Ingresso gratuito: il link ai biglietti non ha senso e viene scartato. */
+  isFree?: boolean;
 }): Promise<CreateAdminEventResult> {
   if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
 
@@ -400,8 +402,9 @@ export async function createAdminEventAction(input: {
     directions_text: data.address,
     latitude: coordinates?.latitude ?? null,
     longitude: coordinates?.longitude ?? null,
-    price_text: data.priceText,
-    ticket_url: validHttpUrl(data.ticketUrl ?? null),
+    price_text: input.isFree ? null : data.priceText,
+    ticket_url: input.isFree ? null : validHttpUrl(data.ticketUrl ?? null),
+    is_free: Boolean(input.isFree),
     cover_image_url: coverImageUrl,
     status: input.status,
     artist_id: input.ownerType === "artist" ? owner.id : null,

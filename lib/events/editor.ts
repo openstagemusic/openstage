@@ -472,7 +472,7 @@ export function editorStateFromEvent(event: EditableEvent): EventEditorState {
     areaRadiusM: event.areaRadiusM ?? DEFAULT_RADIUS_M,
     isFree: event.isFree,
     priceText: event.priceText ?? "",
-    ticketUrl: event.ticketUrl ?? "",
+    ticketUrl: event.isFree ? "" : event.ticketUrl ?? "",
     coverImageUrl: event.coverImageUrl ?? "",
   };
 }

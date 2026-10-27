@@ -1099,6 +1099,8 @@ export const en = {
     aiCreatePublishCity: "A city is required to publish.",
     aiCreateCoverFailed: "Cover not imported: the event was saved without an image.",
     aiCreateLocationFailed: "Location not found: set the pin in the editor before publishing.",
+    aiCreateFree: "Free entry",
+    aiCreateFreeHint: "No tickets: the ticket link is discarded and the event page will not show it.",
     aiCreateOpen: "Create on behalf of",
     aiCreateBack: "Back to events",
     aiCreateNoOwners: "No pages available.",

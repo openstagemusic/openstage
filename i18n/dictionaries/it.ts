@@ -1098,6 +1098,8 @@ export const it: Dictionary = {
     aiCreatePublishCity: "Per pubblicare serve la città.",
     aiCreateCoverFailed: "Copertina non importata: l'evento è stato salvato senza immagine.",
     aiCreateLocationFailed: "Posizione non trovata: imposta il pin nell'editor prima di pubblicare.",
+    aiCreateFree: "Ingresso gratuito",
+    aiCreateFreeHint: "Nessun biglietto: il link ai biglietti viene scartato e la pagina evento non lo mostrerà.",
     aiCreateOpen: "Crea per conto di",
     aiCreateBack: "Torna agli eventi",
     aiCreateNoOwners: "Nessuna scheda disponibile.",

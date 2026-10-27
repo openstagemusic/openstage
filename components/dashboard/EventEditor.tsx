@@ -1049,7 +1049,13 @@ export default function EventEditor({
             <input
               type="checkbox"
               checked={values.isFree}
-              onChange={(event) => set("isFree", event.target.checked)}
+              onChange={(event) => {
+                const checked = event.target.checked;
+                set("isFree", checked);
+                // Un ingresso gratuito non ha un link ai biglietti: si toglie
+                // anche dallo stato, così non ricompare né viene salvato.
+                if (checked) set("ticketUrl", "");
+              }}
               className="h-4 w-4 rounded border-white/20 bg-white/10"
             />
             {t.free}
@@ -1068,21 +1074,23 @@ export default function EventEditor({
             </Field>
           ) : null}
 
-          <Field
-            id="event-ticket"
-            label={t.ticketUrl}
-            error={errors.ticketUrl ? t.errors[errors.ticketUrl] : null}
-          >
-            <input
+          {!values.isFree ? (
+            <Field
               id="event-ticket"
-              className={inputClass}
-              value={values.ticketUrl}
-              onChange={(event) => set("ticketUrl", event.target.value)}
-              placeholder={t.ticketUrlPlaceholder}
-              maxLength={300}
-              inputMode="url"
-            />
-          </Field>
+              label={t.ticketUrl}
+              error={errors.ticketUrl ? t.errors[errors.ticketUrl] : null}
+            >
+              <input
+                id="event-ticket"
+                className={inputClass}
+                value={values.ticketUrl}
+                onChange={(event) => set("ticketUrl", event.target.value)}
+                placeholder={t.ticketUrlPlaceholder}
+                maxLength={300}
+                inputMode="url"
+              />
+            </Field>
+          ) : null}
         </div>
 
         {/* --- Immagine e locandina ---------------------------------------- */}

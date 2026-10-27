@@ -103,7 +103,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
         ? { "@type": "Place", name: event.city }
         : undefined,
     offers:
-      !cancelled && event.ticketUrl
+      !cancelled && !event.isFree && event.ticketUrl
         ? { "@type": "Offer", url: event.ticketUrl, availability: "https://schema.org/InStock" }
         : undefined,
   };
@@ -300,7 +300,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       ) : null}
 
       <div className="mt-10 flex flex-col gap-2 border-t border-line pt-6 sm:flex-row sm:flex-wrap sm:items-center">
-        {!cancelled && event.ticketUrl ? (
+        {!cancelled && !event.isFree && event.ticketUrl ? (
           <a
             href={event.ticketUrl}
             target="_blank"

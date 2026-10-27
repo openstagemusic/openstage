@@ -228,7 +228,9 @@ export async function saveEventAction(input: {
   // Il link dei biglietti si prova **prima** di salvare: un link morto nella
   // chiamata più importante della serata è peggio di mezzo secondo d'attesa.
   // Un sito che non risponde al controllo, però, non è un link morto.
-  if (values.ticketUrl && !(await isTicketUrlReachable(values.ticketUrl))) {
+  // Un ingresso gratuito non ha biglietti: il link non si controlla e non si
+  // salva. Vale anche per i dati vecchi che lo avevano ancora appiccicato.
+  if (!values.isFree && values.ticketUrl && !(await isTicketUrlReachable(values.ticketUrl))) {
     return { ok: false, fieldErrors: { ticketUrl: "ticketUnreachable" } };
   }
 
@@ -274,8 +276,8 @@ export async function saveEventAction(input: {
     location_precision: values.locationPrecision,
     area_radius_m: values.areaRadiusM,
     is_free: values.isFree,
-    price_text: values.priceText,
-    ticket_url: values.ticketUrl,
+    price_text: values.isFree ? null : values.priceText,
+    ticket_url: values.isFree ? null : values.ticketUrl,
     cover_image_url: values.coverImageUrl,
     status: input.status,
   };

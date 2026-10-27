@@ -62,6 +62,7 @@ export default function AdminEventCreatePanel({
   const [coverSourceUrl, setCoverSourceUrl] = useState<string | null>(null);
   const [pageDraft, setPageDraft] = useState<PageDraft>({ name: "", city: "", address: "" });
   const [pageConfirmed, setPageConfirmed] = useState(false);
+  const [isFree, setIsFree] = useState(false);
   const [matches, setMatches] = useState<PageMatch[] | null>(null);
   const [allowDuplicate, setAllowDuplicate] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -110,6 +111,7 @@ export default function AdminEventCreatePanel({
     setMatches(null);
     setPageConfirmed(false);
     setAllowDuplicate(false);
+    setIsFree(false);
 
     const outcome = await analyzeEventAction({ text, url });
     setBusy(null);
@@ -141,6 +143,7 @@ export default function AdminEventCreatePanel({
     setMatches(null);
     setPageConfirmed(false);
     setAllowDuplicate(false);
+    setIsFree(false);
     setPageDraft({ name: "", city: "", address: "" });
     setNotice(dict.aiCreateManual);
     setError(null);
@@ -220,6 +223,7 @@ export default function AdminEventCreatePanel({
       status,
       data: preview,
       coverSourceUrl,
+      isFree,
     });
 
     setBusy(null);
@@ -471,28 +475,50 @@ export default function AdminEventCreatePanel({
               />
             </label>
 
-            <label className="block">
-              <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
-                {dict.aiImportFieldPrice}
-              </span>
+            <label className="flex items-center gap-2 text-sm text-white sm:col-span-2">
               <input
-                value={preview.priceText ?? ""}
-                onChange={(event) => field("priceText", event.target.value || null)}
-                className={FIELD}
+                type="checkbox"
+                checked={isFree}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setIsFree(checked);
+                  if (checked) field("ticketUrl", null);
+                }}
+                className="h-4 w-4 rounded border-white/20 bg-white/10"
               />
+              {dict.aiCreateFree}
             </label>
 
-            <label className="block sm:col-span-2">
-              <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
-                {dict.aiImportFieldTicketUrl}
-              </span>
-              <input
-                type="url"
-                value={preview.ticketUrl ?? ""}
-                onChange={(event) => field("ticketUrl", event.target.value || null)}
-                className={FIELD}
-              />
-            </label>
+            {isFree ? (
+              <p className="text-[11px] leading-relaxed text-muted sm:col-span-2">
+                {dict.aiCreateFreeHint}
+              </p>
+            ) : (
+              <>
+                <label className="block">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                    {dict.aiImportFieldPrice}
+                  </span>
+                  <input
+                    value={preview.priceText ?? ""}
+                    onChange={(event) => field("priceText", event.target.value || null)}
+                    className={FIELD}
+                  />
+                </label>
+
+                <label className="block sm:col-span-2">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                    {dict.aiImportFieldTicketUrl}
+                  </span>
+                  <input
+                    type="url"
+                    value={preview.ticketUrl ?? ""}
+                    onChange={(event) => field("ticketUrl", event.target.value || null)}
+                    className={FIELD}
+                  />
+                </label>
+              </>
+            )}
 
             <label className="block sm:col-span-2">
               <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">

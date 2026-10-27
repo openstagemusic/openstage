@@ -174,7 +174,7 @@ export default function EventCard({
             {t.eventPage}
           </Link>
 
-          {event.ticketUrl ? (
+          {!event.isFree && event.ticketUrl ? (
             <a
               href={event.ticketUrl}
               target="_blank"
