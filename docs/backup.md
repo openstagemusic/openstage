@@ -70,6 +70,8 @@ Regole:
   totale del progetto. La copia GitHub sì.
 - Gli artifact scadono dopo 90 giorni. Per conservazioni più lunghe, scarica il
   file o aggiungi un bucket esterno (Cloudflare R2, Backblaze B2, S3).
+- Il repository GitHub è **pubblico**: l'artifact è scaricabile da chiunque, ma è
+  cifrato. La `BACKUP_PASSPHRASE` deve essere lunga e robusta.
 - È un backup **logico**, non un PITR: non ripristina al secondo, ma al momento
   del dump.
 - Un workflow schedulato può essere disattivato da GitHub dopo lunghi periodi

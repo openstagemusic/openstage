@@ -1,6 +1,7 @@
 # Fase 8.9 - Backup del database
 
-> **Stato: infrastruttura pronta, in attesa dei secret GitHub.** Scritto il 27 ottobre 2026.
+> **Stato: attivo, primo backup verificato il 27 ottobre 2026.** Scritto il 27 ottobre 2026.
+> Resta la prova di ripristino su un progetto di test.
 > Scelta approvata: **GitHub Actions + `pg_dump`**, senza piano Supabase Pro.
 
 ## Obiettivo

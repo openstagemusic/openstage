@@ -26,11 +26,13 @@ artisti e locali, editor eventi con bozze e locandine, mappa interattiva, pagine
 calendario e condivisione, ricerca con suggerimenti, preferiti, segnalazioni e moderazione,
 Home poster wall, pagine pubbliche, indice e pagine città, modulo contatti che diventa ticket,
 email transazionali, centro notifiche e digest, Area Fan, control room admin con 2FA e audit,
-claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram e assistente AI per bozze, import eventi e verifica schede.
+claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram,
+assistente AI per bozze e verifica schede, creazione eventi per conto di artisti/locali,
+ingresso gratuito, qualità dati e backup cifrato del database.
 
-**In arrivo:** creazione eventi per conto di artisti/locali, import della copertina, qualità
-dati e doppioni, community e follow, Spotify, pagamenti opzionali, Help Center completo e
-rifiniture SEO.
+**In arrivo:** rifinitura delle liste admin, notice & takedown, community e follow, Spotify,
+pagamenti opzionali, Help Center completo e rifiniture SEO. La prova di ripristino del backup
+è l'ultimo controllo aperto.
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
 oppure pubblicati da artisti e locali dopo il reclamo della scheda. La Home mostra le serate
@@ -163,10 +165,11 @@ server, così i link sono condivisibili e le anteprime social funzionano).
   **bottom sheet** che sale dal basso.
 - Se il locale ha più serate, le scorri **una alla volta** con le frecce e il contatore
   `‹ 1 / 3 ›`; la scheda resta della stessa altezza e non esce dalla mappa.
-- Dalla scheda: **Pagina evento**, **Biglietti** (se ci sono), **Apri in Google Maps**,
+- Dalla scheda: **Pagina evento**, **Biglietti** (se ci sono e l'evento non è gratuito), **Apri in Google Maps**,
   **Salva** e **Condividi**. I pulsanti hanno un'area di tocco di almeno 44 px.
-- Il popup desktop lascia spazio alla ricerca e ai filtri: non finisce più sotto il pannello
-  dei filtri quando la mappa è a tutto schermo.
+- Il popup desktop si apre **sopra il pin** e lascia spazio alla ricerca e ai filtri: non
+  finisce più tagliato dal bordo né sotto il pannello dei filtri quando la mappa è a tutto
+  schermo. Se il contenuto è lungo, la scheda scorre al suo interno.
 - Gli eventi che dichiarano una posizione **approssimata** mostrano un'area invece di un
   punto, e la pagina evento lo spiega.
 - **A tutto schermo** (voce "Mappa" nella barra, oppure il pulsante sulla mappa) la mappa
@@ -273,6 +276,10 @@ pin sulla mappa, genere, tipo, prezzo o ingresso gratuito, link biglietti, locan
 testo **"Come arrivare"** per i posti difficili da trovare. La posizione può essere **esatta o
 approssimata**: se scegli l'area, la pagina evento mostra una zona e non un punto finto.
 
+Se spunti **Ingresso gratuito**, il prezzo e il link ai biglietti vengono rimossi: la pagina
+evento mostra "Ingresso gratuito" e non mostra il pulsante "Biglietti". Vale anche per le
+serate modificate in un secondo momento.
+
 Le serate nascono in **bozza**: puoi pubblicarle, annullarle o modificarle. Un locale può
 collegare la scheda di un artista esistente; se una serata simile è già presente, il sistema
 ti avvisa e ti lascia decidere. C'è un tetto anti-spam di **10 serate nelle 24 ore** per
@@ -315,18 +322,25 @@ finestra breve senza cancellare la chiave TOTP.
 | **Utenti** | Ruolo, verifica, sospensione, schede collegate |
 | **Artisti / Locali** | Claim, verifica, schede senza eventi, inviti |
 | **Claim e verifiche** | Richieste, schede da verificare, revoca |
-| **Eventi / Bozze** | Serate pubblicate e bozze da revisione |
+| **Eventi / Bozze** | Serate pubblicate e bozze; da qui **Crea per conto di** e **Modifica** |
 | **Segnalazioni** | Risoluzione, archiviazione, riapertura |
+| **Qualità dati** | Campi mancanti, serate passate, schede libere e possibili doppioni |
 | **Ticket e messaggi** | Priorità, assegnazione, storico e risposta email |
 | **Email** | Coda, falliti, registro, quota Resend, retry ed export |
 | **Audit** | Registro delle azioni admin |
 | **Sicurezza** | 2FA e sospensione temporanea |
 | **Impostazioni** | Stato e test dei due bot Telegram, uso AI |
-| **AI** | Bozze risposte, import evento, verifica schede |
+| **AI** | Bozze risposte, verifica schede, uso e budget. L'import evento vive in "Crea per conto di" |
 
 Ogni azione distruttiva chiede conferma e finisce nell'audit. Telegram avvisa l'admin quando
 arriva un ticket, una richiesta, una segnalazione, una bozza da revisione o un'email fallita;
 un secondo bot avvisa nuove registrazioni e nuovi eventi con i totali aggiornati.
+
+La redazione crea una serata per un artista o un locale da **Eventi → Crea per conto di**:
+può collegare una scheda esistente oppure crearne una libera con nome, città e indirizzo
+confermati, dopo il controllo dei doppioni. L'evento nasce con il pin già geocodificato e si
+può riaprire con **Modifica**. Il **backup** del database gira ogni domenica con copia cifrata
+su GitHub e nel bucket privato Supabase.
 
 # Navigare il sito
 

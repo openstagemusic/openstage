@@ -717,6 +717,67 @@ deploy.
 
 **Rimandato:** qualità dati/doppioni (8.8.4) e triage segnalazioni (8.8.5).
 
+## Fase 8.8.4 - Qualità dati e doppioni
+
+**Obiettivo:** trovare i dati incompleti e i possibili doppioni senza spendere budget AI.
+
+**Cosa è stato costruito**
+
+- Pagina `/admin/qualita` nel gruppo Contenuti.
+- Controlli su eventi (città, scheda collegata, passati ancora pubblicati, copertina, prezzo,
+  date sospette), artisti e locali (campi mancanti, nessun evento, scheda libera).
+- Confronto deterministico dei nomi normalizzati, con città per i locali e titolo/giorno per
+  gli eventi.
+- Nessuna scrittura automatica e nessuna chiamata AI: ogni riga porta alla scheda da correggere.
+
+**Verifiche superate:** pagina IT/EN, numeri coerenti con il database, evento passato e scheda
+senza eventi rilevati, doppione creato apposta e poi rimosso, build e deploy.
+
+**Rimandato:** 8.8.5 (triage AI delle segnalazioni), solo se il volume lo giustifica.
+
+## B74-B79 - Crea per conto di, posizione, ingresso gratuito e popup
+
+**Obiettivo:** permettere alla redazione di pubblicare serate reali anche per artisti e locali
+che non hanno ancora una scheda, senza creare doppioni.
+
+**Cosa è stato costruito**
+
+- `/admin/eventi/nuovo`: scelta artista/locale, import AI o inserimento manuale, copertina,
+  bozza o pubblicazione.
+- Scheda **libera** con `profile_id` nullo quando non ne esiste una, con conferma di nome,
+  città e indirizzo e controllo doppioni.
+- Geocodifica di nome/indirizzo/città: l'evento e la scheda locale nascono con il pin già
+  sulla mappa.
+- Onboarding artista/locale ridotto al solo nome, con atterraggio su `/account`.
+- Dopo il claim dell'invito si atterra su `/account`, non sulla scheda pubblica.
+- Link **Modifica** in `/admin/eventi` e `/admin/bozze`; l'admin può aprire l'editor anche
+  per eventi non creati da lui.
+- **Ingresso gratuito**: prezzo e link biglietti vengono scartati; pagina evento e mappa non
+  mostrano il pulsante Biglietti.
+- Popup mappa ancorato sopra il pin, con margine superiore e altezza massima scorrevole.
+
+**Verifiche superate:** eventi creati con e senza scheda, doppione bloccato e collegato,
+pin visibile, ricerca locale con "nome, città", modifica admin, ingresso gratuito, popup su
+Home e `/mappa`, build e deploy.
+
+## Fase 8.9 - Backup del database
+
+**Obiettivo:** avere un backup reale e ripristinabile senza passare al piano Supabase Pro.
+
+**Cosa è stato costruito**
+
+- Workflow GitHub Actions `db-backup.yml`, domenica alle 03:00 UTC e avvio manuale.
+- `pg_dump` in formato custom, validato con `pg_restore --list`, cifrato GPG AES-256.
+- Artifact GitHub (90 giorni) + bucket Supabase privato `backups` con rotazione delle ultime
+  12 copie e checksum SHA-256.
+- Bucket creato con la migrazione `0051`.
+- Guida ai quattro secret GitHub e procedura di ripristino in `docs/backup.md`.
+
+**Verifiche superate:** prima esecuzione verde il 27 ottobre 2026, dump da 233 KB, checksum
+verificato.
+
+**Rimandato:** prova di ripristino su un progetto Supabase di test.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

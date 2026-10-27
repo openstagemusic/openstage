@@ -11,6 +11,7 @@ npm run dev        # sviluppo su http://localhost:3000
 npm run build      # build di produzione
 npm run start      # build locale
 npm run manuale    # rigenera docs/manuale/OpenStage-Manuale.pdf
+npm run manuale -- --anteprima  # rigenera anche docs/manuale/anteprima.html
 ```
 
 ## Configurazione
@@ -19,6 +20,7 @@ npm run manuale    # rigenera docs/manuale/OpenStage-Manuale.pdf
 2. Applica le migrazioni in `supabase/migrations/` in ordine.
 3. Verifica che `settings.admin_email` nel database coincida con `ADMIN_EMAIL`.
 4. Su Vercel imposta le stesse variabili su Production, Preview e Development.
+5. Per il backup del database imposta i quattro secret GitHub descritti in `docs/backup.md`.
 
 Le variabili principali sono Supabase, Turnstile, Resend e la coda email, Telegram (due bot:
 code admin e attività), URL del sito e, facoltativamente, Spotify e Photon.

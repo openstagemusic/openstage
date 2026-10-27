@@ -1,14 +1,15 @@
 # Fase 8 — Control room, claim a invito e centro assistenza
 
-> **Stato: in corso.** Scritto il 23 ottobre 2026.
+> **Stato: in chiusura.** Scritto il 23 ottobre 2026.
 > **Fatti: 8.0 (guscio + registro + overview), 8.1 (2FA AAL2, audit, revoca
 > claim), 8.2 (metriche reali), 8.3 (utenti, artisti, locali, bozze,
 > segnalazioni, audit), 8.4 (claim a invito), 8.5 (ticket e messaggi),
 > 8.6 (comunicazione email con quota e retry), 8.6a (avvisi Telegram admin),
 > 8.6b (bot attività), 8.7 (notifiche admin), 8.8.1 (bozze AI), 8.8.2
-> (import evento), 8.8.3 (verifica assistita), 8.8.4 (qualità dati), B74 (crea per
-> conto di), B75 (copertina AI) e B76 (scheda libera e onboarding al solo nome).**
-> Restano 8.8.5 (facoltativo) e B52; il backup è attivo.
+> (import evento), 8.8.3 (verifica assistita), 8.8.4 (qualità dati), B74-B79 (crea per
+> conto di, scheda libera, pin, modifica admin, ingresso gratuito, popup mappa) e 8.9
+> (backup cifrato).**
+> Restano 8.8.5 (facoltativo), B52, notice & takedown e la prova di ripristino del backup.
 
 ## Obiettivo
 
@@ -230,12 +231,12 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 **Fatto:** 8.0 control room, 8.1 2FA/audit/revoca, 8.2 metriche, 8.3 persone/contenuti,
 8.4 claim a invito, 8.5 centro assistenza, 8.6a avvisi Telegram admin, 8.6b bot attività.
 
-**Fatti anche B74, B75, B76, B77 e 8.8.4:** creazione per conto di artista/locale con import AI o
-manuale, scheda libera con conferma dei campi e controllo doppioni, copertina e posizione geocodificata,
-onboarding al solo nome con redirect a `/account`, modifica degli eventi dalla control room e pagina
-`/admin/qualita` con controlli deterministici su eventi, artisti, locali e possibili doppioni.
-**Prossimo blocco:** decidere se fare 8.8.5 (facoltativo) o chiudere i debiti B52/backup.
+**Fatti anche B74-B79, 8.8.4 e 8.9:** creazione per conto di artista/locale con import AI o manuale,
+scheda libera con conferma dei campi e controllo doppioni, copertina e posizione geocodificata,
+ingresso gratuito senza link biglietti, modifica degli eventi dalla control room, popup mappa corretto,
+pagina `/admin/qualita` con controlli deterministici e backup settimanale cifrato con ripristino da provare.
+**Prossimo blocco:** B52 sulle liste admin, notice & takedown e prova di ripristino del backup.
 
 
-**Debito aperto prima della chiusura:** B68 (bozze solo prime pubblicazioni), B52 (filtri,
-paginazione ed export delle altre liste), backup e notice & takedown.
+**Debito aperto prima della chiusura:** B52 (filtri, paginazione ed export delle altre liste),
+notice & takedown e la prova di ripristino del backup.

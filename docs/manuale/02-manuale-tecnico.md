@@ -61,8 +61,10 @@ app/                     Pagine (App Router) e server action
   eventi/[...percorso]   Pagina evento SSR con dati strutturati e anteprima social
   artisti/ locali/       Directory reali con ricerca, filtri e schede [slug]
   dashboard/             Panoramica, eventi, editor, preferiti, account
-  admin/                 Coda reclami, moderazione serate e coda messaggi (solo staff)
+  admin/                 Control room: code, moderazione, qualità dati, creazione per conto di
   admin/messaggi/        Messaggi dal modulo contatti, con filtri e stati
+  admin/qualita/         Controlli deterministici su eventi, schede e possibili doppioni
+  admin/eventi/nuovo/    Crea per conto di artista/locale, con import AI o manuale
   account/               Profilo, richiesta di reclamo, impostazioni
   onboarding/role/       Scelta del ruolo ("Diventa artista o locale")
   onboarding/artist/     Profilo e reclamo artista
@@ -113,8 +115,9 @@ lib/
   pagination.ts          ITEMS_PER_PAGE: costante condivisa (vedi "errori noti")
   i18n/                  config, server, metadata, dictionaries
   supabase/              client, server, admin, env, middleware, session
-supabase/migrations/     0001…0028 (vedi tabella migrazioni)
+supabase/migrations/     0001.0051 (vedi tabella migrazioni)
 docs/                    Piani di fase, review di fase, sorgenti del manuale
+.github/workflows/       db-backup.yml: backup settimanale cifrato del database
 scripts/manuale.mjs      Generatore del PDF (solo locale, non va in produzione)
 ```
 
@@ -163,6 +166,19 @@ quando ne aggiungi una, impostala su tutti e tre.
 > Due variabili sono marcate **sensitive** su Vercel (`SUPABASE_SERVICE_ROLE_KEY`,
 > `TURNSTILE_SECRET_KEY`): una volta salvate non sono più leggibili, per questo è normale non
 > poterle "rivedere" dalla dashboard.
+
+### Secret del backup (GitHub, non Vercel)
+
+Il backup del database non usa variabili Vercel. Sono quattro **GitHub Actions secrets**:
+
+| Secret | Cosa contiene |
+| --- | --- |
+| `SUPABASE_DB_URL` | Connection string **Session pooler (IPv4)** con la password del database |
+| `SUPABASE_URL` | URL del progetto Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Chiave `service_role`, usata solo dal workflow per caricare il file nel bucket privato |
+| `BACKUP_PASSPHRASE` | Passphrase GPG: senza questa i backup non si aprono |
+
+Dettagli e procedura di ripristino in `docs/backup.md`.
 
 **Le Fasi 2, 3, 4 e 5.4 non hanno aggiunto variabili obbligatorie**: la mappa usa
 OpenFreeMap e la geocodifica usa Photon, che non richiedono chiavi API né account. Vale la
@@ -397,9 +413,10 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0048_email_panel.sql` | Batch, RLS admin, statistiche e retry email |
 | `0049_admin_notifications.sql` | Vista admin notifiche e invio manuale |
 | `0050_ai_runs.sql` | Registro AI, costo, budget e audit |
+| `0051_backup_bucket.sql` | Bucket privato `backups` per le copie cifrate del database |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
-> `0028`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
+> `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
 > `supabase migration list` non la vede.
 
 # Sicurezza: Row Level Security
@@ -585,11 +602,13 @@ di accesso è doppio: `is_admin()` nel database e 2FA AAL2 nella sessione. La pa
 | `/admin/utenti` | Persone, verifica, sospensione |
 | `/admin/artisti`, `/admin/locali` | Schede, claim e inviti |
 | `/admin/claim` | Richieste, verifiche, revoca, inviti |
-| `/admin/eventi`, `/admin/bozze` | Serate e revisione |
+| `/admin/eventi`, `/admin/bozze` | Serate e revisione, **Modifica** e **Crea per conto di** |
+| `/admin/eventi/nuovo` | Creazione per conto di artista/locale, con import AI o manuale |
 | `/admin/segnalazioni` | Segnalazioni eventi |
+| `/admin/qualita` | Qualità dati: campi mancanti, serate passate, schede libere, doppioni |
 | `/admin/messaggi` | Ticket, priorità, assegnazione, risposte |
 | `/admin/email` | Coda, falliti, registro, quota, retry ed export |
-| `/admin/ai` | Import evento con AI, bozze e verifica assistita |
+| `/admin/ai` | Bozze risposte, verifica assistita, uso e budget AI |
 | `/admin/audit` | Registro azioni |
 | `/admin/sicurezza` | 2FA e sospensione temporanea |
 | `/admin/impostazioni` | Bot Telegram e test |
@@ -600,8 +619,12 @@ chiamano `/api/admin/telegram/alert` o `/api/admin/telegram/activity`, protette 
 con il token del bot. Le rotte inviano il messaggio con le variabili Vercel; i token sono
 anche in Supabase Vault per autorizzare le chiamate dal database.
 
-**Cosa non c'è ancora.** Creazione eventi per conto di artisti/locali, import della
-copertina dall'AI, qualità dati/doppioni, Help Center completo e rifiniture finali.
+**Cosa c'è.** La creazione per conto di artisti/locali (con scheda libera e controllo
+doppioni), l'import della copertina, la modifica degli eventi anche non creati dall'admin, la
+pagina Qualità dati, l'ingresso gratuito senza link biglietti e il backup cifrato settimanale.
+
+**Cosa manca.** La prova di ripristino del backup su un progetto di test, la rifinitura delle
+liste admin (B52), il notice & takedown, la community/follow e le fasi successive.
 
 # Deploy e rilascio
 
@@ -613,7 +636,10 @@ copertina dall'AI, qualità dati/doppioni, Help Center completo e rifiniture fin
 5. La protezione "Vercel Authentication" (Deployment Protection) è **disattivata**, altrimenti
    il sito pubblico chiederebbe un login Vercel.
 
-**URL di produzione:** `https://openstage-alpha.vercel.app`
+**URL di produzione:** `https://getopenstage.it`
+
+Il repository GitHub è pubblico: gli artifact di backup sono scaricabili da chiunque, ma
+sono cifrati GPG. La passphrase resta l'unica chiave.
 
 ## Checklist di fine fase
 
@@ -626,6 +652,27 @@ copertina dall'AI, qualità dati/doppioni, Help Center completo e rifiniture fin
    riprendere).
 6. Se la fase ha cambiato qualcosa di stabile (architettura, variabili, regole, schermate):
    **`npm run manuale`** per rigenerare questo PDF, con versione e data nuove in `meta.json`.
+7. Se la fase tocca schema o dati, controllare che il backup settimanale sia verde; la prova
+   di ripristino si fa su un progetto Supabase di test, mai in produzione.
+
+# Backup del database
+
+Il piano **Free di Supabase non include backup automatici**. OpenStage usa un dump logico
+settimanale con GitHub Actions.
+
+- Workflow: `.github/workflows/db-backup.yml`, domenica alle **03:00 UTC** e avvio manuale.
+- `pg_dump` in formato custom, validato con `pg_restore --list`, cifrato **GPG AES-256**.
+- Doppia copia: **artifact GitHub** (90 giorni, fuori da Supabase) e bucket Supabase privato
+  **`backups`** con rotazione delle ultime 12 copie.
+- Checksum SHA-256 accanto a ogni dump.
+- I quattro secret sono in GitHub, non su Vercel (vedi "Variabili d'ambiente").
+- La passphrase va conservata in un password manager: senza, i backup non si aprono.
+- Il bucket è nello stesso progetto: non protegge dalla perdita totale di Supabase. La copia
+  GitHub sì.
+- Procedura completa di ripristino: `docs/backup.md`.
+
+**Stato:** primo backup verificato il 27 ottobre 2026 (233 KB, checksum valido). Resta la prova
+di ripristino su un progetto di test.
 
 # Errori già incontrati e come si risolvono
 
@@ -643,7 +690,8 @@ copertina dall'AI, qualità dati/doppioni, Help Center completo e rifiniture fin
 | Google torna alla Home da scollegato | I cookie di sessione non vengono applicati alla redirect del callback | Il callback deve impostare i cookie sulla `NextResponse.redirect` (non solo su `cookies()`); verificare anche i Redirect URLs Supabase |
 | La lista degli eventi in Home è **sempre vuota** | Una costante importata da un modulo `"use client"` dentro un Server Component arriva `undefined` | Tenere le costanti condivise in un file neutro: `lib/pagination.ts`. **Regola**: mai importare valori da un modulo `"use client"` in un componente server |
 | `?page=2` mostra una pagina vuota | Il numero di pagina richiesto supera l'ultima disponibile | Riportare la pagina all'ultimo valore valido invece di mostrare il vuoto |
-| Il pop-up di un locale con più serate esce dalla mappa e si taglia | La scheda cresce con il numero di date, e il pop-up desktop sta **sopra** il pin | Una serata alla volta con le frecce (altezza costante) + margine della mappa dal lato giusto |
+| Il pop-up della mappa si taglia in basso o finisce sotto i filtri | MapLibre non aveva un ancoraggio esplicito e misurava la scheda prima che fosse disegnata | `anchor: "bottom"`, margine superiore dedicato e altezza massima con scroll interno. Verificato su Home e `/mappa` |
+| Un evento gratuito mostra ancora il link biglietti | Il vecchio `ticket_url` restava salvato anche con `is_free` attivo | Il salvataggio azzera `ticket_url` e `price_text` quando è gratuito; pagina evento e mappa non mostrano il pulsante Biglietti |
 | La pagina torna in cima usando ricerca e filtri | Navigazione senza `scroll: false`; i menu a tendina nativi su mobile possono saltare in cima comunque | `scroll: false` su ogni navigazione + `useScrollAnchor`, che ripristina la posizione solo se il browser ha davvero saltato |
 | Un blocco SQL con `union all` si interrompe | I valori di tipo enum vanno convertiti esplicitamente nelle unioni | Scrivere `'published'::event_status` e simili |
 | La build fallisce con `useSearchParams` | In Next 15 un componente client che legge i parametri va avvolto in `<Suspense>` | Avvolgere il componente (o il suo gruppo) in un confine `<Suspense>` |
@@ -714,5 +762,8 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 8.6a | ✅ Avvisi Telegram per le code admin |
 | 8.6b | ✅ Secondo bot Telegram per registrazioni ed eventi |
 | 8.6 | ✅ Comunicazione: registro, coda, quota Resend, riserva, dry run, retry ed export |
-| 8.7 | ⏳ Pannello notifiche admin aggregato |
-| 8.8 | ⏳ Automazioni AI assistite, sempre con approvazione umana |
+| 8.7 | ✅ Pannello notifiche admin aggregato |
+| 8.8 | ✅ AI assistita (8.8.1-8.8.4); 8.8.5 facoltativo |
+| 8.8.4 | ✅ Qualità dati e doppioni deterministici, senza costo AI |
+| B74-B79 | ✅ Crea per conto di, scheda libera, copertina, pin, modifica admin, ingresso gratuito, popup mappa |
+| 8.9 | ✅ Backup settimanale cifrato; resta la prova di ripristino |

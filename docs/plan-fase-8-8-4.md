@@ -1,6 +1,6 @@
 # Fase 8.8.4 - Qualità dati e doppioni (deterministica)
 
-> **Stato: in corso.** Scritto il 27 ottobre 2026.
+> **Stato: fatta il 27 ottobre 2026**, build verde, deploy e commit.
 > Scelta approvata: partire **senza AI**. L'audit AI arriverà quando i volumi
 > lo giustificheranno, riusando `ai_runs`, il budget e il modello già presenti.
 
@@ -43,9 +43,9 @@ automatica: ogni riga porta alla scheda da aprire e sistemare.
 
 ## QA
 
-- [ ] Pagina raggiungibile dalla sidebar admin, IT ed EN.
-- [ ] I numeri corrispondono alle query reali.
-- [ ] Un evento passato pubblicato compare nella lista.
-- [ ] Una scheda senza eventi compare nella lista.
-- [ ] Un doppione creato di proposito compare e viene rimosso dopo il test.
-- [ ] `npm run build` verde, deploy e commit.
+- [x] Pagina raggiungibile dalla sidebar admin, IT ed EN.
+- [x] I numeri corrispondono alle query reali.
+- [x] Un evento passato pubblicato compare nella lista.
+- [x] Una scheda senza eventi compare nella lista.
+- [x] Un doppione creato di proposito compare e viene rimosso dopo il test.
+- [x] `npm run build` verde, deploy e commit.
