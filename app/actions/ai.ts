@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
-import { fetchPublicText } from "@/lib/ai/fetch-public";
+import { fetchPublicPage } from "@/lib/ai/fetch-public";
+import { prepareCoverFromUrl } from "@/lib/ai/cover";
 import { parseEventFromText } from "@/lib/ai/tasks/parse-event";
 import { ParsedEventSchema, type ParsedEvent } from "@/lib/ai/schemas";
 import { collectVerificationChecks, type VerificationReport } from "@/lib/ai/verify-page";
@@ -13,7 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 export type AnalyzeEventResult =
-  | { ok: true; data: ParsedEvent }
+  | { ok: true; data: ParsedEvent; imageUrl: string | null }
   | {
       ok: false;
       error: "unauthorized" | "invalid" | "fetch_failed" | "not_configured" | "budget" | "failed";
@@ -29,10 +30,13 @@ export async function analyzeEventAction(input: {
   const pasted = input.text.trim();
   const url = input.url?.trim() ?? "";
   let fetched = "";
+  let imageUrl: string | null = null;
 
   if (url) {
     try {
-      fetched = await fetchPublicText(url);
+      const page = await fetchPublicPage(url);
+      fetched = page.text;
+      imageUrl = page.imageUrl;
     } catch (error) {
       console.error("[ai] fetch-public:", error instanceof Error ? error.message : error);
       return { ok: false, error: "fetch_failed" };
@@ -50,11 +54,11 @@ export async function analyzeEventAction(input: {
 
   if (!parsed.ok) return { ok: false, error: parsed.error };
 
-  return { ok: true, data: parsed.data };
+  return { ok: true, data: parsed.data, imageUrl };
 }
 
-export type CreateImportedEventResult =
-  | { ok: true; eventId: string }
+export type CreateAdminEventResult =
+  | { ok: true; eventId: string; coverImported: boolean; coverRequested: boolean }
   | { ok: false; error: "unauthorized" | "invalid" | "failed" };
 
 function validHttpUrl(value: string | null): string | null {
@@ -67,13 +71,17 @@ function validHttpUrl(value: string | null): string | null {
   }
 }
 
-/** Salva l'anteprima come bozza: l'admin completa l'editor prima di pubblicare. */
-export async function createImportedEventAction(
-  input: ParsedEvent
-): Promise<CreateImportedEventResult> {
+/** Crea una bozza o pubblica un evento per conto di un artista/locale. */
+export async function createAdminEventAction(input: {
+  ownerType: "artist" | "venue";
+  ownerId: string;
+  status: "draft" | "published";
+  data: ParsedEvent;
+  coverSourceUrl?: string | null;
+}): Promise<CreateAdminEventResult> {
   if (!(await isCurrentUserAdmin())) return { ok: false, error: "unauthorized" };
 
-  const parsed = ParsedEventSchema.safeParse(input);
+  const parsed = ParsedEventSchema.safeParse(input.data);
   if (!parsed.success) return { ok: false, error: "invalid" };
 
   const data = parsed.data;
@@ -101,45 +109,91 @@ export async function createImportedEventAction(
   const session = await getSessionProfile();
   if (!session) return { ok: false, error: "unauthorized" };
 
+  const supabase = await createClient();
+  const ownerTable = input.ownerType === "artist" ? "artists" : "venues";
+  const { data: owner, error: ownerError } = await supabase
+    .from(ownerTable)
+    .select("id, name, city")
+    .eq("id", input.ownerId)
+    .maybeSingle();
+
+  if (ownerError || !owner) return { ok: false, error: "invalid" };
+
+  const city = data.city?.trim() || owner.city?.trim() || null;
+  if (input.status === "published" && !city) return { ok: false, error: "invalid" };
+
   const descriptionParts = [
-    data.artist ? `Artista: ${data.artist}` : null,
-    data.address ? `Indirizzo: ${data.address}` : null,
+    data.artist ? "Artista: " + data.artist : null,
+    data.address ? "Indirizzo: " + data.address : null,
     data.description,
   ].filter(Boolean);
 
-  const supabase = await createClient();
+  let coverImageUrl: string | null = null;
+  const coverRequested = Boolean(input.coverSourceUrl?.trim());
+
+  if (coverRequested && input.coverSourceUrl) {
+    const cover = await prepareCoverFromUrl(input.coverSourceUrl);
+
+    if (cover) {
+      const path = session.id + "/" + crypto.randomUUID() + ".jpg";
+      const { error: uploadError } = await supabase.storage
+        .from("event-covers")
+        .upload(path, cover.buffer, {
+          contentType: cover.contentType,
+          cacheControl: "31536000",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("[ai] cover upload:", uploadError.message);
+      } else {
+        const { data: publicUrl } = supabase.storage.from("event-covers").getPublicUrl(path);
+        coverImageUrl = publicUrl.publicUrl;
+      }
+    }
+  }
+
+  const insert = {
+    title: data.title,
+    description: descriptionParts.join("\n\n").slice(0, 4000),
+    genre: data.genre,
+    starts_at: instant.toISOString(),
+    timezone: FILTER_TIMEZONE,
+    city,
+    venue_name: data.venue ?? (input.ownerType === "venue" ? owner.name : null),
+    directions_text: data.address,
+    price_text: data.priceText,
+    ticket_url: validHttpUrl(data.ticketUrl ?? null),
+    cover_image_url: coverImageUrl,
+    status: input.status,
+    artist_id: input.ownerType === "artist" ? owner.id : null,
+    venue_id: input.ownerType === "venue" ? owner.id : null,
+    created_by: session.id,
+  };
+
   const { data: event, error } = await supabase
     .from("events")
-    .insert({
-      title: data.title,
-      description: descriptionParts.join("\n\n").slice(0, 4000),
-      genre: data.genre,
-      starts_at: instant.toISOString(),
-      timezone: FILTER_TIMEZONE,
-      city: data.city,
-      venue_name: data.venue,
-      directions_text: data.address,
-      price_text: data.priceText,
-      ticket_url: validHttpUrl(data.ticketUrl ?? null),
-      status: "draft",
-      created_by: session.id,
-    })
+    .insert(insert)
     .select("id")
     .single();
 
   if (error || !event) {
-    console.error("[ai] createImportedEvent:", error?.message);
+    console.error("[ai] createAdminEvent:", error?.message);
     return { ok: false, error: "failed" };
   }
 
   revalidatePath("/admin");
   revalidatePath("/admin/eventi");
-  revalidatePath("/admin/bozze");
+  revalidatePath("/admin/ai");
   revalidatePath("/dashboard/events");
 
-  return { ok: true, eventId: event.id };
+  return {
+    ok: true,
+    eventId: event.id,
+    coverImported: coverImageUrl !== null,
+    coverRequested,
+  };
 }
-
 export type VerificationAnalysisResult =
   | {
       ok: true;

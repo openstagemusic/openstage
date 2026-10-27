@@ -89,7 +89,47 @@ function htmlToText(html: string): string {
  * Solo http/https, niente IP privati/localhost, redirect limitati, timeout e
  * tetto di byte. Non invia cookie o credenziali: non legge pagine autenticate.
  */
-export async function fetchPublicText(rawUrl: string): Promise<string> {
+function decodeEntities(value: string): string {
+  return value
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
+function extractImageUrl(html: string, pageUrl: URL): string | null {
+  const patterns = [
+    /<meta[^>]+(?:property|name)=["'](?:og:image|og:image:url|twitter:image)["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|og:image:url|twitter:image)["']/i,
+    /<link[^>]+rel=["']image_src["'][^>]+href=["']([^"']+)["']/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = pattern.exec(html);
+    if (!match?.[1]) continue;
+
+    try {
+      const resolved = new URL(decodeEntities(match[1]), pageUrl);
+      if (resolved.protocol === "http:" || resolved.protocol === "https:") return resolved.toString();
+    } catch {
+      // ignora un'immagine malformata e passa alla successiva
+    }
+  }
+
+  return null;
+}
+
+export type PublicPage = { text: string; imageUrl: string | null };
+
+/**
+ * Legge una pagina pubblica per l'import evento.
+ *
+ * Solo http/https, niente IP privati/localhost, redirect limitati, timeout e
+ * tetto di byte. Non invia cookie o credenziali: non legge pagine autenticate.
+ * Restituisce anche l'immagine social (`og:image`/`twitter:image`) quando c'è.
+ */
+export async function fetchPublicPage(rawUrl: string): Promise<PublicPage> {
   let current = rawUrl;
 
   for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect += 1) {
@@ -115,14 +155,14 @@ export async function fetchPublicText(rawUrl: string): Promise<string> {
         continue;
       }
 
-      if (!response.ok) throw new Error(`http_${response.status}`);
+      if (!response.ok) throw new Error("http_" + response.status);
 
       const contentType = (response.headers.get("content-type") ?? "").toLowerCase();
       if (!contentType.includes("text/html") && !contentType.includes("text/plain")) {
         throw new Error("unsupported_content_type");
       }
 
-      if (!response.body) return "";
+      if (!response.body) return { text: "", imageUrl: null };
 
       const reader = response.body.getReader();
       const chunks: Uint8Array[] = [];
@@ -143,7 +183,11 @@ export async function fetchPublicText(rawUrl: string): Promise<string> {
       const buffer = Buffer.concat(chunks.map((chunk) => Buffer.from(chunk)));
       const body = buffer.toString("utf8");
 
-      return contentType.includes("text/plain") ? body.slice(0, MAX_TEXT).trim() : htmlToText(body);
+      if (contentType.includes("text/plain")) {
+        return { text: body.slice(0, MAX_TEXT).trim(), imageUrl: null };
+      }
+
+      return { text: htmlToText(body), imageUrl: extractImageUrl(body, url) };
     } finally {
       clearTimeout(timer);
     }
@@ -152,6 +196,10 @@ export async function fetchPublicText(rawUrl: string): Promise<string> {
   throw new Error("too_many_redirects");
 }
 
+/** Compatibilità: solo il testo della pagina. */
+export async function fetchPublicText(rawUrl: string): Promise<string> {
+  return (await fetchPublicPage(rawUrl)).text;
+}
 export type PublicUrlCheck = {
   ok: boolean;
   status: number | null;

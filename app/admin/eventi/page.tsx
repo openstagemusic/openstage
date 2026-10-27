@@ -44,6 +44,13 @@ export default async function AdminEventsPage() {
       </h1>
       <p className="mt-2 max-w-2xl text-sm text-muted">{dict.admin.moderationSubtitle}</p>
 
+      <Link
+        href="/admin/eventi/nuovo"
+        className="mt-4 inline-flex min-h-10 items-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+      >
+        {dict.admin.aiCreateOpen}
+      </Link>
+
       <AdminEventsPanel events={events} dict={dict.admin} locale={locale} />
     </main>
   );

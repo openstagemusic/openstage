@@ -288,3 +288,29 @@ export async function listAuditLog(limit = 150): Promise<AuditEntry[]> {
     actorEmail: row.actor?.email ?? null,
   }));
 }
+
+export type AdminOwnerOption = {
+  id: string;
+  name: string;
+  city: string | null;
+};
+
+/** Artisti e locali reali per il selettore "crea per conto di". */
+export async function listOwnerOptions(): Promise<{
+  artists: AdminOwnerOption[];
+  venues: AdminOwnerOption[];
+}> {
+  const supabase = await createClient();
+  const [artists, venues] = await Promise.all([
+    supabase.from("artists").select("id, name, city").order("name", { ascending: true }).limit(1000),
+    supabase.from("venues").select("id, name, city").order("name", { ascending: true }).limit(1000),
+  ]);
+
+  if (artists.error) console.error("[admin] listOwnerOptions artists:", artists.error.message);
+  if (venues.error) console.error("[admin] listOwnerOptions venues:", venues.error.message);
+
+  return {
+    artists: (artists.data as unknown as AdminOwnerOption[]) ?? [],
+    venues: (venues.data as unknown as AdminOwnerOption[]) ?? [],
+  };
+}

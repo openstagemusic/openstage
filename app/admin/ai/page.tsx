@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import AdminAiImportPanel from "@/components/admin/AdminAiImportPanel";
+import Link from "@/components/i18n/LocaleLink";
 import AdminAiUsagePanel from "@/components/admin/AdminAiUsagePanel";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getAiUsage, isAiConfigured } from "@/lib/ai/client";
@@ -29,7 +29,13 @@ export default async function AdminAiPage() {
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{dict.admin.aiText}</p>
       </header>
 
-      <AdminAiImportPanel dict={dict.admin} />
+      <Link
+        href="/admin/eventi/nuovo"
+        className="mt-6 inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+      >
+        {dict.admin.aiCreateOpen}
+      </Link>
+
       <AdminAiUsagePanel
         configured={isAiConfigured()}
         usage={usage}
