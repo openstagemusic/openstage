@@ -52,5 +52,5 @@ La passphrase non va mai committata: senza di essa i backup non si aprono.
 - [x] Bucket privato `backups` creato con migrazione.
 - [x] Workflow con schedule e avvio manuale.
 - [x] Controllo dei secret mancanti con messaggio esplicito.
-- [ ] Prima esecuzione reale dopo l'inserimento dei 4 secret.
+- [x] Prima esecuzione reale dopo l'inserimento dei 4 secret (27 ottobre 2026, run verde).
 - [ ] Prova di ripristino su progetto di test.

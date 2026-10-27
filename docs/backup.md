@@ -9,6 +9,12 @@ Il piano **Free di Supabase non include backup automatici**. I backup nativi
 (giornalieri, con retention e PITR) richiedono il piano **Pro**. Per non pagare
 un piano superiore, OpenStage usa un dump logico settimanale.
 
+## Stato
+
+- Primo backup: **27 ottobre 2026, 20:37 UTC**, 233 KB, checksum SHA-256 verificato.
+- Artifact GitHub `db-backup-1` e copia nel bucket `backups`.
+- Prossimo passo: prova di ripristino su un progetto Supabase di test.
+
 ## Cosa fa il workflow
 
 File: `.github/workflows/db-backup.yml`

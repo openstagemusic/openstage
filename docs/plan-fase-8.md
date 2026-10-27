@@ -8,7 +8,7 @@
 > 8.6b (bot attività), 8.7 (notifiche admin), 8.8.1 (bozze AI), 8.8.2
 > (import evento), 8.8.3 (verifica assistita), 8.8.4 (qualità dati), B74 (crea per
 > conto di), B75 (copertina AI) e B76 (scheda libera e onboarding al solo nome).**
-> Restano 8.8.5 (facoltativo), B52 e la prima esecuzione del backup.
+> Restano 8.8.5 (facoltativo) e B52; il backup è attivo.
 
 ## Obiettivo
 
