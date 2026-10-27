@@ -114,16 +114,20 @@ export const listSavedEvents = cache(async (): Promise<PublicEvent[]> => {
  * eventi già esistenti: il legame con la scheda è la seconda via d'accesso.
  */
 export const getMyEvent = cache(
-  async (id: string, profileId: string): Promise<DashboardEvent | null> => {
+  async (id: string, profileId: string, anyEvent = false): Promise<DashboardEvent | null> => {
     const supabase = await createClient();
     const filters = await myEventFilters(profileId);
 
-    const { data, error } = await supabase
+    let query = supabase
       .from("events")
       .select(`${EVENT_SELECT}, updated_at`)
-      .eq("id", id)
-      .or(filters.join(","))
-      .maybeSingle();
+      .eq("id", id);
+
+    // L'admin modera e corregge anche le serate che non ha creato: la RLS gli
+    // permette già l'update, qui si toglie solo il filtro della dashboard.
+    if (!anyEvent) query = query.or(filters.join(","));
+
+    const { data, error } = await query.maybeSingle();
 
     if (error || !data) {
       if (error) console.error("[dashboard] getMyEvent:", error.message);
@@ -146,6 +150,15 @@ export type VenueOption = {
   longitude: number | null;
 };
 
+/** "Nome, città" non deve rompere il filtro PostgREST: si cercano le parti. */
+function searchParts(query: string): string[] {
+  return query
+    .split(",")
+    .map((part) => part.replace(/[%_()\\]/g, " ").replace(/\s+/g, " ").trim())
+    .filter((part) => part.length >= 2)
+    .slice(0, 3);
+}
+
 /**
  * Ricerca fra i locali già presenti.
  *
@@ -154,15 +167,18 @@ export type VenueOption = {
  * scritto a mano (`events.venue_name`).
  */
 export async function searchVenues(query: string, limit = 6): Promise<VenueOption[]> {
-  const term = query.replace(/[%_]/g, "").trim();
-  if (term.length < 2) return [];
+  const parts = searchParts(query);
+  if (parts.length === 0) return [];
 
   const supabase = await createClient();
+  const filters = parts
+    .flatMap((part) => [`name.ilike.%${part}%`, `city.ilike.%${part}%`])
+    .join(",");
 
   const { data, error } = await supabase
     .from("venues")
     .select("id, name, city, address, latitude, longitude")
-    .or(`name.ilike.%${term}%,city.ilike.%${term}%`)
+    .or(filters)
     .order("name", { ascending: true })
     .limit(limit);
 
@@ -189,15 +205,18 @@ export type ArtistOption = {
  * e l'artista resta fuori. La ricerca è aperta a chi ha una sessione.
  */
 export async function searchArtists(query: string, limit = 6): Promise<ArtistOption[]> {
-  const term = query.replace(/[%_]/g, "").trim();
-  if (term.length < 2) return [];
+  const parts = searchParts(query);
+  if (parts.length === 0) return [];
 
   const supabase = await createClient();
+  const filters = parts
+    .flatMap((part) => [`name.ilike.%${part}%`, `city.ilike.%${part}%`])
+    .join(",");
 
   const { data, error } = await supabase
     .from("artists")
     .select("id, name, city")
-    .or(`name.ilike.%${term}%,city.ilike.%${term}%`)
+    .or(filters)
     .order("name", { ascending: true })
     .limit(limit);
 

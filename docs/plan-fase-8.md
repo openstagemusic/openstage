@@ -230,11 +230,12 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 **Fatto:** 8.0 control room, 8.1 2FA/audit/revoca, 8.2 metriche, 8.3 persone/contenuti,
 8.4 claim a invito, 8.5 centro assistenza, 8.6a avvisi Telegram admin, 8.6b bot attività.
 
-**Fatti anche B74, B75, B76 e 8.8.4:** creazione per conto di artista/locale con import AI o
-manuale, scheda libera con conferma dei campi e controllo doppioni, copertina su Storage,
-onboarding al solo nome con redirect a `/account` e pagina `/admin/qualita` con controlli
-deterministici su eventi, artisti, locali e possibili doppioni. **Prossimo blocco:** decidere
-se fare 8.8.5 (facoltativo) o chiudere i debiti B52/backup.
+**Fatti anche B74, B75, B76, B77 e 8.8.4:** creazione per conto di artista/locale con import AI o
+manuale, scheda libera con conferma dei campi e controllo doppioni, copertina e posizione geocodificata,
+onboarding al solo nome con redirect a `/account`, modifica degli eventi dalla control room e pagina
+`/admin/qualita` con controlli deterministici su eventi, artisti, locali e possibili doppioni.
+**Prossimo blocco:** decidere se fare 8.8.5 (facoltativo) o chiudere i debiti B52/backup.
+
 
 **Debito aperto prima della chiusura:** B68 (bozze solo prime pubblicazioni), B52 (filtri,
 paginazione ed export delle altre liste), backup e notice & takedown.

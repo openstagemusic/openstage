@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { fetchPublicPage } from "@/lib/ai/fetch-public";
 import { prepareCoverFromUrl } from "@/lib/ai/cover";
+import { searchPlaces } from "@/lib/geo/geocoder";
 import { parseEventFromText } from "@/lib/ai/tasks/parse-event";
 import { ParsedEventSchema, type ParsedEvent } from "@/lib/ai/schemas";
 import { collectVerificationChecks, type VerificationReport } from "@/lib/ai/verify-page";
@@ -75,6 +76,7 @@ export type CreateAdminEventResult =
       pageCreated: boolean;
       coverImported: boolean;
       coverRequested: boolean;
+      locationFound: boolean;
     }
   | {
       ok: false;
@@ -94,6 +96,69 @@ function validHttpUrl(value: string | null): string | null {
 
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, (char) => "\\" + char);
+}
+
+type OwnerRow = {
+  id: string;
+  name: string;
+  city: string | null;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+type Coordinates = { latitude: number; longitude: number };
+
+function joinParts(values: Array<string | null | undefined>): string {
+  const parts: string[] = [];
+
+  for (const value of values) {
+    const text = value?.trim();
+    if (!text) continue;
+    if (parts.some((part) => part.toLowerCase() === text.toLowerCase())) continue;
+    parts.push(text);
+  }
+
+  return parts.join(", ");
+}
+
+/**
+ * Dal nome/indirizzo alla posizione sulla mappa.
+ *
+ * Senza questo passaggio l'evento nascerebbe con città e indirizzo ma senza pin,
+ * e l'editor chiederebbe di rimetterlo a mano. Se Photon non risponde, la
+ * creazione non si blocca: l'admin sistema il pin nell'editor.
+ */
+async function findCoordinates(input: {
+  name?: string | null;
+  address?: string | null;
+  city?: string | null;
+}): Promise<Coordinates | null> {
+  const candidates = [
+    joinParts([input.name, input.address, input.city]),
+    joinParts([input.address, input.city]),
+    joinParts([input.city]),
+  ].filter((query, index, all) => query.length >= 3 && all.indexOf(query) === index);
+
+  const wantedCity = input.city?.trim().toLowerCase() || null;
+
+  for (const query of candidates) {
+    try {
+      const places = await searchPlaces(query, { locale: "it", timeoutMs: 3500 });
+      const place =
+        (wantedCity
+          ? places.find((item) => item.city?.trim().toLowerCase() === wantedCity)
+          : null) ??
+        places[0] ??
+        null;
+
+      if (place) return { latitude: place.latitude, longitude: place.longitude };
+    } catch (error) {
+      console.error("[ai] geocode:", error instanceof Error ? error.message : error);
+    }
+  }
+
+  return null;
 }
 
 /** Schede con un nome simile: servono a fermare i doppioni prima di crearne una nuova. */
@@ -194,18 +259,25 @@ export async function createAdminEventAction(input: {
   const supabase = await createClient();
   const ownerTable = input.ownerType === "artist" ? "artists" : "venues";
 
-  let owner: { id: string; name: string; city: string | null } | null = null;
+  let owner: OwnerRow;
   let pageCreated = false;
 
   if (input.ownerId) {
-    const { data: found, error: ownerError } = await supabase
-      .from(ownerTable)
-      .select("id, name, city")
-      .eq("id", input.ownerId)
-      .maybeSingle();
+    const { data: found, error: ownerError } =
+      input.ownerType === "venue"
+        ? await supabase
+            .from("venues")
+            .select("id, name, city, address, latitude, longitude")
+            .eq("id", input.ownerId)
+            .maybeSingle()
+        : await supabase
+            .from("artists")
+            .select("id, name, city")
+            .eq("id", input.ownerId)
+            .maybeSingle();
 
     if (ownerError || !found) return { ok: false, error: "invalid" };
-    owner = found;
+    owner = found as OwnerRow;
   } else {
     const pageName = (input.newPage?.name ?? "").trim();
     if (!pageName) return { ok: false, error: "invalid" };
@@ -245,12 +317,46 @@ export async function createAdminEventAction(input: {
       return { ok: false, error: "failed" };
     }
 
-    owner = created.data;
+    owner = {
+      ...created.data,
+      address: pageAddress,
+      latitude: null,
+      longitude: null,
+    };
     pageCreated = true;
   }
 
   const city = data.city?.trim() || owner.city?.trim() || null;
   if (input.status === "published" && !city) return { ok: false, error: "invalid" };
+
+  // La mappa deve aprirsi con il pin già sul posto: si usano le coordinate del
+  // locale collegato, altrimenti si geocodifica nome/indirizzo/città. Se Photon
+  // non risponde, l'admin può sempre posizionare il pin nell'editor.
+  const ownerHasCoordinates =
+    input.ownerType === "venue" &&
+    typeof owner.latitude === "number" &&
+    typeof owner.longitude === "number";
+
+  let coordinates: Coordinates | null = ownerHasCoordinates
+    ? { latitude: owner.latitude as number, longitude: owner.longitude as number }
+    : null;
+
+  if (!coordinates) {
+    coordinates = await findCoordinates({
+      name: input.ownerType === "venue" ? owner.name : data.venue,
+      address: data.address ?? owner.address ?? null,
+      city,
+    });
+  }
+
+  if (pageCreated && input.ownerType === "venue" && coordinates) {
+    const { error: locationError } = await supabase
+      .from("venues")
+      .update({ latitude: coordinates.latitude, longitude: coordinates.longitude })
+      .eq("id", owner.id);
+
+    if (locationError) console.error("[ai] page coordinates:", locationError.message);
+  }
 
   const descriptionParts = [
     data.artist ? "Artista: " + data.artist : null,
@@ -292,6 +398,8 @@ export async function createAdminEventAction(input: {
     city,
     venue_name: data.venue ?? (input.ownerType === "venue" ? owner.name : null),
     directions_text: data.address,
+    latitude: coordinates?.latitude ?? null,
+    longitude: coordinates?.longitude ?? null,
     price_text: data.priceText,
     ticket_url: validHttpUrl(data.ticketUrl ?? null),
     cover_image_url: coverImageUrl,
@@ -341,6 +449,7 @@ export async function createAdminEventAction(input: {
     pageCreated,
     coverImported: coverImageUrl !== null,
     coverRequested,
+    locationFound: coordinates !== null,
   };
 }
 export type VerificationAnalysisResult =

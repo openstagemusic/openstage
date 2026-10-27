@@ -40,7 +40,7 @@ export default async function EditEventPage({
 
   if (!canManageEvents(session.role)) redirect(withLocale(locale, "/onboarding/role"));
 
-  const event = await getMyEvent(id, session.id);
+  const event = await getMyEvent(id, session.id, session.role === "admin");
 
   if (!event) notFound();
 

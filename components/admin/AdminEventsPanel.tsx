@@ -153,6 +153,12 @@ export default function AdminEventsPanel({
                       </span>
                     ) : null}
                     <Link
+                      href={`/dashboard/events/${event.id}`}
+                      className="rounded-full border border-white/10 px-2.5 py-1 text-muted transition-colors hover:border-white/30 hover:text-white"
+                    >
+                      {dict.moderationEdit}
+                    </Link>
+                    <Link
                       href={eventPath(event)}
                       className="rounded-full border border-white/10 px-2.5 py-1 text-cyan transition-colors hover:border-cyan/40"
                     >

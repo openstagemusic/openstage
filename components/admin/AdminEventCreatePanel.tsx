@@ -241,6 +241,10 @@ export default function AdminEventCreatePanel({
       window.alert(dict.aiCreateCoverFailed);
     }
 
+    if (!outcome.locationFound) {
+      window.alert(dict.aiCreateLocationFailed);
+    }
+
     router.push(withLocale(locale, `/dashboard/events/${outcome.eventId}`));
     router.refresh();
   }

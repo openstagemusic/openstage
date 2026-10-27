@@ -79,14 +79,22 @@ export default function AdminDraftsPanel({
                 </p>
               </div>
 
-              <button
-                type="button"
-                disabled={busy === draft.id}
-                onClick={() => void publish(draft)}
-                className="inline-flex min-h-9 items-center border border-violet-strong bg-violet-strong px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet disabled:opacity-50"
-              >
-                {busy === draft.id ? dict.publishing : dict.publish}
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <LocaleLink
+                  href={`/dashboard/events/${draft.id}`}
+                  className="inline-flex min-h-9 items-center border border-line px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted transition-colors hover:border-line-strong hover:text-white"
+                >
+                  {dict.moderationEdit}
+                </LocaleLink>
+                <button
+                  type="button"
+                  disabled={busy === draft.id}
+                  onClick={() => void publish(draft)}
+                  className="inline-flex min-h-9 items-center border border-violet-strong bg-violet-strong px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet disabled:opacity-50"
+                >
+                  {busy === draft.id ? dict.publishing : dict.publish}
+                </button>
+              </div>
             </div>
           </li>
         ))}
