@@ -4,11 +4,13 @@ import { notFound } from "next/navigation";
 
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
+import FollowButton from "@/components/directory/FollowButton";
 import EventTeaser from "@/components/events/EventTeaser";
 import JsonLd from "@/components/seo/JsonLd";
 import { canManageArtistProfile } from "@/lib/auth/roles";
 import { getReplaceablePage } from "@/lib/claims/queries";
 import { getArtistByProfileId, getArtistBySlug } from "@/lib/directory/queries";
+import { isFollowing } from "@/lib/follows/queries";
 import { artistPath } from "@/lib/events/paths";
 import { listPastEventsByArtist, listUpcomingEventsByArtist } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -62,9 +64,10 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const session = await getSessionProfile();
-  const [events, past] = await Promise.all([
+  const [events, past, following] = await Promise.all([
     listUpcomingEventsByArtist(artist.id),
     listPastEventsByArtist(artist.id),
+    isFollowing("artist", artist.id, session?.id ?? null),
   ]);
 
   // Il reclamo di una scheda artista è immediato: non esiste uno stato "in
@@ -170,6 +173,18 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             <p className="mt-6 max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted">
               {artist.bio}
             </p>
+          ) : null}
+
+          {artist.profileId !== session?.id ? (
+            <div className="mt-6">
+              <FollowButton
+                subjectType="artist"
+                subjectId={artist.id}
+                initialFollowing={following}
+                isAuthenticated={session !== null}
+                dict={dict.follow}
+              />
+            </div>
           ) : null}
         </div>
       </header>

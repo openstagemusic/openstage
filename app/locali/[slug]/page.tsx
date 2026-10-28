@@ -6,9 +6,11 @@ import EventTeaser from "@/components/events/EventTeaser";
 import JsonLd from "@/components/seo/JsonLd";
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
+import FollowButton from "@/components/directory/FollowButton";
 import { canManageVenueProfile } from "@/lib/auth/roles";
 import { getMyPendingRequest, getReplaceablePage } from "@/lib/claims/queries";
 import { getVenueByProfileId, getVenueBySlug } from "@/lib/directory/queries";
+import { isFollowing } from "@/lib/follows/queries";
 import { venuePath } from "@/lib/events/paths";
 import { listPastEventsByVenue, listUpcomingEventsByVenue } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -61,9 +63,10 @@ export default async function VenuePage({ params }: VenuePageProps) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const session = await getSessionProfile();
-  const [events, past] = await Promise.all([
+  const [events, past, following] = await Promise.all([
     listUpcomingEventsByVenue(venue.id),
     listPastEventsByVenue(venue.id),
+    isFollowing("venue", venue.id, session?.id ?? null),
   ]);
 
   // La scheda di un locale si prende su richiesta. Il database permette una
@@ -170,6 +173,18 @@ export default async function VenuePage({ params }: VenuePageProps) {
           <h1 className="mt-4 text-balance font-poster text-4xl uppercase leading-[0.92] tracking-[-0.02em] sm:text-6xl">
             {venue.name}
           </h1>
+
+          {venue.profileId !== session?.id ? (
+            <div className="mt-6">
+              <FollowButton
+                subjectType="venue"
+                subjectId={venue.id}
+                initialFollowing={following}
+                isAuthenticated={session !== null}
+                dict={dict.follow}
+              />
+            </div>
+          ) : null}
         </div>
       </header>
 

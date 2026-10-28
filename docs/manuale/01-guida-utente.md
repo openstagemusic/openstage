@@ -29,9 +29,9 @@ email transazionali, centro notifiche e digest, Area Fan, control room admin con
 claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram,
 assistente AI per bozze e verifica schede, creazione eventi per conto di artisti/locali,
 ingresso gratuito, qualità dati, backup cifrato con prova di ripristino, liste admin con
-ricerca, filtri, paginazione ed export e notice & takedown.
+ricerca, filtri, paginazione ed export, notice & takedown e follow di artisti e locali.
 
-**In arrivo:** community e follow, Spotify,
+**In arrivo:** Spotify,
 pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
 ripristino è già passata.
 
@@ -226,6 +226,16 @@ Il pulsante **Salva** scrive davvero nel database, sul tuo profilo (serve l'acce
 preferiti sono raccolti in **Dashboard → Preferiti** (`/dashboard/saved`), dal più recente.
 Se non hai una dashboard da artista o locale, la voce è disponibile anche per i fan.
 
+## Seguire un artista o un locale
+
+Sulla scheda pubblica di un artista o di un locale trovi **Segui**. Serve l'accesso; da
+scollegato il pulsante porta al login. Quando la scheda pubblica una nuova serata ricevi una
+notifica in-app, se non l'hai disattivata nelle impostazioni.
+
+Le schede che segui sono raccolte in **Dashboard → Per te**. Il digest settimanale, se lo hai
+attivato, include anche le serate degli artisti e locali seguiti, senza duplicare quelle
+salvate.
+
 # Reclamare la tua scheda
 
 Se una scheda artista o locale è stata creata dalla redazione, puoi diventarne proprietario.
@@ -270,6 +280,7 @@ La dashboard è il posto dove gestisci il tuo profilo e le tue date.
 | **I miei eventi** | Tutte le tue serate, divise tra in programma e **passate** |
 | **Crea evento** | Il modulo di pubblicazione |
 | **Preferiti** | Le serate che hai salvato |
+| **Per te** | Le schede che segui e le prossime serate salvate |
 | **Profilo / Account** | La tua scheda, la richiesta di reclamo e le impostazioni |
 
 Nel modulo puoi inserire titolo, artista, data e ora, locale o nome del posto, indirizzo con

@@ -262,7 +262,11 @@ scheda), `starts_at`, `city`, `city_key`, `status` (**enum**: `draft`/`published
 `merged_status`, `auto_hidden_at`, `auto_hidden_status`. **`is_unclaimed` non esiste più**:
 lo stato "inserito da OpenStage" si calcola dall'assenza dei `profile_id` collegati.
 
-**`saved_events`** — gli eventi salvati da un profilo (Fase 2).
+**`follows`** - artisti e locali seguiti da un profilo (Fase 9A).
+`follower_id` più `artist_id` oppure `venue_id` (uno solo), con chiave unica per coppia e RLS
+sulla propria riga. Il trigger vieta di seguire la propria scheda.
+
+**`saved_events`** - gli eventi salvati da un profilo (Fase 2).
 `profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
 dato sensibile, e la RLS lo limita al proprietario.
 
@@ -289,7 +293,8 @@ scadenza, priorità e chiave di deduplica. RLS sul proprietario.
 errore, provider id, idempotenza, `batch_id`, `recipient_count` e webhook Resend.
 
 **`notification_preferences` / `digest`** - preferenze per tipo e digest settimanale opt-in;
-la disiscrizione usa un token firmato.
+la disiscrizione usa un token firmato. Il digest include le serate salvate e quelle delle
+schede seguite, senza duplicati.
 
 **`claim_invites`** - inviti a reclamare una scheda: token solo come hash, scadenza, stato,
 canale (email o notifica), chi ha invitato e chi ha accettato.
@@ -415,6 +420,7 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0050_ai_runs.sql` | Registro AI, costo, budget e audit |
 | `0051_backup_bucket.sql` | Bucket privato `backups` per le copie cifrate del database |
 | `0052_takedown_notices.sql` | Notice & takedown: tabella, RLS, notifica admin, audit e funzione di decisione |
+| `0053_follows.sql` | Follow di artisti/locali, notifica ai follower e digest esteso |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
@@ -441,6 +447,7 @@ di `is_admin()`, mai di valori passati dal browser.
 | | `events_update_own`, `events_delete_own` | Modifichi solo i tuoi eventi (o l'admin) |
 | `saved_events` | `saved_events_select_own` | Vedi solo i **tuoi** preferiti |
 | | `saved_events_insert_own`, `saved_events_delete_own` | Salvi e togli solo i tuoi |
+| `follows` | `follows_select_own`, `follows_insert_own`, `follows_delete_own` | Segui e togli solo le tue schede; il trigger vieta la propria scheda |
 | `claims` | `claims_select_own_or_admin` | Vedi la tua richiesta (o tutte se admin); si scrive solo tramite funzioni |
 | `reports` | `reports_insert_own` | Segnali solo a nome tuo, una volta per serata |
 | | `reports_select_own_or_admin`, `reports_admin_update` | Vedi le tue segnalazioni; l'admin le legge e le chiude |
@@ -629,8 +636,8 @@ anche in Supabase Vault per autorizzare le chiamate dal database.
 doppioni), l'import della copertina, la modifica degli eventi anche non creati dall'admin, la
 pagina Qualità dati, l'ingresso gratuito senza link biglietti e il backup cifrato settimanale.
 
-**Cosa manca.** La community/follow e le fasi successive. Il backup, il restore test, le liste
-admin complete e il notice & takedown sono attivi.
+**Cosa manca.** Gli inviti virali (rimandati), Spotify e le fasi successive. Follow, backup,
+restore test, liste admin complete e notice & takedown sono attivi.
 
 # Deploy e rilascio
 
@@ -784,3 +791,4 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 8.9 | ✅ Backup settimanale cifrato e restore test automatico superato |
 | B52 | ✅ Liste admin con ricerca, filtri nell'URL, paginazione ed export CSV/JSON |
 | 8.11 / B81 | ✅ Notice & takedown con pagina pubblica, coda admin, notifiche, audit ed export |
+| 9A / B82 | ✅ Follow di artisti e locali, notifica nuovi eventi, digest e sezione Per te |

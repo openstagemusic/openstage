@@ -821,6 +821,27 @@ contenuto, e all'admin una coda per decidere senza automatismi.
 **Verifiche superate:** invio pubblico reale, riga in database, notifica admin, presa in carico,
 risoluzione con azione, audit, export e accesso anonimo all'export respinto.
 
+## Fase 9A - Follow di artisti e locali
+
+**Obiettivo:** seguire una scheda e ricevere informazione reale quando pubblica una serata,
+senza classifiche di popolarità né engagement finto.
+
+**Cosa è stato costruito**
+
+- Tabella `follows` con RLS sulla propria riga e divieto di seguire la propria scheda.
+- Pulsante **Segui / Segui già** sulle schede pubbliche di artista e locale; da scollegati
+  porta al login.
+- Notifica in-app `follow_new_event` quando una scheda seguita pubblica un evento futuro,
+  rispettando `in_app_follows`.
+- Digest settimanale esteso: serate salvate + serate delle schede seguite, senza duplicati.
+- Sezione **Artisti e locali che segui** in `/dashboard/per-te`.
+- Testi IT/EN.
+
+**Verifiche superate:** follow e unfollow reali, login link da anonimo, notifica su evento
+pubblicato, digest con evento seguito, sezione Per te, build.
+
+**Rimandato:** inviti virali (9B): manca un premio chiaro e una regola anti-abuso.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato
