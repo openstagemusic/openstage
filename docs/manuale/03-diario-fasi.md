@@ -780,6 +780,26 @@ verificato; restore test automatico superato il **28 ottobre 2026**.
 
 **Nessun blocco aperto:** il backup è periodico e il ripristino è provato a ogni copia.
 
+## B52 - Liste admin complete
+
+**Obiettivo:** chiudere la control room con gli strumenti che mancavano sulle liste: ricerca,
+filtri condivisibili, paginazione ed export.
+
+**Cosa è stato costruito**
+
+- Componente unico per ricerca, filtri nell'URL ed export.
+- Filtri su utenti (ruolo, stato), artisti/locali (scheda reclamata, verifica), eventi
+  (online, concluse, in pausa, segnalate, annullate), segnalazioni (stato), bozze e audit.
+- Paginazione server-side della pagina, con filtri conservati nei link.
+- API `/api/admin/export` per CSV/JSON: rilegge la lista con gli stessi filtri e scarica
+  tutte le righe, non solo la pagina.
+- Le liste già complete (email) restano invariate; ticket e claim mantengono i loro filtri
+  dedicati.
+
+**Verifiche superate:** ricerca e filtri nell'URL, azzeramento, paginazione su 22 righe,
+export CSV/JSON con e senza filtro, accesso anonimo all'export respinto con 403, build e test
+admin.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

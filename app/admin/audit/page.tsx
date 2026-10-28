@@ -1,19 +1,41 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { isCurrentUserAdmin } from "@/lib/claims/queries";
+import AdminListToolbar from "@/components/admin/AdminListToolbar";
+import Pagination from "@/components/ui/Pagination";
+import { filterAuditEntries } from "@/lib/admin/filters";
+import {
+  ADMIN_PAGE_SIZE,
+  firstParam,
+  listParams,
+  paginate,
+  parsePage,
+  type AdminSearchParams,
+} from "@/lib/admin/list";
 import { listAuditLog } from "@/lib/admin/queries";
+import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function AdminAuditPage() {
+type AdminAuditPageProps = {
+  searchParams: Promise<AdminSearchParams>;
+};
+
+export default async function AdminAuditPage({ searchParams }: AdminAuditPageProps) {
   if (!(await isCurrentUserAdmin())) notFound();
 
   const locale = await getLocale();
   const dict = getDictionary(locale);
-  const entries = await listAuditLog();
+  const params = await searchParams;
+
+  const q = firstParam(params.q);
+  const page = parsePage(params.page);
+
+  const entries = await listAuditLog(2000);
+  const filtered = filterAuditEntries(entries, q);
+  const paged = paginate(filtered, page);
 
   const date = new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
     dateStyle: "medium",
@@ -34,7 +56,13 @@ export default async function AdminAuditPage() {
         </p>
       </header>
 
-      {entries.length === 0 ? (
+      <AdminListToolbar q={q} exportList="audit" dict={dict.admin} />
+
+      <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+        {dict.admin.listResults.replace("{n}", String(paged.total))}
+      </p>
+
+      {paged.rows.length === 0 ? (
         <p className="mt-6 border-l-2 border-line-strong pl-3 text-sm text-muted">
           {dict.admin.auditEmpty}
         </p>
@@ -50,7 +78,7 @@ export default async function AdminAuditPage() {
               </tr>
             </thead>
             <tbody>
-              {entries.map((entry) => {
+              {paged.rows.map((entry) => {
                 const note =
                   typeof entry.metadata.note === "string" ? entry.metadata.note : null;
 
@@ -60,14 +88,14 @@ export default async function AdminAuditPage() {
                       {date.format(new Date(entry.createdAt))}
                     </td>
                     <td className="px-3 py-3 text-xs text-white">
-                      {entry.actorEmail ?? "—"}
+                      {entry.actorEmail ?? "-"}
                     </td>
                     <td className="px-3 py-3 font-mono text-[10px] uppercase tracking-[0.08em] text-cyan">
                       {entry.action}
                     </td>
                     <td className="px-3 py-3 text-xs text-muted">
                       <p>
-                        {entry.subjectType ?? "—"}
+                        {entry.subjectType ?? "-"}
                         {entry.subjectId ? ` · ${entry.subjectId.slice(0, 8)}` : ""}
                       </p>
                       {note ? <p className="mt-1 text-white">{note}</p> : null}
@@ -79,6 +107,21 @@ export default async function AdminAuditPage() {
           </table>
         </div>
       )}
+
+      <div className="mt-8">
+        <Pagination
+          currentPage={paged.page}
+          totalItems={paged.total}
+          basePath="/admin/audit"
+          perPage={ADMIN_PAGE_SIZE}
+          params={listParams({ q })}
+          labels={{
+            previous: dict.pagination.previous,
+            next: dict.pagination.next,
+            label: dict.pagination.label,
+          }}
+        />
+      </div>
     </div>
   );
 }

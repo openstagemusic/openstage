@@ -28,8 +28,6 @@ import type { ModerationEvent } from "@/lib/moderation/queries";
  * **proposte**, non condanne: la serata torna in bozza e aspetta una decisione.
  */
 
-type Filter = "all" | "online" | "past" | "paused" | "reported" | "cancelled";
-
 export default function AdminEventsPanel({
   events,
   dict,
@@ -40,21 +38,9 @@ export default function AdminEventsPanel({
   locale: string;
 }) {
   const router = useRouter();
-  const [filter, setFilter] = useState<Filter>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mergeTarget, setMergeTarget] = useState<Record<string, string>>({});
-
-  const visible = events.filter((event) => {
-    if (filter === "online")
-      return event.status === "published" && !isEventPast(event.startsAt, event.timezone);
-    if (filter === "past")
-      return event.status === "published" && isEventPast(event.startsAt, event.timezone);
-    if (filter === "paused") return event.autoHiddenAt !== null;
-    if (filter === "reported") return event.reports > 0;
-    if (filter === "cancelled") return event.status === "cancelled";
-    return true;
-  });
 
   async function run(id: string, work: () => Promise<{ ok: boolean }>) {
     setBusy(id);
@@ -84,41 +70,15 @@ export default function AdminEventsPanel({
     return dict.moderationStatusDraft;
   }
 
-  const filters: Array<{ key: Filter; label: string }> = [
-    { key: "all", label: dict.moderationFilterAll },
-    { key: "online", label: dict.moderationFilterOnline },
-    { key: "past", label: dict.moderationFilterPast },
-    { key: "paused", label: dict.moderationFilterPaused },
-    { key: "reported", label: dict.moderationFilterReported },
-    { key: "cancelled", label: dict.moderationFilterCancelled },
-  ];
-
   return (
     <div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {filters.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            onClick={() => setFilter(item.key)}
-            className={
-              filter === item.key
-                ? "rounded-full border border-cyan/50 bg-cyan/15 px-3 py-1 text-xs text-white"
-                : "rounded-full border border-white/10 px-3 py-1 text-xs text-muted transition-colors hover:text-white"
-            }
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
       {error ? <p className="mt-3 text-xs text-pink">{error}</p> : null}
 
-      {visible.length === 0 ? (
+      {events.length === 0 ? (
         <p className="mt-6 text-sm text-muted">{dict.moderationEmpty}</p>
       ) : (
         <ul className="mt-6 space-y-4">
-          {visible.map((event) => {
+          {events.map((event) => {
             const working = busy === event.id;
 
             return (

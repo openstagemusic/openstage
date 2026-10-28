@@ -3,7 +3,7 @@
   "sottotitolo": "Manuale tecnico e guida utente",
   "versione": "1.11",
   "data": "28 ottobre 2026",
-  "copre": "Fase 1 · Fase 1.2 · Fase 1.3 · Fase 2 · Fase 3 · Fase 4 · Fase 5.4 · Fase 5.5A · Fase 5.5B · Fase 5.5C · Fase 5.5D · Fase 5.5E · Fase 6 · Fase 7A · Fase 7B · Fase 8.0 · Fase 8.1 · Fase 8.2 · Fase 8.3 · Fase 8.4 · Fase 8.5 · Fase 8.6 · Fase 8.6a · Fase 8.6b · Fase 8.7 · Fase 8.8.1 · Fase 8.8.2 · Fase 8.8.3 · Fase 8.8.4 · B74 · B75 · B76 · B77 · B78 · B79 · Fase 8.9",
+  "copre": "Fase 1 · Fase 1.2 · Fase 1.3 · Fase 2 · Fase 3 · Fase 4 · Fase 5.4 · Fase 5.5A · Fase 5.5B · Fase 5.5C · Fase 5.5D · Fase 5.5E · Fase 6 · Fase 7A · Fase 7B · Fase 8.0 · Fase 8.1 · Fase 8.2 · Fase 8.3 · Fase 8.4 · Fase 8.5 · Fase 8.6 · Fase 8.6a · Fase 8.6b · Fase 8.7 · Fase 8.8.1 · Fase 8.8.2 · Fase 8.8.3 · Fase 8.8.4 · B74 · B75 · B76 · B77 · B78 · B79 · Fase 8.9 · B52",
   "autore": "OpenStage - documento interno",
   "nota": "Documento generato automaticamente dai sorgenti in docs/manuale. Non modificare il PDF a mano: si aggiorna con npm run manuale."
 }

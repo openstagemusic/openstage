@@ -28,9 +28,10 @@ Home poster wall, pagine pubbliche, indice e pagine città, modulo contatti che 
 email transazionali, centro notifiche e digest, Area Fan, control room admin con 2FA e audit,
 claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram,
 assistente AI per bozze e verifica schede, creazione eventi per conto di artisti/locali,
-ingresso gratuito, qualità dati e backup cifrato con prova di ripristino.
+ingresso gratuito, qualità dati, backup cifrato con prova di ripristino e liste admin con
+ricerca, filtri, paginazione ed export.
 
-**In arrivo:** rifinitura delle liste admin, notice & takedown, community e follow, Spotify,
+**In arrivo:** notice & takedown, community e follow, Spotify,
 pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
 ripristino è già passata.
 
@@ -335,6 +336,10 @@ finestra breve senza cancellare la chiave TOTP.
 Ogni azione distruttiva chiede conferma e finisce nell'audit. Telegram avvisa l'admin quando
 arriva un ticket, una richiesta, una segnalazione, una bozza da revisione o un'email fallita;
 un secondo bot avvisa nuove registrazioni e nuovi eventi con i totali aggiornati.
+
+Le liste di **Utenti**, **Artisti**, **Locali**, **Eventi**, **Bozze**, **Segnalazioni** e **Audit**
+hanno ricerca, filtri nell'URL, paginazione ed export CSV/JSON. I filtri restano nell'indirizzo:
+puoi ricaricare o condividere la stessa vista.
 
 La redazione crea una serata per un artista o un locale da **Eventi → Crea per conto di**:
 può collegare una scheda esistente oppure crearne una libera con nome, città e indirizzo

@@ -613,6 +613,10 @@ di accesso è doppio: `is_admin()` nel database e 2FA AAL2 nella sessione. La pa
 | `/admin/sicurezza` | 2FA e sospensione temporanea |
 | `/admin/impostazioni` | Bot Telegram e test |
 
+Le liste principali (utenti, artisti, locali, eventi, bozze, segnalazioni, audit) condividono
+ricerca, filtri nell'URL, paginazione e export CSV/JSON. L'export rilegge la lista con gli stessi
+filtri e scarica tutte le righe, non solo la pagina visibile. L'API è `/api/admin/export`.
+
 **Telegram.** Due bot separati: uno per le code admin, uno per registrazioni ed eventi. I
 trigger del database non chiamano Telegram direttamente: inseriscono un avviso con dedupe e
 chiamano `/api/admin/telegram/alert` o `/api/admin/telegram/activity`, protette da un header
@@ -623,8 +627,8 @@ anche in Supabase Vault per autorizzare le chiamate dal database.
 doppioni), l'import della copertina, la modifica degli eventi anche non creati dall'admin, la
 pagina Qualità dati, l'ingresso gratuito senza link biglietti e il backup cifrato settimanale.
 
-**Cosa manca.** La rifinitura delle liste admin (B52), il notice & takedown, la community/follow
-e le fasi successive. Il backup e il restore test sono attivi.
+**Cosa manca.** Il notice & takedown, la community/follow e le fasi successive. Il backup, il
+restore test e le liste admin complete sono attivi.
 
 # Deploy e rilascio
 
@@ -775,3 +779,4 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 8.8.4 | ✅ Qualità dati e doppioni deterministici, senza costo AI |
 | B74-B79 | ✅ Crea per conto di, scheda libera, copertina, pin, modifica admin, ingresso gratuito, popup mappa |
 | 8.9 | ✅ Backup settimanale cifrato e restore test automatico superato |
+| B52 | ✅ Liste admin con ricerca, filtri nell'URL, paginazione ed export CSV/JSON |

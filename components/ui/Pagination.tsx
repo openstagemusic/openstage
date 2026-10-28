@@ -11,6 +11,8 @@ export type PaginationProps = {
   totalItems: number;
   /** Base path, e.g. "/artisti". */
   basePath: string;
+  /** Elementi per pagina. Default: ITEMS_PER_PAGE. */
+  perPage?: number;
   /** Query string parameter used for the page number. */
   queryParam?: string;
   /** Altri parametri da conservare nei link (filtri, ricerca…). */
@@ -28,12 +30,13 @@ export default function Pagination({
   currentPage,
   totalItems,
   basePath,
+  perPage = ITEMS_PER_PAGE,
   queryParam = "page",
   params,
   hash,
   labels,
 }: PaginationProps) {
-  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
   const page = Math.min(Math.max(1, currentPage), totalPages);
 
   const pages = useMemo(() => {
