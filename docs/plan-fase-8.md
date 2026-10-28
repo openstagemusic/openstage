@@ -9,7 +9,7 @@
 > (import evento), 8.8.3 (verifica assistita), 8.8.4 (qualità dati), B74-B79 (crea per
 > conto di, scheda libera, pin, modifica admin, ingresso gratuito, popup mappa) e 8.9
 > (backup cifrato).**
-> Restano 8.8.5 (facoltativo), B52, notice & takedown e la prova di ripristino del backup.
+> Restano 8.8.5 (facoltativo), B52 e notice & takedown.
 
 ## Obiettivo
 
@@ -234,9 +234,9 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 **Fatti anche B74-B79, 8.8.4 e 8.9:** creazione per conto di artista/locale con import AI o manuale,
 scheda libera con conferma dei campi e controllo doppioni, copertina e posizione geocodificata,
 ingresso gratuito senza link biglietti, modifica degli eventi dalla control room, popup mappa corretto,
-pagina `/admin/qualita` con controlli deterministici e backup settimanale cifrato con ripristino da provare.
-**Prossimo blocco:** B52 sulle liste admin, notice & takedown e prova di ripristino del backup.
+pagina `/admin/qualita` con controlli deterministici e backup settimanale cifrato con prova di ripristino superata.
+**Prossimo blocco:** B52 sulle liste admin e notice & takedown.
 
 
 **Debito aperto prima della chiusura:** B52 (filtri, paginazione ed export delle altre liste),
-notice & takedown e la prova di ripristino del backup.
+notice & takedown.

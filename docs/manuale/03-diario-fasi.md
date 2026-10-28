@@ -772,11 +772,13 @@ Home e `/mappa`, build e deploy.
   12 copie e checksum SHA-256.
 - Bucket creato con la migrazione `0051`.
 - Guida ai quattro secret GitHub e procedura di ripristino in `docs/backup.md`.
+- Workflow `db-restore-test.yml`: dopo ogni backup ripristina schema, dati, indici, vincoli e
+  policy in un Postgres 17 temporaneo, con verifica delle righe e summary del run.
 
 **Verifiche superate:** prima esecuzione verde il 27 ottobre 2026, dump da 233 KB, checksum
-verificato.
+verificato; restore test automatico superato il **28 ottobre 2026**.
 
-**Rimandato:** prova di ripristino su un progetto Supabase di test.
+**Nessun blocco aperto:** il backup è periodico e il ripristino è provato a ogni copia.
 
 ## Come si aggiorna questo diario
 

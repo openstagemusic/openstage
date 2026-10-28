@@ -623,8 +623,8 @@ anche in Supabase Vault per autorizzare le chiamate dal database.
 doppioni), l'import della copertina, la modifica degli eventi anche non creati dall'admin, la
 pagina Qualità dati, l'ingresso gratuito senza link biglietti e il backup cifrato settimanale.
 
-**Cosa manca.** La prova di ripristino del backup su un progetto di test, la rifinitura delle
-liste admin (B52), il notice & takedown, la community/follow e le fasi successive.
+**Cosa manca.** La rifinitura delle liste admin (B52), il notice & takedown, la community/follow
+e le fasi successive. Il backup e il restore test sono attivi.
 
 # Deploy e rilascio
 
@@ -652,8 +652,8 @@ sono cifrati GPG. La passphrase resta l'unica chiave.
    riprendere).
 6. Se la fase ha cambiato qualcosa di stabile (architettura, variabili, regole, schermate):
    **`npm run manuale`** per rigenerare questo PDF, con versione e data nuove in `meta.json`.
-7. Se la fase tocca schema o dati, controllare che il backup settimanale sia verde; la prova
-   di ripristino si fa su un progetto Supabase di test, mai in produzione.
+7. Se la fase tocca schema o dati, controllare che il backup settimanale e il restore test
+   automatico siano verdi; il test usa un Postgres temporaneo, mai la produzione.
 
 # Backup del database
 
@@ -671,8 +671,16 @@ settimanale con GitHub Actions.
   GitHub sì.
 - Procedura completa di ripristino: `docs/backup.md`.
 
-**Stato:** primo backup verificato il 27 ottobre 2026 (233 KB, checksum valido). Resta la prova
-di ripristino su un progetto di test.
+**Prova di ripristino.** Il workflow `db-restore-test.yml` parte dopo ogni backup riuscito e
+si può avviare a mano. Scarica l'ultimo dump, verifica il checksum, lo decifra e lo ripristina
+in un **Postgres 17 temporaneo** dentro GitHub Actions: schema `public`, dati, indici, vincoli
+e policy RLS. Controlla righe di profili, eventi, artisti, locali, claim, segnalazioni e
+notifiche e scrive il risultato nel summary del run. Non tocca la produzione né un progetto
+Supabase reale. Limite: Auth e Storage restano gestiti da Supabase, quindi il test copre il
+database applicativo, non l'intera istanza Auth.
+
+**Stato:** primo backup verificato il 27 ottobre 2026 (233 KB, checksum valido); prova di
+ripristino automatica superata il **28 ottobre 2026**.
 
 # Errori già incontrati e come si risolvono
 
@@ -766,4 +774,4 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | 8.8 | ✅ AI assistita (8.8.1-8.8.4); 8.8.5 facoltativo |
 | 8.8.4 | ✅ Qualità dati e doppioni deterministici, senza costo AI |
 | B74-B79 | ✅ Crea per conto di, scheda libera, copertina, pin, modifica admin, ingresso gratuito, popup mappa |
-| 8.9 | ✅ Backup settimanale cifrato; resta la prova di ripristino |
+| 8.9 | ✅ Backup settimanale cifrato e restore test automatico superato |

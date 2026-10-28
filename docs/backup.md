@@ -1,6 +1,6 @@
 # Backup del database
 
-> Ultimo aggiornamento: 27 ottobre 2026.
+> Ultimo aggiornamento: 28 ottobre 2026.
 > Scelta: **GitHub Actions + `pg_dump`**, senza piano Supabase Pro.
 
 ## Perché non i backup Supabase
@@ -13,7 +13,23 @@ un piano superiore, OpenStage usa un dump logico settimanale.
 
 - Primo backup: **27 ottobre 2026, 20:37 UTC**, 233 KB, checksum SHA-256 verificato.
 - Artifact GitHub `db-backup-1` e copia nel bucket `backups`.
-- Prossimo passo: prova di ripristino su un progetto Supabase di test.
+- **Prova di ripristino superata il 28 ottobre 2026** su un Postgres 17 temporaneo: schema,
+  dati, indici, vincoli e policy ripristinati e verificati.
+
+## Prova di ripristino
+
+File: `.github/workflows/db-restore-test.yml`. Parte **dopo ogni backup riuscito** e si può
+avviare a mano.
+
+- Scarica l'ultimo dump cifrato dal bucket e verifica lo SHA-256.
+- Lo decifra e lo valida con `pg_restore --list`.
+- Avvia un **Postgres 17 temporaneo** dentro GitHub Actions, mai la produzione.
+- Ripristina lo schema `public`, i dati, gli indici, i vincoli e le policy RLS.
+- Controlla le righe di profili, eventi, artisti, locali, claim, segnalazioni e notifiche.
+- Il risultato compare nel **summary** del run GitHub.
+
+Limite: il test ripristina il database applicativo (`public`). Auth e Storage restano gestiti
+da Supabase; non è una prova di ripristino completo dell'istanza Auth.
 
 ## Cosa fa il workflow
 

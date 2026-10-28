@@ -177,7 +177,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          "$PGBIN/psql" "$TEST_DB_URL" -X -v ON_ERROR_STOP=1 <<'SQL'
+          "$PGBIN/psql" "$TEST_DB_URL" -X -v ON_ERROR_STOP=1 > restore-report.txt <<'SQL'
           select 'profiles' as tabella, count(*)::int as righe from public.profiles
           union all select 'events', count(*)::int from public.events
           union all select 'artists', count(*)::int from public.artists
@@ -198,4 +198,14 @@ jobs:
           left join auth.users u on u.id = p.id
           where u.id is null;
           SQL
+          cat restore-report.txt
+          {
+            echo "## Restore test"
+            echo ""
+            echo "Backup: \`$LATEST\`"
+            echo ""
+            echo '```'
+            cat restore-report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
           echo "::notice ::Backup $LATEST ripristinato e verificato su Postgres temporaneo."

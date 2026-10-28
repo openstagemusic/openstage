@@ -28,11 +28,11 @@ Home poster wall, pagine pubbliche, indice e pagine città, modulo contatti che 
 email transazionali, centro notifiche e digest, Area Fan, control room admin con 2FA e audit,
 claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram,
 assistente AI per bozze e verifica schede, creazione eventi per conto di artisti/locali,
-ingresso gratuito, qualità dati e backup cifrato del database.
+ingresso gratuito, qualità dati e backup cifrato con prova di ripristino.
 
 **In arrivo:** rifinitura delle liste admin, notice & takedown, community e follow, Spotify,
-pagamenti opzionali, Help Center completo e rifiniture SEO. La prova di ripristino del backup
-è l'ultimo controllo aperto.
+pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
+ripristino è già passata.
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
 oppure pubblicati da artisti e locali dopo il reclamo della scheda. La Home mostra le serate
@@ -340,7 +340,8 @@ La redazione crea una serata per un artista o un locale da **Eventi → Crea per
 può collegare una scheda esistente oppure crearne una libera con nome, città e indirizzo
 confermati, dopo il controllo dei doppioni. L'evento nasce con il pin già geocodificato e si
 può riaprire con **Modifica**. Il **backup** del database gira ogni domenica con copia cifrata
-su GitHub e nel bucket privato Supabase.
+su GitHub e nel bucket privato Supabase; il ripristino viene provato automaticamente dopo
+ogni backup.
 
 # Navigare il sito
 

@@ -1,7 +1,7 @@
 # Fase 8.9 - Backup del database
 
-> **Stato: attivo, primo backup verificato il 27 ottobre 2026.** Scritto il 27 ottobre 2026.
-> Resta la prova di ripristino su un progetto di test.
+> **Stato: completo.** Primo backup verificato il 27 ottobre 2026 e prova di ripristino
+> automatica superata il 28 ottobre 2026 su Postgres temporaneo.
 > Scelta approvata: **GitHub Actions + `pg_dump`**, senza piano Supabase Pro.
 
 ## Obiettivo
@@ -54,4 +54,4 @@ La passphrase non va mai committata: senza di essa i backup non si aprono.
 - [x] Workflow con schedule e avvio manuale.
 - [x] Controllo dei secret mancanti con messaggio esplicito.
 - [x] Prima esecuzione reale dopo l'inserimento dei 4 secret (27 ottobre 2026, run verde).
-- [ ] Prova di ripristino su progetto di test.
+- [x] Prova di ripristino automatica su Postgres 17 temporaneo (28 ottobre 2026).
