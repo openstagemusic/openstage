@@ -202,14 +202,14 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 - **7A**: email reale, conferma, reset, risposta contatti.
 - **7B**: coda, notifiche in-app, digest, classi e quota.
 - **5.5D**: guscio dashboard coerente, così l'admin non sembra un altro prodotto.
-- **Backup** (S3) e **notice & takedown**: da fissare entro la fase.
+- **Backup** e **notice & takedown**: il backup è attivo e testato; resta il notice & takedown.
 
 ## QA
 
 - [ ] 2FA obbligatoria; senza AAL2 l'admin non entra.
 - [ ] Ogni azione distruttiva chiede conferma e finisce nell'audit.
 - [ ] Ogni KPI apre la lista filtrata giusta.
-- [ ] Filtri e pagina restano nell'URL e funzionano al refresh.
+- [x] Filtri e pagina restano nell'URL e funzionano al refresh.
 - [ ] Tabelle leggibili a 320 px o trasformate in card.
 - [ ] Email: dry run, quota, retry a lotti, errore sanitizzato.
 - [ ] Notifiche: nessun dato di vanità, preferenze rispettate.
