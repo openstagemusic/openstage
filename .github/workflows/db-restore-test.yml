@@ -1,0 +1,187 @@
+name: Database restore test
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Database backup"]
+    types: [completed]
+  # Il test parte anche quando cambia il workflow: serve a validarlo subito.
+  push:
+    paths:
+      - .github/workflows/db-restore-test.yml
+
+concurrency:
+  group: db-restore-test
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  restore:
+    name: Ripristina l'ultimo backup su Postgres temporaneo
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: restore_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d restore_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      TEST_DB_URL: postgresql://postgres:postgres@localhost:5432/restore_test
+      PGBIN: /usr/lib/postgresql/17/bin
+
+    steps:
+      - name: Controlla i secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY BACKUP_PASSPHRASE; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error ::Manca il secret GitHub $name"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Installa il client PostgreSQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl ca-certificates gnupg lsb-release jq
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          "$PGBIN/pg_restore" --version
+          "$PGBIN/psql" --version
+
+      - name: Scarica l'ultimo backup
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            -X POST "$SUPABASE_URL/storage/v1/object/list/backups" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"prefix":"","limit":1000}' > backup-list.json
+          LATEST="$(jq -r '.[] | select(.name | test("\\.dump\\.gpg$")) | .name' backup-list.json | sort | tail -n 1)"
+          if [ -z "$LATEST" ]; then
+            echo "::error ::Nessun backup trovato nel bucket backups"
+            exit 1
+          fi
+          echo "Backup scelto: $LATEST"
+          echo "LATEST=$LATEST" >> "$GITHUB_ENV"
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/storage/v1/object/backups/$LATEST" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -o "$LATEST"
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/storage/v1/object/backups/$LATEST.sha256" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -o "$LATEST.sha256"
+          sha256sum -c "$LATEST.sha256"
+
+      - name: Decifra e valida il dump
+        shell: bash
+        run: |
+          set -euo pipefail
+          gpg --batch --yes --decrypt --passphrase-fd 3 3<<<"$BACKUP_PASSPHRASE" "$LATEST" > openstage.dump
+          test -s openstage.dump
+          "$PGBIN/pg_restore" --list openstage.dump > /dev/null
+          echo "Dump valido: $(du -h openstage.dump | cut -f1)"
+
+      - name: Prepara il database di test
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$PGBIN/psql" "$TEST_DB_URL" -X -v ON_ERROR_STOP=1 <<'SQL'
+          create schema if not exists auth;
+          create table if not exists auth.users (id uuid primary key, email text);
+          create or replace function auth.uid() returns uuid language sql stable as $$ select null::uuid $$;
+          create or replace function auth.role() returns text language sql stable as $$ select 'authenticated'::text $$;
+          create or replace function auth.email() returns text language sql stable as $$ select null::text $$;
+          create or replace function auth.jwt() returns jsonb language sql stable as $$ select '{}'::jsonb $$;
+
+          create schema if not exists extensions;
+          create extension if not exists pg_trgm schema extensions;
+          create extension if not exists pgcrypto schema extensions;
+          create extension if not exists "uuid-ossp" schema extensions;
+          SQL
+
+      - name: Ripristina schema e dati pubblici
+        shell: bash
+        env:
+          PGOPTIONS: -c check_function_bodies=off
+        run: |
+          set -euo pipefail
+          "$PGBIN/pg_restore" \
+            --schema=public --section=pre-data --clean --if-exists \
+            --no-owner --no-privileges --dbname="$TEST_DB_URL" openstage.dump
+          "$PGBIN/pg_restore" \
+            --schema=public --section=data \
+            --no-owner --no-privileges --dbname="$TEST_DB_URL" openstage.dump
+
+      - name: Aggancia i profili agli utenti auth di prova
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$PGBIN/psql" "$TEST_DB_URL" -X -v ON_ERROR_STOP=1 -c \
+            "insert into auth.users (id, email) select id, email from public.profiles on conflict (id) do nothing;"
+
+      - name: Ripristina indici, vincoli e policy
+        shell: bash
+        env:
+          PGOPTIONS: -c check_function_bodies=off
+        run: |
+          set -euo pipefail
+          "$PGBIN/pg_restore" \
+            --schema=public --section=post-data \
+            --no-owner --no-privileges --dbname="$TEST_DB_URL" openstage.dump
+
+      - name: Verifica i dati ripristinati
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$PGBIN/psql" "$TEST_DB_URL" -X -v ON_ERROR_STOP=1 <<'SQL'
+          select 'profiles' as tabella, count(*)::int as righe from public.profiles
+          union all select 'events', count(*)::int from public.events
+          union all select 'artists', count(*)::int from public.artists
+          union all select 'venues', count(*)::int from public.venues
+          union all select 'claims', count(*)::int from public.claims
+          union all select 'reports', count(*)::int from public.reports
+          union all select 'notifications', count(*)::int from public.notifications
+          order by tabella;
+
+          select count(*)::int as tabelle_public
+          from information_schema.tables where table_schema = 'public';
+
+          select count(*)::int as tabelle_con_rls
+          from pg_tables where schemaname = 'public' and rowsecurity = true;
+
+          select count(*)::int as profili_senza_auth
+          from public.profiles p
+          left join auth.users u on u.id = p.id
+          where u.id is null;
+          SQL
+          echo "::notice ::Backup $LATEST ripristinato e verificato su Postgres temporaneo."
