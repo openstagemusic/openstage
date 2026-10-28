@@ -835,10 +835,13 @@ senza classifiche di popolarità né engagement finto.
   rispettando `in_app_follows`.
 - Digest settimanale esteso: serate salvate + serate delle schede seguite, senza duplicati.
 - Sezione **Artisti e locali che segui** in `/dashboard/per-te`.
+- Conteggio pubblico dei follower sulla scheda, con la funzione `follow_count`: solo il
+  numero, nascosto a zero, nessuna classifica e nessuna lista di follower.
 - Testi IT/EN.
 
 **Verifiche superate:** follow e unfollow reali, login link da anonimo, notifica su evento
-pubblicato, digest con evento seguito, sezione Per te, build.
+pubblicato, digest con evento seguito, sezione Per te, conteggio visibile da anonimo e
+aggiornato subito dopo il click, build.
 
 **Rimandato:** inviti virali (9B): manca un premio chiaro e una regola anti-abuso.
 

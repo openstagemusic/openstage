@@ -10,7 +10,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { canManageArtistProfile } from "@/lib/auth/roles";
 import { getReplaceablePage } from "@/lib/claims/queries";
 import { getArtistByProfileId, getArtistBySlug } from "@/lib/directory/queries";
-import { isFollowing } from "@/lib/follows/queries";
+import { getFollowCount, isFollowing } from "@/lib/follows/queries";
 import { artistPath } from "@/lib/events/paths";
 import { listPastEventsByArtist, listUpcomingEventsByArtist } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -64,10 +64,11 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const session = await getSessionProfile();
-  const [events, past, following] = await Promise.all([
+  const [events, past, following, followers] = await Promise.all([
     listUpcomingEventsByArtist(artist.id),
     listPastEventsByArtist(artist.id),
     isFollowing("artist", artist.id, session?.id ?? null),
+    getFollowCount("artist", artist.id),
   ]);
 
   // Il reclamo di una scheda artista è immediato: non esiste uno stato "in
@@ -175,17 +176,17 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             </p>
           ) : null}
 
-          {artist.profileId !== session?.id ? (
-            <div className="mt-6">
-              <FollowButton
-                subjectType="artist"
-                subjectId={artist.id}
-                initialFollowing={following}
-                isAuthenticated={session !== null}
-                dict={dict.follow}
-              />
-            </div>
-          ) : null}
+          <div className="mt-6">
+            <FollowButton
+              subjectType="artist"
+              subjectId={artist.id}
+              initialFollowing={following}
+              initialFollowers={followers}
+              isAuthenticated={session !== null}
+              isOwnPage={artist.profileId === session?.id}
+              dict={dict.follow}
+            />
+          </div>
         </div>
       </header>
 

@@ -338,6 +338,7 @@ resta in Supabase Auth.
 | `notify_admin_telegram(...)`, `notify_activity_telegram(...)` | Avvisi Telegram con dedupe, via rotta Vercel protetta |
 | `admin_log_ai_run(...)`, `admin_ai_usage()` | Registro esecuzioni AI, token, costo stimato e limiti |
 | `admin_send_manual_notification(...)` | Notifica in-app manuale a utente o ruolo, con audit |
+| `follow_count(subject_type, subject_id)` | Restituisce solo il **numero** di follower di una scheda: `SECURITY DEFINER`, eseguibile da anon e authenticated. La tabella `follows` resta privata, quindi nessuno può leggere chi segue chi |
 | `claim_email_batch(...)` | Worker della coda email, con filtro per categoria |
 | `admin_email_stats()`, `admin_retry_email_queue(...)` | Statistiche, quota e retry controllato delle email fallite |
 | Trigger | `on_auth_user_created`, `profiles_guard`, `artists_touch`, `venues_touch`, `events_touch`, `settings_touch`, `events_rate_limit`, `events_log_creation`, `events_require_review`, `events_require_page`, `events_block_suspended`, `reports_apply_threshold`, `telegram_on_*` |
@@ -421,6 +422,7 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0051_backup_bucket.sql` | Bucket privato `backups` per le copie cifrate del database |
 | `0052_takedown_notices.sql` | Notice & takedown: tabella, RLS, notifica admin, audit e funzione di decisione |
 | `0053_follows.sql` | Follow di artisti/locali, notifica ai follower e digest esteso |
+| `0054_follow_count.sql` | Funzione `follow_count`: solo il totale dei follower, senza esporre le righe |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti

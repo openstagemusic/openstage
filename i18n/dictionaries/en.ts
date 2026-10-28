@@ -112,6 +112,8 @@ export const en = {
     login: "Log in to follow",
     error: "The follow could not be updated.",
     own: "This is your page.",
+    followerOne: "follower",
+    followerMany: "followers",
   },
   home: {
     badge: "Independent & underground live music",

@@ -84,3 +84,22 @@ export async function listFollowedPages(profileId: string): Promise<FollowedPage
 
   return result;
 }
+
+/** Solo il totale: la tabella dei follow resta privata. */
+export async function getFollowCount(
+  subjectType: FollowSubjectType,
+  subjectId: string
+): Promise<number> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("follow_count", {
+    p_subject_type: subjectType,
+    p_subject_id: subjectId,
+  });
+
+  if (error) {
+    console.error("[follows] getFollowCount:", error.message);
+    return 0;
+  }
+
+  return typeof data === "number" ? data : 0;
+}

@@ -10,7 +10,7 @@ import FollowButton from "@/components/directory/FollowButton";
 import { canManageVenueProfile } from "@/lib/auth/roles";
 import { getMyPendingRequest, getReplaceablePage } from "@/lib/claims/queries";
 import { getVenueByProfileId, getVenueBySlug } from "@/lib/directory/queries";
-import { isFollowing } from "@/lib/follows/queries";
+import { getFollowCount, isFollowing } from "@/lib/follows/queries";
 import { venuePath } from "@/lib/events/paths";
 import { listPastEventsByVenue, listUpcomingEventsByVenue } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -63,10 +63,11 @@ export default async function VenuePage({ params }: VenuePageProps) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const session = await getSessionProfile();
-  const [events, past, following] = await Promise.all([
+  const [events, past, following, followers] = await Promise.all([
     listUpcomingEventsByVenue(venue.id),
     listPastEventsByVenue(venue.id),
     isFollowing("venue", venue.id, session?.id ?? null),
+    getFollowCount("venue", venue.id),
   ]);
 
   // La scheda di un locale si prende su richiesta. Il database permette una
@@ -174,17 +175,17 @@ export default async function VenuePage({ params }: VenuePageProps) {
             {venue.name}
           </h1>
 
-          {venue.profileId !== session?.id ? (
-            <div className="mt-6">
-              <FollowButton
-                subjectType="venue"
-                subjectId={venue.id}
-                initialFollowing={following}
-                isAuthenticated={session !== null}
-                dict={dict.follow}
-              />
-            </div>
-          ) : null}
+          <div className="mt-6">
+            <FollowButton
+              subjectType="venue"
+              subjectId={venue.id}
+              initialFollowing={following}
+              initialFollowers={followers}
+              isAuthenticated={session !== null}
+              isOwnPage={venue.profileId === session?.id}
+              dict={dict.follow}
+            />
+          </div>
         </div>
       </header>
 

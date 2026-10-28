@@ -236,6 +236,10 @@ Le schede che segui sono raccolte in **Dashboard → Per te**. Il digest settima
 attivato, include anche le serate degli artisti e locali seguiti, senza duplicare quelle
 salvate.
 
+Accanto al pulsante vedi il **numero dei follower** della scheda: è un totale reale, visibile
+anche senza accesso e nascosto quando è zero. Non è una classifica e non mostra chi segue:
+solo il numero.
+
 # Reclamare la tua scheda
 
 Se una scheda artista o locale è stata creata dalla redazione, puoi diventarne proprietario.

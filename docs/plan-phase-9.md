@@ -20,13 +20,18 @@ popolarità, nessun engagement finto.
   pubblica un evento futuro. Rispetta la preferenza `in_app_follows`.
 - Integrazione nel **digest settimanale** già esistente: oltre alle serate
   salvate, include quelle degli artisti/locali seguiti, senza duplicati.
-- Sezione **“Artisti e locali che segui”** in `/dashboard/per-te`.
+- Sezione **"Artisti e locali che segui"** in `/dashboard/per-te`.
+- **Conteggio pubblico dei follower** accanto al pulsante, sulla sola scheda:
+  numero reale calcolato dal database con la funzione `follow_count`, visibile
+  anche da scollegati, nascosto quando è zero. Nessuna classifica e nessuna
+  lista di chi segue.
 - Testi IT/EN nei dizionari.
 
 ## Cosa non entra
 
 - Inviti virali, codici `/invite/CODICE`, premi e riscatto.
-- Conteggio pubblico dei follower o classifiche.
+- Classifiche di popolarità, ordinamento per follower, lista pubblica dei
+  follower.
 - Follow via email, notifica per ogni singolo follow.
 - Follow di eventi o città: solo schede artista/locale.
 
@@ -42,9 +47,11 @@ popolarità, nessun engagement finto.
 - [x] Follow e unfollow da scheda artista e locale, con stato persistente.
 - [x] Da scollegati il pulsante porta al login, senza errori.
 - [x] Impossibile seguire la propria scheda.
-- [ ] La notifica in-app arriva ai follower quando l'evento viene pubblicato e
+- [x] La notifica in-app arriva ai follower quando l'evento viene pubblicato e
       rispetta `in_app_follows`.
 - [x] Il digest include le serate delle schede seguite senza duplicare quelle
       salvate.
+- [x] Il conteggio dei follower compare solo se maggiore di zero, anche da
+      scollegati, e si aggiorna subito dopo follow/unfollow.
 - [x] `/dashboard/per-te` mostra le schede seguite.
 - [x] Build, test reale, deploy e commit.

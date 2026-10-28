@@ -110,6 +110,8 @@ export const it: Dictionary = {
     login: "Accedi per seguire",
     error: "Non è stato possibile aggiornare il follow.",
     own: "È la tua scheda.",
+    followerOne: "follower",
+    followerMany: "follower",
   },
   home: {
     badge: "Musica dal vivo indipendente e underground",
