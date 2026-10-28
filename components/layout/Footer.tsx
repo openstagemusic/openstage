@@ -53,6 +53,11 @@ export default function Footer({ dict }: { dict: Dictionary["footer"] }) {
                 {dict.cookies}
               </Link>
             </li>
+            <li>
+              <Link href="/notice-takedown" className={LINK}>
+                {dict.takedown}
+              </Link>
+            </li>
           </ul>
         </nav>
 

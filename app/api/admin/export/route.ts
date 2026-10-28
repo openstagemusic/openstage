@@ -7,8 +7,11 @@ import {
   filterAuditEntries,
   filterDrafts,
   filterModerationEvents,
+  filterTakedownNotices,
   MODERATION_FILTERS,
   REPORT_FILTERS,
+  TAKEDOWN_STATUSES,
+  TAKEDOWN_TYPES,
   type ModerationFilter,
   type ReportFilter,
 } from "@/lib/admin/filters";
@@ -22,6 +25,7 @@ import {
 } from "@/lib/admin/queries";
 import { isCurrentUserAdmin, listDraftEvents } from "@/lib/claims/queries";
 import { listModerationEvents } from "@/lib/moderation/queries";
+import { listTakedownNotices } from "@/lib/admin/takedown";
 
 /**
  * Export CSV/JSON delle liste admin.
@@ -236,6 +240,52 @@ export async function GET(request: Request) {
       { key: "note", label: "note" },
       { key: "reporterEmail", label: "reporter_email" },
       { key: "createdAt", label: "created_at" },
+    ], rows);
+  }
+
+  if (list === "takedown") {
+    const status = pickFilter(searchParams.get("status"), TAKEDOWN_STATUSES);
+    const type = pickFilter(searchParams.get("type"), TAKEDOWN_TYPES);
+    const rows = filterTakedownNotices(await listTakedownNotices(EXPORT_LIMIT), {
+      q,
+      status,
+      type,
+    }).map((notice) => ({
+      id: notice.id,
+      createdAt: notice.createdAt,
+      type: notice.type,
+      status: notice.status,
+      reporterName: notice.reporterName,
+      reporterEmail: notice.reporterEmail,
+      organization: notice.organization,
+      targetUrl: notice.targetUrl,
+      description: notice.description,
+      evidenceUrl: notice.evidenceUrl,
+      goodFaith: notice.goodFaith,
+      accuracy: notice.accuracy,
+      adminNote: notice.adminNote,
+      actionTaken: notice.actionTaken,
+      resolvedAt: notice.resolvedAt,
+      locale: notice.locale,
+    }));
+
+    return download(format, list, [
+      { key: "id", label: "id" },
+      { key: "createdAt", label: "created_at" },
+      { key: "type", label: "type" },
+      { key: "status", label: "status" },
+      { key: "reporterName", label: "reporter_name" },
+      { key: "reporterEmail", label: "reporter_email" },
+      { key: "organization", label: "organization" },
+      { key: "targetUrl", label: "target_url" },
+      { key: "description", label: "description" },
+      { key: "evidenceUrl", label: "evidence_url" },
+      { key: "goodFaith", label: "good_faith" },
+      { key: "accuracy", label: "accuracy" },
+      { key: "adminNote", label: "admin_note" },
+      { key: "actionTaken", label: "action_taken" },
+      { key: "resolvedAt", label: "resolved_at" },
+      { key: "locale", label: "locale" },
     ], rows);
   }
 

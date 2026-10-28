@@ -12,10 +12,12 @@ import type { AdminMetrics } from "@/lib/admin/queries";
 export default function AdminTodo({
   metrics,
   profilesToVerify,
+  takedownOpen,
   dict,
 }: {
   metrics: AdminMetrics | null;
   profilesToVerify: number;
+  takedownOpen: number;
   dict: Dictionary["admin"];
 }) {
   if (!metrics) return null;
@@ -31,6 +33,7 @@ export default function AdminTodo({
     { label: dict.kpiUnverified, value: profilesToVerify, href: "/admin/utenti" },
     { label: dict.kpiDrafts, value: metrics.eventsDraft, href: "/admin/bozze" },
     { label: dict.kpiMessages, value: metrics.messagesNew, href: "/admin/messaggi" },
+    { label: dict.kpiTakedown, value: takedownOpen, href: "/admin/takedown" },
     { label: dict.metricsReportsOpen, value: metrics.reportsOpen, href: "/admin/segnalazioni" },
     { label: dict.metricsEmailQueued, value: metrics.emailQueued },
     {

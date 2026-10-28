@@ -143,3 +143,122 @@ export async function sendContactReply(input: {
     replyTo,
   });
 }
+
+type TakedownNotification = {
+  noticeId: string;
+  type: string;
+  reporterName: string;
+  reporterEmail: string;
+  organization: string | null;
+  targetUrl: string;
+  description: string;
+  locale: string;
+};
+
+/** Avvisa la casella ufficiale che è arrivata una notice & takedown. */
+export async function sendTakedownNotification(input: TakedownNotification): Promise<boolean> {
+  const inbox = process.env.EMAIL_REPLY_TO?.trim() || "ciao@getopenstage.it";
+  const subject = `[OpenStage] Notice & takedown - ${input.type}`;
+  const text = [
+    "Nuova notice & takedown",
+    "",
+    `ID: ${input.noticeId}`,
+    `Tipo: ${input.type}`,
+    `Nome: ${input.reporterName}`,
+    `Email: ${input.reporterEmail}`,
+    input.organization ? `Organizzazione: ${input.organization}` : null,
+    `Contenuto: ${input.targetUrl}`,
+    `Lingua: ${input.locale}`,
+    "",
+    input.description,
+  ].filter((line): line is string => line !== null).join("\n");
+
+  const html = `
+    <h2>Nuova notice &amp; takedown</h2>
+    <p><strong>ID:</strong> ${escapeHtml(input.noticeId)}<br>
+    <strong>Tipo:</strong> ${escapeHtml(input.type)}<br>
+    <strong>Nome:</strong> ${escapeHtml(input.reporterName)}<br>
+    <strong>Email:</strong> ${escapeHtml(input.reporterEmail)}<br>
+    ${input.organization ? `<strong>Organizzazione:</strong> ${escapeHtml(input.organization)}<br>` : ""}
+    <strong>Contenuto:</strong> ${escapeHtml(input.targetUrl)}<br>
+    <strong>Lingua:</strong> ${escapeHtml(input.locale)}</p>
+    <p style="white-space:pre-wrap">${escapeHtml(input.description)}</p>
+  `;
+
+  return sendEmail({ to: inbox, subject, text, html });
+}
+
+/** Conferma al segnalante che la richiesta è stata registrata. */
+export async function sendTakedownAcknowledgement(input: {
+  to: string;
+  name: string;
+  noticeId: string;
+  locale: string;
+}): Promise<boolean> {
+  const italian = input.locale !== "en";
+  const subject = italian
+    ? "OpenStage - Notice & takedown ricevuto"
+    : "OpenStage - Notice & takedown received";
+  const text = italian
+    ? [
+        `Ciao ${input.name},`,
+        "",
+        `abbiamo ricevuto la tua segnalazione (ID ${input.noticeId}).`,
+        "La esamineremo e ti risponderemo a questo indirizzo.",
+        "",
+        "OpenStage",
+      ].join("\n")
+    : [
+        `Hi ${input.name},`,
+        "",
+        `we received your notice (ID ${input.noticeId}).`,
+        "We will review it and reply to this address.",
+        "",
+        "OpenStage",
+      ].join("\n");
+
+  return sendEmail({
+    to: input.to,
+    subject,
+    text,
+    html: `<p style="white-space:pre-wrap">${escapeHtml(text)}</p>`,
+  });
+}
+
+/** Comunica al segnalante l'esito della decisione. */
+export async function sendTakedownOutcome(input: {
+  to: string;
+  name: string;
+  noticeId: string;
+  status: "actioned" | "rejected";
+  action: string | null;
+  locale: string;
+}): Promise<boolean> {
+  const italian = input.locale !== "en";
+  const subject = italian
+    ? "OpenStage - Esito notice & takedown"
+    : "OpenStage - Notice & takedown outcome";
+  const outcome = italian
+    ? input.status === "actioned"
+      ? "La segnalazione è stata accolta e il contenuto è stato rimosso o modificato."
+      : "La segnalazione è stata esaminata e non è stato possibile accoglierla."
+    : input.status === "actioned"
+      ? "Your notice was accepted and the content was removed or changed."
+      : "Your notice was reviewed and could not be accepted.";
+  const text = [
+    italian ? `Ciao ${input.name},` : `Hi ${input.name},`,
+    "",
+    `${italian ? "Riferimento" : "Reference"}: ${input.noticeId}`,
+    outcome,
+    input.status === "actioned" && input.action ? `${italian ? "Azione" : "Action"}: ${input.action}` : "",
+    "",
+    "OpenStage",
+  ].filter(Boolean).join("\n");
+
+  return sendEmail({
+    to: input.to,
+    subject,
+    text,
+    html: `<p style="white-space:pre-wrap">${escapeHtml(text)}</p>`,
+  });
+}

@@ -800,6 +800,27 @@ filtri condivisibili, paginazione ed export.
 export CSV/JSON con e senza filtro, accesso anonimo all'export respinto con 403, build e test
 admin.
 
+## Fase 8.11 - Notice & takedown
+
+**Obiettivo:** dare a chi detiene un diritto un canale pubblico e tracciabile per segnalare un
+contenuto, e all'admin una coda per decidere senza automatismi.
+
+**Cosa è stato costruito**
+
+- Pagina pubblica `/notice-takedown` con tipo di richiesta, dati del segnalante, URL del
+  contenuto, descrizione, prova e dichiarazioni di buona fede e accuratezza.
+- Tabella `takedown_notices` con RLS: inserimento pubblico solo in stato `new`, lettura e
+  decisione solo admin.
+- Notifica in-app agli admin e email alla casella ufficiale; conferma al segnalante e
+  comunicazione dell'esito.
+- Coda `/admin/takedown` con ricerca, filtri, paginazione, export CSV/JSON e azioni
+  prendi in carico / risolvi / rifiuta.
+- Audit automatico in `admin_audit_log` per ogni cambio di stato.
+- Link nel footer e conteggio "Notice aperte" nella panoramica.
+
+**Verifiche superate:** invio pubblico reale, riga in database, notifica admin, presa in carico,
+risoluzione con azione, audit, export e accesso anonimo all'export respinto.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

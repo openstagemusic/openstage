@@ -7,6 +7,11 @@ import type {
 import type { DraftEvent } from "@/lib/claims/queries";
 import { isEventPast } from "@/lib/events/format";
 import type { ModerationEvent } from "@/lib/moderation/queries";
+import type {
+  TakedownNotice,
+  TakedownNoticeStatus,
+  TakedownNoticeType,
+} from "@/lib/admin/takedown";
 
 import { matchesSearch } from "./list";
 
@@ -142,6 +147,42 @@ export function filterAuditEntries(entries: AuditEntry[], q: string): AuditEntry
       entry.subjectType,
       entry.subjectId,
       note,
+    ]);
+  });
+}
+
+export const TAKEDOWN_STATUSES: readonly TakedownNoticeStatus[] = [
+  "new",
+  "reviewing",
+  "actioned",
+  "rejected",
+];
+
+export const TAKEDOWN_TYPES: readonly TakedownNoticeType[] = [
+  "copyright",
+  "trademark",
+  "privacy",
+  "defamation",
+  "illegal",
+  "other",
+];
+
+export function filterTakedownNotices(
+  notices: TakedownNotice[],
+  filters: { q: string; status: string; type: string }
+): TakedownNotice[] {
+  return notices.filter((notice) => {
+    if (filters.status !== "all" && notice.status !== filters.status) return false;
+    if (filters.type !== "all" && notice.type !== filters.type) return false;
+
+    return matchesSearch(filters.q, [
+      notice.reporterName,
+      notice.reporterEmail,
+      notice.organization,
+      notice.targetUrl,
+      notice.description,
+      notice.actionTaken,
+      notice.adminNote,
     ]);
   });
 }

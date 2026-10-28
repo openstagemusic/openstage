@@ -414,6 +414,7 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0049_admin_notifications.sql` | Vista admin notifiche e invio manuale |
 | `0050_ai_runs.sql` | Registro AI, costo, budget e audit |
 | `0051_backup_bucket.sql` | Bucket privato `backups` per le copie cifrate del database |
+| `0052_takedown_notices.sql` | Notice & takedown: tabella, RLS, notifica admin, audit e funzione di decisione |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
@@ -606,6 +607,7 @@ di accesso è doppio: `is_admin()` nel database e 2FA AAL2 nella sessione. La pa
 | `/admin/eventi/nuovo` | Creazione per conto di artista/locale, con import AI o manuale |
 | `/admin/segnalazioni` | Segnalazioni eventi |
 | `/admin/qualita` | Qualità dati: campi mancanti, serate passate, schede libere, doppioni |
+| `/admin/takedown` | Notice & takedown: presa in carico, decisione, audit, export |
 | `/admin/messaggi` | Ticket, priorità, assegnazione, risposte |
 | `/admin/email` | Coda, falliti, registro, quota, retry ed export |
 | `/admin/ai` | Bozze risposte, verifica assistita, uso e budget AI |
@@ -627,8 +629,8 @@ anche in Supabase Vault per autorizzare le chiamate dal database.
 doppioni), l'import della copertina, la modifica degli eventi anche non creati dall'admin, la
 pagina Qualità dati, l'ingresso gratuito senza link biglietti e il backup cifrato settimanale.
 
-**Cosa manca.** Il notice & takedown, la community/follow e le fasi successive. Il backup, il
-restore test e le liste admin complete sono attivi.
+**Cosa manca.** La community/follow e le fasi successive. Il backup, il restore test, le liste
+admin complete e il notice & takedown sono attivi.
 
 # Deploy e rilascio
 
@@ -709,6 +711,7 @@ ripristino automatica superata il **28 ottobre 2026**.
 | La build fallisce con `useSearchParams` | In Next 15 un componente client che legge i parametri va avvolto in `<Suspense>` | Avvolgere il componente (o il suo gruppo) in un confine `<Suspense>` |
 | La mappa resta grigia / il worker non si carica | Il worker di MapLibre non è raggiungibile dal percorso previsto | Servirlo dal nostro dominio: `scripts/copy-maplibre-worker.mjs` lo copia in `public/` durante `prebuild` |
 | Il titolo-poster appare tagliato in basso | Con `line-height` molto sotto 1 il glifo esce dalla line box e viene ritagliato | Usare `leading-none` (1) e recuperare la compattezza con un margine negativo, non con un `line-height` più piccolo |
+| Il modulo pubblico notice & takedown non salva | `insert().select()` richiede una policy di lettura che il pubblico non deve avere | Generare l'UUID prima dell'insert e non chiedere la rappresentazione della riga |
 | Un link condiviso su `/eventi/<uuid>` non apre la scheda | Dalla Fase 3 l'URL canonico è `/eventi/[città]/[slug]` | Il vecchio indirizzo fa un redirect permanente verso quello nuovo: usare sempre il link canonico |
 
 # Come si verifica una pagina (browser headless)
@@ -780,3 +783,4 @@ rilancia `npm run manuale` e si committa il PDF. Il generatore è `scripts/manua
 | B74-B79 | ✅ Crea per conto di, scheda libera, copertina, pin, modifica admin, ingresso gratuito, popup mappa |
 | 8.9 | ✅ Backup settimanale cifrato e restore test automatico superato |
 | B52 | ✅ Liste admin con ricerca, filtri nell'URL, paginazione ed export CSV/JSON |
+| 8.11 / B81 | ✅ Notice & takedown con pagina pubblica, coda admin, notifiche, audit ed export |

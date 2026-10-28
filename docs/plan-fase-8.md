@@ -1,6 +1,6 @@
 # Fase 8 — Control room, claim a invito e centro assistenza
 
-> **Stato: in chiusura.** Scritto il 23 ottobre 2026.
+> **Stato: chiusa (resta 8.8.5 facoltativo).** Scritto il 23 ottobre 2026.
 > **Fatti: 8.0 (guscio + registro + overview), 8.1 (2FA AAL2, audit, revoca
 > claim), 8.2 (metriche reali), 8.3 (utenti, artisti, locali, bozze,
 > segnalazioni, audit), 8.4 (claim a invito), 8.5 (ticket e messaggi),
@@ -9,7 +9,7 @@
 > (import evento), 8.8.3 (verifica assistita), 8.8.4 (qualità dati), B74-B79 (crea per
 > conto di, scheda libera, pin, modifica admin, ingresso gratuito, popup mappa) e 8.9
 > (backup cifrato).**
-> Restano 8.8.5 (facoltativo) e notice & takedown.
+> Resta 8.8.5 (facoltativo).
 
 ## Obiettivo
 
@@ -202,7 +202,7 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 - **7A**: email reale, conferma, reset, risposta contatti.
 - **7B**: coda, notifiche in-app, digest, classi e quota.
 - **5.5D**: guscio dashboard coerente, così l'admin non sembra un altro prodotto.
-- **Backup** e **notice & takedown**: il backup è attivo e testato; resta il notice & takedown.
+- **Backup** e **notice & takedown**: entrambi attivi e testati.
 
 ## QA
 
@@ -234,8 +234,8 @@ lista finale e le priorità si chiudono in una revisione dedicata.
 **Fatti anche B74-B79, 8.8.4 e 8.9:** creazione per conto di artista/locale con import AI o manuale,
 scheda libera con conferma dei campi e controllo doppioni, copertina e posizione geocodificata,
 ingresso gratuito senza link biglietti, modifica degli eventi dalla control room, popup mappa corretto,
-pagina `/admin/qualita` con controlli deterministici, backup settimanale cifrato con prova di ripristino superata e B52 (ricerca, filtri, paginazione ed export nelle liste admin).
-**Prossimo blocco:** notice & takedown.
+pagina `/admin/qualita` con controlli deterministici, backup settimanale cifrato con prova di ripristino superata, B52 (ricerca, filtri, paginazione ed export nelle liste admin) e notice & takedown con coda admin e audit.
+**Fase 8 chiusa.** Resta solo 8.8.5 (triage AI delle segnalazioni), facoltativo.
 
 
-**Debito aperto prima della chiusura:** notice & takedown.
+**Debito aperto:** 8.8.5 (facoltativo).

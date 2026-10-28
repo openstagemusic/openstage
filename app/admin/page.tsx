@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminTodo from "@/components/admin/AdminTodo";
 import { getAdminMetrics } from "@/lib/admin/queries";
+import { countOpenTakedownNotices } from "@/lib/admin/takedown";
 import { isCurrentUserAdmin, listUnverifiedProfiles } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
+
+export const dynamic = "force-dynamic";
 
 /**
  * Panoramica della control room: ricerca, numeri reali e niente duplicazioni.
@@ -33,7 +36,11 @@ export default async function AdminPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const t = dict.admin;
-  const [metrics, unverified] = await Promise.all([getAdminMetrics(), listUnverifiedProfiles()]);
+  const [metrics, unverified, takedownOpen] = await Promise.all([
+    getAdminMetrics(),
+    listUnverifiedProfiles(),
+    countOpenTakedownNotices(),
+  ]);
 
   return (
     <div>
@@ -72,7 +79,12 @@ export default async function AdminPage() {
         </form>
       </header>
 
-      <AdminTodo metrics={metrics} profilesToVerify={unverified.length} dict={t} />
+      <AdminTodo
+        metrics={metrics}
+        profilesToVerify={unverified.length}
+        takedownOpen={takedownOpen}
+        dict={t}
+      />
 
       <AdminMetrics metrics={metrics} dict={t} />
     </div>

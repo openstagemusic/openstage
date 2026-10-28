@@ -22,7 +22,8 @@ type AdminListToolbarProps = {
     | "events"
     | "drafts"
     | "reports"
-    | "audit";
+    | "audit"
+    | "takedown";
   dict: Dictionary["admin"];
 };
 

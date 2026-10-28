@@ -37,6 +37,7 @@ const STATIC_PATHS = [
   "/privacy",
   "/terms",
   "/cookies",
+  "/notice-takedown",
 ];
 
 const MAX_PER_SECTION = 500;
