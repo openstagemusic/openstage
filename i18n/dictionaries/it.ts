@@ -113,6 +113,19 @@ export const it: Dictionary = {
     followerOne: "follower",
     followerMany: "follower",
   },
+  spotify: {
+    eyebrow: "Playlist",
+    headline: "Playlist",
+    accent: "OpenStage",
+    lead: "Le selezioni musicali di OpenStage: artisti indipendenti, locali e serate da non perdere, scelte dalla redazione.",
+    listen: "Ascolta",
+    listenText: "Il player è incorporato da Spotify: nessun dato personale passa da OpenStage.",
+    embedTitle: "Player Spotify",
+    empty:
+      "Le playlist OpenStage arrivano presto: stiamo scegliendo le prime serate da raccontare. Intanto scopri gli artisti già sulla mappa.",
+    openInSpotify: "Apri su Spotify",
+    exploreArtists: "Scopri gli artisti",
+  },
   home: {
     badge: "Musica dal vivo indipendente e underground",
     title: "Trova il concerto di stasera, come aprire una mappa.",
@@ -1588,6 +1601,10 @@ export const it: Dictionary = {
     city: "Città",
     genre: "Genere principale",
     spotifyUrl: "Link Spotify",
+    spotifyHint:
+      "Incolla il link del tuo profilo artista, di un album o di un brano su Spotify.",
+    invalidSpotify:
+      "Link Spotify non valido: serve un indirizzo open.spotify.com di artista, album, brano o playlist.",
     bio: "Presentazione",
     address: "Indirizzo",
     website: "Sito",

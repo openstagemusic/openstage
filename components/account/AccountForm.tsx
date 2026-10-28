@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { createClient } from "@/lib/supabase/client";
+import { parseSpotifyLink } from "@/lib/spotify/links";
 
 import {
   authErrorClass,
@@ -65,6 +66,19 @@ export default function AccountForm({
     setSaved(false);
     setLoading(true);
 
+    // Il link Spotify si salva nella forma canonica: l'embed e il controllo
+    // nel database accettano solo quella. Meglio fermarsi qui con un messaggio
+    // chiaro che mostrare l'errore grezzo di Postgres.
+    const rawSpotify =
+      subject.kind === "artist" ? (values as AccountArtist).spotifyUrl.trim() : "";
+    const spotify = rawSpotify ? parseSpotifyLink(rawSpotify) : null;
+
+    if (rawSpotify && !spotify) {
+      setLoading(false);
+      setError(dict.invalidSpotify);
+      return;
+    }
+
     const supabase = createClient();
 
     const { error: updateError } =
@@ -75,7 +89,7 @@ export default function AccountForm({
               name: (values as AccountArtist).name,
               city: (values as AccountArtist).city || null,
               genre: (values as AccountArtist).genre || null,
-              spotify_url: (values as AccountArtist).spotifyUrl || null,
+              spotify_url: spotify?.url ?? null,
               bio: (values as AccountArtist).bio || null,
             })
             .eq("id", subject.values.id)
@@ -161,6 +175,7 @@ export default function AccountForm({
               onChange={(event) => set("spotifyUrl", event.target.value)}
               className={authInputClass}
             />
+            <p className="mt-1 text-xs leading-relaxed text-muted">{dict.spotifyHint}</p>
           </div>
 
           <div>

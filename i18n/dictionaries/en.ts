@@ -115,6 +115,19 @@ export const en = {
     followerOne: "follower",
     followerMany: "followers",
   },
+  spotify: {
+    eyebrow: "Playlists",
+    headline: "OpenStage",
+    accent: "playlists",
+    lead: "OpenStage's music selection: independent artists, venues and nights not to miss, picked by the editors.",
+    listen: "Listen",
+    listenText: "The player is embedded from Spotify: no personal data passes through OpenStage.",
+    embedTitle: "Spotify player",
+    empty:
+      "OpenStage playlists are coming soon: we are picking the first nights to tell. In the meantime, discover the artists already on the map.",
+    openInSpotify: "Open on Spotify",
+    exploreArtists: "Discover the artists",
+  },
   home: {
     badge: "Independent & underground live music",
     title: "Find tonight's gig, like opening a map.",
@@ -1589,6 +1602,10 @@ export const en = {
     city: "City",
     genre: "Main genre",
     spotifyUrl: "Spotify link",
+    spotifyHint:
+      "Paste the link to your artist profile, an album or a track on Spotify.",
+    invalidSpotify:
+      "Invalid Spotify link: use an open.spotify.com address for an artist, album, track or playlist.",
     bio: "About",
     address: "Address",
     website: "Website",

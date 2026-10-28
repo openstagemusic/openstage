@@ -3,8 +3,8 @@
 > **Approvata dal proprietario il 19 ottobre 2026**, aggiornata il **23 ottobre 2026** con
 > la **Fase 5.5 — Coerenza visiva**, la divisione della **Fase 7 in 7A/7B**, la
 > **control room della Fase 8** e la **politica “email minime + notifiche in-app”**.
-> **Ultimo commit di codice: `60f55f8` (22 ottobre 2026).** La **5.5A** è completata e
-> pronta per il test in produzione.
+> **Ultimo commit di codice: `a4a8665` (28 ottobre 2026, "Fase 9A: conteggio follow").**
+> **Riallineata il 28 ottobre 2026** dopo la chiusura di 7B, Fase 8 e Fase 9A.
 > Fonte unica: se la tabella del manuale dice altro, vale questa. Il manuale (e il PDF) si
 > aggiornano **solo su richiesta** ("aggiorna pdf").
 >
@@ -16,15 +16,20 @@
 
 ## Stato
 
-Fasi **1 · 1.2 · 1.3 · 2 · 3 · 4 · 5 · 6** (6.1 → 6.3) **fatte e in produzione** (ultimo
-commit di codice `60f55f8`, 22 ottobre 2026). Da qui si riparte dalla **Fase 5.5**, già
-approvata: la **5.5A** è **completata** (build verde) mentre Aruba valida il DNS, senza
-aspettare le email.
-
-La **Fase 7** è divisa in due blocchi: **7A** (email reale, conferma account, reset password,
-risposta ai messaggi) e **7B** (coda, webhook, preferenze, notifiche in-app, digest, Area Fan).
-La **7A** parte appena dominio, Resend e SMTP Supabase sono verificati. La **Fase 8** dipende
-dalla 7A e dalla 5.5D.
+| Fase | Stato |
+| --- | --- |
+| **1 → 6** (1, 1.2, 1.3, 2, 3, 4, 5, 6.1 → 6.3) | ✅ fatte e in produzione |
+| **5.5A → 5.5E** | ✅ fatte e in produzione |
+| **7A** | ✅ email reale, conferma account, reset password, Turnstile, B48 |
+| **7B** | ✅ coda, webhook, preferenze, notifiche in-app, digest e Area Fan |
+| **8** (8.0 → 8.8.4, B74 → B81, backup e restore test) | ✅ fatte; resta **8.8.5** facoltativa (triage AI) |
+| **9A** | ✅ follow di artisti/locali, notifica nuovi eventi, digest, conteggio follower |
+| **9B** | ⏸ **rimandata**: manca un premio chiaro e una regola anti-abuso |
+| **10** | ▶ **in corso**: 10A Spotify fatta; prossima 10B Area artista/locale. Piano: `docs/plan-phase-10.md` |
+| **11** | ⬜ monetizzazione opzionale (PayPal, Vercel Pro) |
+| **12** | ⬜ serie, locale chiuso, bacheca ingaggi |
+| **13** | ⬜ SEO, legal, cancellazione account, audit e polish |
+| **14** | ⬜ Help Center completo (B73), dopo la 13 |
 
 La regola sui canali è in **`docs/notifications-email-policy.md`**: email solo per ciò che
 serve anche a chi non entra nel sito; il resto è in-app. La quota Resend riservata alle email
@@ -41,11 +46,12 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 | **7A — Email reale e accesso affidabile** | 7.1 Resend + SMTP di Auth + dominio + `lib/email` astratto · **B35** conferma email · **B36** reset password e password per account Google · **B48** risposta ai messaggi senza `mailto:` · template it/en per questi flussi. **Niente coda**: invio sincrono, con errore esplicito se Resend non risponde. **Stato: 7A completata — dominio, Resend, SMTP, conferma/reset cross-browser, Turnstile e B48 fatti** | **dominio**, account Resend, SMTP verificato. Vercel Pro **no** |
 | **7B — Email Engine completo + Area Fan** | 7.2 `email_queue`/`email_log` + worker (`pg_cron` + Edge Function) con tetto 2 invii/sec, retry ×3 e backoff, `idempotency_key` · 7.3 webhook Resend (consegnate/rimborsate/spam) · 7.4 template completi · 7.5 preferenze + tetto 1/settimana + **disiscrizione senza login** · 7.6 Area Fan (Per te, Promemoria, Impostazioni, **centro notifiche**) · 7.7 **notifiche in-app**: tabella `notifications`, badge, pagina, preferenze, digest; **B43** diventa in-app + digest, non email a tutti · 7.8 classi email e **quota riservata** (`auth`, `transactional`, `digest`, `optional`) · include **B26, B28** (in-app, email solo digest opt-in); **B08/B35** sono nella 7A. Richiede la 7A. **Stato: 7B completata — notifiche, coda, webhook, preferenze, digest e Area Fan** | Fase 7A completata; politica in `docs/notifications-email-policy.md` |
 | **8 — Pannello Admin + Claim a invito** | **8.0 control room modulare** (registro moduli, overview “da fare adesso”, ricerca, responsive, 2FA, audit) · 8.1 admin con **2FA (AAL2)** + registro azioni · 8.2 metriche reali · 8.3 eventi/utenti/segnalazioni · 8.4 "crea per conto di" + **`/claim/[token]`** (invito email) · 8.5 centro assistenza/ticket (agganciato al form di `/contatti`) · 8.6 **Comunicazione**: registro email, coda, quota Resend, riprova controllata, export CSV/JSON · 8.7 pannello notifiche in-app e audit · **8.8 AI assistita** (bozze risposte, import eventi, verifica schede, qualità dati; sempre con approvazione umana) | **7A** (email); **7B** (notifiche e coda); **5.5D** per il linguaggio visivo condiviso. Piano: `docs/plan-fase-8.md`  **Stato: 8.0-8.7, 8.8.1-8.8.4, B74-B79 e backup 8.9 fatti; resta 8.8.5 (facoltativo)** |
-| **9 — Community: segui e inviti virali** | **"Segui"** artista e locale (tabella `follows`, base per il digest della Fase 7) · **inviti virali** `/invite/CODICE` nel dashboard artista, con riscatto automatico (3 invitati con email verificata e almeno 1 evento pubblicato). **Stato: 9A follow fatta il 28 ottobre 2026; 9B inviti rimandata** | nessuno |
-| **10 — Spotify e Area Artista/Locale** | Form Spotify nel profilo (brani/album/ID), **sticky player** persistente, `/playlists` con le playlist OpenStage; **moduli ruolo-specifici** per artista e locale dentro il guscio della 5.5D (profilo, eventi, completezza, strumenti). **Niente dashboard duplicate** | nessuno (embed Spotify è gratuito) |
+| **9 — Community: segui e inviti virali** | **"Segui"** artista e locale (tabella `follows`, base per il digest della Fase 7) · **inviti virali** `/invite/CODICE` nel dashboard artista, con riscatto automatico (3 invitati con email verificata e almeno 1 evento pubblicato). **Stato: 9A completa il 28 ottobre 2026 (follow + conteggio pubblico dei follower, commit `a4a8665`); 9B inviti rimandata** | nessuno |
+| **10 — Spotify e Area Artista/Locale** | Form Spotify nel profilo (brani/album/ID), **sticky player** persistente, `/playlists` con le playlist OpenStage; **moduli ruolo-specifici** per artista e locale dentro il guscio della 5.5D (profilo, eventi, completezza, strumenti). **Niente dashboard duplicate**. Divisa in **10A** Spotify (link validati, player, `/playlists` con tabella `spotify_playlists`, dock) e **10B** moduli ruolo (completezza, prossime serate, follower del proprietario, azioni rapide); **10C** gestione playlist da admin. Piano: `docs/plan-phase-10.md`. **Stato: 10A fatta il 28 ottobre 2026 (parser, tabella, `/playlists`, player artista, dock); restano 10B e le playlist reali** | nessuno (embed Spotify è gratuito, nessuna API key) |
 | **11 — Monetizzazione opzionale** | 11.1 Artist Pro 3 € una tantum (PayPal Orders API + webhook con firma verificata) · 11.2 Venue Pro abbonamento (Subscriptions API, ciclo di vita, grazia 3 giorni) · 11.3 vantaggi Pro (galleria, copertina, statistiche, badge, widget) | **Vercel Pro**, dominio, conto PayPal **Business**, decisione fiscale |
 | **12 — Serie, locali chiusi, bacheca ingaggi** | 12.1 ricorrenza/`serie_id` (**B41**) · 12.2 locale chiuso (**B42**) · 12.3 **`/calls`** "cercasi artisti" + candidature | nessuno nuovo |
 | **13 — SEO, legal, audit e polish finale** | **B09 + B44 + B45** (OG di default, favicon, anteprime delle schede) · `/privacy`, `/terms`, `/cookies` **reali** per GDPR e pagamenti + banner cookie · **notice & takedown** · audit RLS · pagina **500** · README + checklist env · pulizia fixture · **B46/B47** (serate simili, visti di recente) · generatore social AI (facoltativo). **Non si rifanno le pagine della 5.5**: qui solo rifiniture e contenuti | Anthropic solo se si fa il generatore |
+| **14 — Help Center completo** | **B73**: `/aiuto` con ricerca, categorie, articoli, feedback utile/non utile e CTA ai contatti; contenuti gestiti dalla control room (`/admin/aiuto`), non da Zendesk. Tabelle `help_categories`, `help_articles`, `help_feedback`; Markdown IT/EN, bozza/pubblicato, SEO con `pg_trgm`/full-text. `/faq` viene assorbita o reindirizzata. Solo dopo la 13, con l'audit dei ticket reali | nessuno |
 
 ## Ordine operativo (deciso il 23 ottobre 2026)
 
@@ -59,10 +65,20 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
    **Completata** e in produzione. Piano: `docs/plan-fase-5.5D.md`.
 6. **5.5E** — editor eventi crea/modifica: restyling e UX, nessun campo nuovo. **Completata**
    e in produzione. Piano: `docs/plan-fase-5.5E.md`.
-7. **7B** - coda, webhook, preferenze, notifiche in-app, digest e Area Fan, dentro il guscio
-   già sistemato. **7B.1 (notifiche in-app) completata**; restano 7B.2 e 7B.3.
-8. **Fase 8** — control room, pannello admin e claim a invito. La lista dei moduli e delle
-   funzioni si completa con il proprietario prima di costruire.
+7. **7B** — coda, webhook, preferenze, notifiche in-app, digest e Area Fan. **Completata.**
+8. **Fase 8** — control room, pannello admin, claim a invito, notice & takedown, backup e
+   restore test. **Completata** (resta 8.8.5 facoltativa).
+9. **9A** — follow di artisti/locali, notifica nuovi eventi, digest e conteggio follower.
+   **Completata** il 28 ottobre 2026. **9B** inviti virali: **rimandata** finché non ci sono
+   premio e regola anti-abuso.
+10. **10A → 10B** — Spotify e Area artista/locale. **In preparazione**: piano pronto, si
+    parte quando ci sono i link reali delle playlist.
+11. **11** — monetizzazione opzionale: solo dopo Vercel Pro, conto PayPal Business e
+    decisione fiscale.
+12. **12** — serie, locali chiusi e bacheca ingaggi.
+13. **13** — SEO, legal, cancellazione account, audit RLS e polish finale: è il **cancello
+    d'ingresso** all'apertura pubblica.
+14. **14** — Help Center completo (B73), dopo la 13.
 
 La 5.5 non è un "grande restyling" unico: ogni blocco è indipendente, verificabile e
 committabile. Non si mescolano restyling e logica nella stessa modifica.
@@ -71,17 +87,17 @@ committabile. Non si mescolano restyling e logica nella stessa modifica.
 
 | Cancello | Perché | Dove vive |
 | --- | --- | --- |
-| **Dominio definitivo** (B14) | senza dominio verificato Resend e Supabase Auth non scrivono a estranei | **7A**; dominio acquistato, attivazione DNS in corso |
-| **Conferma email + SMTP** (B35, B08) | oggi `mailer_autoconfirm = true`: si può "ereditare" l'account altrui | **7A**, prima dei pagamenti |
-| **Reset password** (B36) | oggi chi perde la password di un account email è fuori per sempre; chi nasce con Google non può impostarne una | **7A**, prima dell'apertura pubblica |
-| **Coerenza visiva delle pagine interne** | login, eventi, directory, dashboard e editor non possono sembrare un altro prodotto rispetto alla Home | **5.5A–E**, prima della 7B e dell'apertura |
-| **Turnstile lato applicazione** (B11) | oggi il CAPTCHA lo verifica solo Supabase | Fase 8/13 |
+| **Dominio definitivo** (B14) | senza dominio verificato Resend e Supabase Auth non scrivono a estranei | ✅ **chiuso in 7A** (`getopenstage.it`) |
+| **Conferma email + SMTP** (B35, B08) | si poteva "ereditare" l'account altrui | ✅ **chiuso in 7A** |
+| **Reset password** (B36) | chi perde la password non rientrava più | ✅ **chiuso in 7A** |
+| **Coerenza visiva delle pagine interne** | login, eventi, directory, dashboard e editor sembravano un altro prodotto | ✅ **chiuso in 5.5A–E** |
+| **Turnstile lato applicazione** (B11) | il CAPTCHA era verificato solo da Supabase | ✅ **chiuso in 7A** |
 | **Vercel Pro** (B16) | Hobby non è commerciale | solo con la Fase 11 |
 | **Cancellazione dell'account** (B07) | diritto GDPR promesso e oggi assente | Fase 13 |
-| **Backup del database** (nuovo) | il piano free di Supabase **non include backup automatici**: oggi se qualcosa si rompe non torniamo indietro | da fissare entro la Fase 8 |
+| **Backup del database** | il piano free non include backup automatici | ✅ **chiuso**: `db-backup.yml` settimanale, artifact + bucket privato, restore test verde |
 | **Notice & Takedown** | conseguenza dei profili creati dall'admin | **Fatto in 8.11** |
-| **Quota Resend protetta** | se la quota finisce, si fermano anche conferma email e reset: le email di autenticazione hanno una riserva | **7B** (classi + quota), control room **8.6** |
-| **Notifiche in-app** | le cancellazioni e i follow non possono bruciare centinaia di email; serve il centro notifiche prima di aprire la community | **7B**, dentro il guscio **5.5D** |
+| **Quota Resend protetta** | se la quota finisce si fermano anche conferma e reset | ✅ **chiuso in 7B**, control room 8.6 |
+| **Notifiche in-app** | cancellazioni e follow non possono bruciare email | ✅ **chiuso in 7B** |
 
 ## Stato delle pagine pubbliche (verificato il 23 ottobre 2026)
 
@@ -97,8 +113,9 @@ committabile. Non si mescolano restyling e logica nella stessa modifica.
 | `/forgot-password`, `/reset-password` | **veri** (7A): link reale via Resend/Supabase, pagina nuova password e gestione link scaduto |
 | `/dashboard`, `/dashboard/events`, `/dashboard/saved` | **funzionanti**; guscio, panoramica, I miei eventi e Preferiti **5.5D fatti**; le funzioni nuove (filtri, duplica, azioni multiple) nella **Fase 10** |
 | `/dashboard/events/new`, `/dashboard/events/[id]` | **funzionanti**; restyling editor **5.5E fatto**. Nessun campo nuovo: `ends_at`, serie e festival restano **B41/Fase 12** |
+| `/playlists` | **pronta** (10A): mostra solo playlist reali pubblicate; con la tabella vuota è `noindex` e fuori dal menu. Il dock resta spento finché non ce n'è una |
 | `/admin/messaggi` | **vera** (Fase 6.3): coda messaggi con stati e filtri; la risposta `mailto:` diventa integrata nella **7A** |
-| `/privacy`, `/terms`, `/cookies` | **segnaposto** — non contengono testo legale |
+| `/privacy`, `/terms`, `/cookies` | **segnaposto** — non contengono testo legale. Cancello della **Fase 13** |
 | Footer: "Playlist Spotify" e "Social" | **nascosti** finché non ci sono URL reali |
 | Animazioni | reveal e hero in CSS + `IntersectionObserver`; **`framer-motion` non è installato**; tilt 3D e parallax restano B12 |
 
@@ -110,7 +127,7 @@ iniziativa.
 | # | Proposta | Dove | Perché conviene |
 | --- | --- | --- | --- |
 | S1 | **Pagine per città** (`/citta`, `/citta/[city]`) generate dai dati reali, con JSON-LD | ✅ Fase 6.2 | È la leva SEO più forte che abbiamo: "concerto a Milano stasera" è la ricerca vera. Fatte con soglia e `noindex` per le città sottili |
-| S2 | **Calendario personale `.ics` dei Preferiti** (`/api/me/ical`) | Fase 7B | Il codice del calendario c'è già (3.4): chi salva le serate se le porta sul telefono, e ci torna |
+| S2 | **Calendario personale `.ics` dei Preferiti** (`/api/me/ical`) | Fase 13 (non fatta in 7B) | Il codice del calendario c'è già (3.4): chi salva le serate se le porta sul telefono, e ci torna |
 | S3 | **Backup settimanale** del database (script + GitHub Action, o export dal pannello) | Fase 8 | Il piano free non ha backup: è l'unico rischio che può cancellare mesi di lavoro. **Stato: attivo.** Workflow `db-backup.yml`, primo dump verificato il 27 ottobre 2026, artifact GitHub + bucket privato `backups`; restore test superato il 28 ottobre 2026 su Postgres temporaneo |
 | S4 | **Contatori propri in Postgres** (visite profilo, click Spotify, aggregati al giorno) invece di analytics di terze parti | Fase 10/11 | Servono alle statistiche Pro, restano privacy-friendly (nessun cookie, nessun dato personale) → **niente banner cookie per gli analytics** |
 | S5 | **"Non trovi il locale? segnalalo"** (modulo breve che crea una richiesta per l'admin) | Fase 8 | Fa crescere il database dei locali con gli occhi dei fan; atterra nel centro assistenza già previsto |

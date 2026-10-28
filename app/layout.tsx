@@ -11,6 +11,7 @@ import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getCurrentPath, getLocale } from "@/lib/i18n/server";
 import { getUnreadNotificationCount } from "@/lib/notifications/queries";
+import { getFeaturedPlaylist } from "@/lib/spotify/queries";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 // Every public page is server-rendered (SSR) — never a client-only SPA.
@@ -103,6 +104,8 @@ export default async function RootLayout({
   // Un'unica lettura per richiesta (React `cache`): utente + ruolo dal database.
   const session = await getSessionProfile();
   const notificationCount = session ? await getUnreadNotificationCount(session.id) : 0;
+  // Il dock non compare nell'admin e non esiste senza una playlist reale.
+  const featuredPlaylist = isAdmin ? null : await getFeaturedPlaylist();
 
   return (
     <html
@@ -139,7 +142,12 @@ export default async function RootLayout({
               notificationCount={notificationCount}
             />
           )}
-          {isAdmin ? null : <SpotifyPlayerDock />}
+          {isAdmin ? null : (
+            <SpotifyPlayerDock
+              embedUrl={featuredPlaylist?.embedUrl ?? null}
+              title={dict.spotify.embedTitle}
+            />
+          )}
         </LocaleProvider>
       </body>
     </html>

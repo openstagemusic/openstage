@@ -16,6 +16,7 @@ import { listPastEventsByArtist, listUpcomingEventsByArtist } from "@/lib/events
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
+import { parseSpotifyLink, spotifyEmbedHeight } from "@/lib/spotify/links";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 type ArtistPageProps = {
@@ -64,6 +65,8 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const session = await getSessionProfile();
+  const spotify = parseSpotifyLink(artist.spotifyUrl);
+
   const [events, past, following, followers] = await Promise.all([
     listUpcomingEventsByArtist(artist.id),
     listPastEventsByArtist(artist.id),
@@ -189,6 +192,26 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           </div>
         </div>
       </header>
+
+      {spotify ? (
+        <section className="mt-10">
+          <h2 className="font-display text-2xl font-semibold">{dict.spotify.listen}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+            {dict.spotify.listenText}
+          </p>
+          <div className="mt-4 max-w-2xl overflow-hidden border border-line bg-bg">
+            <iframe
+              title={`${artist.name} — ${dict.spotify.embedTitle}`}
+              src={spotify.embedUrl}
+              width="100%"
+              height={spotifyEmbedHeight(spotify.kind)}
+              style={{ border: 0 }}
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+            />
+          </div>
+        </section>
+      ) : null}
 
       <ClaimPanel
         subjectType="artist"
