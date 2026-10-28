@@ -60,6 +60,14 @@ export default async function AccountPage() {
           genre: artist.genre ?? "",
           spotifyUrl: artist.spotifyUrl ?? "",
           bio: artist.bio ?? "",
+          websiteUrl: artist.links.website ?? "",
+          instagramUrl: artist.links.instagram ?? "",
+          facebookUrl: artist.links.facebook ?? "",
+          tiktokUrl: artist.links.tiktok ?? "",
+          youtubeUrl: artist.links.youtube ?? "",
+          soundcloudUrl: artist.links.soundcloud ?? "",
+          bandcampUrl: artist.links.bandcamp ?? "",
+          linktreeUrl: artist.links.linktree ?? "",
         },
       }
     : venue
@@ -72,6 +80,13 @@ export default async function AccountPage() {
             address: venue.address ?? "",
             website: venue.website ?? "",
             capacity: venue.capacity ? String(venue.capacity) : "",
+            instagramUrl: venue.links.instagram ?? "",
+            facebookUrl: venue.links.facebook ?? "",
+            tiktokUrl: venue.links.tiktok ?? "",
+            youtubeUrl: venue.links.youtube ?? "",
+            soundcloudUrl: venue.links.soundcloud ?? "",
+            bandcampUrl: venue.links.bandcamp ?? "",
+            linktreeUrl: venue.links.linktree ?? "",
           },
         }
       : null;
@@ -175,7 +190,7 @@ export default async function AccountPage() {
               </LocaleLink>
             ) : null}
 
-            <AccountForm subject={subject} dict={t} />
+            <AccountForm subject={subject} dict={t} social={dict.social} />
           </section>
         ) : null}
 

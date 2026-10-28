@@ -1,8 +1,8 @@
 # Fase 10 — Spotify e Area Artista/Locale
 
-> **Stato: 10A fatta il 28 ottobre 2026.** Restano i link reali delle playlist (nessuno
-> inventato) e la **10B**. Regola: se manca una playlist vera, `/playlists` mostra uno stato
-> vuoto e il dock resta spento.
+> **Stato: 10A e 10B fatte il 28 ottobre 2026.** Restano solo i link reali delle playlist
+> (nessuno inventato). Regola: se manca una playlist vera, `/playlists` mostra uno stato vuoto
+> e il dock resta spento.
 
 ## Obiettivo
 
@@ -43,6 +43,19 @@ Moduli dentro il guscio `/dashboard` già esistente, senza duplicare dashboard:
 - Per i locali gli stessi moduli, con i campi che ha davvero un locale (niente Spotify se
   non esiste la colonna: si valuta a parte).
 
+### 10B — Link e social della scheda (fatto)
+
+- Campi nuovi su artisti e locali: sito, Instagram, Facebook, TikTok, YouTube, SoundCloud,
+  Bandcamp, Linktree. Spotify resta il campo già esistente degli artisti.
+- **Icone, non pulsanti**: sulla scheda pubblica i link compaiono come SVG inline (nessuna
+  libreria, nessuna richiesta esterna), solo se il campo è compilato. Tocchi da 44px, nome
+  accessibile.
+- Normalizzazione in `lib/social/links.ts`: accetta link completi o `@nomeutente` per
+  Instagram, TikTok e SoundCloud; verifica il dominio della piattaforma; forza https.
+  Il database rifiuta URL non https o troppo lunghi.
+- Form in **Account → Link e social**, con errore sul singolo campo.
+- I link entrano anche nel dato strutturato `sameAs` della scheda.
+
 ### 10C — (dopo, facoltativo)
 
 Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare senza SQL.
@@ -73,7 +86,7 @@ Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare s
 1. ✅ **10A.1** — parser e validazione link (`lib/spotify/links.ts`), controlli anche nel database.
 2. ✅ **10A.2** — migration `0055_spotify_playlists.sql` e pagina `/playlists`.
 3. ✅ **10A.3** — player sulla scheda artista e dock collegato alla prima playlist pubblicata.
-4. ▶ **10B** — moduli ruolo nel guscio dashboard.
+4. ✅ **10B** — moduli ruolo nel guscio dashboard e link social con icone.
 5. **10C** — solo se il proprietario lo chiede.
 
 ### Da fare appena arrivano le playlist
@@ -89,5 +102,8 @@ Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare s
 - [x] Il dock non copre la barra mobile né il contenuto; si spegne senza playlist.
 - [x] `/playlists` mostra solo playlist reali e pubblicate, in IT e EN (oggi: stato vuoto,
       `noindex`, fuori da menu e footer finché non c'è una playlist).
-- [ ] Il proprietario vede i follower della propria scheda, gli altri no.
+- [x] Il proprietario vede i follower della propria scheda, gli altri no.
+- [x] Le icone compaiono solo per i link reali, con il dominio giusto; un link sbagliato
+      viene rifiutato e non salva nulla.
+- [x] Completezza scheda, prossime serate, follower e azioni rapide in `/dashboard`.
 - [ ] Build, test reale, deploy e commit "Fase 10A" / "Fase 10B".

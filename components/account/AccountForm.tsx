@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { createClient } from "@/lib/supabase/client";
-import { parseSpotifyLink } from "@/lib/spotify/links";
+import { validateSocialLinks, type SocialKind } from "@/lib/social/links";
 
 import {
   authErrorClass,
@@ -22,6 +22,14 @@ export type AccountArtist = {
   genre: string;
   spotifyUrl: string;
   bio: string;
+  websiteUrl: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  tiktokUrl: string;
+  youtubeUrl: string;
+  soundcloudUrl: string;
+  bandcampUrl: string;
+  linktreeUrl: string;
 };
 
 export type AccountVenue = {
@@ -31,7 +39,25 @@ export type AccountVenue = {
   address: string;
   website: string;
   capacity: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  tiktokUrl: string;
+  youtubeUrl: string;
+  soundcloudUrl: string;
+  bandcampUrl: string;
+  linktreeUrl: string;
 };
+
+/** I campi social condivisi fra artista e locale (il sito ha nomi diversi). */
+const SOCIAL_FIELDS = [
+  { kind: "instagram", field: "instagramUrl" },
+  { kind: "facebook", field: "facebookUrl" },
+  { kind: "tiktok", field: "tiktokUrl" },
+  { kind: "youtube", field: "youtubeUrl" },
+  { kind: "soundcloud", field: "soundcloudUrl" },
+  { kind: "bandcamp", field: "bandcampUrl" },
+  { kind: "linktree", field: "linktreeUrl" },
+] as const;
 
 export type AccountSubject =
   | { kind: "artist"; values: AccountArtist }
@@ -45,15 +71,18 @@ export type AccountSubject =
 export default function AccountForm({
   subject,
   dict,
+  social,
 }: {
   subject: AccountSubject;
   dict: Dictionary["account"];
+  social: Dictionary["social"];
 }) {
   const router = useRouter();
   const [values, setValues] = useState<AccountArtist | AccountVenue>(subject.values);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [invalidLinks, setInvalidLinks] = useState<SocialKind[]>([]);
 
   function set(field: string, value: string) {
     setValues((current) => ({ ...current, [field]: value }) as AccountArtist | AccountVenue);
@@ -66,16 +95,40 @@ export default function AccountForm({
     setSaved(false);
     setLoading(true);
 
-    // Il link Spotify si salva nella forma canonica: l'embed e il controllo
-    // nel database accettano solo quella. Meglio fermarsi qui con un messaggio
-    // chiaro che mostrare l'errore grezzo di Postgres.
-    const rawSpotify =
-      subject.kind === "artist" ? (values as AccountArtist).spotifyUrl.trim() : "";
-    const spotify = rawSpotify ? parseSpotifyLink(rawSpotify) : null;
+    // Link e social: si normalizzano prima di scrivere. In questo modo nel
+    // database arriva solo la forma canonica (https, dominio giusto) e un link
+    // sbagliato non spegne le icone della scheda pubblica.
+    const input =
+      subject.kind === "artist"
+        ? {
+            website: (values as AccountArtist).websiteUrl,
+            instagram: (values as AccountArtist).instagramUrl,
+            facebook: (values as AccountArtist).facebookUrl,
+            tiktok: (values as AccountArtist).tiktokUrl,
+            youtube: (values as AccountArtist).youtubeUrl,
+            soundcloud: (values as AccountArtist).soundcloudUrl,
+            bandcamp: (values as AccountArtist).bandcampUrl,
+            linktree: (values as AccountArtist).linktreeUrl,
+            spotify: (values as AccountArtist).spotifyUrl,
+          }
+        : {
+            website: (values as AccountVenue).website,
+            instagram: (values as AccountVenue).instagramUrl,
+            facebook: (values as AccountVenue).facebookUrl,
+            tiktok: (values as AccountVenue).tiktokUrl,
+            youtube: (values as AccountVenue).youtubeUrl,
+            soundcloud: (values as AccountVenue).soundcloudUrl,
+            bandcamp: (values as AccountVenue).bandcampUrl,
+            linktree: (values as AccountVenue).linktreeUrl,
+            spotify: "",
+          };
 
-    if (rawSpotify && !spotify) {
+    const { urls, invalid } = validateSocialLinks(input);
+    setInvalidLinks(invalid);
+
+    if (invalid.length > 0) {
       setLoading(false);
-      setError(dict.invalidSpotify);
+      setError(dict.invalidLink);
       return;
     }
 
@@ -89,7 +142,15 @@ export default function AccountForm({
               name: (values as AccountArtist).name,
               city: (values as AccountArtist).city || null,
               genre: (values as AccountArtist).genre || null,
-              spotify_url: spotify?.url ?? null,
+              spotify_url: urls.spotify,
+              website_url: urls.website,
+              instagram_url: urls.instagram,
+              facebook_url: urls.facebook,
+              tiktok_url: urls.tiktok,
+              youtube_url: urls.youtube,
+              soundcloud_url: urls.soundcloud,
+              bandcamp_url: urls.bandcamp,
+              linktree_url: urls.linktree,
               bio: (values as AccountArtist).bio || null,
             })
             .eq("id", subject.values.id)
@@ -99,7 +160,14 @@ export default function AccountForm({
               name: (values as AccountVenue).name,
               city: (values as AccountVenue).city || null,
               address: (values as AccountVenue).address || null,
-              website: (values as AccountVenue).website || null,
+              website: urls.website,
+              instagram_url: urls.instagram,
+              facebook_url: urls.facebook,
+              tiktok_url: urls.tiktok,
+              youtube_url: urls.youtube,
+              soundcloud_url: urls.soundcloud,
+              bandcamp_url: urls.bandcamp,
+              linktree_url: urls.linktree,
               capacity: (values as AccountVenue).capacity
                 ? Number((values as AccountVenue).capacity)
                 : null,
@@ -119,6 +187,28 @@ export default function AccountForm({
 
   const artist = subject.kind === "artist" ? (values as AccountArtist) : null;
   const venue = subject.kind === "venue" ? (values as AccountVenue) : null;
+
+  const socialFields = artist
+    ? [
+        {
+          kind: "website" as const,
+          field: "websiteUrl" as const,
+          label: social.website,
+          value: artist.websiteUrl,
+        },
+        ...SOCIAL_FIELDS.map((item) => ({
+          ...item,
+          label: social[item.kind],
+          value: artist[item.field],
+        })),
+      ]
+    : venue
+      ? SOCIAL_FIELDS.map((item) => ({
+          ...item,
+          label: social[item.kind],
+          value: venue[item.field],
+        }))
+      : [];
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 space-y-5">
@@ -214,7 +304,8 @@ export default function AccountForm({
             </label>
             <input
               id="website"
-              type="url"
+              type="text"
+              inputMode="url"
               value={venue.website}
               onChange={(event) => set("website", event.target.value)}
               className={authInputClass}
@@ -235,6 +326,37 @@ export default function AccountForm({
             />
           </div>
         </>
+      ) : null}
+
+      {socialFields.length > 0 ? (
+        <section className="border-t border-line pt-5">
+          <h3 className="font-display text-lg font-semibold">{dict.linksTitle}</h3>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.linksText}</p>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {socialFields.map((item) => (
+              <div key={item.kind}>
+                <label htmlFor={`link-${item.kind}`} className={authLabelClass}>
+                  {item.label}
+                </label>
+                <input
+                  id={`link-${item.kind}`}
+                  type="text"
+                  inputMode="url"
+                  autoComplete="url"
+                  placeholder="https://"
+                  value={item.value}
+                  aria-invalid={invalidLinks.includes(item.kind)}
+                  onChange={(event) => set(item.field, event.target.value)}
+                  className={authInputClass}
+                />
+                {invalidLinks.includes(item.kind) ? (
+                  <span className="mt-1 block text-[10px] text-pink">{social.invalid}</span>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
 
       {error ? (

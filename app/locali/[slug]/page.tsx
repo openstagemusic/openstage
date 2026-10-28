@@ -5,12 +5,14 @@ import { notFound } from "next/navigation";
 import EventTeaser from "@/components/events/EventTeaser";
 import JsonLd from "@/components/seo/JsonLd";
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
+import SocialLinks from "@/components/directory/SocialLinks";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import FollowButton from "@/components/directory/FollowButton";
 import { canManageVenueProfile } from "@/lib/auth/roles";
 import { getMyPendingRequest, getReplaceablePage } from "@/lib/claims/queries";
 import { getVenueByProfileId, getVenueBySlug } from "@/lib/directory/queries";
 import { getFollowCount, isFollowing } from "@/lib/follows/queries";
+import { hasAnySocialLink } from "@/lib/social/links";
 import { venuePath } from "@/lib/events/paths";
 import { listPastEventsByVenue, listUpcomingEventsByVenue } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -128,7 +130,12 @@ export default async function VenuePage({ params }: VenuePageProps) {
     geo: hasPosition
       ? { "@type": "GeoCoordinates", latitude: venue.latitude, longitude: venue.longitude }
       : undefined,
-    sameAs: venue.website ? [venue.website] : undefined,
+    sameAs: (() => {
+      const urls = Object.values(venue.links).filter(
+        (url): url is string => typeof url === "string" && url.length > 0
+      );
+      return urls.length > 0 ? urls : undefined;
+    })(),
   };
 
   return (
@@ -174,6 +181,12 @@ export default async function VenuePage({ params }: VenuePageProps) {
           <h1 className="mt-4 text-balance font-poster text-4xl uppercase leading-[0.92] tracking-[-0.02em] sm:text-6xl">
             {venue.name}
           </h1>
+
+          {hasAnySocialLink(venue.links) ? (
+            <div className="mt-5">
+              <SocialLinks links={venue.links} dict={dict.social} />
+            </div>
+          ) : null}
 
           <div className="mt-6">
             <FollowButton

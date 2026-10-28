@@ -1,6 +1,7 @@
 import { cache } from "react";
 
 import { cityKey, preferredCityLabel } from "@/lib/geo/city";
+import type { SocialUrls } from "@/lib/social/links";
 import { ITEMS_PER_PAGE } from "@/lib/pagination";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,9 +16,10 @@ import { createClient } from "@/lib/supabase/server";
  * profilo collegato (email, ruolo) non esce mai dal database.
  */
 
-const ARTIST_SELECT = "id, slug, name, city, genre, spotify_url, bio, profile_id";
+const ARTIST_SELECT =
+  "id, slug, name, city, genre, spotify_url, bio, profile_id, website_url, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url";
 const VENUE_SELECT =
-  "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id";
+  "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url";
 
 export type PublicArtist = {
   id: string;
@@ -27,6 +29,8 @@ export type PublicArtist = {
   genre: string | null;
   spotifyUrl: string | null;
   bio: string | null;
+  /** Sito e social reali; le icone compaiono solo per i campi compilati. */
+  links: SocialUrls;
   /** Nessuno ha ancora reclamato la scheda. */
   claimed: boolean;
   /** Il profilo che l'ha reclamata: serve solo a riconoscere la propria. */
@@ -42,6 +46,7 @@ export type PublicVenue = {
   city: string | null;
   address: string | null;
   website: string | null;
+  links: SocialUrls;
   latitude: number | null;
   longitude: number | null;
   capacity: number | null;
@@ -59,6 +64,14 @@ type ArtistRow = {
   spotify_url: string | null;
   bio: string | null;
   profile_id: string | null;
+  website_url: string | null;
+  instagram_url: string | null;
+  facebook_url: string | null;
+  tiktok_url: string | null;
+  youtube_url: string | null;
+  soundcloud_url: string | null;
+  bandcamp_url: string | null;
+  linktree_url: string | null;
 };
 
 type VenueRow = {
@@ -72,6 +85,13 @@ type VenueRow = {
   longitude: number | null;
   capacity: number | null;
   profile_id: string | null;
+  instagram_url: string | null;
+  facebook_url: string | null;
+  tiktok_url: string | null;
+  youtube_url: string | null;
+  soundcloud_url: string | null;
+  bandcamp_url: string | null;
+  linktree_url: string | null;
 };
 
 /**
@@ -103,6 +123,17 @@ function toArtist(row: ArtistRow, verified: Set<string>): PublicArtist {
     genre: row.genre,
     spotifyUrl: row.spotify_url,
     bio: row.bio,
+    links: {
+      website: row.website_url,
+      instagram: row.instagram_url,
+      facebook: row.facebook_url,
+      tiktok: row.tiktok_url,
+      youtube: row.youtube_url,
+      soundcloud: row.soundcloud_url,
+      bandcamp: row.bandcamp_url,
+      linktree: row.linktree_url,
+      spotify: row.spotify_url,
+    },
     claimed: row.profile_id !== null,
     profileId: row.profile_id,
     verified: row.profile_id !== null && verified.has(row.profile_id),
@@ -117,6 +148,17 @@ function toVenue(row: VenueRow, verified: Set<string>): PublicVenue {
     city: row.city,
     address: row.address,
     website: row.website,
+    links: {
+      website: row.website,
+      instagram: row.instagram_url,
+      facebook: row.facebook_url,
+      tiktok: row.tiktok_url,
+      youtube: row.youtube_url,
+      soundcloud: row.soundcloud_url,
+      bandcamp: row.bandcamp_url,
+      linktree: row.linktree_url,
+      spotify: null,
+    },
     latitude: row.latitude,
     longitude: row.longitude,
     capacity: row.capacity,

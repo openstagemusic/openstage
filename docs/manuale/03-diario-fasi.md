@@ -845,6 +845,38 @@ aggiornato subito dopo il click, build.
 
 **Rimandato:** inviti virali (9B): manca un premio chiaro e una regola anti-abuso.
 
+## Fase 10 - Spotify, Area artista/locale e link social
+
+**Obiettivo:** dare ad artisti e locali strumenti reali (musica, link, completezza) e al
+pubblico un ascolto continuo, senza servizi a pagamento e senza dati finti.
+
+**10A - Spotify**
+
+- Link Spotify normalizzati (`lib/spotify/links.ts`: `open.spotify.com` con o senza
+  `/intl-xx/`, URI `spotify:`), con controllo anche nel database.
+- Player sulla scheda artista, acceso solo con un link valido.
+- Tabella `spotify_playlists` con RLS: lettura delle sole playlist pubblicate, scrittura solo
+  admin. Pagina `/playlists` con embed reali; con la tabella vuota è `noindex` e mostra uno
+  stato vuoto onesto.
+- Dock persistente collegato alla prima playlist pubblicata: spento finché non ce n'è una.
+
+**10B - Area artista/locale e link social**
+
+- Link social per artisti e locali: sito, Instagram, Facebook, TikTok, YouTube, SoundCloud,
+  Bandcamp, Linktree (più Spotify per gli artisti).
+- Normalizzazione con dominio obbligatorio e https; accetta `@nomeutente` per Instagram,
+  TikTok, SoundCloud. Errori sul singolo campo nel form.
+- Sulla scheda pubblica i link sono **icone SVG inline**, non pulsanti: solo quelle compilate.
+- Dashboard: completezza della scheda calcolata sui campi reali, prossime serate, follower
+  visibili solo al proprietario, azioni rapide (modifica, pagina pubblica, copia link).
+- I link entrano nel dato strutturato `sameAs`.
+
+**Verifiche superate:** link validi e invalidi, vincolo del database, icone su artista e
+locale, form con `@handle`, blocco del salvataggio con link sbagliato, moduli dashboard con
+dati reali, build.
+
+**Rimandato:** playlist reali e collegamento di `/playlists` a menu/footer e sitemap (B83).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

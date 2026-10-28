@@ -266,6 +266,15 @@ lo stato "inserito da OpenStage" si calcola dall'assenza dei `profile_id` colleg
 `follower_id` più `artist_id` oppure `venue_id` (uno solo), con chiave unica per coppia e RLS
 sulla propria riga. Il trigger vieta di seguire la propria scheda.
 
+**`artists` / `venues` - link pubblici** (Fase 10B). Oltre a `spotify_url` (artisti) e
+`website` (locali), entrambe le tabelle hanno `instagram_url`, `facebook_url`, `tiktok_url`,
+`youtube_url`, `soundcloud_url`, `bandcamp_url`, `linktree_url`; gli artisti hanno anche
+`website_url`. Gli URL sono normalizzati dall'applicazione e il database accetta solo https.
+
+**`spotify_playlists`** - le playlist reali della redazione (Fase 10A): slug, titolo,
+descrizione, URL, pubblicata, ordine. Lettura pubblica delle sole pubblicate, scrittura solo
+admin. Con la tabella vuota il dock resta spento e `/playlists` � `noindex`.
+
 **`saved_events`** - gli eventi salvati da un profilo (Fase 2).
 `profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
 dato sensibile, e la RLS lo limita al proprietario.
@@ -423,6 +432,8 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0052_takedown_notices.sql` | Notice & takedown: tabella, RLS, notifica admin, audit e funzione di decisione |
 | `0053_follows.sql` | Follow di artisti/locali, notifica ai follower e digest esteso |
 | `0054_follow_count.sql` | Funzione `follow_count`: solo il totale dei follower, senza esporre le righe |
+| `0055_spotify_playlists.sql` | Tabella `spotify_playlists` con RLS, vincolo sul link e trigger `updated_at`; vincolo sul link Spotify degli artisti |
+| `0056_profile_social_links.sql` | Sito e social di artisti e locali, con vincolo https sugli URL |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti

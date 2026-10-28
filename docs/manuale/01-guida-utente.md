@@ -31,8 +31,7 @@ assistente AI per bozze e verifica schede, creazione eventi per conto di artisti
 ingresso gratuito, qualità dati, backup cifrato con prova di ripristino, liste admin con
 ricerca, filtri, paginazione ed export, notice & takedown e follow di artisti e locali.
 
-**In arrivo:** Spotify,
-pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
+**In arrivo:** pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
 ripristino è già passata.
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
@@ -280,12 +279,12 @@ La dashboard è il posto dove gestisci il tuo profilo e le tue date.
 
 | Voce | Cosa trovi |
 | --- | --- |
-| **Panoramica** | Bozze, pubblicate, annullate e preferiti |
+| **Panoramica** | Bozze, pubblicate, annullate e preferiti. Per artisti e locali: completezza della scheda, follower, prossime serate e azioni rapide (modifica, pagina pubblica, copia link) |
 | **I miei eventi** | Tutte le tue serate, divise tra in programma e **passate** |
 | **Crea evento** | Il modulo di pubblicazione |
 | **Preferiti** | Le serate che hai salvato |
 | **Per te** | Le schede che segui e le prossime serate salvate |
-| **Profilo / Account** | La tua scheda, la richiesta di reclamo e le impostazioni |
+| **Profilo / Account** | La tua scheda, i link e social, la richiesta di reclamo e le impostazioni |
 
 Nel modulo puoi inserire titolo, artista, data e ora, locale o nome del posto, indirizzo con
 pin sulla mappa, genere, tipo, prezzo o ingresso gratuito, link biglietti, locandina e il
@@ -395,14 +394,10 @@ altro paese. Puoi cambiarla quando vuoi con il selettore **IT / EN** nella barra
 lingua vive nell'indirizzo (`/it/...` oppure `/en/...`), quindi un link mantiene la lingua
 anche quando lo condividi. La scelta viene ricordata alla visita successiva.
 
-## Il player in basso (non ancora attivo)
+## Il player in basso
 
 È previsto un **player Spotify fisso** in fondo allo schermo, per ascoltare in background le
-playlist di OpenStage mentre navighi. **Oggi però non si vede**: il player esiste nel codice ma
-compare **solo** quando è configurata una playlist pubblica, e le playlist di OpenStage non sono
-ancora state create. Non c'è niente di rotto: è una funzione **spenta**, non una funzione
-mancante. Quando le playlist esisteranno, il player si accende con una sola impostazione, senza
-modifiche al codice.
+playlist di OpenStage mentre navighi. **Oggi non si vede**: il player compare **solo** quando c'è almeno una playlist reale e pubblicata in `spotify_playlists`, e le playlist di OpenStage non sono ancora state create. Non c'è niente di rotto: è una funzione **spenta**, non una funzione mancante. La pagina `/playlists` esiste ed è `noindex` finché resta vuota; quando arriva una playlist reale si accende il player e la pagina entra nel menu.
 
 # Domande frequenti
 

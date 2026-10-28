@@ -25,7 +25,7 @@
 | **8** (8.0 → 8.8.4, B74 → B81, backup e restore test) | ✅ fatte; resta **8.8.5** facoltativa (triage AI) |
 | **9A** | ✅ follow di artisti/locali, notifica nuovi eventi, digest, conteggio follower |
 | **9B** | ⏸ **rimandata**: manca un premio chiaro e una regola anti-abuso |
-| **10** | ▶ **in corso**: 10A Spotify fatta; prossima 10B Area artista/locale. Piano: `docs/plan-phase-10.md` |
+| **10** | ▶ **fatte 10A e 10B** il 28 ottobre 2026; restano i link reali delle playlist. Piano: `docs/plan-phase-10.md` |
 | **11** | ⬜ monetizzazione opzionale (PayPal, Vercel Pro) |
 | **12** | ⬜ serie, locale chiuso, bacheca ingaggi |
 | **13** | ⬜ SEO, legal, cancellazione account, audit e polish |
@@ -47,7 +47,7 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 | **7B — Email Engine completo + Area Fan** | 7.2 `email_queue`/`email_log` + worker (`pg_cron` + Edge Function) con tetto 2 invii/sec, retry ×3 e backoff, `idempotency_key` · 7.3 webhook Resend (consegnate/rimborsate/spam) · 7.4 template completi · 7.5 preferenze + tetto 1/settimana + **disiscrizione senza login** · 7.6 Area Fan (Per te, Promemoria, Impostazioni, **centro notifiche**) · 7.7 **notifiche in-app**: tabella `notifications`, badge, pagina, preferenze, digest; **B43** diventa in-app + digest, non email a tutti · 7.8 classi email e **quota riservata** (`auth`, `transactional`, `digest`, `optional`) · include **B26, B28** (in-app, email solo digest opt-in); **B08/B35** sono nella 7A. Richiede la 7A. **Stato: 7B completata — notifiche, coda, webhook, preferenze, digest e Area Fan** | Fase 7A completata; politica in `docs/notifications-email-policy.md` |
 | **8 — Pannello Admin + Claim a invito** | **8.0 control room modulare** (registro moduli, overview “da fare adesso”, ricerca, responsive, 2FA, audit) · 8.1 admin con **2FA (AAL2)** + registro azioni · 8.2 metriche reali · 8.3 eventi/utenti/segnalazioni · 8.4 "crea per conto di" + **`/claim/[token]`** (invito email) · 8.5 centro assistenza/ticket (agganciato al form di `/contatti`) · 8.6 **Comunicazione**: registro email, coda, quota Resend, riprova controllata, export CSV/JSON · 8.7 pannello notifiche in-app e audit · **8.8 AI assistita** (bozze risposte, import eventi, verifica schede, qualità dati; sempre con approvazione umana) | **7A** (email); **7B** (notifiche e coda); **5.5D** per il linguaggio visivo condiviso. Piano: `docs/plan-fase-8.md`  **Stato: 8.0-8.7, 8.8.1-8.8.4, B74-B79 e backup 8.9 fatti; resta 8.8.5 (facoltativo)** |
 | **9 — Community: segui e inviti virali** | **"Segui"** artista e locale (tabella `follows`, base per il digest della Fase 7) · **inviti virali** `/invite/CODICE` nel dashboard artista, con riscatto automatico (3 invitati con email verificata e almeno 1 evento pubblicato). **Stato: 9A completa il 28 ottobre 2026 (follow + conteggio pubblico dei follower, commit `a4a8665`); 9B inviti rimandata** | nessuno |
-| **10 — Spotify e Area Artista/Locale** | Form Spotify nel profilo (brani/album/ID), **sticky player** persistente, `/playlists` con le playlist OpenStage; **moduli ruolo-specifici** per artista e locale dentro il guscio della 5.5D (profilo, eventi, completezza, strumenti). **Niente dashboard duplicate**. Divisa in **10A** Spotify (link validati, player, `/playlists` con tabella `spotify_playlists`, dock) e **10B** moduli ruolo (completezza, prossime serate, follower del proprietario, azioni rapide); **10C** gestione playlist da admin. Piano: `docs/plan-phase-10.md`. **Stato: 10A fatta il 28 ottobre 2026 (parser, tabella, `/playlists`, player artista, dock); restano 10B e le playlist reali** | nessuno (embed Spotify è gratuito, nessuna API key) |
+| **10 — Spotify e Area Artista/Locale** | Form Spotify nel profilo (brani/album/ID), **sticky player** persistente, `/playlists` con le playlist OpenStage; **moduli ruolo-specifici** per artista e locale dentro il guscio della 5.5D (profilo, eventi, completezza, strumenti). **Niente dashboard duplicate**. Divisa in **10A** Spotify (link validati, player, `/playlists` con tabella `spotify_playlists`, dock) e **10B** moduli ruolo (completezza, prossime serate, follower del proprietario, azioni rapide); **10C** gestione playlist da admin. Piano: `docs/plan-phase-10.md`. **Stato: 10A e 10B fatte il 28 ottobre 2026** (Spotify, `/playlists`, player, dock, moduli ruolo, link social con icone); restano solo le playlist reali | nessuno (embed Spotify è gratuito, nessuna API key) |
 | **11 — Monetizzazione opzionale** | 11.1 Artist Pro 3 € una tantum (PayPal Orders API + webhook con firma verificata) · 11.2 Venue Pro abbonamento (Subscriptions API, ciclo di vita, grazia 3 giorni) · 11.3 vantaggi Pro (galleria, copertina, statistiche, badge, widget) | **Vercel Pro**, dominio, conto PayPal **Business**, decisione fiscale |
 | **12 — Serie, locali chiusi, bacheca ingaggi** | 12.1 ricorrenza/`serie_id` (**B41**) · 12.2 locale chiuso (**B42**) · 12.3 **`/calls`** "cercasi artisti" + candidature | nessuno nuovo |
 | **13 — SEO, legal, audit e polish finale** | **B09 + B44 + B45** (OG di default, favicon, anteprime delle schede) · `/privacy`, `/terms`, `/cookies` **reali** per GDPR e pagamenti + banner cookie · **notice & takedown** · audit RLS · pagina **500** · README + checklist env · pulizia fixture · **B46/B47** (serate simili, visti di recente) · generatore social AI (facoltativo). **Non si rifanno le pagine della 5.5**: qui solo rifiniture e contenuti | Anthropic solo se si fa il generatore |
@@ -71,8 +71,8 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 9. **9A** — follow di artisti/locali, notifica nuovi eventi, digest e conteggio follower.
    **Completata** il 28 ottobre 2026. **9B** inviti virali: **rimandata** finché non ci sono
    premio e regola anti-abuso.
-10. **10A → 10B** — Spotify e Area artista/locale. **In preparazione**: piano pronto, si
-    parte quando ci sono i link reali delle playlist.
+10. **10A → 10B** — Spotify, Area artista/locale e link social. **Completate il 28 ottobre
+    2026**; il dock si accende quando arrivano playlist reali.
 11. **11** — monetizzazione opzionale: solo dopo Vercel Pro, conto PayPal Business e
     decisione fiscale.
 12. **12** — serie, locali chiusi e bacheca ingaggi.
@@ -107,11 +107,11 @@ committabile. Non si mescolano restyling e logica nella stessa modifica.
 | `/citta`, `/citta/[city]` | **veri** (Fase 6.2), generati dai dati reali; le città sotto soglia sono `noindex` |
 | `/login`, `/register` | **funzionanti**; restyling **5.5A fatto** |
 | `/account`, onboarding artista/locale | **funzionanti**; restyling **5.5A fatto** |
-| `/artisti`, `/locali` + schede `[slug]` | **veri** (directory con ricerca e filtri); restyling editoriale **5.5C fatto** |
+| `/artisti`, `/locali` + schede `[slug]` | **veri** (directory con ricerca e filtri); restyling **5.5C fatto**; link social come icone dalla **10B** |
 | `/eventi/<citta>/<slug>` e `/eventi/<id>` | **vere**; restyling editoriale **5.5B fatto**: copertina-first, metadati in righe, azioni in fondo |
 | Mappa e popup/bottom sheet | **funzionanti**; popup e bottom sheet allineati nella **5.5B** |
 | `/forgot-password`, `/reset-password` | **veri** (7A): link reale via Resend/Supabase, pagina nuova password e gestione link scaduto |
-| `/dashboard`, `/dashboard/events`, `/dashboard/saved` | **funzionanti**; guscio, panoramica, I miei eventi e Preferiti **5.5D fatti**; le funzioni nuove (filtri, duplica, azioni multiple) nella **Fase 10** |
+| `/dashboard`, `/dashboard/events`, `/dashboard/saved` | **funzionanti**; guscio e pagine **5.5D**; dalla **10B** la panoramica mostra completezza scheda, follower, prossime serate e azioni rapide. Filtri/duplica restano **B58** |
 | `/dashboard/events/new`, `/dashboard/events/[id]` | **funzionanti**; restyling editor **5.5E fatto**. Nessun campo nuovo: `ends_at`, serie e festival restano **B41/Fase 12** |
 | `/playlists` | **pronta** (10A): mostra solo playlist reali pubblicate; con la tabella vuota è `noindex` e fuori dal menu. Il dock resta spento finché non ce n'è una |
 | `/admin/messaggi` | **vera** (Fase 6.3): coda messaggi con stati e filtri; la risposta `mailto:` diventa integrata nella **7A** |

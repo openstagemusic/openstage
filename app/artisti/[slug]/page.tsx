@@ -3,6 +3,7 @@ import Link from "@/components/i18n/LocaleLink";
 import { notFound } from "next/navigation";
 
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
+import SocialLinks from "@/components/directory/SocialLinks";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import FollowButton from "@/components/directory/FollowButton";
 import EventTeaser from "@/components/events/EventTeaser";
@@ -16,6 +17,7 @@ import { listPastEventsByArtist, listUpcomingEventsByArtist } from "@/lib/events
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
+import { hasAnySocialLink } from "@/lib/social/links";
 import { parseSpotifyLink, spotifyEmbedHeight } from "@/lib/spotify/links";
 import { getSessionProfile } from "@/lib/supabase/session";
 
@@ -106,13 +108,17 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           ? "owned"
           : "unclaimed";
 
+  const sameAs = Object.values(artist.links).filter(
+    (url): url is string => typeof url === "string" && url.length > 0
+  );
+
   const data = {
     "@context": "https://schema.org",
     "@type": "MusicGroup",
     name: artist.name,
     url: absoluteUrl(`/${locale}${artistPath(artist)}`),
     genre: artist.genre ?? undefined,
-    sameAs: artist.spotifyUrl ? [artist.spotifyUrl] : undefined,
+    sameAs: sameAs.length > 0 ? sameAs : undefined,
     homeLocation: artist.city ? { "@type": "Place", name: artist.city } : undefined,
   };
 
@@ -160,17 +166,10 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             {artist.name}
           </h1>
 
-          {artist.spotifyUrl ? (
-            <p className="mt-5">
-              <a
-                href={artist.spotifyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center border border-line bg-white/[0.03] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-colors hover:border-cyan/50"
-              >
-                {t.spotify}
-              </a>
-            </p>
+          {hasAnySocialLink(artist.links) ? (
+            <div className="mt-5">
+              <SocialLinks links={artist.links} dict={dict.social} />
+            </div>
           ) : null}
 
           {artist.bio ? (
