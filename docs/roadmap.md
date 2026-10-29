@@ -3,8 +3,8 @@
 > **Approvata dal proprietario il 19 ottobre 2026**, aggiornata il **23 ottobre 2026** con
 > la **Fase 5.5 — Coerenza visiva**, la divisione della **Fase 7 in 7A/7B**, la
 > **control room della Fase 8** e la **politica “email minime + notifiche in-app”**.
-> **Ultimo commit di codice: `a4a8665` (28 ottobre 2026, "Fase 9A: conteggio follow").**
-> **Riallineata il 28 ottobre 2026** dopo la chiusura di 7B, Fase 8 e Fase 9A.
+> **Ultimo commit di codice: `9dd7f5f` (29 ottobre 2026, "Fase 11A: fondazioni Pro").**
+> **Riallineata il 29 ottobre 2026** dopo 10A/10B/10D/10E e la 11A.
 > Fonte unica: se la tabella del manuale dice altro, vale questa. Il manuale (e il PDF) si
 > aggiornano **solo su richiesta** ("aggiorna pdf").
 >

@@ -31,7 +31,7 @@ assistente AI per bozze e verifica schede, creazione eventi per conto di artisti
 ingresso gratuito, qualità dati, backup cifrato con prova di ripristino, liste admin con
 ricerca, filtri, paginazione ed export, notice & takedown e follow di artisti e locali.
 
-**In arrivo:** pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
+**In arrivo:** OpenStage Pro e pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
 ripristino è già passata.
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
@@ -236,6 +236,18 @@ o **Non selezionata**.
 L'aggiunta alla playlist resta **manuale** su Spotify: OpenStage non scrive nel tuo account né
 modifica la playlist in automatico.
 
+## OpenStage Pro (in preparazione)
+
+Nel dashboard di artisti e locali c'è una voce **Pro**. Non compare in Home, nella navbar, nel
+footer o sulle schede pubbliche: è uno strumento di lavoro, non una vetrina.
+
+La pagina Pro spiega il patto: **nessuna classifica, nessun algoritmo, nessun badge, nessuna
+priorità a pagamento**. Il piano base resta gratuito per sempre, e contatti e booking restano
+gratuiti. Oggi gli strumenti (analytics, export, EPK, widget, booking) sono **in preparazione**;
+prezzi e acquisto non sono ancora attivi. Chi ha un accesso attivo può usare il box **"Cosa ti
+serve davvero?"** per proporre uno strumento: una richiesta ogni 30 giorni, letta nella
+revisione mensile. Non è una promessa di sviluppo.
+
 ## Seguire un artista o un locale
 
 Sulla scheda pubblica di un artista o di un locale trovi **Segui**. Serve l'accesso; da
@@ -360,6 +372,7 @@ finestra breve senza cancellare la chiave TOTP.
 | **Qualità dati** | Campi mancanti, serate passate, schede libere e possibili doppioni |
 | **Notice & takedown** | Richieste legali di rimozione: presa in carico, decisione, audit |
 | **Ticket e messaggi** | Priorità, assegnazione, storico e risposta email |
+| **Pro** | Accessi Pro manuali, richieste di strumenti e stati |
 | **Email** | Coda, falliti, registro, quota Resend, retry ed export |
 | **Audit** | Registro delle azioni admin |
 | **Sicurezza** | 2FA e sospensione temporanea |

@@ -888,6 +888,28 @@ nessuna scrittura automatica. Un trigger impedisce all'artista di auto-dichiarar
 voce nel footer e `/playlists` in sitemap (B83 chiusa). La tabella vuota resta gestita: dock
 spento e pagina `noindex`.
 
+## Fase 11A - Fondazioni Pro
+
+**Obiettivo:** costruire l'accesso Pro e la coda delle richieste senza pagamenti, senza
+visibilità a pagamento e senza esporre il Pro fuori dalla dashboard.
+
+**Cosa è stato costruito**
+
+- Tabelle `pro_entitlements` e `pro_feature_requests` con RLS; nessun `is_pro` sul profilo.
+- Gating server-side: pagina Pro e box richieste solo con accesso attivo.
+- Pagina `/dashboard/pro` editoriale: manifesto, confine (niente classifiche/algoritmi/badge),
+  strumenti in preparazione, patto e nota sul finanziamento.
+- Fascia Pro discreta nella dashboard di artisti e locali; nessun prezzo e nessun riferimento
+  pubblico.
+- Box "Cosa ti serve davvero?" con una richiesta ogni 30 giorni, limite anche nel database.
+- Coda admin `/admin/pro`: richieste con stati, accessi Pro manuali con concessione e revoca.
+- Testi IT/EN.
+
+**Verifiche superate:** accesso manuale, gating, invio richiesta, blocco mensile, cambio stato,
+revoca, nessun riferimento Pro in Home/navbar/footer, build.
+
+**Prossimo:** 11B.1 — contatti/booking gratuiti ed EPK.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

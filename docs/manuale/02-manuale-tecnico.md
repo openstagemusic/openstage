@@ -282,6 +282,16 @@ manuale (nessun OAuth). Il trigger `artists_playlist_guard` lascia all'artista s
 descrizione, URL, pubblicata, ordine. Lettura pubblica delle sole pubblicate, scrittura solo
 admin. Con la tabella vuota il dock resta spento e `/playlists` � `noindex`.
 
+**`pro_entitlements`** - accesso Pro a tempo (Fase 11A): `profile_id`, piano
+(`artist`/`venue`), stato (`active`/`expired`/`refunded`/`revoked`), inizio, scadenza,
+fonte (`manual`/`paypal`) e ordine PayPal. Nessun `is_pro` sul profilo: l'accesso si calcola
+da stato + data. RLS: l'utente vede solo il proprio, l'admin gestisce tutto.
+
+**`pro_feature_requests`** - richieste di strumenti dei Pro (Fase 11A): area, titolo,
+problema, caso d'uso, stato e date. RLS: l'utente inserisce solo le proprie e le vede solo se
+ha un accesso attivo; l'admin aggiorna la coda. Il trigger `guard_pro_request_monthly` impone
+una richiesta ogni 30 giorni.
+
 **`saved_events`** - gli eventi salvati da un profilo (Fase 2).
 `profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
 dato sensibile, e la RLS lo limita al proprietario.
@@ -442,6 +452,9 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0055_spotify_playlists.sql` | Tabella `spotify_playlists` con RLS, vincolo sul link e trigger `updated_at`; vincolo sul link Spotify degli artisti |
 | `0056_profile_social_links.sql` | Sito e social di artisti e locali, con vincolo https sugli URL |
 | `0057_playlist_submissions.sql` | Proposta di un singolo brano per la playlist: URL, titolo, stato e date, con vincolo sul track Spotify |
+| `0058_playlist_status_guard.sql` | Trigger che riserva all'admin l'esito della proposta playlist |
+| `0059_pro_foundation.sql` | Tabelle Pro, richieste strumenti, RLS e gating |
+| `0060_pro_request_monthly.sql` | Limite di una richiesta Pro ogni 30 giorni, anche nel database |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
@@ -469,6 +482,8 @@ di `is_admin()`, mai di valori passati dal browser.
 | `saved_events` | `saved_events_select_own` | Vedi solo i **tuoi** preferiti |
 | | `saved_events_insert_own`, `saved_events_delete_own` | Salvi e togli solo i tuoi |
 | `follows` | `follows_select_own`, `follows_insert_own`, `follows_delete_own` | Segui e togli solo le tue schede; il trigger vieta la propria scheda |
+| `pro_entitlements` | `pro_entitlements_select_own`, `pro_entitlements_admin_*` | Vedi solo il tuo accesso; solo l'admin concede o revoca |
+| `pro_feature_requests` | `pro_feature_requests_select_own`, `pro_feature_requests_insert_pro`, `pro_feature_requests_admin_*` | Inserisci solo se hai un Pro attivo; la coda la gestisce l'admin |
 | `claims` | `claims_select_own_or_admin` | Vedi la tua richiesta (o tutte se admin); si scrive solo tramite funzioni |
 | `reports` | `reports_insert_own` | Segnali solo a nome tuo, una volta per serata |
 | | `reports_select_own_or_admin`, `reports_admin_update` | Vedi le tue segnalazioni; l'admin le legge e le chiude |
