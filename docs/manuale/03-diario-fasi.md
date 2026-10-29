@@ -878,7 +878,9 @@ pubblico un ascolto continuo, senza servizi a pagamento e senza dati finti.
 locale, form con `@handle`, blocco del salvataggio con link sbagliato, moduli dashboard con
 dati reali, build.
 
-**Rimandato:** playlist reali e collegamento di `/playlists` a menu/footer e sitemap (B83).
+**Playlist reale (29 ottobre 2026):** pubblicata **OpenStage — Selezione**, con sezione in Home,
+voce nel footer e `/playlists` in sitemap (B83 chiusa). La tabella vuota resta gestita: dock
+spento e pagina `noindex`.
 
 ## Come si aggiorna questo diario
 

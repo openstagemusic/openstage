@@ -5,7 +5,14 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 const LINK =
   "text-muted underline-offset-4 transition-colors hover:text-white hover:underline";
 
-export default function Footer({ dict }: { dict: Dictionary["footer"] }) {
+export default function Footer({
+  dict,
+  hasPlaylists,
+}: {
+  dict: Dictionary["footer"];
+  /** La voce compare solo quando esiste una playlist reale e pubblicata. */
+  hasPlaylists: boolean;
+}) {
   const year = new Date().getFullYear();
 
   return (
@@ -33,6 +40,13 @@ export default function Footer({ dict }: { dict: Dictionary["footer"] }) {
                 {dict.cities}
               </Link>
             </li>
+            {hasPlaylists ? (
+              <li>
+                <Link href="/playlists" className={LINK}>
+                  {dict.playlist}
+                </Link>
+              </li>
+            ) : null}
             <li>
               <Link href="/contatti" className={LINK}>
                 {dict.contact}

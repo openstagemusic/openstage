@@ -1,8 +1,8 @@
 # Fase 10 — Spotify e Area Artista/Locale
 
-> **Stato: 10A e 10B fatte il 28 ottobre 2026.** Restano solo i link reali delle playlist
-> (nessuno inventato). Regola: se manca una playlist vera, `/playlists` mostra uno stato vuoto
-> e il dock resta spento.
+> **Stato: 10A, 10B e 10D fatte.** La playlist reale **OpenStage — Selezione** è attiva dal
+> 29 ottobre 2026: sezione in Home, `/playlists`, footer e sitemap. Se la tabella resta vuota,
+> la pagina torna `noindex` e il dock si spegne.
 
 ## Obiettivo
 
@@ -99,11 +99,11 @@ Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare s
 4. ✅ **10B** — moduli ruolo nel guscio dashboard e link social con icone.
 5. **10C** — solo se il proprietario lo chiede.
 
-### Da fare appena arrivano le playlist
+### Fatto appena arrivata la playlist
 
-- Inserire le righe reali in `spotify_playlists` con `published = true`.
-- Aggiungere `/playlists` a menu/footer e `sitemap.xml` (B83).
-- Controllare che il dock compaia e non copra la barra mobile.
+- ✅ Riga reale in `spotify_playlists` con `published = true` (`OpenStage — Selezione`).
+- ✅ `/playlists` nel footer e in `sitemap.xml` (B83).
+- ✅ Sezione in Home, dock spento lì e attivo sulle altre pagine; nessuna sovrapposizione con la barra mobile.
 
 ## QA
 

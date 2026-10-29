@@ -153,7 +153,7 @@ export default async function RootLayout({
           >
             {children}
           </main>
-          {isAdmin ? null : <Footer dict={dict.footer} />}
+          {isAdmin ? null : <Footer dict={dict.footer} hasPlaylists={featuredPlaylist !== null} />}
           {isAdmin ? null : (
             <MobileTabBar
               dict={dict.nav}

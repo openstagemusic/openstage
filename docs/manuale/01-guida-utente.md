@@ -396,11 +396,10 @@ anche quando lo condividi. La scelta viene ricordata alla visita successiva.
 
 ## Il player in basso
 
-È previsto un **player Spotify fisso** in fondo allo schermo, per ascoltare in background le
-playlist di OpenStage mentre navighi. **Oggi non si vede**: il player compare **solo** quando c'è almeno una playlist reale e pubblicata in `spotify_playlists`, e le playlist di OpenStage non sono ancora state create. Non c'è niente di rotto: è una funzione **spenta**, non una funzione mancante. La pagina `/playlists` esiste ed è `noindex` finché resta vuota; quando arriva una playlist reale si accende il player e la pagina entra nel menu. In **Home**, in fondo, compare anche la
-sezione **Playlist** con l'embed e il pulsante per aprirla e salvarla su Spotify; lì il player
-fisso in basso resta spento, per non avere due player insieme.
-
+C'è una **playlist ufficiale OpenStage** su Spotify: **OpenStage — Selezione**. In **Home**, in fondo,
+trovi la sezione con l'embed e il pulsante **Ascoltala su Spotify**: puoi ascoltarla e salvarla
+nella tua libreria con **Save on Spotify**. Sulle altre pagine il player resta fisso in basso,
+sopra la barra di navigazione mobile; in Home è spento, per non avere due player insieme.
 # Domande frequenti
 
 **Posso avere due profili (uno da fan e uno da artista) con la stessa email?**

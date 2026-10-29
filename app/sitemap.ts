@@ -7,6 +7,7 @@ import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listEvents } from "@/lib/events/queries";
 import type { Locale } from "@/lib/i18n/config";
 import { getSiteUrl } from "@/lib/seo/site";
+import { listPublishedPlaylists } from "@/lib/spotify/queries";
 
 /**
  * Mappa del sito per i motori di ricerca.
@@ -57,15 +58,18 @@ function entry(path: string, lastModified?: Date): MetadataRoute.Sitemap[number]
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [artists, venues, events, cities] = await Promise.all([
+  const [artists, venues, events, cities, playlists] = await Promise.all([
     listArtists({ perPage: MAX_PER_SECTION }),
     listVenues({ perPage: MAX_PER_SECTION }),
     listEvents({ perPage: MAX_PER_SECTION }),
     listCityDirectory(),
+    listPublishedPlaylists(),
   ]);
 
   return [
     ...STATIC_PATHS.map((path) => entry(path)),
+    // La pagina playlist entra solo quando c’è almeno una playlist pubblicata.
+    ...(playlists.length > 0 ? [entry("/playlists")] : []),
     ...artists.items.map((artist) => entry(artistPath(artist))),
     ...venues.items.map((venue) => entry(venuePath(venue))),
     // Le città sottili restano fuori: la pagina esiste, ma non chiediamo a
