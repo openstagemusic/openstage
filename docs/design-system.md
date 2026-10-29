@@ -42,6 +42,13 @@ Regole:
 - I gradienti non stanno mai dietro a testi lunghi.
 - Il colore non è l'unico segnale di stato: sempre anche testo o icona.
 
+### Marchio
+
+Il marchio è **O/S** con lo slash in gradiente. Il sistema completo (file, formati,
+regole d'uso, immagini Spotify) vive in **`docs/brand/README.md`**; nel sito le icone
+stanno in `app/icon.png`, `app/apple-icon.png`, `app/favicon.ico` e `public/brand/`.
+La favicon usa solo lo slash, perché a 16 px le lettere non si leggono.
+
 ## 3. Tipografia
 
 - Titoli e numeri: **Space Grotesk** (`font-display`).
