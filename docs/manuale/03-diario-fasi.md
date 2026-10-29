@@ -870,6 +870,9 @@ pubblico un ascolto continuo, senza servizi a pagamento e senza dati finti.
 - Dashboard: completezza della scheda calcolata sui campi reali, prossime serate, follower
   visibili solo al proprietario, azioni rapide (modifica, pagina pubblica, copia link).
 - I link entrano nel dato strutturato `sameAs`.
+- **Playlist in Home** (10D): sezione in fondo con embed reale e pulsante per salvarla su
+  Spotify. Compare solo con una playlist pubblicata; in Home il dock fisso si spegne per non
+  duplicare il player.
 
 **Verifiche superate:** link validi e invalidi, vincolo del database, icone su artista e
 locale, form con `@handle`, blocco del salvataggio con link sbagliato, moduli dashboard con

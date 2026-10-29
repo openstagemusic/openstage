@@ -123,6 +123,9 @@ export default async function RootLayout({
   const notificationCount = session ? await getUnreadNotificationCount(session.id) : 0;
   // Il dock non compare nell'admin e non esiste senza una playlist reale.
   const featuredPlaylist = isAdmin ? null : await getFeaturedPlaylist();
+  // In Home la playlist ha la sua sezione con embed: il dock duplicherebbe il
+  // player (e permetterebbe due audio insieme). Sulle altre pagine resta.
+  const showDock = featuredPlaylist !== null && currentPath !== "/";
 
   return (
     <html
@@ -159,12 +162,12 @@ export default async function RootLayout({
               notificationCount={notificationCount}
             />
           )}
-          {isAdmin ? null : (
+          {showDock && !isAdmin ? (
             <SpotifyPlayerDock
               embedUrl={featuredPlaylist?.embedUrl ?? null}
               title={dict.spotify.embedTitle}
             />
-          )}
+          ) : null}
         </LocaleProvider>
       </body>
     </html>

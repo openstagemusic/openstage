@@ -8,6 +8,7 @@ import BentoGrid from "@/components/home/BentoGrid";
 import CityStrip from "@/components/home/CityStrip";
 import HeroPosters from "@/components/home/HeroPosters";
 import HomeIntro from "@/components/home/HomeIntro";
+import PlaylistSection from "@/components/home/PlaylistSection";
 import GlobeMap from "@/components/map/GlobeMap";
 import Reveal from "@/components/motion/Reveal";
 import Pagination from "@/components/ui/Pagination";
@@ -32,6 +33,7 @@ import { getPageMetadata } from "@/lib/i18n/metadata";
 import { getLocale } from "@/lib/i18n/server";
 import { DEFAULT_ZOOM, MAX_MAP_EVENTS, REGION_ZOOM } from "@/lib/map/config";
 import { ITEMS_PER_PAGE } from "@/lib/pagination";
+import { listPublishedPlaylists } from "@/lib/spotify/queries";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 export const generateMetadata = () => getPageMetadata((dict) => dict.meta);
@@ -56,7 +58,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const params = await searchParams;
 
-  const [visitor, session, savedIds, genres, featured, counters, cityDirectory] = await Promise.all([
+  const [visitor, session, savedIds, genres, featured, counters, cityDirectory, playlists] =
+    await Promise.all([
     getVisitorLocation(),
     getSessionProfile(),
     listSavedEventIds(),
@@ -64,6 +67,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     listFeaturedEvents(4),
     getDiscoveryCounters(),
     listCityDirectory(),
+    listPublishedPlaylists(),
   ]);
 
   // In Home le città restano poche e in ordine alfabetico: l'elenco completo,
@@ -319,6 +323,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <Reveal>
         <BentoGrid dict={dict} counters={counters} />
       </Reveal>
+
+      {/* 06 - Playlist della redazione: solo se ce n'è una pubblicata. */}
+      {playlists.length > 0 ? (
+        <Reveal>
+          <PlaylistSection
+            playlist={playlists[0]}
+            showAll={playlists.length > 1}
+            dict={dict}
+          />
+        </Reveal>
+      ) : null}
     </>
   );
 }

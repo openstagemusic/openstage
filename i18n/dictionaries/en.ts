@@ -160,6 +160,15 @@ export const en = {
     discoveryTitle: "Find the closest night.",
     discoverySubtitle:
       "The globe shows the live shows coming up. Rotate it, zoom in, tap a pin: every point is a real event.",
+    playlistEyebrow: "Playlist",
+    playlistTitle: "The soundtrack of the scene.",
+    playlistText:
+      "Nights end, the music stays. OpenStage's selection gathers independent and underground artists picked by the editors: listen while you look for the next show.",
+    playlistSave: "Listen on Spotify",
+    playlistSaveHint:
+      "Open it on Spotify and save it to your library: it will be there whenever you want. The selection grows with the nights we cover.",
+    playlistAll: "All playlists",
+    playlistOfficial: "Official OpenStage playlist",
     upcomingTitle: "Next nights",
     upcomingSubtitle: "Everything published by artists and venues on OpenStage.",
     cities: {

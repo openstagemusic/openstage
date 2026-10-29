@@ -158,6 +158,15 @@ export const it: Dictionary = {
     discoveryTitle: "Trova la serata più vicina.",
     discoverySubtitle:
       "Il globo mostra i concerti in programma. Ruotalo, ingrandisci, tocca un pin: ogni punto è un evento reale.",
+    playlistEyebrow: "Playlist",
+    playlistTitle: "La colonna sonora della scena.",
+    playlistText:
+      "Le serate finiscono, la musica resta. La selezione di OpenStage raccoglie artisti indipendenti e underground scelti dalla redazione: ascoltala mentre cerchi il prossimo concerto.",
+    playlistSave: "Ascoltala su Spotify",
+    playlistSaveHint:
+      "Aprila su Spotify e salvala nella tua libreria: la ritrovi quando vuoi. La selezione cresce con le serate che raccontiamo.",
+    playlistAll: "Tutte le playlist",
+    playlistOfficial: "Playlist ufficiale OpenStage",
     upcomingTitle: "Prossime serate",
     upcomingSubtitle: "Tutto quello che artisti e locali hanno pubblicato su OpenStage.",
     cities: {

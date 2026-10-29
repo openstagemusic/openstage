@@ -56,6 +56,16 @@ Moduli dentro il guscio `/dashboard` già esistente, senza duplicare dashboard:
 - Form in **Account → Link e social**, con errore sul singolo campo.
 - I link entrano anche nel dato strutturato `sameAs` della scheda.
 
+### 10D — Playlist in Home (fatto)
+
+- Sezione **06 / Playlist** in fondo alla Home, dopo il bento: testo editoriale, embed reale e
+  pulsante **Ascoltala su Spotify**.
+- Compare **solo** con almeno una playlist pubblicata: nessun riquadro vuoto.
+- L'embed ufficiale ha il pulsante **Save on Spotify**: chi ascolta può salvare subito la
+  playlist nella propria libreria.
+- In Home il **dock fisso è spento** quando la sezione è presente: eviterebbe due player e due
+  audio insieme. Sulle altre pagine il dock resta.
+
 ### 10C — (dopo, facoltativo)
 
 Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare senza SQL.
@@ -106,4 +116,6 @@ Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare s
 - [x] Le icone compaiono solo per i link reali, con il dominio giusto; un link sbagliato
       viene rifiutato e non salva nulla.
 - [x] Completezza scheda, prossime serate, follower e azioni rapide in `/dashboard`.
+- [x] La sezione playlist in Home compare solo con una playlist reale, con embed e CTA;
+      senza playlist non lascia spazio vuoto e il dock resta spento.
 - [ ] Build, test reale, deploy e commit "Fase 10A" / "Fase 10B".
