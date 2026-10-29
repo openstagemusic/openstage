@@ -69,6 +69,14 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: base,
     title: { default: dict.meta.title, template: "%s · OpenStage" },
     description: dict.meta.description,
+    icons: {
+      // Nei tab piccoli vale lo slash; il monogramma O/S resta per installazione e iOS.
+      icon: [
+        { url: "/brand/openstage-favicon.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico", sizes: "any" },
+      ],
+      apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+    },
     alternates: {
       canonical,
       languages: {
