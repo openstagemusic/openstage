@@ -225,6 +225,17 @@ Il pulsante **Salva** scrive davvero nel database, sul tuo profilo (serve l'acce
 preferiti sono raccolti in **Dashboard → Preferiti** (`/dashboard/saved`), dal più recente.
 Se non hai una dashboard da artista o locale, la voce è disponibile anche per i fan.
 
+## Proporre una traccia per la playlist
+
+Se sei un artista, in **Account** trovi **Traccia per la playlist**: incolla il link di **un solo
+brano Spotify** (non un album, un artista o una playlist). Il link viene verificato: se il brano
+non esiste, il salvataggio si ferma. La proposta arriva allo staff, che la ascolta e decide se
+aggiungerla alla selezione OpenStage. Nel profilo vedi lo stato: **In valutazione**, **Aggiunta**
+o **Non selezionata**.
+
+L'aggiunta alla playlist resta **manuale** su Spotify: OpenStage non scrive nel tuo account né
+modifica la playlist in automatico.
+
 ## Seguire un artista o un locale
 
 Sulla scheda pubblica di un artista o di un locale trovi **Segui**. Serve l'accesso; da
@@ -326,6 +337,13 @@ segnalazioni da persone diverse e verificate, la serata va in pausa automaticame
 un controllo umano; l'admin può rimetterla online, annullarla o sospendere l'autore.
 
 # La control room (solo staff)
+
+## Playlist
+
+In **Playlist** trovi le tracce proposte dagli artisti. Apri il brano su Spotify, ascoltalo e,
+se entra nella selezione, aggiungilo alla playlist con il tuo account. Poi premi **Segna
+aggiunta** (o **Scarta** se non va). Il link si copia con **Copia link**; nessun account Spotify
+è collegato al sito.
 
 L'admin non usa la dashboard pubblica: dopo il login entra nella **control room** e da lì
 gestisce tutto. La 2FA è obbligatoria; se serve, può essere sospesa temporaneamente per una

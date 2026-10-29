@@ -878,6 +878,11 @@ pubblico un ascolto continuo, senza servizi a pagamento e senza dati finti.
 locale, form con `@handle`, blocco del salvataggio con link sbagliato, moduli dashboard con
 dati reali, build.
 
+**10E - Proposte per la playlist (29 ottobre 2026):** verifica dei link Spotify con l'oEmbed
+(404 blocca il salvataggio), campo artista per un singolo brano, coda `/admin/playlist` con
+stati da valutare/aggiunta/scartata. L'aggiunta alla playlist resta manuale: nessun OAuth e
+nessuna scrittura automatica. Un trigger impedisce all'artista di auto-dichiararsi "aggiunto".
+
 **Playlist reale (29 ottobre 2026):** pubblicata **OpenStage — Selezione**, con sezione in Home,
 voce nel footer e `/playlists` in sitemap (B83 chiusa). La tabella vuota resta gestita: dock
 spento e pagina `noindex`.

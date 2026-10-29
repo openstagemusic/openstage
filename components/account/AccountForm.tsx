@@ -3,8 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { checkSpotifyLinkAction } from "@/app/actions/spotify";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { createClient } from "@/lib/supabase/client";
+import { parseSpotifyLink } from "@/lib/spotify/links";
 import { validateSocialLinks, type SocialKind } from "@/lib/social/links";
 
 import {
@@ -30,6 +32,9 @@ export type AccountArtist = {
   soundcloudUrl: string;
   bandcampUrl: string;
   linktreeUrl: string;
+  playlistTrackUrl: string;
+  playlistTrackTitle: string;
+  playlistTrackStatus: "pending" | "added" | "hidden" | null;
 };
 
 export type AccountVenue = {
@@ -132,6 +137,72 @@ export default function AccountForm({
       return;
     }
 
+    // Un link Spotify nuovo (o modificato) viene verificato davvero: l'oEmbed
+    // risponde 404 per un brano inesistente. Il salvataggio si ferma prima del
+    // database, così la scheda non mostra un player rotto.
+    let spotifyUrl = urls.spotify;
+    let trackUrl: string | null = null;
+    let trackTitle: string | null = null;
+    let trackChanged = false;
+
+    if (subject.kind === "artist") {
+      const artistValues = values as AccountArtist;
+      const rawProfile = artistValues.spotifyUrl.trim();
+      const rawTrack = artistValues.playlistTrackUrl.trim();
+      const profileCandidate = parseSpotifyLink(rawProfile)?.url ?? rawProfile;
+      const trackCandidate = parseSpotifyLink(rawTrack)?.url ?? rawTrack;
+
+      // Se il link non è cambiato non serve una chiamata: si risparmia tempo
+      // sul salvataggio di soli dati testuali. Il confronto usa la forma
+      // canonica, così un parametro ?si= non fa sembrare nuovo lo stesso brano.
+      if (rawProfile && profileCandidate !== subject.values.spotifyUrl) {
+        const check = await checkSpotifyLinkAction(rawProfile, "any");
+
+        if (!check.ok) {
+          setLoading(false);
+          setError(
+            check.reason === "not_found"
+              ? dict.spotifyLinkNotFound
+              : check.reason === "unavailable" || check.reason === "auth"
+                ? dict.spotifyCheckUnavailable
+                : dict.invalidSpotify
+          );
+          return;
+        }
+
+        spotifyUrl = check.url;
+      }
+
+      trackChanged = trackCandidate !== subject.values.playlistTrackUrl;
+
+      if (!rawTrack) {
+        trackUrl = null;
+        trackTitle = null;
+      } else if (!trackChanged) {
+        trackUrl = subject.values.playlistTrackUrl || trackCandidate;
+        trackTitle = artistValues.playlistTrackTitle || null;
+      } else {
+        const check = await checkSpotifyLinkAction(rawTrack, "track");
+
+        if (!check.ok) {
+          setLoading(false);
+          setError(
+            check.reason === "not_found"
+              ? dict.playlistTrackNotFound
+              : check.reason === "wrong_kind"
+                ? dict.playlistTrackWrongKind
+                : check.reason === "unavailable" || check.reason === "auth"
+                  ? dict.spotifyCheckUnavailable
+                  : dict.playlistTrackInvalid
+          );
+          return;
+        }
+
+        trackUrl = check.url;
+        trackTitle = check.title;
+      }
+    }
+
     const supabase = createClient();
 
     const { error: updateError } =
@@ -142,7 +213,7 @@ export default function AccountForm({
               name: (values as AccountArtist).name,
               city: (values as AccountArtist).city || null,
               genre: (values as AccountArtist).genre || null,
-              spotify_url: urls.spotify,
+              spotify_url: spotifyUrl,
               website_url: urls.website,
               instagram_url: urls.instagram,
               facebook_url: urls.facebook,
@@ -152,6 +223,15 @@ export default function AccountForm({
               bandcamp_url: urls.bandcamp,
               linktree_url: urls.linktree,
               bio: (values as AccountArtist).bio || null,
+              playlist_track_url: trackUrl,
+              playlist_track_title: trackTitle,
+              ...(trackChanged
+                ? {
+                    playlist_track_status: trackUrl ? "pending" : null,
+                    playlist_track_submitted_at: trackUrl ? new Date().toISOString() : null,
+                    playlist_track_added_at: null,
+                  }
+                : {}),
             })
             .eq("id", subject.values.id)
         : await supabase
@@ -179,6 +259,20 @@ export default function AccountForm({
     if (updateError) {
       setError(updateError.message);
       return;
+    }
+
+    // La proposta appena inviata è in valutazione: aggiorniamo subito lo stato
+    // locale, senza costringere a ricaricare la pagina.
+    if (subject.kind === "artist" && trackChanged) {
+      setValues(
+        (current) =>
+          ({
+            ...(current as AccountArtist),
+            playlistTrackUrl: trackUrl ?? "",
+            playlistTrackTitle: trackTitle ?? "",
+            playlistTrackStatus: trackUrl ? "pending" : null,
+          }) as AccountArtist | AccountVenue
+      );
     }
 
     setSaved(true);
@@ -356,6 +450,56 @@ export default function AccountForm({
               </div>
             ))}
           </div>
+        </section>
+      ) : null}
+
+      {artist ? (
+        <section className="border-t border-line pt-5">
+          <h3 className="font-display text-lg font-semibold">{dict.playlistTrackTitle}</h3>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
+            {dict.playlistTrackText}
+          </p>
+
+          <div className="mt-4">
+            <label htmlFor="playlist-track" className={authLabelClass}>
+              {dict.playlistTrackLabel}
+            </label>
+            <input
+              id="playlist-track"
+              type="text"
+              inputMode="url"
+              placeholder="https://open.spotify.com/track/…"
+              value={artist.playlistTrackUrl}
+              onChange={(event) => set("playlistTrackUrl", event.target.value)}
+              className={authInputClass}
+            />
+            <p className="mt-1 text-xs leading-relaxed text-muted">{dict.playlistTrackHint}</p>
+          </div>
+
+          {artist.playlistTrackTitle ? (
+            <p className="mt-3 text-sm text-white">
+              <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                {dict.playlistTrackSelected}:{" "}
+              </span>
+              {artist.playlistTrackTitle}
+            </p>
+          ) : null}
+
+          {artist.playlistTrackStatus ? (
+            <p
+              className={
+                artist.playlistTrackStatus === "hidden"
+                  ? "mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted"
+                  : "mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan"
+              }
+            >
+              {artist.playlistTrackStatus === "pending"
+                ? dict.playlistTrackPending
+                : artist.playlistTrackStatus === "added"
+                  ? dict.playlistTrackAdded
+                  : dict.playlistTrackHidden}
+            </p>
+          ) : null}
         </section>
       ) : null}
 

@@ -271,6 +271,13 @@ sulla propria riga. Il trigger vieta di seguire la propria scheda.
 `youtube_url`, `soundcloud_url`, `bandcamp_url`, `linktree_url`; gli artisti hanno anche
 `website_url`. Gli URL sono normalizzati dall'applicazione e il database accetta solo https.
 
+**Proposta playlist su `artists`** (Fase 10E): `playlist_track_url` (solo
+`open.spotify.com/track/…`), `playlist_track_title`, `playlist_track_status`
+(`pending`/`added`/`hidden`), `playlist_track_submitted_at`, `playlist_track_added_at`.
+La verifica di esistenza usa l'oEmbed pubblico di Spotify; la scrittura sulla playlist resta
+manuale (nessun OAuth). Il trigger `artists_playlist_guard` lascia all'artista solo la proposta
+(o il ritiro) e riserva ad admin l'esito `added`/`hidden`.
+
 **`spotify_playlists`** - le playlist reali della redazione (Fase 10A): slug, titolo,
 descrizione, URL, pubblicata, ordine. Lettura pubblica delle sole pubblicate, scrittura solo
 admin. Con la tabella vuota il dock resta spento e `/playlists` � `noindex`.
@@ -434,6 +441,7 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0054_follow_count.sql` | Funzione `follow_count`: solo il totale dei follower, senza esporre le righe |
 | `0055_spotify_playlists.sql` | Tabella `spotify_playlists` con RLS, vincolo sul link e trigger `updated_at`; vincolo sul link Spotify degli artisti |
 | `0056_profile_social_links.sql` | Sito e social di artisti e locali, con vincolo https sugli URL |
+| `0057_playlist_submissions.sql` | Proposta di un singolo brano per la playlist: URL, titolo, stato e date, con vincolo sul track Spotify |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti

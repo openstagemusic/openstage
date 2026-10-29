@@ -65,3 +65,42 @@ export const getFeaturedPlaylist = cache(async (): Promise<SpotifyPlaylist | nul
   const playlists = await listPublishedPlaylists();
   return playlists[0] ?? null;
 });
+
+export type PlaylistSubmissionStatus = "pending" | "added" | "hidden";
+
+export type PlaylistSubmission = {
+  url: string;
+  title: string | null;
+  status: PlaylistSubmissionStatus;
+  submittedAt: string | null;
+  addedAt: string | null;
+};
+
+/** La proposta di un artista per la playlist, se c'è. */
+export async function getArtistPlaylistSubmission(
+  artistId: string
+): Promise<PlaylistSubmission | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("artists")
+    .select(
+      "playlist_track_url, playlist_track_title, playlist_track_status, playlist_track_submitted_at, playlist_track_added_at"
+    )
+    .eq("id", artistId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[spotify] getArtistPlaylistSubmission:", error.message);
+    return null;
+  }
+
+  if (!data?.playlist_track_url || !data.playlist_track_status) return null;
+
+  return {
+    url: data.playlist_track_url,
+    title: data.playlist_track_title ?? null,
+    status: data.playlist_track_status as PlaylistSubmissionStatus,
+    submittedAt: data.playlist_track_submitted_at ?? null,
+    addedAt: data.playlist_track_added_at ?? null,
+  };
+}

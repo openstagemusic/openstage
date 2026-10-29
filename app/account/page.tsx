@@ -12,6 +12,7 @@ import { artistPath, venuePath } from "@/lib/events/paths";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
+import { getArtistPlaylistSubmission } from "@/lib/spotify/queries";
 import { getSessionProfile } from "@/lib/supabase/session";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -49,6 +50,7 @@ export default async function AccountPage() {
   // Una richiesta in attesa: finché non è decisa, il database non lascia creare
   // altre schede. Qui lo diciamo, con il modo per ritirarla.
   const pendingRequest = await getMyPendingRequest();
+  const playlistSubmission = artist ? await getArtistPlaylistSubmission(artist.id) : null;
 
   const subject: AccountSubject | null = artist
     ? {
@@ -68,6 +70,9 @@ export default async function AccountPage() {
           soundcloudUrl: artist.links.soundcloud ?? "",
           bandcampUrl: artist.links.bandcamp ?? "",
           linktreeUrl: artist.links.linktree ?? "",
+          playlistTrackUrl: playlistSubmission?.url ?? "",
+          playlistTrackTitle: playlistSubmission?.title ?? "",
+          playlistTrackStatus: playlistSubmission?.status ?? null,
         },
       }
     : venue

@@ -66,6 +66,19 @@ Moduli dentro il guscio `/dashboard` già esistente, senza duplicare dashboard:
 - In Home il **dock fisso è spento** quando la sezione è presente: eviterebbe due player e due
   audio insieme. Sulle altre pagine il dock resta.
 
+### 10E — Proposte per la playlist (fatto)
+
+- **Verifica reale dei link Spotify** con l'oEmbed ufficiale: un link inesistente
+  (404) blocca il salvataggio. Vale per il link della scheda e per la traccia proposta.
+- Campo **Traccia per la playlist** nel profilo artista: solo un **brano** Spotify, non album,
+  artista o playlist. Il database accetta solo `open.spotify.com/track/…`.
+- La proposta arriva in **/admin/playlist**: apri il brano, copia il link, aggiungilo su Spotify
+  e segna l'esito (**da valutare / aggiunta / scartata**). L'artista vede lo stato nel profilo.
+- **Nessun OAuth e nessuna scrittura automatica**: l'aggiunta alla playlist resta manuale.
+- Un trigger impedisce all'artista di dichiarare da solo la traccia **aggiunta** o **scartata**:
+  l'esito lo registra solo l'admin.
+- Un link nuovo o modificato viene verificato; se non cambia, il salvataggio resta veloce.
+
 ### 10C — (dopo, facoltativo)
 
 Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare senza SQL.
@@ -118,4 +131,6 @@ Gestione delle playlist da `/admin`: creare, modificare, pubblicare e ordinare s
 - [x] Completezza scheda, prossime serate, follower e azioni rapide in `/dashboard`.
 - [x] La sezione playlist in Home compare solo con una playlist reale, con embed e CTA;
       senza playlist non lascia spazio vuoto e il dock resta spento.
+- [x] Un link Spotify inesistente viene rifiutato; la traccia proposta deve essere un brano
+      (album, artista e playlist vengono rifiutati) e finisce nella coda admin.
 - [ ] Build, test reale, deploy e commit "Fase 10A" / "Fase 10B".
