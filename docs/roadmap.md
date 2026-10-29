@@ -25,8 +25,8 @@
 | **8** (8.0 → 8.8.4, B74 → B81, backup e restore test) | ✅ fatte; resta **8.8.5** facoltativa (triage AI) |
 | **9A** | ✅ follow di artisti/locali, notifica nuovi eventi, digest, conteggio follower |
 | **9B** | ⏸ **rimandata**: manca un premio chiaro e una regola anti-abuso |
-| **10** | ▶ **fatte 10A e 10B** il 28 ottobre 2026; restano i link reali delle playlist. Piano: `docs/plan-phase-10.md` |
-| **11** | ⬜ monetizzazione opzionale (PayPal, Vercel Pro) |
+| **10** | ✅ **10A, 10B, 10D e 10E fatte**; playlist reale attiva. **10C** (gestione playlist da admin) resta facoltativa. Piano: `docs/plan-phase-10.md` |
+| **11** | ▶ **in corso**: Pro operativo per artisti e locali (strumenti, zero visibilità). **Niente beta: vendita al lancio**, dopo legali, fiscalità e PayPal |
 | **12** | ⬜ serie, locale chiuso, bacheca ingaggi |
 | **13** | ⬜ SEO, legal, cancellazione account, audit e polish |
 | **14** | ⬜ Help Center completo (B73), dopo la 13 |
@@ -48,7 +48,7 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 | **8 — Pannello Admin + Claim a invito** | **8.0 control room modulare** (registro moduli, overview “da fare adesso”, ricerca, responsive, 2FA, audit) · 8.1 admin con **2FA (AAL2)** + registro azioni · 8.2 metriche reali · 8.3 eventi/utenti/segnalazioni · 8.4 "crea per conto di" + **`/claim/[token]`** (invito email) · 8.5 centro assistenza/ticket (agganciato al form di `/contatti`) · 8.6 **Comunicazione**: registro email, coda, quota Resend, riprova controllata, export CSV/JSON · 8.7 pannello notifiche in-app e audit · **8.8 AI assistita** (bozze risposte, import eventi, verifica schede, qualità dati; sempre con approvazione umana) | **7A** (email); **7B** (notifiche e coda); **5.5D** per il linguaggio visivo condiviso. Piano: `docs/plan-fase-8.md`  **Stato: 8.0-8.7, 8.8.1-8.8.4, B74-B79 e backup 8.9 fatti; resta 8.8.5 (facoltativo)** |
 | **9 — Community: segui e inviti virali** | **"Segui"** artista e locale (tabella `follows`, base per il digest della Fase 7) · **inviti virali** `/invite/CODICE` nel dashboard artista, con riscatto automatico (3 invitati con email verificata e almeno 1 evento pubblicato). **Stato: 9A completa il 28 ottobre 2026 (follow + conteggio pubblico dei follower, commit `a4a8665`); 9B inviti rimandata** | nessuno |
 | **10 — Spotify e Area Artista/Locale** | Form Spotify nel profilo (brani/album/ID), **sticky player** persistente, `/playlists` con le playlist OpenStage; **moduli ruolo-specifici** per artista e locale dentro il guscio della 5.5D (profilo, eventi, completezza, strumenti). **Niente dashboard duplicate**. Divisa in **10A** Spotify (link validati, player, `/playlists` con tabella `spotify_playlists`, dock) e **10B** moduli ruolo (completezza, prossime serate, follower del proprietario, azioni rapide); **10C** gestione playlist da admin. Piano: `docs/plan-phase-10.md`. **Stato: 10A, 10B, 10D e 10E fatte** (Spotify, `/playlists`, sezione playlist in Home, dock, moduli ruolo, link social con icone, proposte con verifica link e coda admin). **Playlist reale attiva dal 29 ottobre 2026** | nessuno (embed Spotify è gratuito, nessuna API key) |
-| **11 — Monetizzazione opzionale** | 11.1 Artist Pro 3 € una tantum (PayPal Orders API + webhook con firma verificata) · 11.2 Venue Pro abbonamento (Subscriptions API, ciclo di vita, grazia 3 giorni) · 11.3 vantaggi Pro (galleria, copertina, statistiche, badge, widget) | **Vercel Pro**, dominio, conto PayPal **Business**, decisione fiscale |
+| **11 — Pro operativo (solo strumenti, zero visibilità)** | **11A**: entitlements, gating, area Pro (solo dashboard), box richieste. **11B.1**: contatti/booking **gratuiti** tra artisti e locali + **EPK artista**. **11B.2**: pipeline booking, analytics aggregate, export, widget locale (base gratis, Pro personalizzato). **11C**: **PayPal Orders una tantum** (pass 12 mesi), legali, fiscalità, lancio. **Stato: 11A fatta.** **Zero**: donazioni, Stripe, abbonamenti, badge, priorità, limiti al contatto, Pro in Home. | **Vercel Pro**, PayPal **Business**, consulenza fiscale e legali prima di incassare |
 | **12 — Serie, locali chiusi, bacheca ingaggi** | 12.1 ricorrenza/`serie_id` (**B41**) · 12.2 locale chiuso (**B42**) · 12.3 **`/calls`** "cercasi artisti" + candidature | nessuno nuovo |
 | **13 — SEO, legal, audit e polish finale** | **B09 + B44 + B45** (OG di default, favicon, anteprime delle schede) · `/privacy`, `/terms`, `/cookies` **reali** per GDPR e pagamenti + banner cookie · **notice & takedown** · audit RLS · pagina **500** · README + checklist env · pulizia fixture · **B46/B47** (serate simili, visti di recente) · generatore social AI (facoltativo). **Non si rifanno le pagine della 5.5**: qui solo rifiniture e contenuti | Anthropic solo se si fa il generatore |
 | **14 — Help Center completo** | **B73**: `/aiuto` con ricerca, categorie, articoli, feedback utile/non utile e CTA ai contatti; contenuti gestiti dalla control room (`/admin/aiuto`), non da Zendesk. Tabelle `help_categories`, `help_articles`, `help_feedback`; Markdown IT/EN, bozza/pubblicato, SEO con `pg_trgm`/full-text. `/faq` viene assorbita o reindirizzata. Solo dopo la 13, con l'audit dei ticket reali | nessuno |
@@ -73,8 +73,9 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
    premio e regola anti-abuso.
 10. **10A → 10B** — Spotify, Area artista/locale e link social. **Completate il 28 ottobre
     2026**; il dock si accende quando arrivano playlist reali.
-11. **11** — monetizzazione opzionale: solo dopo Vercel Pro, conto PayPal Business e
-    decisione fiscale.
+11. **11A → 11C** — Pro operativo: 11A (fondazioni), 11B.1 (contatti gratuiti + EPK),
+    11B.2 (booking Pro, analytics, export, widget), 11C (PayPal Orders una tantum, legali,
+    fiscalità, lancio). Niente beta: vendita al lancio.
 12. **12** — serie, locali chiusi e bacheca ingaggi.
 13. **13** — SEO, legal, cancellazione account, audit RLS e polish finale: è il **cancello
     d'ingresso** all'apertura pubblica.
@@ -92,7 +93,8 @@ committabile. Non si mescolano restyling e logica nella stessa modifica.
 | **Reset password** (B36) | chi perde la password non rientrava più | ✅ **chiuso in 7A** |
 | **Coerenza visiva delle pagine interne** | login, eventi, directory, dashboard e editor sembravano un altro prodotto | ✅ **chiuso in 5.5A–E** |
 | **Turnstile lato applicazione** (B11) | il CAPTCHA era verificato solo da Supabase | ✅ **chiuso in 7A** |
-| **Vercel Pro** (B16) | Hobby non è commerciale | solo con la Fase 11 |
+| **Vercel Pro** (B16) | Hobby non è commerciale: serve per incassare | **prima della 11C**, non per costruire 11A/11B |
+| **Fiscalità e incasso** | persona fisica + PayPal Business: regime, IVA, fatture, rimborsi | commercialista, **prima della 11C** |
 | **Cancellazione dell'account** (B07) | diritto GDPR promesso e oggi assente | Fase 13 |
 | **Backup del database** | il piano free non include backup automatici | ✅ **chiuso**: `db-backup.yml` settimanale, artifact + bucket privato, restore test verde |
 | **Notice & Takedown** | conseguenza dei profili creati dall'admin | **Fatto in 8.11** |
@@ -129,13 +131,13 @@ iniziativa.
 | S1 | **Pagine per città** (`/citta`, `/citta/[city]`) generate dai dati reali, con JSON-LD | ✅ Fase 6.2 | È la leva SEO più forte che abbiamo: "concerto a Milano stasera" è la ricerca vera. Fatte con soglia e `noindex` per le città sottili |
 | S2 | **Calendario personale `.ics` dei Preferiti** (`/api/me/ical`) | Fase 13 (non fatta in 7B) | Il codice del calendario c'è già (3.4): chi salva le serate se le porta sul telefono, e ci torna |
 | S3 | **Backup settimanale** del database (script + GitHub Action, o export dal pannello) | Fase 8 | Il piano free non ha backup: è l'unico rischio che può cancellare mesi di lavoro. **Stato: attivo.** Workflow `db-backup.yml`, primo dump verificato il 27 ottobre 2026, artifact GitHub + bucket privato `backups`; restore test superato il 28 ottobre 2026 su Postgres temporaneo |
-| S4 | **Contatori propri in Postgres** (visite profilo, click Spotify, aggregati al giorno) invece di analytics di terze parti | Fase 10/11 | Servono alle statistiche Pro, restano privacy-friendly (nessun cookie, nessun dato personale) → **niente banner cookie per gli analytics** |
+| S4 | **Contatori propri in Postgres** (visite profilo, click Spotify, aggregati al giorno) invece di analytics di terze parti | Fase 11 | Servono alle statistiche Pro, restano privacy-friendly (nessun cookie, nessun dato personale) → **niente banner cookie per gli analytics** |
 | S5 | **"Non trovi il locale? segnalalo"** (modulo breve che crea una richiesta per l'admin) | Fase 8 | Fa crescere il database dei locali con gli occhi dei fan; atterra nel centro assistenza già previsto |
 | S6 | **Serate simili / "vicino a questa"** in fondo alla pagina evento | → B46 (Fase 13) | Non fatta nella Fase 5. Allunga la scoperta da una serata all'altra, con query già pronte |
 | S7 | **Visti di recente** sulla Home | → B47 (Fase 13) | Non fatta nella Fase 5. Piccolo, aiuta a ritrovare ciò che si era guardato |
 | S8 | **PWA installabile** con i Preferiti disponibili offline | Fase 13 | Sul telefono OpenStage diventa "un'app", senza app store |
 | S9 | **Prova end-to-end automatica** (Playwright su GitHub Actions) del percorso principale | Fase 13 | Oggi ogni prova è a mano: con 13 fasi davanti, un test automatico evita le regressioni |
-| S10 | **Widget incorporabile** per i locali (già nel Venue Pro) reso **libero per tutti** | Fase 11 | Un locale che incolla OpenStage sul suo sito ci porta traffico gratis: la visibilità la dà il prodotto, non il pagamento |
+| S10 | **Widget incorporabile** per i locali | Fase 11 | Un locale che incolla OpenStage sul suo sito ci porta traffico gratis: la visibilità la dà il prodotto, non il pagamento. Da decidere quanto lasciare gratuito e cosa riservare al Pro |
 
 ## Decisioni prese (19 ottobre 2026, aggiornate il 23 ottobre 2026)
 
@@ -158,3 +160,8 @@ iniziativa.
 | 15 | **Email minime, notifiche in-app come default**: email solo per conferma, reset, sicurezza, ricevute, risposta 1:1 e inviti con token. Cancellazioni, follow, promemoria e moderazione sono in-app; il digest settimanale è opt-in (`docs/notifications-email-policy.md`) |
 | 16 | **Quota Resend protetta**: classi `auth`, `transactional`, `digest`, `optional`; riserva per auth/sicurezza; dry run e conferma prima degli invii massivi; nessun tracking |
 | 17 | **Barra mobile ruolo-specifica**: non loggati mantengono `Esplora · Mappa · Artisti · Locali · Accedi`; loggati hanno `Esplora · Notifiche · Artisti · Locali · Profilo`. La mappa resta raggiungibile da Esplora e da `/mappa`; l'admin non ha barra pubblica |
+| 18 | **Modello Pro 2026**: Pro per artisti e locali **solo con strumenti operativi e analytics**; niente donazioni, niente Stripe, niente vantaggi di visibilità o badge. Contatto e booking restano gratuiti. Il box “richiesta strumento” è un canale di co-sviluppo, non un diritto a una funzione. Pagamenti con PayPal Subscriptions. |
+| 19 | **Niente beta Pro**: si va in vendita direttamente. Il Pro non è un test chiuso e non si regala per feedback: **14 giorni soddisfatti o rimborsati**. Legali, fiscalità, PayPal Business e Vercel Pro sono prerequisiti di lancio. |
+| 20 | **Vendita come persona fisica** con PayPal Business. Il regime fiscale (IVA, fatture, rimborsi) va confermato con un commercialista prima della 11C; PayPal Business non basta da solo. |
+| 21 | **Pro invisibile in Home**: nessun riferimento a piani, prezzi o upgrade in Home, navbar, footer, schede pubbliche o sitemap. Solo dashboard di artisti e locali, pagine `noindex`. |
+| 22 | **Pagamento unico annuale**: Pro Artista 49 €/12 mesi, Pro Locale 149 €/12 mesi, IVA inclusa, 14 giorni soddisfatti o rimborsati. Nessun abbonamento, nessun rinnovo automatico. Prezzo fondatore per i primi 50. |
