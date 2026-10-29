@@ -166,6 +166,8 @@ export default async function RootLayout({
             <SpotifyPlayerDock
               embedUrl={featuredPlaylist?.embedUrl ?? null}
               title={dict.spotify.embedTitle}
+              collapseLabel={dict.spotify.playerCollapse}
+              expandLabel={dict.spotify.playerExpand}
             />
           ) : null}
         </LocaleProvider>

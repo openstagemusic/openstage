@@ -872,7 +872,8 @@ pubblico un ascolto continuo, senza servizi a pagamento e senza dati finti.
 - I link entrano nel dato strutturato `sameAs`.
 - **Playlist in Home** (10D): card con copertina e pulsanti per ascoltare/salvare su Spotify.
   Il player unico è il dock fisso, presente anche in Home: vive nel layout e non viene smontato
-  cambiando pagina, quindi la musica continua.
+  cambiando pagina, quindi la musica continua. Il dock si può ridurre a icona senza fermare
+  l'audio; la preferenza è ricordata nel browser.
 
 **Verifiche superate:** link validi e invalidi, vincolo del database, icone su artista e
 locale, form con `@handle`, blocco del salvataggio con link sbagliato, moduli dashboard con

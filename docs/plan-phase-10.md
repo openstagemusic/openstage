@@ -64,6 +64,8 @@ Moduli dentro il guscio `/dashboard` già esistente, senza duplicare dashboard:
 - Il player unico è il **dock fisso in basso**, presente in tutte le pagine pubbliche (Home
   compresa). Vive nel layout: cambiando pagina l'iframe non viene smontato, quindi la musica
   continua.
+- Il dock si può **ridurre a icona** con il tastino a destra: l'iframe resta montato (l'audio
+  continua) e la scelta è ricordata nel browser. Su mobile il tastino sta sopra la barra.
 
 ### 10E — Proposte per la playlist (fatto)
 

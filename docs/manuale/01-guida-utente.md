@@ -418,7 +418,9 @@ C'è una **playlist ufficiale OpenStage** su Spotify: **OpenStage — Selezione*
 in fondo, trovi la sezione con la copertina e i pulsanti per ascoltarla o salvarla su Spotify.
 Il player vero e proprio è **fisso in basso** e resta acceso mentre navighi: cambiando pagina la
 musica non si interrompe. Su mobile sta sopra la barra di navigazione. Nella sezione Home non
-c'è un secondo player, così non partono due audio insieme.
+c'è un secondo player, così non partono due audio insieme. Se il player dà fastidio, premi il
+**tastino a destra del dock**: si riduce a una piccola icona in basso a destra e la musica
+continua. Premi l'icona per riaprirlo; la scelta resta anche cambiando pagina.
 # Domande frequenti
 
 **Posso avere due profili (uno da fan e uno da artista) con la stessa email?**

@@ -121,6 +121,8 @@ export const it: Dictionary = {
     listen: "Ascolta",
     listenText: "Il player è incorporato da Spotify: nessun dato personale passa da OpenStage.",
     embedTitle: "Player Spotify",
+    playerCollapse: "Riduci il player",
+    playerExpand: "Apri il player",
     empty:
       "Le playlist OpenStage arrivano presto: stiamo scegliendo le prime serate da raccontare. Intanto scopri gli artisti già sulla mappa.",
     openInSpotify: "Apri su Spotify",

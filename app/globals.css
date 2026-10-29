@@ -580,6 +580,19 @@ body:has(.spotify-dock) {
   padding-bottom: 5rem;
 }
 
+/* Ridotto a icona: il player resta montato (l'audio continua) ma non occupa
+   spazio e non copre i contenuti. */
+html.spotify-collapsed body:has(.spotify-dock) {
+  padding-bottom: 0;
+}
+
+.spotify-dock-toggle {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 41;
+}
+
 /* ---------------------------------------------------------------------------
    Guscio mobile: barra di navigazione fissa in basso e player sopra di essa.
    Lo spazio si prenota solo quando la barra è davvero nella pagina.
@@ -595,5 +608,13 @@ body:has(.spotify-dock) {
 
   body:has(.mobile-tabbar):has(.spotify-dock) {
     padding-bottom: calc(3.5rem + 5rem + 1px + env(safe-area-inset-bottom));
+  }
+
+  html.spotify-collapsed body:has(.mobile-tabbar):has(.spotify-dock) {
+    padding-bottom: calc(3.5rem + 1px + env(safe-area-inset-bottom));
+  }
+
+  body:has(.mobile-tabbar) .spotify-dock-toggle {
+    bottom: calc(3.5rem + 1px + env(safe-area-inset-bottom) + 0.75rem);
   }
 }

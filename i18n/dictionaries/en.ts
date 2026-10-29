@@ -123,6 +123,8 @@ export const en = {
     listen: "Listen",
     listenText: "The player is embedded from Spotify: no personal data passes through OpenStage.",
     embedTitle: "Spotify player",
+    playerCollapse: "Minimize the player",
+    playerExpand: "Open the player",
     empty:
       "OpenStage playlists are coming soon: we are picking the first nights to tell. In the meantime, discover the artists already on the map.",
     openInSpotify: "Open on Spotify",
