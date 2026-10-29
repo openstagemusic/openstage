@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import LocaleLink from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { SpotifyPlaylist } from "@/lib/spotify/queries";
@@ -69,20 +71,30 @@ export default function PlaylistSection({
                 <span aria-hidden="true" className="h-2 w-2 bg-pink" />
               </div>
 
-              <iframe
-                title={`${playlist.title} — ${dict.spotify.embedTitle}`}
-                src={playlist.embedUrl}
-                width="100%"
-                height="352"
-                style={{ border: 0 }}
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-              />
-            </div>
+              <div className="relative aspect-square overflow-hidden border border-line bg-bg">
+                <Image
+                  src="/brand/openstage-playlist-1000.png"
+                  alt={playlist.title}
+                  fill
+                  sizes="(min-width: 1024px) 520px, 100vw"
+                  className="object-cover"
+                />
+              </div>
 
-            <p className="mt-2 px-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
-              {playlist.title}
-            </p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1">
+                <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                  {playlist.title}
+                </p>
+                <a
+                  href={playlist.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[9px] uppercase tracking-[0.12em] text-cyan transition-colors hover:text-white"
+                >
+                  {t.playlistSavePlaylist} ↗
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

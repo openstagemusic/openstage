@@ -414,10 +414,11 @@ anche quando lo condividi. La scelta viene ricordata alla visita successiva.
 
 ## Il player in basso
 
-C'è una **playlist ufficiale OpenStage** su Spotify: **OpenStage — Selezione**. In **Home**, in fondo,
-trovi la sezione con l'embed e il pulsante **Ascoltala su Spotify**: puoi ascoltarla e salvarla
-nella tua libreria con **Save on Spotify**. Sulle altre pagine il player resta fisso in basso,
-sopra la barra di navigazione mobile; in Home è spento, per non avere due player insieme.
+C'è una **playlist ufficiale OpenStage** su Spotify: **OpenStage — Selezione**. In **Home**,
+in fondo, trovi la sezione con la copertina e i pulsanti per ascoltarla o salvarla su Spotify.
+Il player vero e proprio è **fisso in basso** e resta acceso mentre navighi: cambiando pagina la
+musica non si interrompe. Su mobile sta sopra la barra di navigazione. Nella sezione Home non
+c'è un secondo player, così non partono due audio insieme.
 # Domande frequenti
 
 **Posso avere due profili (uno da fan e uno da artista) con la stessa email?**

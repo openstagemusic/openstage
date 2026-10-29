@@ -123,9 +123,9 @@ export default async function RootLayout({
   const notificationCount = session ? await getUnreadNotificationCount(session.id) : 0;
   // Il dock non compare nell'admin e non esiste senza una playlist reale.
   const featuredPlaylist = isAdmin ? null : await getFeaturedPlaylist();
-  // In Home la playlist ha la sua sezione con embed: il dock duplicherebbe il
-  // player (e permetterebbe due audio insieme). Sulle altre pagine resta.
-  const showDock = featuredPlaylist !== null && currentPath !== "/";
+  // Un solo player per tutto il sito: il dock vive nel layout, quindi
+  // l'iframe non viene smontato quando si cambia pagina e la musica continua.
+  const showDock = featuredPlaylist !== null;
 
   return (
     <html

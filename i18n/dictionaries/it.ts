@@ -164,7 +164,8 @@ export const it: Dictionary = {
       "Le serate finiscono, la musica resta. La selezione di OpenStage raccoglie artisti indipendenti e underground scelti dalla redazione: ascoltala mentre cerchi il prossimo concerto.",
     playlistSave: "Ascoltala su Spotify",
     playlistSaveHint:
-      "Aprila su Spotify e salvala nella tua libreria: la ritrovi quando vuoi. La selezione cresce con le serate che raccontiamo.",
+      "Il player in basso continua mentre navighi il sito. Per salvarla, aprila su Spotify: la ritrovi nella tua libreria.",
+    playlistSavePlaylist: "Salva su Spotify",
     playlistAll: "Tutte le playlist",
     playlistOfficial: "Playlist ufficiale OpenStage",
     upcomingTitle: "Prossime serate",

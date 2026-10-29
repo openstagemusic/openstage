@@ -166,7 +166,8 @@ export const en = {
       "Nights end, the music stays. OpenStage's selection gathers independent and underground artists picked by the editors: listen while you look for the next show.",
     playlistSave: "Listen on Spotify",
     playlistSaveHint:
-      "Open it on Spotify and save it to your library: it will be there whenever you want. The selection grows with the nights we cover.",
+      "The player at the bottom keeps going while you browse. To save it, open it on Spotify: it will be in your library.",
+    playlistSavePlaylist: "Save on Spotify",
     playlistAll: "All playlists",
     playlistOfficial: "Official OpenStage playlist",
     upcomingTitle: "Next nights",

@@ -58,13 +58,12 @@ Moduli dentro il guscio `/dashboard` già esistente, senza duplicare dashboard:
 
 ### 10D — Playlist in Home (fatto)
 
-- Sezione **06 / Playlist** in fondo alla Home, dopo il bento: testo editoriale, embed reale e
-  pulsante **Ascoltala su Spotify**.
+- Sezione **06 / Playlist** in fondo alla Home, dopo il bento: copertina, testo editoriale e
+  pulsanti **Ascoltala su Spotify** / **Salva su Spotify**. Nessun secondo player nella pagina.
 - Compare **solo** con almeno una playlist pubblicata: nessun riquadro vuoto.
-- L'embed ufficiale ha il pulsante **Save on Spotify**: chi ascolta può salvare subito la
-  playlist nella propria libreria.
-- In Home il **dock fisso è spento** quando la sezione è presente: eviterebbe due player e due
-  audio insieme. Sulle altre pagine il dock resta.
+- Il player unico è il **dock fisso in basso**, presente in tutte le pagine pubbliche (Home
+  compresa). Vive nel layout: cambiando pagina l'iframe non viene smontato, quindi la musica
+  continua.
 
 ### 10E — Proposte per la playlist (fatto)
 
