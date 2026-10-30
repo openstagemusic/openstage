@@ -54,7 +54,7 @@ export default function SpotifyPlayerDock({
       <div
         aria-hidden={collapsed}
         className={cn(
-          "spotify-dock fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 backdrop-blur transition-opacity duration-200",
+          "spotify-dock fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 backdrop-blur transition-opacity duration-200 print:hidden",
           collapsed && "pointer-events-none opacity-0"
         )}
       >

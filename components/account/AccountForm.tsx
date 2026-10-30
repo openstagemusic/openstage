@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { checkSpotifyLinkAction } from "@/app/actions/spotify";
+import EpkPhotoField from "@/components/account/EpkPhotoField";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { createClient } from "@/lib/supabase/client";
 import { parseSpotifyLink } from "@/lib/spotify/links";
@@ -35,6 +36,9 @@ export type AccountArtist = {
   playlistTrackUrl: string;
   playlistTrackTitle: string;
   playlistTrackStatus: "pending" | "added" | "hidden" | null;
+  epkPhotoUrl: string;
+  epkRider: string;
+  epkContact: string;
 };
 
 export type AccountVenue = {
@@ -225,6 +229,9 @@ export default function AccountForm({
               bio: (values as AccountArtist).bio || null,
               playlist_track_url: trackUrl,
               playlist_track_title: trackTitle,
+              epk_photo_url: (values as AccountArtist).epkPhotoUrl || null,
+              epk_rider: (values as AccountArtist).epkRider || null,
+              epk_contact: (values as AccountArtist).epkContact || null,
               ...(trackChanged
                 ? {
                     playlist_track_status: trackUrl ? "pending" : null,
@@ -373,6 +380,56 @@ export default function AccountForm({
               onChange={(event) => set("bio", event.target.value)}
               className={authInputClass}
             />
+          </div>
+
+          <div className="border-t border-line pt-5">
+            <h3 className="font-display text-lg font-semibold">{dict.epkTitle}</h3>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.epkText}</p>
+
+            <div className="mt-4 space-y-5">
+              <EpkPhotoField
+                value={artist.epkPhotoUrl}
+                onChange={(url) => set("epkPhotoUrl", url)}
+                labels={{
+                  label: dict.epkPhoto,
+                  hint: dict.epkPhotoHint,
+                  choose: dict.epkPhotoChoose,
+                  uploading: dict.epkPhotoUploading,
+                  remove: dict.epkPhotoRemove,
+                  error: dict.epkPhotoError,
+                }}
+              />
+
+              <div>
+                <label htmlFor="epk-contact" className={authLabelClass}>
+                  {dict.epkContact}
+                </label>
+                <input
+                  id="epk-contact"
+                  type="text"
+                  maxLength={200}
+                  value={artist.epkContact}
+                  onChange={(event) => set("epkContact", event.target.value)}
+                  placeholder={dict.epkContactPlaceholder}
+                  className={authInputClass}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="epk-rider" className={authLabelClass}>
+                  {dict.epkRider}
+                </label>
+                <textarea
+                  id="epk-rider"
+                  rows={5}
+                  maxLength={4000}
+                  value={artist.epkRider}
+                  onChange={(event) => set("epkRider", event.target.value)}
+                  placeholder={dict.epkRiderPlaceholder}
+                  className={authInputClass}
+                />
+              </div>
+            </div>
           </div>
         </>
       ) : null}

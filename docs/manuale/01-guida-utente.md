@@ -255,6 +255,17 @@ conversazione arriva in **Dashboard → Messaggi**, con una notifica in-app. Il 
 gratuito, non richiede un piano Pro e non compra visibilità. Da scollegati il pulsante porta al
 login. Solo artisti e locali possono scambiarsi richieste; i fan no.
 
+## EPK artista
+
+In **Account** puoi preparare il tuo **EPK / press kit**: una foto, un contatto pubblico, il
+rider tecnico, la bio, i link e le prossime date. La foto viene ridimensionata prima del
+caricamento e usa lo spazio già esistente.
+
+La pagina è **`/artisti/<slug>/epk`**, condivisibile con locali e festival. È `noindex` (la
+scheda artista resta la pagina canonica) e ha un pulsante **Stampa**: in stampa spariscono
+navbar, footer e player, con testo nero su bianco. Il link **EPK** compare sulla scheda
+artista e in Account.
+
 ## Seguire un artista o un locale
 
 Sulla scheda pubblica di un artista o di un locale trovi **Segui**. Serve l'accesso; da

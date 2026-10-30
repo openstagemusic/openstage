@@ -17,7 +17,7 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 const ARTIST_SELECT =
-  "id, slug, name, city, genre, spotify_url, bio, profile_id, website_url, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url";
+  "id, slug, name, city, genre, spotify_url, bio, profile_id, website_url, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, epk_photo_url, epk_rider, epk_contact";
 const VENUE_SELECT =
   "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url";
 
@@ -31,6 +31,10 @@ export type PublicArtist = {
   bio: string | null;
   /** Sito e social reali; le icone compaiono solo per i campi compilati. */
   links: SocialUrls;
+  /** Dati del press kit: foto, rider e contatto pubblico. */
+  epkPhotoUrl: string | null;
+  epkRider: string | null;
+  epkContact: string | null;
   /** Nessuno ha ancora reclamato la scheda. */
   claimed: boolean;
   /** Il profilo che l'ha reclamata: serve solo a riconoscere la propria. */
@@ -72,6 +76,9 @@ type ArtistRow = {
   soundcloud_url: string | null;
   bandcamp_url: string | null;
   linktree_url: string | null;
+  epk_photo_url: string | null;
+  epk_rider: string | null;
+  epk_contact: string | null;
 };
 
 type VenueRow = {
@@ -123,6 +130,9 @@ function toArtist(row: ArtistRow, verified: Set<string>): PublicArtist {
     genre: row.genre,
     spotifyUrl: row.spotify_url,
     bio: row.bio,
+    epkPhotoUrl: row.epk_photo_url,
+    epkRider: row.epk_rider,
+    epkContact: row.epk_contact,
     links: {
       website: row.website_url,
       instagram: row.instagram_url,

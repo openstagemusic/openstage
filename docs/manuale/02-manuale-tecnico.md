@@ -302,6 +302,10 @@ thread tra un artista e un locale, con data, cachet indicativo, messaggi e ultim
 RLS: solo i due partecipanti e l'admin. Nessun pagamento e nessun gating. Il trigger
 `notify_booking_message` aggiorna il thread e crea una notifica in-app al destinatario.
 
+**EPK su `artists`** (Fase 11B.1b): `epk_photo_url`, `epk_rider`, `epk_contact`. La foto usa
+lo storage pubblico `event-covers` con la politica esistente (cartella = profilo); la pagina
+`/artisti/[slug]/epk` è `noindex` e stampabile.
+
 **`saved_events`** - gli eventi salvati da un profilo (Fase 2).
 `profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
 dato sensibile, e la RLS lo limita al proprietario.
@@ -466,6 +470,7 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0059_pro_foundation.sql` | Tabelle Pro, richieste strumenti, RLS e gating |
 | `0060_pro_request_monthly.sql` | Limite di una richiesta Pro ogni 30 giorni, anche nel database |
 | `0061_booking_threads.sql` | Thread e messaggi di booking gratuiti, RLS, notifiche in-app |
+| `0062_artist_epk.sql` | Foto, rider e contatto pubblico dell'EPK artista |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti

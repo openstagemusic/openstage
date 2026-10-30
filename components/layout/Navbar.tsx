@@ -52,7 +52,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 print:hidden border-b border-line bg-bg/85 backdrop-blur-xl">
       <nav className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-4 sm:px-6">
         <Link
           href="/"

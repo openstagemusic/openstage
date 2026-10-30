@@ -44,11 +44,14 @@
 - Pro rimosso dalla dashboard: niente prezzi, niente CTA, `/dashboard/pro` riporta alla
   dashboard. La coda admin Pro resta interna.
 
-### 11B.1b — EPK artista (prossimo)
+### 11B.1b — EPK artista (fatto)
 
-- Pagina condivisibile con bio, foto, generi, link, rider, contatti e date.
-- Versione stampabile; PDF in un secondo momento.
-- Gratuita, nessun vantaggio di visibilità.
+- Campi `epk_photo_url`, `epk_rider`, `epk_contact` sull'artista, con upload foto nello storage
+  esistente (nessun bucket nuovo).
+- Pagina `/artisti/[slug]/epk` condivisibile con bio, foto, generi, link, rider, contatto e
+  prossime date; `noindex` e canonical alla scheda.
+- Versione stampabile: navbar, footer e player nascosti in stampa, testo nero su bianco.
+- Link “EPK” sulla scheda artista e in Account. PDF in un secondo momento.
 
 ### 11B.1c — Pagine pubbliche (prossimo)
 

@@ -149,7 +149,7 @@ export default async function RootLayout({
           <main
             id="contenuto"
             tabIndex={-1}
-            className={`flex-1 outline-none ${isAdmin ? "" : "pt-16"}`}
+            className={`flex-1 outline-none ${isAdmin ? "" : "pt-16 print:pt-0"}`}
           >
             {children}
           </main>

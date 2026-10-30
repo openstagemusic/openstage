@@ -204,6 +204,15 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         dict={dict.booking}
       />
 
+      <div className="mt-4 print:hidden">
+        <Link
+          href={`${artistPath(artist)}/epk`}
+          className="inline-flex min-h-10 items-center border-b border-line-strong pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+        >
+          {dict.epk.eyebrow} <span aria-hidden="true">↗</span>
+        </Link>
+      </div>
+
       {spotify ? (
         <section className="mt-10">
           <h2 className="font-display text-2xl font-semibold">{dict.spotify.listen}</h2>

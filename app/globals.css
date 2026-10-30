@@ -618,3 +618,25 @@ html.spotify-collapsed body:has(.spotify-dock) {
     bottom: calc(3.5rem + 1px + env(safe-area-inset-bottom) + 0.75rem);
   }
 }
+
+
+/* EPK: la pagina deve restare leggibile quando si stampa o si salva in PDF. */
+@media print {
+  body,
+  .epk-page {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .epk-page * {
+    background: transparent !important;
+    color: #000000 !important;
+    border-color: #d4d4d4 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .epk-page a {
+    text-decoration: underline;
+  }
+}

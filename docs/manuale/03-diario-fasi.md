@@ -947,6 +947,26 @@ le parti, RLS, divieto di auto-contatto, build.
 **Prossimo:** EPK artista e aggiornamento delle pagine pubbliche (Home, per gli artisti, per le
 venue).
 
+## Fase 11B.1b - EPK artista (30 ottobre 2026)
+
+**Obiettivo:** dare all'artista un press kit reale, condivisibile e stampabile, senza costi e
+senza vantaggi di visibilità.
+
+**Cosa è stato costruito**
+
+- Campi `epk_photo_url`, `epk_rider`, `epk_contact` su `artists`.
+- Upload foto nello storage pubblico esistente, con ridimensionamento nel browser.
+- Pagina `/artisti/[slug]/epk` con foto, bio, generi, link, date, rider e contatto.
+- `noindex` e canonical alla scheda artista; link “EPK” dalla scheda e da Account.
+- Stampa pulita: niente navbar/footer/player, testo nero su bianco.
+- Testi IT/EN.
+
+**Verifiche superate:** caricamento foto, salvataggio rider/contatto, pagina EPK, date, stampa,
+build.
+
+**Prossimo:** aggiornare Home e pagine “Per gli artisti / Per le venue” per spiegare cosa si
+può fare e usare.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

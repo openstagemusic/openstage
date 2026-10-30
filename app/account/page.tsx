@@ -73,6 +73,9 @@ export default async function AccountPage() {
           playlistTrackUrl: playlistSubmission?.url ?? "",
           playlistTrackTitle: playlistSubmission?.title ?? "",
           playlistTrackStatus: playlistSubmission?.status ?? null,
+          epkPhotoUrl: artist.epkPhotoUrl ?? "",
+          epkRider: artist.epkRider ?? "",
+          epkContact: artist.epkContact ?? "",
         },
       }
     : venue
@@ -187,12 +190,22 @@ export default async function AccountPage() {
             </p>
 
             {publicPath ? (
-              <LocaleLink
-                href={publicPath}
-                className="mt-3 inline-flex items-center gap-2 border-b border-line-strong pb-1 font-mono text-[10px] uppercase tracking-[0.1em] text-cyan transition-colors hover:border-cyan"
-              >
-                {t.viewPublic} →
-              </LocaleLink>
+              <div className="mt-3 flex flex-wrap items-center gap-4">
+                <LocaleLink
+                  href={publicPath}
+                  className="inline-flex items-center gap-2 border-b border-line-strong pb-1 font-mono text-[10px] uppercase tracking-[0.1em] text-cyan transition-colors hover:border-cyan"
+                >
+                  {t.viewPublic} →
+                </LocaleLink>
+                {artist ? (
+                  <LocaleLink
+                    href={`${publicPath}/epk`}
+                    className="inline-flex items-center gap-2 border-b border-line-strong pb-1 font-mono text-[10px] uppercase tracking-[0.1em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+                  >
+                    {dict.epk.eyebrow} →
+                  </LocaleLink>
+                ) : null}
+              </div>
             ) : null}
 
             <AccountForm subject={subject} dict={t} social={dict.social} />
