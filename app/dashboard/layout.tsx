@@ -32,7 +32,7 @@ export default async function DashboardLayout({
         ]
       : []),
     ...(session.role === "artist" || session.role === "venue"
-      ? [{ href: "/dashboard/pro", label: t.navPro }]
+      ? [{ href: "/dashboard/messaggi", label: t.navMessages }]
       : []),
     { href: "/dashboard/saved", label: t.navSaved },
     { href: "/dashboard/per-te", label: t.navForYou },

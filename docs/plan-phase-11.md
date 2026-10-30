@@ -2,8 +2,9 @@
 
 > **Stato: 30 ottobre 2026.** La 11A è costruita ma **dormiente**. Vendita, donazioni e
 > sponsor pagati sono **congelati**: niente P.IVA, niente commercialista, nessun incasso.
-> L'infrastruttura resta sui piani gratuiti. Il prossimo lavoro è **11B.1 gratuito**
-> (contatti/booking e EPK). La monetizzazione diventa una **Fase 15 condizionale**.
+> L'infrastruttura resta sui piani gratuiti. **11B.1a fatta**: contatti/booking gratuiti,
+> inbox Messaggi e rimozione del Pro dalla UI. Prossimo: **11B.1b EPK** e aggiornamento delle
+> pagine pubbliche. La monetizzazione resta una **Fase 15 condizionale**.
 
 ## Perché è congelata
 
@@ -35,14 +36,24 @@
 
 ## Nuova sequenza
 
-### 11B.1 — Contatti, booking ed EPK (gratuito)
+### 11B.1a — Contatti e booking (fatto)
 
-- Richiesta di booking dalla scheda: data, luogo, cachet indicativo, messaggio.
-- Thread privato artista ↔ locale, notifiche in-app, email opzionale, blocca/segnala,
-  anti-spam.
-- EPK artista condivisibile: bio, foto, generi, link, rider, contatti, date, versione
-  stampabile.
-- Tutto gratuito, nessun gating.
+- Richiesta di booking dalla scheda: data, cachet indicativo, messaggio.
+- Thread privato artista ↔ locale, inbox `/dashboard/messaggi`, risposta, notifiche in-app.
+- RLS: solo i due partecipanti; nessuna email, nessun gating, nessun pagamento.
+- Pro rimosso dalla dashboard: niente prezzi, niente CTA, `/dashboard/pro` riporta alla
+  dashboard. La coda admin Pro resta interna.
+
+### 11B.1b — EPK artista (prossimo)
+
+- Pagina condivisibile con bio, foto, generi, link, rider, contatti e date.
+- Versione stampabile; PDF in un secondo momento.
+- Gratuita, nessun vantaggio di visibilità.
+
+### 11B.1c — Pagine pubbliche (prossimo)
+
+- Home, `/per-gli-artisti` e `/per-le-venue` devono spiegare cosa offre OpenStage e cosa
+  possono fare/usare artisti e locali, senza prezzi e senza promesse Pro.
 
 ### 11B.2 — Strumenti gratuiti
 

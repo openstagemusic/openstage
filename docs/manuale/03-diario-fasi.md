@@ -926,6 +926,27 @@ Supabase Free, Resend/MapTiler/GitHub free; il dominio è l'unica spesa viva.
 
 **Prossimo:** 11B.1 gratuita (contatti/booking + EPK).
 
+## Fase 11B.1a - Contatti e booking gratuiti (30 ottobre 2026)
+
+**Obiettivo:** far parlare artisti e locali senza paywall, senza Pro e senza percentuali.
+
+**Cosa è stato costruito**
+
+- Tabelle `booking_threads` e `booking_messages` con RLS: solo i due partecipanti e l'admin.
+- Richiesta dalla scheda pubblica: data, cachet indicativo, messaggio, con controllo del ruolo e
+  divieto di contattare la propria scheda.
+- Inbox `/dashboard/messaggi` e thread con risposta; nessuna email, notifiche in-app.
+- Notifica `booking_message` al destinatario, con dedupe per messaggio.
+- Pro rimosso dalla dashboard: nav e banda eliminate, `/dashboard/pro` riporta alla dashboard;
+  la coda admin Pro resta interna.
+- Testi IT/EN.
+
+**Verifiche superate:** CTA da scheda, richiesta reale, inbox, risposta, notifiche a entrambe
+le parti, RLS, divieto di auto-contatto, build.
+
+**Prossimo:** EPK artista e aggiornamento delle pagine pubbliche (Home, per gli artisti, per le
+venue).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato

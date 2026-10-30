@@ -238,18 +238,22 @@ modifica la playlist in automatico.
 
 ## OpenStage Pro (vendita congelata)
 
-Nel dashboard di artisti e locali esiste una pagina **Pro**, ma **non è in vendita**: non ci sono
-pagamenti, donazioni, sponsor pagati o pubblicità. La vendita è congelata finché non esiste una
-posizione fiscale adeguata; l'infrastruttura resta sui piani gratuiti.
+Il **Pro è stato rimosso dalla dashboard**: non ci sono pagamenti, donazioni, sponsor pagati o
+pubblicità. La vendita è congelata finché non esiste una posizione fiscale adeguata;
+l'infrastruttura resta sui piani gratuiti.
 
-La pagina serve come **anteprima interna** e sarà trasformata in **Strumenti gratuiti**:
-contatti/booking, EPK, analytics, export e widget base. Il principio resta lo stesso: **nessuna
-classifica, nessun algoritmo, nessun badge, nessuna priorità a pagamento**. Il piano base è
-gratuito per sempre, e contatti e booking restano gratuiti.
+Al suo posto arriveranno **strumenti gratuiti**: contatti/booking, EPK, analytics, export e
+widget base. Il principio resta lo stesso: **nessuna classifica, nessun algoritmo, nessun badge,
+nessuna priorità a pagamento**. Il piano base è gratuito per sempre, e contatti e booking
+restano gratuiti. La monetizzazione, se e quando ci sarà, è una fase futura separata.
 
-Chi ha un accesso attivo può usare il box **"Cosa ti serve davvero?"** per proporre uno
-strumento: una richiesta ogni 30 giorni, letta nella revisione mensile. Non è una promessa di
-sviluppo. La monetizzazione, se e quando ci sarà, è una fase futura separata.
+## Contattare un artista o un locale
+
+Artisti e locali possono scriversi direttamente dalla scheda pubblica con **Proponi una data**
+o **Contatta il locale**. Puoi indicare una data, un cachet indicativo e un messaggio. La
+conversazione arriva in **Dashboard → Messaggi**, con una notifica in-app. Il contatto è
+gratuito, non richiede un piano Pro e non compra visibilità. Da scollegati il pulsante porta al
+login. Solo artisti e locali possono scambiarsi richieste; i fan no.
 
 ## Seguire un artista o un locale
 

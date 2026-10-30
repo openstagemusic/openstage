@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 
 import CopyLinkButton from "@/components/dashboard/CopyLinkButton";
 import NeedsPageNotice from "@/components/dashboard/NeedsPageNotice";
-import ProBand from "@/components/dashboard/ProBand";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import { canManageEvents } from "@/lib/auth/roles";
@@ -11,7 +10,6 @@ import { listMyEvents, listSavedEvents } from "@/lib/dashboard/queries";
 import { artistPath, venuePath } from "@/lib/events/paths";
 import { formatEventDate, isEventPast } from "@/lib/events/format";
 import { getFollowCount } from "@/lib/follows/queries";
-import { getProAccess } from "@/lib/pro/queries";
 import { SOCIAL_KINDS } from "@/lib/social/links";
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -51,10 +49,6 @@ export default async function DashboardPage() {
   const page = artistPage ?? venuePage;
   const pageKind = artistPage ? "artist" : venuePage ? "venue" : null;
   const followers = page && pageKind ? await getFollowCount(pageKind, page.id) : 0;
-  const proAccess =
-    page && (session.role === "artist" || session.role === "venue")
-      ? await getProAccess(session.id, session.role)
-      : null;
   const publicPath = artistPage
     ? artistPath(artistPage)
     : venuePage
@@ -283,10 +277,6 @@ export default async function DashboardPage() {
             </p>
           )}
         </section>
-      ) : null}
-
-      {page && publicPath && !missingPage && (session.role === "artist" || session.role === "venue") ? (
-        <ProBand access={proAccess} dict={t} locale={locale} />
       ) : null}
 
       {canManage && !missingPage ? (

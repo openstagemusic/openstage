@@ -297,6 +297,11 @@ accesso e richieste esiste, ma con il **congelamento commerciale** non ci sono v
 donazioni o sponsor. La 11C (PayPal, checkout, ricevute) non è costruita e non va attivata
 finché non esiste una posizione fiscale o un ente/fiscal host che gestisce gli incassi.
 
+**`booking_threads` / `booking_messages`** - contatti e booking gratuiti (Fase 11B.1a):
+thread tra un artista e un locale, con data, cachet indicativo, messaggi e ultimo messaggio.
+RLS: solo i due partecipanti e l'admin. Nessun pagamento e nessun gating. Il trigger
+`notify_booking_message` aggiorna il thread e crea una notifica in-app al destinatario.
+
 **`saved_events`** - gli eventi salvati da un profilo (Fase 2).
 `profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
 dato sensibile, e la RLS lo limita al proprietario.
@@ -460,6 +465,7 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0058_playlist_status_guard.sql` | Trigger che riserva all'admin l'esito della proposta playlist |
 | `0059_pro_foundation.sql` | Tabelle Pro, richieste strumenti, RLS e gating |
 | `0060_pro_request_monthly.sql` | Limite di una richiesta Pro ogni 30 giorni, anche nel database |
+| `0061_booking_threads.sql` | Thread e messaggi di booking gratuiti, RLS, notifiche in-app |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti
@@ -489,6 +495,8 @@ di `is_admin()`, mai di valori passati dal browser.
 | `follows` | `follows_select_own`, `follows_insert_own`, `follows_delete_own` | Segui e togli solo le tue schede; il trigger vieta la propria scheda |
 | `pro_entitlements` | `pro_entitlements_select_own`, `pro_entitlements_admin_*` | Vedi solo il tuo accesso; solo l'admin concede o revoca |
 | `pro_feature_requests` | `pro_feature_requests_select_own`, `pro_feature_requests_insert_pro`, `pro_feature_requests_admin_*` | Inserisci solo se hai un Pro attivo; la coda la gestisce l'admin |
+| `booking_threads` | `booking_threads_select_participants`, `booking_threads_insert_participant`, `booking_threads_update_participants` | Solo artista e locale del thread (o admin) leggono e scrivono |
+| `booking_messages` | `booking_messages_select_participants`, `booking_messages_insert_participants` | Solo i partecipanti leggono e rispondono; niente email, niente pagamenti |
 | `claims` | `claims_select_own_or_admin` | Vedi la tua richiesta (o tutte se admin); si scrive solo tramite funzioni |
 | `reports` | `reports_insert_own` | Segnali solo a nome tuo, una volta per serata |
 | | `reports_select_own_or_admin`, `reports_admin_update` | Vedi le tue segnalazioni; l'admin le legge e le chiude |

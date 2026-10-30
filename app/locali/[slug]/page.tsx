@@ -199,6 +199,26 @@ export default async function VenuePage({ params }: VenuePageProps) {
               dict={dict.follow}
             />
           </div>
+
+          {venue.profileId ? (
+            <div className="mt-3">
+              {session === null ? (
+                <Link
+                  href={`/login?next=${encodeURIComponent(`/${locale}${venuePath(venue)}`)}`}
+                  className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+                >
+                  {dict.booking.login}
+                </Link>
+              ) : session.role === "artist" ? (
+                <Link
+                  href={`/dashboard/messaggi/nuovo?venue=${venue.id}`}
+                  className="inline-flex min-h-11 items-center border border-cyan/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-colors hover:bg-cyan/10"
+                >
+                  {dict.booking.ctaVenue} <span aria-hidden="true">→</span>
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </header>
 
