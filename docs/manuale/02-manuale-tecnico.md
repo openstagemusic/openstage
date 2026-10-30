@@ -292,6 +292,11 @@ problema, caso d'uso, stato e date. RLS: l'utente inserisce solo le proprie e le
 ha un accesso attivo; l'admin aggiorna la coda. Il trigger `guard_pro_request_monthly` impone
 una richiesta ogni 30 giorni.
 
+**`pro_entitlements` e `pro_feature_requests` sono dormienti** (Fase 11A): il codice di
+accesso e richieste esiste, ma con il **congelamento commerciale** non ci sono vendite,
+donazioni o sponsor. La 11C (PayPal, checkout, ricevute) non è costruita e non va attivata
+finché non esiste una posizione fiscale o un ente/fiscal host che gestisce gli incassi.
+
 **`saved_events`** - gli eventi salvati da un profilo (Fase 2).
 `profile_id`, `event_id`, `created_at`, con chiave primaria composta. È un segnalibro: nessun
 dato sensibile, e la RLS lo limita al proprietario.

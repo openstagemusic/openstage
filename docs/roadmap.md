@@ -26,10 +26,11 @@
 | **9A** | ✅ follow di artisti/locali, notifica nuovi eventi, digest, conteggio follower |
 | **9B** | ⏸ **rimandata**: manca un premio chiaro e una regola anti-abuso |
 | **10** | ✅ **10A, 10B, 10D e 10E fatte**; playlist reale attiva. **10C** (gestione playlist da admin) resta facoltativa. Piano: `docs/plan-phase-10.md` |
-| **11** | ▶ **in corso**: Pro operativo per artisti e locali (strumenti, zero visibilità). **Niente beta: vendita al lancio**, dopo legali, fiscalità e PayPal |
+| **11** | ▶ **11A fatta ma dormiente**. Vendita, donazioni e sponsor **congelati**. Prossima **11B.1 gratuita** (contatti/EPK). Pro e pagamenti tornano nella **Fase 15** condizionale |
 | **12** | ⬜ serie, locale chiuso, bacheca ingaggi |
 | **13** | ⬜ SEO, legal, cancellazione account, audit e polish |
 | **14** | ⬜ Help Center completo (B73), dopo la 13 |
+| **15** | ⏸ **condizionale**: monetizzazione solo con posizione fiscale/ente/fiscal host |
 
 La regola sui canali è in **`docs/notifications-email-policy.md`**: email solo per ciò che
 serve anche a chi non entra nel sito; il resto è in-app. La quota Resend riservata alle email
@@ -48,10 +49,11 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 | **8 — Pannello Admin + Claim a invito** | **8.0 control room modulare** (registro moduli, overview “da fare adesso”, ricerca, responsive, 2FA, audit) · 8.1 admin con **2FA (AAL2)** + registro azioni · 8.2 metriche reali · 8.3 eventi/utenti/segnalazioni · 8.4 "crea per conto di" + **`/claim/[token]`** (invito email) · 8.5 centro assistenza/ticket (agganciato al form di `/contatti`) · 8.6 **Comunicazione**: registro email, coda, quota Resend, riprova controllata, export CSV/JSON · 8.7 pannello notifiche in-app e audit · **8.8 AI assistita** (bozze risposte, import eventi, verifica schede, qualità dati; sempre con approvazione umana) | **7A** (email); **7B** (notifiche e coda); **5.5D** per il linguaggio visivo condiviso. Piano: `docs/plan-fase-8.md`  **Stato: 8.0-8.7, 8.8.1-8.8.4, B74-B79 e backup 8.9 fatti; resta 8.8.5 (facoltativo)** |
 | **9 — Community: segui e inviti virali** | **"Segui"** artista e locale (tabella `follows`, base per il digest della Fase 7) · **inviti virali** `/invite/CODICE` nel dashboard artista, con riscatto automatico (3 invitati con email verificata e almeno 1 evento pubblicato). **Stato: 9A completa il 28 ottobre 2026 (follow + conteggio pubblico dei follower, commit `a4a8665`); 9B inviti rimandata** | nessuno |
 | **10 — Spotify e Area Artista/Locale** | Form Spotify nel profilo (brani/album/ID), **sticky player** persistente, `/playlists` con le playlist OpenStage; **moduli ruolo-specifici** per artista e locale dentro il guscio della 5.5D (profilo, eventi, completezza, strumenti). **Niente dashboard duplicate**. Divisa in **10A** Spotify (link validati, player, `/playlists` con tabella `spotify_playlists`, dock) e **10B** moduli ruolo (completezza, prossime serate, follower del proprietario, azioni rapide); **10C** gestione playlist da admin. Piano: `docs/plan-phase-10.md`. **Stato: 10A, 10B, 10D e 10E fatte** (Spotify, `/playlists`, sezione playlist in Home, dock, moduli ruolo, link social con icone, proposte con verifica link e coda admin). **Playlist reale attiva dal 29 ottobre 2026** | nessuno (embed Spotify è gratuito, nessuna API key) |
-| **11 — Pro operativo (solo strumenti, zero visibilità)** | **11A**: entitlements, gating, area Pro (solo dashboard), box richieste. **11B.1**: contatti/booking **gratuiti** tra artisti e locali + **EPK artista**. **11B.2**: pipeline booking, analytics aggregate, export, widget locale (base gratis, Pro personalizzato). **11C**: **PayPal Orders una tantum** (pass 12 mesi), legali, fiscalità, lancio. **Stato: 11A fatta.** **Zero**: donazioni, Stripe, abbonamenti, badge, priorità, limiti al contatto, Pro in Home. | **Vercel Pro**, PayPal **Business**, consulenza fiscale e legali prima di incassare |
+| **11 — Strumenti gratuiti (vendita congelata)** | **11A** costruita e dormiente: entitlements, gating, pagina Pro, box richieste. **11B.1**: contatti/booking **gratuiti** tra artisti e locali + **EPK artista**. **11B.2**: analytics, export e widget base gratuiti. **11C pagamenti congelata**. Zero incassi, zero donazioni, zero sponsor pagati, zero pubblicità. Il Pro va nascosto o trasformato in “Strumenti”; la monetizzazione torna nella **Fase 15**. | **nessuno**: Vercel Hobby, Supabase Free, Resend/MapTiler/GitHub free; dominio unico costo |
 | **12 — Serie, locali chiusi, bacheca ingaggi** | 12.1 ricorrenza/`serie_id` (**B41**) · 12.2 locale chiuso (**B42**) · 12.3 **`/calls`** "cercasi artisti" + candidature | nessuno nuovo |
 | **13 — SEO, legal, audit e polish finale** | **B09 + B44 + B45** (OG di default, favicon, anteprime delle schede) · `/privacy`, `/terms`, `/cookies` **reali** per GDPR e pagamenti + banner cookie · **notice & takedown** · audit RLS · pagina **500** · README + checklist env · pulizia fixture · **B46/B47** (serate simili, visti di recente) · generatore social AI (facoltativo). **Non si rifanno le pagine della 5.5**: qui solo rifiniture e contenuti | Anthropic solo se si fa il generatore |
 | **14 — Help Center completo** | **B73**: `/aiuto` con ricerca, categorie, articoli, feedback utile/non utile e CTA ai contatti; contenuti gestiti dalla control room (`/admin/aiuto`), non da Zendesk. Tabelle `help_categories`, `help_articles`, `help_feedback`; Markdown IT/EN, bozza/pubblicato, SEO con `pg_trgm`/full-text. `/faq` viene assorbita o reindirizzata. Solo dopo la 13, con l'audit dei ticket reali | nessuno |
+| **15 — Sostenibilità (condizionale)** | Pass Pro, sponsor o donazioni solo dopo una posizione fiscale o un ente/fiscal host che gestisce gli incassi; 30–50 locali attivi, 100+ artisti, 20–30 in waitlist. Sempre zero pay-to-play. | commercialista, eventuale P.IVA/ente, Vercel Pro, PayPal |
 
 ## Ordine operativo (deciso il 23 ottobre 2026)
 
@@ -73,8 +75,8 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
    premio e regola anti-abuso.
 10. **10A → 10B** — Spotify, Area artista/locale e link social. **Completate il 28 ottobre
     2026**; il dock si accende quando arrivano playlist reali.
-11. **11A → 11C** — Pro operativo: 11A (fondazioni), 11B.1 (contatti gratuiti + EPK),
-    11B.2 (booking Pro, analytics, export, widget), 11C (PayPal Orders una tantum, legali,
+11. **11B.1 → 11B.2** — strumenti gratuiti: contatti/booking, EPK, analytics, export, widget.
+    **11C pagamenti congelata**. La monetizzazione torna nella **Fase 15**, solo con fiscalità.
     fiscalità, lancio). Niente beta: vendita al lancio.
 12. **12** — serie, locali chiusi e bacheca ingaggi.
 13. **13** — SEO, legal, cancellazione account, audit RLS e polish finale: è il **cancello
@@ -93,8 +95,8 @@ committabile. Non si mescolano restyling e logica nella stessa modifica.
 | **Reset password** (B36) | chi perde la password non rientrava più | ✅ **chiuso in 7A** |
 | **Coerenza visiva delle pagine interne** | login, eventi, directory, dashboard e editor sembravano un altro prodotto | ✅ **chiuso in 5.5A–E** |
 | **Turnstile lato applicazione** (B11) | il CAPTCHA era verificato solo da Supabase | ✅ **chiuso in 7A** |
-| **Vercel Pro** (B16) | Hobby non è commerciale: serve per incassare | **prima della 11C**, non per costruire 11A/11B |
-| **Fiscalità e incasso** | persona fisica + PayPal Business: regime, IVA, fatture, rimborsi | commercialista, **prima della 11C** |
+| **Vercel Pro** (B16) | Hobby va bene finché non c’è attività commerciale; serve solo quando si riapre la monetizzazione | **Fase 15**, non ora |
+| **Fiscalità e incasso** | congelati: nessun incasso finché non c’è posizione fiscale o ente/fiscal host | **Fase 15** |
 | **Cancellazione dell'account** (B07) | diritto GDPR promesso e oggi assente | Fase 13 |
 | **Backup del database** | il piano free non include backup automatici | ✅ **chiuso**: `db-backup.yml` settimanale, artifact + bucket privato, restore test verde |
 | **Notice & Takedown** | conseguenza dei profili creati dall'admin | **Fatto in 8.11** |
@@ -165,3 +167,6 @@ iniziativa.
 | 20 | **Vendita come persona fisica** con PayPal Business. Il regime fiscale (IVA, fatture, rimborsi) va confermato con un commercialista prima della 11C; PayPal Business non basta da solo. |
 | 21 | **Pro invisibile in Home**: nessun riferimento a piani, prezzi o upgrade in Home, navbar, footer, schede pubbliche o sitemap. Solo dashboard di artisti e locali, pagine `noindex`. |
 | 22 | **Pagamento unico annuale**: Pro Artista 49 €/12 mesi, Pro Locale 149 €/12 mesi, IVA inclusa, 14 giorni soddisfatti o rimborsati. Nessun abbonamento, nessun rinnovo automatico. Prezzo fondatore per i primi 50. |
+| 23 | **Congelamento incassi**: niente pass Pro, donazioni, sponsor pagati o pubblicità finché non esiste una posizione fiscale o un ente/fiscal host che gestisce gli incassi. Nessuna eccezione “piccola”. |
+| 24 | **Zero-cost**: Vercel Hobby, Supabase Free, Resend/MapTiler/GitHub free; il dominio è l’unica spesa viva. Niente servizi che possono trasformare l’uso in commerciale. |
+| 25 | **Pro dormiente**: 11A resta una base tecnica, non un prodotto in vendita. 11B diventa gratuita; la monetizzazione è una Fase 15 condizionale. |

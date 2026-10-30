@@ -31,7 +31,7 @@ assistente AI per bozze e verifica schede, creazione eventi per conto di artisti
 ingresso gratuito, qualità dati, backup cifrato con prova di ripristino, liste admin con
 ricerca, filtri, paginazione ed export, notice & takedown e follow di artisti e locali.
 
-**In arrivo:** OpenStage Pro e pagamenti opzionali, Help Center completo e rifiniture SEO. Il backup è attivo e la prova di
+**In arrivo:** strumenti gratuiti (contatti/booking, EPK, analytics, export, widget), Help Center completo e rifiniture SEO. **Vendita, donazioni e sponsor pagati sono congelati.** Il backup è attivo e la prova di
 ripristino è già passata.
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
@@ -236,17 +236,20 @@ o **Non selezionata**.
 L'aggiunta alla playlist resta **manuale** su Spotify: OpenStage non scrive nel tuo account né
 modifica la playlist in automatico.
 
-## OpenStage Pro (in preparazione)
+## OpenStage Pro (vendita congelata)
 
-Nel dashboard di artisti e locali c'è una voce **Pro**. Non compare in Home, nella navbar, nel
-footer o sulle schede pubbliche: è uno strumento di lavoro, non una vetrina.
+Nel dashboard di artisti e locali esiste una pagina **Pro**, ma **non è in vendita**: non ci sono
+pagamenti, donazioni, sponsor pagati o pubblicità. La vendita è congelata finché non esiste una
+posizione fiscale adeguata; l'infrastruttura resta sui piani gratuiti.
 
-La pagina Pro spiega il patto: **nessuna classifica, nessun algoritmo, nessun badge, nessuna
-priorità a pagamento**. Il piano base resta gratuito per sempre, e contatti e booking restano
-gratuiti. Oggi gli strumenti (analytics, export, EPK, widget, booking) sono **in preparazione**;
-prezzi e acquisto non sono ancora attivi. Chi ha un accesso attivo può usare il box **"Cosa ti
-serve davvero?"** per proporre uno strumento: una richiesta ogni 30 giorni, letta nella
-revisione mensile. Non è una promessa di sviluppo.
+La pagina serve come **anteprima interna** e sarà trasformata in **Strumenti gratuiti**:
+contatti/booking, EPK, analytics, export e widget base. Il principio resta lo stesso: **nessuna
+classifica, nessun algoritmo, nessun badge, nessuna priorità a pagamento**. Il piano base è
+gratuito per sempre, e contatti e booking restano gratuiti.
+
+Chi ha un accesso attivo può usare il box **"Cosa ti serve davvero?"** per proporre uno
+strumento: una richiesta ogni 30 giorni, letta nella revisione mensile. Non è una promessa di
+sviluppo. La monetizzazione, se e quando ci sarà, è una fase futura separata.
 
 ## Seguire un artista o un locale
 

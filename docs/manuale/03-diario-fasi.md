@@ -910,6 +910,22 @@ revoca, nessun riferimento Pro in Home/navbar/footer, build.
 
 **Prossimo:** 11B.1 — contatti/booking gratuiti ed EPK.
 
+## Fase 11 - Congelamento commerciale (30 ottobre 2026)
+
+**Decisione:** nessun incasso finché non esiste una posizione fiscale o un ente/fiscal host.
+Niente pass Pro, donazioni, sponsor pagati o pubblicità. L'infrastruttura resta su Vercel Hobby,
+Supabase Free, Resend/MapTiler/GitHub free; il dominio è l'unica spesa viva.
+
+**Cosa cambia**
+
+- La 11A resta una base tecnica dormiente: entitlements, gating, box richieste e coda admin.
+- La 11C (PayPal, checkout, ricevute, legali commerciali) è **congelata**.
+- La 11B diventa **gratuita**: contatti/booking, EPK, analytics, export e widget base.
+- Il Pro va nascosto o trasformato in "Strumenti"; nessun prezzo o CTA di acquisto.
+- La monetizzazione torna nella **Fase 15**, solo con domanda reale e fiscalità.
+
+**Prossimo:** 11B.1 gratuita (contatti/booking + EPK).
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato
