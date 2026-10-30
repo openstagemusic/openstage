@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { checkSpotifyLinkAction } from "@/app/actions/spotify";
 import EpkPhotoField from "@/components/account/EpkPhotoField";
+import ImageUploadField from "@/components/account/ImageUploadField";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { createClient } from "@/lib/supabase/client";
 import { parseSpotifyLink } from "@/lib/spotify/links";
@@ -39,6 +40,8 @@ export type AccountArtist = {
   epkPhotoUrl: string;
   epkRider: string;
   epkContact: string;
+  avatarUrl: string;
+  bannerUrl: string;
 };
 
 export type AccountVenue = {
@@ -55,6 +58,8 @@ export type AccountVenue = {
   soundcloudUrl: string;
   bandcampUrl: string;
   linktreeUrl: string;
+  avatarUrl: string;
+  bannerUrl: string;
 };
 
 /** I campi social condivisi fra artista e locale (il sito ha nomi diversi). */
@@ -227,6 +232,8 @@ export default function AccountForm({
               bandcamp_url: urls.bandcamp,
               linktree_url: urls.linktree,
               bio: (values as AccountArtist).bio || null,
+              avatar_url: (values as AccountArtist).avatarUrl || null,
+              banner_url: (values as AccountArtist).bannerUrl || null,
               playlist_track_url: trackUrl,
               playlist_track_title: trackTitle,
               epk_photo_url: (values as AccountArtist).epkPhotoUrl || null,
@@ -258,6 +265,8 @@ export default function AccountForm({
               capacity: (values as AccountVenue).capacity
                 ? Number((values as AccountVenue).capacity)
                 : null,
+              avatar_url: (values as AccountVenue).avatarUrl || null,
+              banner_url: (values as AccountVenue).bannerUrl || null,
             })
             .eq("id", subject.values.id);
 
@@ -383,6 +392,40 @@ export default function AccountForm({
           </div>
 
           <div className="border-t border-line pt-5">
+            <h3 className="font-display text-lg font-semibold">{dict.imagesTitle}</h3>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.imagesText}</p>
+
+            <div className="mt-4 space-y-5">
+              <ImageUploadField
+                value={artist.avatarUrl}
+                onChange={(url) => set("avatarUrl", url)}
+                label={dict.avatarLabel}
+                guidelines={dict.avatarGuidelines}
+                preview="avatar"
+                labels={{
+                  choose: dict.imageChoose,
+                  uploading: dict.imageUploading,
+                  remove: dict.imageRemove,
+                  error: dict.imageError,
+                }}
+              />
+              <ImageUploadField
+                value={artist.bannerUrl}
+                onChange={(url) => set("bannerUrl", url)}
+                label={dict.bannerLabel}
+                guidelines={dict.bannerGuidelines}
+                preview="banner"
+                labels={{
+                  choose: dict.imageChoose,
+                  uploading: dict.imageUploading,
+                  remove: dict.imageRemove,
+                  error: dict.imageError,
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="border-t border-line pt-5">
             <h3 className="font-display text-lg font-semibold">{dict.epkTitle}</h3>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.epkText}</p>
 
@@ -475,6 +518,40 @@ export default function AccountForm({
               onChange={(event) => set("capacity", event.target.value)}
               className={authInputClass}
             />
+          </div>
+
+          <div className="border-t border-line pt-5">
+            <h3 className="font-display text-lg font-semibold">{dict.imagesTitle}</h3>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.imagesText}</p>
+
+            <div className="mt-4 space-y-5">
+              <ImageUploadField
+                value={venue.avatarUrl}
+                onChange={(url) => set("avatarUrl", url)}
+                label={dict.avatarLabel}
+                guidelines={dict.avatarGuidelines}
+                preview="avatar"
+                labels={{
+                  choose: dict.imageChoose,
+                  uploading: dict.imageUploading,
+                  remove: dict.imageRemove,
+                  error: dict.imageError,
+                }}
+              />
+              <ImageUploadField
+                value={venue.bannerUrl}
+                onChange={(url) => set("bannerUrl", url)}
+                label={dict.bannerLabel}
+                guidelines={dict.bannerGuidelines}
+                preview="banner"
+                labels={{
+                  choose: dict.imageChoose,
+                  uploading: dict.imageUploading,
+                  remove: dict.imageRemove,
+                  error: dict.imageError,
+                }}
+              />
+            </div>
           </div>
         </>
       ) : null}

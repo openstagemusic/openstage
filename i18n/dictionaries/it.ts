@@ -1811,6 +1811,19 @@ export const it: Dictionary = {
     linksText:
       "Sito e profili ufficiali: compaiono come icone sulla scheda pubblica. Accetto link completi oppure @nome utente per Instagram, TikTok e SoundCloud.",
     invalidLink: "Controlla i link: uno o più indirizzi non sono validi.",
+    imagesTitle: "Immagine e banner",
+    imagesText:
+      "La prima impressione della scheda. Carica un'immagine profilo e un banner: se mancano, usiamo il placeholder OpenStage.",
+    avatarLabel: "Immagine profilo",
+    avatarGuidelines:
+      "Quadrata, minimo 400×400 px, consigliata 800×800. JPG, PNG o WebP, max 3 MB. Tieni il viso o il logo al centro.",
+    bannerLabel: "Banner",
+    bannerGuidelines:
+      "Orizzontale, consigliata 1600×600 px (minimo 1200×400). JPG, PNG o WebP, max 3 MB. Tieni il soggetto al centro: sui telefoni viene ritagliato.",
+    imageChoose: "Scegli immagine",
+    imageUploading: "Carico...",
+    imageRemove: "Rimuovi",
+    imageError: "Caricamento non riuscito. Controlla formato e peso.",
     epkTitle: "EPK / press kit",
     epkText:
       "La pagina che mandi a locali e festival: foto, bio, rider, contatti e date. È pubblica e condivisibile.",

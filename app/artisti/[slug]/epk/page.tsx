@@ -54,6 +54,7 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
   if (!artist) notFound();
 
   const events = (await listUpcomingEventsByArtist(artist.id)).slice(0, 8);
+  const photo = artist.epkPhotoUrl ?? artist.avatarUrl;
 
   return (
     <div className="epk-page mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16 print:max-w-none print:px-0 print:py-0">
@@ -68,10 +69,10 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
       </div>
 
       <header className="mt-8 grid gap-6 border-t border-line pt-8 sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-start print:mt-0 print:border-black/20 print:pt-0">
-        {artist.epkPhotoUrl ? (
+        {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={artist.epkPhotoUrl}
+            src={photo}
             alt={artist.name}
             className="h-48 w-48 border border-line object-cover print:h-40 print:w-40"
           />

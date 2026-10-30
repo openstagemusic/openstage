@@ -17,9 +17,9 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 const ARTIST_SELECT =
-  "id, slug, name, city, genre, spotify_url, bio, profile_id, website_url, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, epk_photo_url, epk_rider, epk_contact";
+  "id, slug, name, city, genre, spotify_url, bio, profile_id, website_url, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, epk_photo_url, epk_rider, epk_contact, avatar_url, banner_url";
 const VENUE_SELECT =
-  "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url";
+  "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, avatar_url, banner_url";
 
 export type PublicArtist = {
   id: string;
@@ -35,6 +35,9 @@ export type PublicArtist = {
   epkPhotoUrl: string | null;
   epkRider: string | null;
   epkContact: string | null;
+  /** Immagini pubbliche della scheda. */
+  avatarUrl: string | null;
+  bannerUrl: string | null;
   /** Nessuno ha ancora reclamato la scheda. */
   claimed: boolean;
   /** Il profilo che l'ha reclamata: serve solo a riconoscere la propria. */
@@ -51,6 +54,8 @@ export type PublicVenue = {
   address: string | null;
   website: string | null;
   links: SocialUrls;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
   latitude: number | null;
   longitude: number | null;
   capacity: number | null;
@@ -79,6 +84,8 @@ type ArtistRow = {
   epk_photo_url: string | null;
   epk_rider: string | null;
   epk_contact: string | null;
+  avatar_url: string | null;
+  banner_url: string | null;
 };
 
 type VenueRow = {
@@ -99,6 +106,8 @@ type VenueRow = {
   soundcloud_url: string | null;
   bandcamp_url: string | null;
   linktree_url: string | null;
+  avatar_url: string | null;
+  banner_url: string | null;
 };
 
 /**
@@ -133,6 +142,8 @@ function toArtist(row: ArtistRow, verified: Set<string>): PublicArtist {
     epkPhotoUrl: row.epk_photo_url,
     epkRider: row.epk_rider,
     epkContact: row.epk_contact,
+    avatarUrl: row.avatar_url,
+    bannerUrl: row.banner_url,
     links: {
       website: row.website_url,
       instagram: row.instagram_url,
@@ -158,6 +169,8 @@ function toVenue(row: VenueRow, verified: Set<string>): PublicVenue {
     city: row.city,
     address: row.address,
     website: row.website,
+    avatarUrl: row.avatar_url,
+    bannerUrl: row.banner_url,
     links: {
       website: row.website,
       instagram: row.instagram_url,

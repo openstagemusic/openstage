@@ -7,6 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import SocialLinks from "@/components/directory/SocialLinks";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
+import BrandBanner from "@/components/directory/BrandBanner";
 import BookingPanel from "@/components/booking/BookingPanel";
 import FollowButton from "@/components/directory/FollowButton";
 import { canManageVenueProfile } from "@/lib/auth/roles";
@@ -150,12 +151,32 @@ export default async function VenuePage({ params }: VenuePageProps) {
         ← {t.backToVenues}
       </Link>
 
-      <header className="mt-8 grid gap-6 border-t border-line pt-8 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-start">
+      <div className="relative mt-8 overflow-hidden border border-line">
+        <div className="absolute inset-0">
+          {venue.bannerUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={venue.bannerUrl}
+              alt=""
+              className="h-full w-full scale-105 object-cover opacity-40 blur-[2px]"
+            />
+          ) : (
+            <BrandBanner />
+          )}
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/30" />
+
+        <header className="relative grid gap-6 p-5 pt-16 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-start sm:p-8 sm:pt-20">
         <span
           aria-hidden="true"
-          className="flex h-32 w-32 items-center justify-center border border-cyan/30 bg-cyan/10 font-poster text-6xl leading-none text-cyan"
+          className="flex h-32 w-32 items-center justify-center overflow-hidden border border-cyan/30 bg-cyan/10 font-poster text-6xl leading-none text-cyan"
         >
-          {initials(venue.name)}
+          {venue.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={venue.avatarUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            initials(venue.name)
+          )}
         </span>
 
         <div>
@@ -202,7 +223,8 @@ export default async function VenuePage({ params }: VenuePageProps) {
           </div>
 
         </div>
-      </header>
+        </header>
+      </div>
 
       <BookingPanel
         subjectType="venue"

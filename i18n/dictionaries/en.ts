@@ -1811,6 +1811,19 @@ export const en = {
     linksText:
       "Website and official profiles: they appear as icons on the public page. Full links or @handle for Instagram, TikTok and SoundCloud are accepted.",
     invalidLink: "Check the links: one or more addresses are not valid.",
+    imagesTitle: "Image and banner",
+    imagesText:
+      "The first impression of the page. Upload a profile image and a banner: if they are missing, we use the OpenStage placeholder.",
+    avatarLabel: "Profile image",
+    avatarGuidelines:
+      "Square, at least 400×400 px, 800×800 recommended. JPG, PNG or WebP, max 3 MB. Keep the face or logo centred.",
+    bannerLabel: "Banner",
+    bannerGuidelines:
+      "Landscape, 1600×600 px recommended (1200×400 minimum). JPG, PNG or WebP, max 3 MB. Keep the subject centred: phones crop it.",
+    imageChoose: "Choose image",
+    imageUploading: "Uploading...",
+    imageRemove: "Remove",
+    imageError: "Upload failed. Check format and size.",
     epkTitle: "EPK / press kit",
     epkText:
       "The page you send to venues and festivals: photo, bio, rider, contacts and dates. It is public and shareable.",

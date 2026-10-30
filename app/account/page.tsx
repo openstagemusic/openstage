@@ -76,6 +76,8 @@ export default async function AccountPage() {
           epkPhotoUrl: artist.epkPhotoUrl ?? "",
           epkRider: artist.epkRider ?? "",
           epkContact: artist.epkContact ?? "",
+          avatarUrl: artist.avatarUrl ?? "",
+          bannerUrl: artist.bannerUrl ?? "",
         },
       }
     : venue
@@ -95,6 +97,8 @@ export default async function AccountPage() {
             soundcloudUrl: venue.links.soundcloud ?? "",
             bandcampUrl: venue.links.bandcamp ?? "",
             linktreeUrl: venue.links.linktree ?? "",
+            avatarUrl: venue.avatarUrl ?? "",
+            bannerUrl: venue.bannerUrl ?? "",
           },
         }
       : null;

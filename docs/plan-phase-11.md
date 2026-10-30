@@ -53,7 +53,15 @@
 - Versione stampabile: navbar, footer e player nascosti in stampa, testo nero su bianco.
 - Link “EPK” sulla scheda artista e in Account. PDF in un secondo momento.
 
-### 11B.1c — Pagine pubbliche (prossimo)
+### 11B.1c — Avatar e banner (fatto)
+
+- Campi `avatar_url` e `banner_url` su artisti e locali; upload nello storage esistente.
+- Linee guida testuali prima del caricamento: formato, dimensioni, peso e punto focale.
+- Scheda profilo: banner di sfondo sfocato, avatar al posto delle iniziali, placeholder OpenStage se mancano.
+- Schede directory: banner in alto, avatar in cerchio vicino al nome, placeholder di marca.
+- L'EPK usa l'avatar come fallback se manca la foto dedicata.
+
+### 11B.1d — Pagine pubbliche (prossimo)
 
 - Home, `/per-gli-artisti` e `/per-le-venue` devono spiegare cosa offre OpenStage e cosa
   possono fare/usare artisti e locali, senza prezzi e senza promesse Pro.
