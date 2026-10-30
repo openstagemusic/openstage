@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import Link from "@/components/i18n/LocaleLink";
+import FreeTools from "@/components/pages/FreeTools";
 import PageCta from "@/components/pages/PageCta";
 import PageHero from "@/components/pages/PageHero";
 import PageSection from "@/components/pages/PageSection";
@@ -59,15 +60,8 @@ export default async function ForArtistsPage() {
           </ol>
         </PageSection>
 
-        <PageSection number="03" title={t.benefitsTitle}>
-          <ul className="grid gap-5 sm:grid-cols-3">
-            {t.benefits.map((benefit) => (
-              <li key={benefit.title} className="border-t border-line pt-4">
-                <h3 className="font-display text-sm font-semibold">{benefit.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{benefit.text}</p>
-              </li>
-            ))}
-          </ul>
+        <PageSection number="03" title={t.toolsTitle}>
+          <FreeTools items={t.tools} note={t.toolsNote} />
         </PageSection>
 
         <PageSection number="04" title={t.claimTitle}>

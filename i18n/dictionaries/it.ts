@@ -696,10 +696,16 @@ export const it: Dictionary = {
     artistsTitle: "Per gli artisti",
     artistsText:
       "Crei la tua scheda in pochi minuti: la tua musica entra sulla mappa. Gratis, per sempre.",
+    artistsTools: ["Scheda con foto e banner", "EPK da mandare ai locali", "Contatti e booking"],
     artistsCta: "Come funziona per te",
     venuesTitle: "Per i locali",
     venuesText:
       "Pubblichi la programmazione e riempi la sala. Nessun costo, nessun algoritmo pay-to-play.",
+    venuesTools: [
+      "Scheda con foto e banner",
+      "Programmazione e archivio",
+      "Contatti con gli artisti",
+    ],
     venuesCta: "Come funziona per te",
   },
   pages: {
@@ -732,21 +738,31 @@ export const it: Dictionary = {
           text: "Ogni evento ha una pagina, un file calendario e le card social. Manda il link al tuo pubblico; nessuna commissione.",
         },
       ],
-      benefitsTitle: "Cosa ottieni",
-      benefits: [
+      toolsTitle: "Cosa puoi usare, gratis",
+      tools: [
         {
-          title: "Una pagina che è tua",
-          text: "Bio, genere, città e link, collegati a ogni data che pubblichi.",
+          title: "Scheda artista con immagini",
+          text: "Immagine profilo, banner, bio, genere, città, Spotify e social. Se mancano le immagini, la scheda usa il placeholder OpenStage.",
         },
         {
-          title: "Scoperta per città e data",
-          text: "Chi cerca ti trova dalla mappa, dall'agenda e dalle pagine città.",
+          title: "EPK / press kit",
+          text: "Una pagina con foto, rider, contatto e prossime date da mandare a locali e festival: condivisibile e stampabile, senza filigrana.",
         },
         {
-          title: "Niente pay-to-play",
-          text: "La visibilità non si vende. Non esiste una priorità a pagamento nella ricerca, sulla mappa o nel muro in evidenza.",
+          title: "Contatti e booking",
+          text: "I locali ti scrivono dalla tua scheda e le richieste arrivano in una inbox privata, con la risposta nello stesso thread. Gratis, anche domani.",
+        },
+        {
+          title: "Date, locandine e calendario",
+          text: "Ogni serata ha la sua pagina, il file calendario e le immagini social pronte. Puoi tenerla in bozza finché non è tutto a posto.",
+        },
+        {
+          title: "Brano per la playlist",
+          text: "Proponi un singolo dalla tua scheda: se la redazione lo sceglie entra nella playlist ufficiale OpenStage, accanto agli altri artisti indipendenti.",
         },
       ],
+      toolsNote:
+        "Niente pay-to-play: ricerca, mappa e serate in evidenza non si comprano, e non c'è un piano a pagamento da attivare.",
       claimTitle: "Sei già su OpenStage?",
       claimText:
         "Alcune schede artista sono create dalla redazione partendo da concerti reali. Se la pagina è tua, aprila e scegli “Sono io”. Ti serve un link pubblico che lo dimostri: il tuo sito, una pagina social o una pagina stampa con il tuo nome.",
@@ -789,21 +805,31 @@ export const it: Dictionary = {
           text: "Collega una scheda artista esistente, oppure scrivi il nome di un ospite che non è ancora su OpenStage.",
         },
       ],
-      benefitsTitle: "Cosa ottieni",
-      benefits: [
+      toolsTitle: "Cosa puoi usare, gratis",
+      tools: [
         {
-          title: "Una pagina locale con memoria",
-          text: "Serate in programma e serate passate nello stesso posto, con indirizzo e capienza quando li fornisci.",
+          title: "Scheda locale con immagini",
+          text: "Immagine profilo, banner, indirizzo, capienza e posizione: la sala resta trovabile anche nelle settimane senza concerti.",
         },
         {
-          title: "Un pin vero sulla mappa",
-          text: "Posizione esatta o approssimata: non inventiamo un punto che non esiste.",
+          title: "Programmazione e archivio",
+          text: "Pubblichi ogni serata con locandina, orari, ingresso e come arrivare; quelle passate restano come archivio della sala.",
         },
         {
-          title: "Nessuna commissione",
-          text: "Niente checkout, niente commissione sui biglietti, niente visibilità a pagamento. Se vendi altrove, tieni il tuo link.",
+          title: "Contatti diretti con gli artisti",
+          text: "Scrivi agli artisti dalla loro scheda: la conversazione resta in una inbox privata, con lo storico. Gratis, anche domani.",
+        },
+        {
+          title: "Artisti collegati alla serata",
+          text: "Colleghi una scheda artista esistente oppure scrivi il nome di un ospite che non è ancora su OpenStage.",
+        },
+        {
+          title: "Follower e notifiche",
+          text: "Chi ti segue riceve una notifica quando pubblichi una serata. La sala si riempie con le persone giuste, non con un boost comprato.",
         },
       ],
+      toolsNote:
+        "Niente commissioni sull'ingresso e niente checkout: se vendi biglietti altrove, il link resta tuo. Nessuna pubblicità a pagamento.",
       claimTitle: "È il tuo locale?",
       claimText:
         "OpenStage può creare la pagina di un locale partendo da un evento reale. Se la pagina è tua, scegli “Sono il gestore” e invia un link pubblico come prova. La richiesta viene approvata dallo staff.",

@@ -61,10 +61,14 @@
 - Schede directory: banner in alto, avatar in cerchio vicino al nome, placeholder di marca.
 - L'EPK usa l'avatar come fallback se manca la foto dedicata.
 
-### 11B.1d — Pagine pubbliche (prossimo)
+### 11B.1d — Pagine pubbliche (fatto)
 
-- Home, `/per-gli-artisti` e `/per-le-venue` devono spiegare cosa offre OpenStage e cosa
-  possono fare/usare artisti e locali, senza prezzi e senza promesse Pro.
+- Home: le due porte (artisti/locali) elencano gli strumenti inclusi, senza prezzi.
+- `/per-gli-artisti`: sezione "Cosa puoi usare, gratis" con scheda e immagini, EPK, contatti e
+  booking, date/locandine/calendario, brano per la playlist.
+- `/per-le-venue`: stessa sezione con scheda e immagini, programmazione e archivio, contatti
+  diretti, artisti collegati, follower e notifiche.
+- Nessun accenno al Pro, nessun prezzo, nessun analytics/export/widget (non ancora costruiti).
 
 ### 11B.2 — Strumenti gratuiti
 

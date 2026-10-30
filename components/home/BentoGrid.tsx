@@ -62,25 +62,55 @@ export default function BentoGrid({ dict, counters }: BentoGridProps) {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-1">
-          <Link href="/per-gli-artisti" className="group border-t border-line pt-4">
-            <h3 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em] transition-colors group-hover:text-cyan">
+          <div className="border-t border-line pt-4">
+            <h3 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em]">
               {t.artistsTitle}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">{t.artistsText}</p>
-            <span className={CTA}>
-              {t.artistsCta} <span aria-hidden="true">→</span>
-            </span>
-          </Link>
+            <ul className="mt-3 space-y-1">
+              {t.artistsTools.map((tool) => (
+                <li
+                  key={tool}
+                  className="flex gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
+                >
+                  <span aria-hidden="true" className="text-cyan">
+                    +
+                  </span>
+                  {tool}
+                </li>
+              ))}
+            </ul>
+            <Link href="/per-gli-artisti" className="group">
+              <span className={CTA}>
+                {t.artistsCta} <span aria-hidden="true">→</span>
+              </span>
+            </Link>
+          </div>
 
-          <Link href="/per-le-venue" className="group border-t border-line pt-4">
-            <h3 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em] transition-colors group-hover:text-cyan">
+          <div className="border-t border-line pt-4">
+            <h3 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em]">
               {t.venuesTitle}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">{t.venuesText}</p>
-            <span className={CTA}>
-              {t.venuesCta} <span aria-hidden="true">→</span>
-            </span>
-          </Link>
+            <ul className="mt-3 space-y-1">
+              {t.venuesTools.map((tool) => (
+                <li
+                  key={tool}
+                  className="flex gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
+                >
+                  <span aria-hidden="true" className="text-cyan">
+                    +
+                  </span>
+                  {tool}
+                </li>
+              ))}
+            </ul>
+            <Link href="/per-le-venue" className="group">
+              <span className={CTA}>
+                {t.venuesCta} <span aria-hidden="true">→</span>
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </section>

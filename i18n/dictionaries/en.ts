@@ -694,9 +694,11 @@ export const en = {
     citiesLabel: "Cities",
     artistsTitle: "For artists",
     artistsText: "Build your page in minutes: your music goes on the map. Free, forever.",
+    artistsTools: ["Page with photo and banner", "EPK to send to venues", "Contacts and booking"],
     artistsCta: "How it works for you",
     venuesTitle: "For venues",
     venuesText: "Publish your programme and fill the room. No fees, no pay-to-play algorithm.",
+    venuesTools: ["Page with photo and banner", "Programme and archive", "Contact with artists"],
     venuesCta: "How it works for you",
   },
   pages: {
@@ -732,21 +734,31 @@ export const en = {
           text: "Every event has a page, a calendar file and social cards. Send the link to your audience; no platform commission.",
         },
       ],
-      benefitsTitle: "What you get",
-      benefits: [
+      toolsTitle: "What you can use, free",
+      tools: [
         {
-          title: "A page that belongs to you",
-          text: "Your bio, genre, city and links, connected to every date you publish.",
+          title: "Artist page with images",
+          text: "Profile image, banner, bio, genre, city, Spotify and socials. If images are missing, the page uses the OpenStage placeholder.",
         },
         {
-          title: "Discovery by city and date",
-          text: "People can find you through the map, the agenda and the city pages.",
+          title: "EPK / press kit",
+          text: "A page with photo, rider, contact and upcoming dates to send to venues and festivals: shareable and printable, no watermark.",
         },
         {
-          title: "No pay-to-play",
-          text: "Visibility is never sold. There is no paid priority in search, on the map or in the featured wall.",
+          title: "Contacts and booking",
+          text: "Venues write to you from your page and requests land in a private inbox, with the reply in the same thread. Free, tomorrow too.",
+        },
+        {
+          title: "Dates, posters and calendar",
+          text: "Every date has its own page, calendar file and ready social images. You can keep it as a draft until everything is set.",
+        },
+        {
+          title: "A track for the playlist",
+          text: "Submit a single from your page: if the editors pick it, it joins the official OpenStage playlist next to other independent artists.",
         },
       ],
+      toolsNote:
+        "No pay-to-play: search, map and featured dates are not for sale, and there is no paid plan to activate.",
       claimTitle: "Already on OpenStage?",
       claimText:
         "Some artist pages are created by our editorial team from real gigs. If the page is yours, open it and choose “This is me”. You will need a public link that proves it: your website, a social page or a press page with your name.",
@@ -789,21 +801,31 @@ export const en = {
           text: "Connect an existing artist page, or write the name of a guest who is not on OpenStage yet.",
         },
       ],
-      benefitsTitle: "What you get",
-      benefits: [
+      toolsTitle: "What you can use, free",
+      tools: [
         {
-          title: "A venue page with memory",
-          text: "Upcoming events and past nights, in one place, with the venue address and capacity when you provide them.",
+          title: "Venue page with images",
+          text: "Profile image, banner, address, capacity and location: the room stays findable even in weeks without gigs.",
         },
         {
-          title: "A real map pin",
-          text: "Exact or approximate location: we never invent a point that does not exist.",
+          title: "Programme and archive",
+          text: "Publish every date with poster, times, entry and directions; past dates stay as the archive of your room.",
         },
         {
-          title: "No commission",
-          text: "No checkout, no fee on tickets, no paid visibility. If you sell tickets elsewhere, keep your link.",
+          title: "Direct contact with artists",
+          text: "Write to artists from their page: the conversation stays in a private inbox, with its history. Free, tomorrow too.",
+        },
+        {
+          title: "Artists linked to the date",
+          text: "Link an existing artist page or type the name of a guest who is not on OpenStage yet.",
+        },
+        {
+          title: "Followers and notifications",
+          text: "People who follow you get a notification when you publish a date. The room fills with the right people, not a bought boost.",
         },
       ],
+      toolsNote:
+        "No fees on the door and no checkout: if you sell tickets elsewhere, the link stays yours. No paid advertising.",
       claimTitle: "Is this your venue?",
       claimText:
         "OpenStage can create a venue page from a real event. If the page is yours, choose “I manage this venue” and send a public proof link. A staff member approves the request.",
