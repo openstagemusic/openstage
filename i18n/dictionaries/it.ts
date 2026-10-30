@@ -142,6 +142,13 @@ export const it: Dictionary = {
     invalid: "Link non valido",
   },
   booking: {
+    sectionTitle: "Contatti e booking",
+    sectionLead:
+      "Scrivi direttamente, senza intermediari. La richiesta arriva nella dashboard e non costa nulla.",
+    unclaimed:
+      "Questa scheda non è ancora reclamata: non c'è un account da contattare. I contatti si attivano quando l'artista o il locale prende la scheda.",
+    onlyRoles:
+      "Solo artisti e locali possono scambiarsi richieste di booking. Il contatto resta gratuito.",
     inboxEyebrow: "Messaggi",
     inboxTitle: "Contatti e booking",
     inboxLead: "Richieste e conversazioni con artisti e locali. Gratuite, senza priorità.",

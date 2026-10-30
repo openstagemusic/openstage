@@ -144,6 +144,13 @@ export const en = {
     invalid: "Invalid link",
   },
   booking: {
+    sectionTitle: "Contact and booking",
+    sectionLead:
+      "Write directly, with no middlemen. The request lands in the dashboard and costs nothing.",
+    unclaimed:
+      "This page has not been claimed yet: there is no account to contact. Messages open when the artist or venue claims the page.",
+    onlyRoles:
+      "Only artists and venues can exchange booking requests. Contact stays free.",
     inboxEyebrow: "Messages",
     inboxTitle: "Contact and booking",
     inboxLead: "Requests and conversations with artists and venues. Free, with no priority.",

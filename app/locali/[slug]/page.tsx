@@ -7,6 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import SocialLinks from "@/components/directory/SocialLinks";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
+import BookingPanel from "@/components/booking/BookingPanel";
 import FollowButton from "@/components/directory/FollowButton";
 import { canManageVenueProfile } from "@/lib/auth/roles";
 import { getMyPendingRequest, getReplaceablePage } from "@/lib/claims/queries";
@@ -200,27 +201,18 @@ export default async function VenuePage({ params }: VenuePageProps) {
             />
           </div>
 
-          {venue.profileId ? (
-            <div className="mt-3">
-              {session === null ? (
-                <Link
-                  href={`/login?next=${encodeURIComponent(`/${locale}${venuePath(venue)}`)}`}
-                  className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
-                >
-                  {dict.booking.login}
-                </Link>
-              ) : session.role === "artist" ? (
-                <Link
-                  href={`/dashboard/messaggi/nuovo?venue=${venue.id}`}
-                  className="inline-flex min-h-11 items-center border border-cyan/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-colors hover:bg-cyan/10"
-                >
-                  {dict.booking.ctaVenue} <span aria-hidden="true">→</span>
-                </Link>
-              ) : null}
-            </div>
-          ) : null}
         </div>
       </header>
+
+      <BookingPanel
+        subjectType="venue"
+        subjectId={venue.id}
+        profileId={venue.profileId}
+        viewerRole={session?.role ?? null}
+        isAuthenticated={session !== null}
+        subjectPath={`/${locale}${venuePath(venue)}`}
+        dict={dict.booking}
+      />
 
       <dl className="mt-8 border-t border-line">
         <div className="grid gap-2 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
