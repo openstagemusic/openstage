@@ -117,12 +117,14 @@ export default async function RootLayout({
   const dict = getDictionary(locale);
   const currentPath = await getCurrentPath();
   const isAdmin = currentPath.startsWith("/admin");
+  // Il widget vive dentro un iframe sul sito di qualcuno: pagina nuda.
+  const isIsolated = isAdmin || currentPath.startsWith("/widget");
 
   // Un'unica lettura per richiesta (React `cache`): utente + ruolo dal database.
   const session = await getSessionProfile();
   const notificationCount = session ? await getUnreadNotificationCount(session.id) : 0;
   // Il dock non compare nell'admin e non esiste senza una playlist reale.
-  const featuredPlaylist = isAdmin ? null : await getFeaturedPlaylist();
+  const featuredPlaylist = isIsolated ? null : await getFeaturedPlaylist();
   // Un solo player per tutto il sito: il dock vive nel layout, quindi
   // l'iframe non viene smontato quando si cambia pagina e la musica continua.
   const showDock = featuredPlaylist !== null;
@@ -137,7 +139,7 @@ export default async function RootLayout({
           {dict.nav.skipToContent}
         </a>
         <LocaleProvider locale={locale}>
-          {isAdmin ? null : (
+          {isIsolated ? null : (
             <Navbar
               locale={locale}
               dict={dict.nav}
@@ -149,12 +151,12 @@ export default async function RootLayout({
           <main
             id="contenuto"
             tabIndex={-1}
-            className={`flex-1 outline-none ${isAdmin ? "" : "pt-16 print:pt-0"}`}
+            className={`flex-1 outline-none ${isIsolated ? "" : "pt-16 print:pt-0"}`}
           >
             {children}
           </main>
-          {isAdmin ? null : <Footer dict={dict.footer} hasPlaylists={featuredPlaylist !== null} />}
-          {isAdmin ? null : (
+          {isIsolated ? null : <Footer dict={dict.footer} hasPlaylists={featuredPlaylist !== null} />}
+          {isIsolated ? null : (
             <MobileTabBar
               dict={dict.nav}
               userEmail={session?.email ?? null}
@@ -162,7 +164,7 @@ export default async function RootLayout({
               notificationCount={notificationCount}
             />
           )}
-          {showDock && !isAdmin ? (
+          {showDock && !isIsolated ? (
             <SpotifyPlayerDock
               embedUrl={featuredPlaylist?.embedUrl ?? null}
               title={dict.spotify.embedTitle}

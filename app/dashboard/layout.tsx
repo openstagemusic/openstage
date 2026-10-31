@@ -30,6 +30,7 @@ export default async function DashboardLayout({
           { href: "/dashboard/events", label: t.navEvents },
           { href: "/dashboard/events/new", label: t.navNew },
           { href: "/dashboard/statistiche", label: t.navStats },
+          { href: "/dashboard/widget", label: t.navWidget },
         ]
       : []),
     ...(session.role === "artist" || session.role === "venue"
