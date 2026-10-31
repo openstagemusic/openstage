@@ -6,6 +6,10 @@ name: Smoke
 # Non fa login e non pubblica niente: quelle prove si fanno a mano nel beta test.
 # Gira **contro la produzione**, quindi non ha bisogno di segreti: se
 # getopenstage.it è rotta, il workflow diventa rosso.
+#
+# Su `push` il deploy di Vercel parte nello stesso momento: prima di misurare si
+# aspetta che la produzione serva la build nuova (gli header di sicurezza sono il
+# segnale più semplice: ci sono da questa versione in poi).
 
 on:
   push:
@@ -22,7 +26,7 @@ concurrency:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -40,6 +44,21 @@ jobs:
             sudo apt-get update && sudo apt-get install -y google-chrome-stable
           fi
           google-chrome --version
+
+      - name: Aspetta che la produzione serva la build nuova
+        if: github.event_name == 'push'
+        run: |
+          for attempt in $(seq 1 40); do
+            headers=$(curl -sI https://getopenstage.it/it || true)
+            if echo "$headers" | grep -qi "^x-frame-options: DENY" \
+              && echo "$headers" | grep -qi "^x-content-type-options: nosniff"; then
+              echo "Produzione aggiornata (tentativo $attempt)."
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "La produzione non ha ancora gli header attesi dopo 10 minuti."
+          exit 1
 
       - name: Smoke sulla produzione
         run: node scripts/smoke.mjs
