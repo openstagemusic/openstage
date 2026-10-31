@@ -35,14 +35,12 @@ const LocationPicker = dynamic(() => import("@/components/dashboard/LocationPick
   ),
 });
 
-const inputClass =
-  "w-full border border-line bg-surface px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-cyan";
-const labelClass =
-  "mb-2 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted";
+const inputClass = "os-field text-sm";
+const labelClass = "os-field-label";
 const primaryButton =
-  "inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
 const secondaryButton =
-  "inline-flex min-h-11 items-center justify-center border border-line px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50";
 
 type EventEditorProps = {
   mode: "create" | "edit";
@@ -625,7 +623,7 @@ export default function EventEditor({
         ) : null}
 
         {!verified ? (
-          <p className="mb-6 border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-sm leading-relaxed text-muted">
+          <p className="mb-6 os-note">
             {t.unverifiedNote}
           </p>
         ) : null}
@@ -749,7 +747,7 @@ export default function EventEditor({
         <SectionHeading step="03" title={t.sectionWhere} />
 
         {linkedVenue ? (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border border-cyan/40 bg-cyan/5 px-4 py-3">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-l-2 border-cyan/60 pl-4">
             <span className="text-sm text-white">
               <span className="text-muted">{t.venueLinked}: </span>
               {linkedVenue.name}
@@ -757,7 +755,7 @@ export default function EventEditor({
             <button
               type="button"
               onClick={unlinkVenue}
-              className="inline-flex min-h-11 items-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+              className="inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
             >
               {t.venueUnlink}
             </button>
@@ -780,7 +778,7 @@ export default function EventEditor({
             </Field>
 
             {results.length > 0 ? (
-              <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface shadow-xl">
+              <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface">
                 {results.map((venue) => (
                   <li key={venue.id}>
                     <button
@@ -806,7 +804,7 @@ export default function EventEditor({
 
         {/* --- Chi suona ------------------------------------------------- */}
         {artistLocked ? (
-          <div className="mt-4 border border-line bg-white/[0.03] px-4 py-3">
+          <div className="mt-4 border-l-2 border-line-strong pl-4">
             <span className="text-sm text-white">
               <span className="text-muted">{t.artistLinked}: </span>
               {artist?.name ?? t.artistYou}
@@ -814,7 +812,7 @@ export default function EventEditor({
             <p className="mt-1 text-xs text-muted">{t.artistLockedHint}</p>
           </div>
         ) : artist ? (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border border-violet/40 bg-violet/5 px-4 py-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-l-2 border-violet/60 pl-4">
             <span className="text-sm text-white">
               <span className="text-muted">{t.artistLinked}: </span>
               {artist.name}
@@ -822,7 +820,7 @@ export default function EventEditor({
             <button
               type="button"
               onClick={unlinkArtist}
-              className="inline-flex min-h-11 items-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+              className="inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
             >
               {t.artistUnlink}
             </button>
@@ -846,7 +844,7 @@ export default function EventEditor({
             </Field>
 
             {artistResults.length > 0 ? (
-              <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface shadow-xl">
+              <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface">
                 {artistResults.map((option) => (
                   <li key={option.id}>
                     <button
@@ -912,7 +910,7 @@ export default function EventEditor({
               />
 
               {showCitySuggestions ? (
-                <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface shadow-xl">
+                <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface">
                   {places.map((place) => (
                     <li key={place.id}>
                       <button
@@ -1145,7 +1143,7 @@ export default function EventEditor({
         </div>
 
         {duplicates.length > 0 ? (
-          <div className="mt-8 border border-cyan/40 bg-cyan/5 p-4">
+          <div className="mt-8 border-l-2 border-cyan/60 pl-4">
             <p className="font-display text-sm font-semibold text-white">{t.duplicatesTitle}</p>
             <p className="mt-1 text-xs text-muted">{t.duplicatesHint}</p>
 
@@ -1153,7 +1151,7 @@ export default function EventEditor({
               {duplicates.map((item) => (
                 <li
                   key={item.id}
-                  className="flex flex-wrap items-center justify-between gap-2 border border-line bg-surface px-3 py-2"
+                  className="flex flex-wrap items-center justify-between gap-2 border-b border-line py-2"
                 >
                   <span className="text-sm text-white">
                     {item.title}

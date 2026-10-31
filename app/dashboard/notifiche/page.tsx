@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { markAllNotificationsReadAction } from "@/app/actions/notifications";
+import DeleteAllNotificationsButton from "@/components/notifications/DeleteAllNotificationsButton";
 import NotificationList from "@/components/notifications/NotificationList";
 import LocaleLink from "@/components/i18n/LocaleLink";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -17,6 +18,7 @@ const TYPES: NotificationType[] = [
   "event_updated",
   "event_reminder",
   "follow_new_event",
+  "booking_message",
   "claim",
   "moderation",
   "system",
@@ -52,10 +54,15 @@ export default async function NotificationsPage({
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.subtitle}</p>
       </header>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-4">
         <LocaleLink
           href="/dashboard/notifiche"
-          className="border border-line px-3 py-2 font-mono text-[9px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+          aria-current={type === null ? "page" : undefined}
+          className={
+            type === null
+              ? "border-b border-cyan pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan"
+              : "border-b border-transparent pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white"
+          }
         >
           {t.filterAll}
         </LocaleLink>
@@ -63,10 +70,11 @@ export default async function NotificationsPage({
           <LocaleLink
             key={item}
             href={`/dashboard/notifiche?type=${item}`}
+            aria-current={type === item ? "page" : undefined}
             className={
               type === item
-                ? "border border-cyan bg-cyan/10 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.12em] text-white"
-                : "border border-line px-3 py-2 font-mono text-[9px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+                ? "border-b border-cyan pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan"
+                : "border-b border-transparent pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white"
             }
           >
             {t.types[item]}
@@ -74,21 +82,27 @@ export default async function NotificationsPage({
         ))}
       </div>
 
-      {hasUnread ? (
-        <form action={markAllNotificationsReadAction} className="mt-5">
-          <button
-            type="submit"
-            className="border border-line px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
-          >
-            {t.markAll}
-          </button>
-        </form>
+      {notifications.length > 0 ? (
+        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+          {hasUnread ? (
+            <form action={markAllNotificationsReadAction}>
+              <button
+                type="submit"
+                className="border-b border-line-strong pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+              >
+                {t.markAll}
+              </button>
+            </form>
+          ) : null}
+
+          <DeleteAllNotificationsButton label={t.deleteAll} confirmLabel={t.confirmDeleteAll} />
+        </div>
       ) : null}
 
       {notifications.length === 0 ? (
-        <section className="mt-8 border border-line bg-surface/60 p-6">
-          <h2 className="font-display text-xl font-semibold">{t.emptyTitle}</h2>
-          <p className="mt-2 text-sm text-muted">{t.emptyText}</p>
+        <section className="mt-8 border-t border-line pt-8">
+          <h2 className="font-poster text-3xl uppercase leading-none">{t.emptyTitle}</h2>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">{t.emptyText}</p>
         </section>
       ) : (
         <div className="mt-6">

@@ -63,7 +63,7 @@ export default function PlaylistSection({
           </div>
 
           <div>
-            <div className="border border-line bg-surface/40 p-3 sm:p-4">
+            <div className="border-t border-line pt-4">
               <div className="flex items-center justify-between gap-3 px-1 pb-3">
                 <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
                   {t.playlistOfficial}

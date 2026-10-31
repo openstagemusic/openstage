@@ -91,7 +91,7 @@ export default function ImageUploadField({
             type="button"
             disabled={busy}
             onClick={() => inputRef.current?.click()}
-            className="inline-flex min-h-10 items-center border border-line px-3 py-2 font-mono text-[9px] uppercase tracking-[0.1em] text-white transition-colors hover:border-cyan/50 hover:text-cyan disabled:opacity-50"
+            className="inline-flex min-h-10 items-center border-b border-line pb-1 font-mono text-[9px] uppercase tracking-[0.1em] text-white transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50"
           >
             {busy ? labels.uploading : labels.choose}
           </button>

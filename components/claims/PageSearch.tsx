@@ -36,7 +36,7 @@ export default function PageSearch({
   const isArtist = kind === "artist";
 
   return (
-    <div className="border border-line bg-surface/40 p-5 sm:p-6">
+    <div className="border-t border-line pt-6">
       <h2 className="font-display text-lg font-semibold">{dict.pageSearchTitle}</h2>
       <p className="mt-2 text-xs leading-relaxed text-muted">
         {isArtist ? dict.pageSearchArtistText : dict.pageSearchVenueText}

@@ -65,7 +65,7 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
       <aside className="hidden w-56 shrink-0 lg:block">
         <nav
           aria-label={dict.menu}
-          className="sticky top-24 border border-line bg-surface/60 p-3"
+          className="sticky top-24 border-t border-line pt-3"
         >
           {list()}
         </nav>
@@ -77,7 +77,7 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
             type="button"
             onClick={() => setOpen(true)}
             aria-expanded={open}
-            className="inline-flex min-h-11 items-center border border-line bg-surface/60 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
           >
             <span className="mr-2 inline-block align-middle" aria-hidden="true">
               ☰
@@ -109,7 +109,7 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex min-h-11 items-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+                className="inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
               >
                 {dict.closeMenu}
               </button>

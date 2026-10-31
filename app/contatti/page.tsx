@@ -20,7 +20,7 @@ type ContactPageProps = {
 const TOPIC_KEYS = ["general", "artist", "venue", "report", "privacy", "other"] as const;
 
 const FIELD =
-  "w-full rounded-none border border-line bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-cyan/70";
+  "os-field text-sm";
 
 export default async function ContactPage({ searchParams }: ContactPageProps) {
   const locale = await getLocale();

@@ -36,12 +36,12 @@ export default async function SavedEventsPage() {
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.savedText}</p>
 
       {saved.length === 0 ? (
-        <section className="mt-8 border border-line bg-surface/60 p-6">
+        <section className="mt-8 border-t border-line pt-8">
           <h2 className="font-display text-xl font-semibold">{t.emptySavedTitle}</h2>
           <p className="mt-2 text-sm text-muted">{t.emptySavedText}</p>
           <LocaleLink
             href="/"
-            className="mt-4 inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
+            className="mt-4 inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
           >
             {dict.events.backToExplore}
           </LocaleLink>

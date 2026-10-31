@@ -28,7 +28,7 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
   const cancelled = isCancelled(event);
 
   return (
-    <article className="group h-full border border-line bg-surface/60 transition-colors hover:border-cyan/50 focus-within:border-cyan/60">
+    <article className="group h-full border-t border-line pt-4 transition-colors">
       <Link
         href={eventPath(event)}
         className="flex h-full flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/40"
@@ -55,7 +55,7 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
               </span>
             ) : null}
             {event.isFree || event.priceText ? (
-              <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+              <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                 {event.isFree ? dict.events.freeEntry : event.priceText}
               </span>
             ) : null}

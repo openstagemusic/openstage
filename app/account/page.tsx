@@ -174,7 +174,7 @@ export default async function AccountPage() {
         ) : null}
 
         {subject ? (
-          <section className="border border-line bg-surface/50 p-5 sm:p-7">
+          <section className="border-t border-line pt-6">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
               <h2 className="font-display text-xl font-semibold">
                 {subject.kind === "artist" ? t.artistTitle : t.venueTitle}
@@ -183,7 +183,7 @@ export default async function AccountPage() {
               {verified ? (
                 <VerifiedBadge label={dict.directory.badgeVerified} />
               ) : (
-                <span className="border border-line-strong px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                   {t.statusPending}
                 </span>
               )}
@@ -247,7 +247,7 @@ export default async function AccountPage() {
         ) : null}
 
         {artist ? null : session.role === "artist" ? (
-          <section className="border border-line bg-surface/40 p-5 sm:p-6">
+          <section className="border-t border-line pt-6">
             <h2 className="font-display text-xl font-semibold">{t.noArtistTitle}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">{t.noArtistText}</p>
             <LocaleLink
@@ -260,7 +260,7 @@ export default async function AccountPage() {
         ) : null}
 
         {venue ? null : session.role === "venue" && !pendingRequest ? (
-          <section className="border border-line bg-surface/40 p-5 sm:p-6">
+          <section className="border-t border-line pt-6">
             <h2 className="font-display text-xl font-semibold">{t.noVenueTitle}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">{t.noVenueText}</p>
             <LocaleLink

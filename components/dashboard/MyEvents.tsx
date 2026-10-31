@@ -27,11 +27,11 @@ type MyEventsProps = {
 };
 
 const primaryButton =
-  "inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 bg-violet-strong px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
 const ghostButton =
-  "inline-flex min-h-11 items-center justify-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50";
 const dangerButton =
-  "inline-flex min-h-11 items-center justify-center border border-pink/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-pink transition-colors hover:bg-pink/10 disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 border-b border-pink/40 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-pink transition-colors hover:border-pink disabled:opacity-50";
 
 /** "I miei eventi": bozze, pubblicati e annullati, con le azioni di ognuno. */
 export default function MyEvents({ events, verified, dict }: MyEventsProps) {
@@ -81,14 +81,14 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
 
   if (events.length === 0) {
     return (
-      <section className="border border-line bg-surface/60 p-6">
-        <h2 className="font-display text-xl font-semibold">{dict.emptyEventsTitle}</h2>
-        <p className="mt-2 text-sm text-muted">{dict.emptyEventsText}</p>
+      <section className="border-t border-line pt-8">
+        <h2 className="font-poster text-3xl uppercase leading-none">{dict.emptyEventsTitle}</h2>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">{dict.emptyEventsText}</p>
         <LocaleLink
           href="/dashboard/events/new"
-          className="mt-4 inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+          className="mt-6 inline-flex min-h-11 items-center gap-2 bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
         >
-          {dict.emptyEventsCta}
+          {dict.emptyEventsCta} <span aria-hidden="true">→</span>
         </LocaleLink>
       </section>
     );
@@ -134,19 +134,19 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
   };
 
   const statusClass: Record<DashboardStatus, string> = {
-    draft: "border-line text-muted",
-    published: "border-cyan/40 bg-cyan/10 text-white",
-    cancelled: "border-pink/40 bg-pink/10 text-white",
+    draft: "text-muted",
+    published: "text-cyan",
+    cancelled: "text-pink",
   };
 
   return (
     <div className="space-y-8">
       {error ? (
-        <p className="border-l-2 border-pink bg-pink/10 px-4 py-3 text-sm text-white">{error}</p>
+        <p className="os-note os-note-pink">{error}</p>
       ) : null}
 
       {!verified ? (
-        <p className="border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-sm leading-relaxed text-muted">
+        <p className="os-note">
           {dict.unverifiedNote}
         </p>
       ) : null}
@@ -157,14 +157,14 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
 
         return (
           <section key={section.key} id={section.key}>
-            <h2 className="font-display text-xl font-semibold">
+            <h2 className="font-poster text-xl uppercase leading-none tracking-[-0.01em]">
               {section.label}{" "}
               <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                 ({list.length})
               </span>
             </h2>
 
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 border-t border-line">
               {list.map((event) => {
                 const when = formatEventDate(event.startsAt, event.timezone, locale);
                 const where = [placeName(event), event.city].filter(Boolean).join(" · ");
@@ -172,13 +172,13 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                 const archived = event.status === "published" && isPast(event);
 
                 return (
-                  <article key={event.id} className="border border-line bg-surface/60 p-4">
+                  <article key={event.id} className="border-b border-line py-5">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <h3 className="font-display text-base font-semibold">{event.title}</h3>
                       <span
                         className={cn(
-                          "border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
-                          archived ? "border-line text-muted" : statusClass[event.status]
+                          "font-mono text-[9px] uppercase tracking-[0.12em]",
+                          archived ? "text-muted" : statusClass[event.status]
                         )}
                       >
                         {archived ? dict.statusPast : statusLabel[event.status]}
@@ -204,7 +204,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                       <p className="mt-1 text-xs text-muted">{dict.pastNote}</p>
                     ) : null}
 
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
                       <LocaleLink href={`/dashboard/events/${event.id}`} className={ghostButton}>
                         {dict.edit}
                       </LocaleLink>
@@ -279,7 +279,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                     </div>
 
                     {cancellingId === event.id ? (
-                      <div className="mt-3 border border-line bg-white/[0.03] p-3">
+                      <div className="mt-4 border-l-2 border-line-strong pl-4">
                         <label
                           htmlFor={`cancel-reason-${event.id}`}
                           className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted"
@@ -289,14 +289,14 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
 
                         <textarea
                           id={`cancel-reason-${event.id}`}
-                          className="mt-2 w-full border border-line bg-surface px-3 py-2 text-sm text-white outline-none focus:border-cyan/60"
+                          className="os-field mt-2"
                           rows={2}
                           maxLength={CANCEL_REASON_MAX}
                           value={reason}
                           onChange={(changeEvent) => setReason(changeEvent.target.value)}
                         />
 
-                        <div className="mt-2 flex flex-wrap gap-2">
+                        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
                           <button
                             type="button"
                             disabled={busy !== null}

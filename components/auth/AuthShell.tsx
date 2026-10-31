@@ -60,7 +60,7 @@ export default function AuthShell({
         </div>
 
         <div className="w-full justify-self-end lg:max-w-md">
-          <div className="border border-line bg-surface/70 p-5 sm:p-7">{children}</div>
+          <div className="border-t border-line pt-6">{children}</div>
           {footer ? <div className="mt-5 text-sm text-muted">{footer}</div> : null}
         </div>
       </div>

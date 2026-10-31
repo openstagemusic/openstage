@@ -60,7 +60,7 @@ export default function EventCountdown({ startsAt, labels, className }: EventCou
   return (
     <p
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-cyan/40 bg-cyan/10 px-3 py-1.5 text-xs font-medium text-cyan",
+        "inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan",
         className
       )}
     >

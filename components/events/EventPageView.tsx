@@ -122,7 +122,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       {/* La notizia prima della locandina: chi apre il link deve sapere subito
           che la serata non si tiene, senza leggere il poster per intero. */}
       {cancelled ? (
-        <section className="mt-6 border-l-2 border-pink bg-pink/10 px-4 py-4">
+        <section className="mt-6 os-note os-note-pink">
           <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-pink">
             {t.cancelledBadge}
           </p>
@@ -156,16 +156,16 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
 
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="border border-violet/40 bg-violet/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white">
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-violet">
               {kindLabel}
             </span>
             {event.genre ? (
-              <span className="border border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                 {event.genre}
               </span>
             ) : null}
             {priceLabel ? (
-              <span className="border border-cyan/40 bg-cyan/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white">
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
                 {priceLabel}
               </span>
             ) : null}
@@ -288,13 +288,13 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
       ) : null}
 
       {event.locationPrecision === "approximate" ? (
-        <p className="mt-6 border-l-2 border-cyan/60 bg-cyan/5 px-4 py-3 text-xs leading-relaxed text-cyan">
+        <p className="mt-6 os-note os-note-cyan">
           {t.approximateNote}
         </p>
       ) : null}
 
       {event.isUnclaimed ? (
-        <p className="mt-4 border-l-2 border-line-strong bg-white/[0.03] px-4 py-3 text-xs leading-relaxed text-muted">
+        <p className="mt-4 os-note">
           {t.unclaimedNote}
         </p>
       ) : null}
@@ -305,7 +305,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             href={event.ticketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full border border-violet-strong bg-violet-strong px-5 py-3 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan sm:w-auto"
+            className="w-full bg-violet-strong px-5 py-3 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan sm:w-auto"
           >
             {t.tickets}
           </a>
@@ -320,7 +320,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
             initiallySaved={savedIds.has(event.id)}
             isAuthenticated={Boolean(session)}
             labels={{ save: t.save, saved: t.saved, loginToSave: t.loginToSave, pending: t.saving }}
-            className="w-full justify-center px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em] sm:w-auto"
+            className="justify-center px-0 font-mono text-[11px] sm:w-auto"
           />
         )}
 

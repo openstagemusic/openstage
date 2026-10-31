@@ -19,14 +19,14 @@ export default function NeedsPageNotice({
   const artist = role === "artist";
 
   return (
-    <div className="border border-line bg-surface/50 p-5 sm:p-6">
+    <div className="border-t border-line pt-6">
       <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-pink">
         {dict.noPageTitle}
       </p>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{dict.noPageText}</p>
       <LocaleLink
         href={artist ? "/onboarding/artist" : "/onboarding/venue"}
-        className="mt-5 inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 bg-violet-strong px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
       >
         {artist ? dict.noPageArtistCta : dict.noPageVenueCta}
       </LocaleLink>

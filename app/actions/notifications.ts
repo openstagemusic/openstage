@@ -37,8 +37,7 @@ export async function markNotificationReadAction(formData: FormData): Promise<vo
 }
 
 /** “Segna tutte come lette”: una sola query, nessuna email. */
-export async function markAllNotificationsReadAction(): Promise<void> {
-  const session = await getSessionProfile();
+export async function markAllNotificationsReadAction(): Promise<void> {  const session = await getSessionProfile();
   if (!session) return;
 
   const supabase = await createClient();
@@ -50,6 +49,45 @@ export async function markAllNotificationsReadAction(): Promise<void> {
 
   if (error) {
     console.error("[notifications] mark all read:", error.message);
+    return;
+  }
+
+  refresh();
+}
+
+/** Cancella una notifica. La RLS permette solo le proprie. */
+export async function deleteNotificationAction(formData: FormData): Promise<void> {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const session = await getSessionProfile();
+  if (!session) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("notifications")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", session.id);
+
+  if (error) {
+    console.error("[notifications] delete:", error.message);
+    return;
+  }
+
+  refresh();
+}
+
+/** Svuota lo storico delle notifiche del profilo. */
+export async function deleteAllNotificationsAction(): Promise<void> {
+  const session = await getSessionProfile();
+  if (!session) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("notifications").delete().eq("user_id", session.id);
+
+  if (error) {
+    console.error("[notifications] delete all:", error.message);
     return;
   }
 

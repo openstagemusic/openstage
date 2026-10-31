@@ -8,7 +8,7 @@ import LocaleLink from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
 const inputClass =
-  "w-full border border-line bg-surface px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-cyan";
+  "os-field";
 
 /**
  * Cosa vede chi arriva sulla scheda di un artista o di un locale che non è suo:
@@ -202,7 +202,7 @@ export default function ClaimPanel({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+                className="inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
               >
                 {dict.cancel}
               </button>

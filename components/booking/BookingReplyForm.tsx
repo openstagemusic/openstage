@@ -50,7 +50,7 @@ export default function BookingReplyForm({
         maxLength={2000}
         value={body}
         onChange={(event) => setBody(event.target.value)}
-        className="mt-2 w-full border border-line bg-bg px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-cyan"
+        className="os-field mt-2"
       />
 
       {error ? (

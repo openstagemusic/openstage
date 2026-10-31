@@ -7,6 +7,7 @@ export type NotificationType =
   | "event_updated"
   | "event_reminder"
   | "follow_new_event"
+  | "booking_message"
   | "claim"
   | "moderation"
   | "system";

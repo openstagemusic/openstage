@@ -73,91 +73,92 @@ export default function DirectoryFilters({
   };
 
   const selectClass =
-    "min-h-11 border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white outline-none transition-colors hover:border-line-strong focus:border-cyan";
+    "os-field min-h-11 w-full min-w-0 font-mono text-[10px] uppercase tracking-[0.12em] text-white sm:w-auto sm:min-w-[9rem]";
 
   return (
     <form
       onSubmit={submit}
       role="search"
-      className={cn("border border-line bg-surface/60 p-3", className)}
+      className={cn(
+        "flex flex-col gap-4 border-t border-line pt-4 sm:flex-row sm:flex-wrap sm:items-end sm:gap-6",
+        className
+      )}
     >
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="flex min-h-11 min-w-0 flex-1 items-center gap-2 border border-line bg-bg px-3 py-2 focus-within:border-cyan">
-          <span aria-hidden="true" className="text-muted">
-            ⌕
-          </span>
-          <label htmlFor="directory-q" className="sr-only">
-            {t.searchLabel}
-          </label>
-          <input
-            id="directory-q"
-            type="search"
-            autoComplete="off"
-            placeholder={placeholder}
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-            className="w-full bg-transparent text-sm text-white outline-none placeholder:text-muted"
-          />
-        </div>
-
-        <label htmlFor="directory-city" className="sr-only">
-          {t.city}
+      <div className="flex min-h-11 min-w-0 flex-1 items-center gap-2 border-b border-line pb-1 transition-colors focus-within:border-cyan">
+        <span aria-hidden="true" className="text-muted">
+          ⌕
+        </span>
+        <label htmlFor="directory-q" className="sr-only">
+          {t.searchLabel}
         </label>
-        <select
-          id="directory-city"
-          value={city}
-          onChange={(event) => apply({ city: event.target.value || null })}
-          className={selectClass}
-        >
-          <option value="">{t.cityAll}</option>
-          {cities.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-
-        {genres ? (
-          <>
-            <label htmlFor="directory-genre" className="sr-only">
-              {t.genre}
-            </label>
-            <select
-              id="directory-genre"
-              value={genre}
-              onChange={(event) => apply({ genre: event.target.value || null })}
-              className={selectClass}
-            >
-              <option value="">{t.genreAll}</option>
-              {genres.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </>
-        ) : null}
-
-        <button
-          type="submit"
-          className="min-h-11 border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
-        >
-          {t.apply}
-        </button>
-
-        {active ? (
-          <button
-            type="button"
-            onClick={() => {
-              setValue("");
-              apply({ q: null, city: null, genre: null });
-            }}
-            className="min-h-11 border border-line px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
-          >
-            {t.reset}
-          </button>
-        ) : null}
+        <input
+          id="directory-q"
+          type="search"
+          autoComplete="off"
+          placeholder={placeholder}
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          className="w-full bg-transparent py-2 text-sm text-white outline-none placeholder:text-muted/70"
+        />
       </div>
+
+      <label htmlFor="directory-city" className="sr-only">
+        {t.city}
+      </label>
+      <select
+        id="directory-city"
+        value={city}
+        onChange={(event) => apply({ city: event.target.value || null })}
+        className={selectClass}
+      >
+        <option value="">{t.cityAll}</option>
+        {cities.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+
+      {genres ? (
+        <>
+          <label htmlFor="directory-genre" className="sr-only">
+            {t.genre}
+          </label>
+          <select
+            id="directory-genre"
+            value={genre}
+            onChange={(event) => apply({ genre: event.target.value || null })}
+            className={selectClass}
+          >
+            <option value="">{t.genreAll}</option>
+            {genres.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </>
+      ) : null}
+
+      <button
+        type="submit"
+        className="min-h-11 bg-violet-strong px-5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+      >
+        {t.apply}
+      </button>
+
+      {active ? (
+        <button
+          type="button"
+          onClick={() => {
+            setValue("");
+            apply({ q: null, city: null, genre: null });
+          }}
+          className="min-h-11 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+        >
+          {t.reset}
+        </button>
+      ) : null}
     </form>
   );
 }

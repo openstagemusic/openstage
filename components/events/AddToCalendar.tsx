@@ -24,7 +24,7 @@ type AddToCalendarProps = {
 export default function AddToCalendar({ googleUrl, icsUrl, labels, className }: AddToCalendarProps) {
   return (
     <details className={cn("relative", className)}>
-      <summary className="flex w-full cursor-pointer list-none items-center justify-center gap-2 border border-line bg-white/[0.03] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan/50 hover:text-cyan [&::-webkit-details-marker]:hidden">
+      <summary className="flex w-full cursor-pointer list-none items-center justify-center gap-2 border-b border-line pb-1 font-mono text-[11px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan [&::-webkit-details-marker]:hidden">
         <span aria-hidden="true">＋</span>
         {labels.add}
       </summary>

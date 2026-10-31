@@ -620,6 +620,85 @@ html.spotify-collapsed body:has(.spotify-dock) {
 }
 
 
+/* ---------------------------------------------------------------------------
+   Campi editoriali.
+   La riga sotto al campo basta: niente scatole, niente sfondo, niente ombre.
+   Vale per tutti i moduli (account, eventi, filtri, messaggi).
+   --------------------------------------------------------------------------- */
+.os-field {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.55rem 0;
+  color: var(--color-foreground);
+  outline: none;
+  transition: border-color 0.15s var(--ease-out-expo);
+}
+
+.os-field::placeholder {
+  color: color-mix(in srgb, var(--color-muted) 65%, transparent);
+}
+
+.os-field:hover {
+  border-bottom-color: var(--color-line-strong);
+}
+
+.os-field:focus,
+.os-field:focus-visible {
+  border-bottom-color: var(--color-cyan);
+  outline: none;
+}
+
+.os-field:disabled {
+  opacity: 0.55;
+}
+
+textarea.os-field {
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+select.os-field {
+  cursor: pointer;
+}
+
+/* Le tendine native restano leggibili sul fondo scuro. */
+.os-field option {
+  background: var(--color-surface);
+  color: var(--color-foreground);
+}
+
+.os-field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Avvisi: un filo colorato a sinistra, nessun riquadro pieno. */
+.os-note {
+  border-left: 2px solid var(--color-line-strong);
+  padding-left: 0.85rem;
+  font-size: 0.825rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.os-note-cyan {
+  border-left-color: var(--color-cyan);
+  color: var(--color-foreground);
+}
+
+.os-note-pink {
+  border-left-color: var(--color-pink);
+  color: var(--color-pink);
+}
+
 /* EPK: la pagina deve restare leggibile quando si stampa o si salva in PDF. */
 @media print {
   body,

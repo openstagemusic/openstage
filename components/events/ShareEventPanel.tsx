@@ -223,7 +223,7 @@ export default function ShareEventPanel({
         type="button"
         onClick={openPanel}
         className={cn(
-          "inline-flex items-center justify-center gap-2 border border-line bg-white/[0.03] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan/50 hover:text-cyan",
+          "inline-flex items-center justify-center gap-2 border-b border-line pb-1 font-mono text-[11px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan",
           className
         )}
       >

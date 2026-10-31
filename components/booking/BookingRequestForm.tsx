@@ -7,7 +7,7 @@ import { startBookingThreadAction } from "@/app/actions/booking";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
 const inputClass =
-  "mt-2 w-full border border-line bg-bg px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted focus:border-cyan";
+  "os-field mt-2";
 const labelClass = "font-mono text-[9px] uppercase tracking-[0.14em] text-muted";
 
 export default function BookingRequestForm({

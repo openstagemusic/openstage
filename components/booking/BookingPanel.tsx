@@ -56,7 +56,7 @@ export default function BookingPanel({
           !isAuthenticated ? (
             <LocaleLink
               href={`/login?next=${encodeURIComponent(subjectPath)}`}
-              className="inline-flex min-h-11 shrink-0 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+              className="inline-flex min-h-11 shrink-0 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
             >
               {dict.login}
             </LocaleLink>

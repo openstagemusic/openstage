@@ -88,7 +88,7 @@ export default function ReportEventButton({
   }
 
   return (
-    <div className="w-full border border-line bg-white/[0.03] p-4">
+    <div className="w-full border-l-2 border-line-strong pl-4">
       <p className="font-display text-sm font-semibold text-white">{labels.title}</p>
       <p className="mt-1 text-xs text-muted">{labels.hint}</p>
 
@@ -99,7 +99,7 @@ export default function ReportEventButton({
         id="report-reason"
         value={reason}
         onChange={(event) => setReason(event.target.value)}
-        className="mt-1 w-full border border-line bg-surface px-3 py-2.5 text-sm text-white outline-none focus:border-cyan/60"
+        className="os-field mt-1"
       >
         {Object.entries(labels.reasons).map(([value, text]) => (
           <option key={value} value={value}>
@@ -118,7 +118,7 @@ export default function ReportEventButton({
         maxLength={500}
         rows={3}
         placeholder={labels.notePlaceholder}
-        className="mt-1 w-full border border-line bg-surface px-3 py-2.5 text-sm text-white outline-none focus:border-cyan/60"
+        className="os-field mt-1"
       />
 
       {error ? <p className="mt-2 text-xs text-pink">{error}</p> : null}

@@ -67,10 +67,10 @@ export default function SaveEventButton({
       disabled={pending}
       aria-pressed={saved}
       className={cn(
-        "inline-flex items-center gap-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors disabled:opacity-60",
+        "inline-flex items-center gap-2 border-b pb-1 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors disabled:opacity-60",
         saved
-          ? "border-pink/50 bg-pink/10 text-white"
-          : "border-line text-muted hover:border-line-strong hover:text-white",
+          ? "border-pink/50 text-pink"
+          : "border-line text-muted hover:border-cyan hover:text-cyan",
         className
       )}
     >

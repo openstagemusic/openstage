@@ -45,7 +45,7 @@ export default async function ForYouPage() {
       <div className="mt-6 flex flex-wrap gap-2">
         <LocaleLink
           href="/dashboard/notifiche"
-          className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
+          className="inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
         >
           {t.forYouNotifications}
         </LocaleLink>
@@ -119,7 +119,7 @@ export default async function ForYouPage() {
       <h2 className="mt-10 font-display text-2xl font-semibold">{t.forYouUpcoming}</h2>
 
       {upcoming.length === 0 ? (
-        <section className="mt-5 border border-line bg-surface/60 p-6">
+        <section className="mt-5 border-t border-line pt-8">
           <h3 className="font-display text-lg font-semibold">{t.forYouEmptyTitle}</h3>
           <p className="mt-2 text-sm text-muted">{t.forYouEmptyText}</p>
           <LocaleLink

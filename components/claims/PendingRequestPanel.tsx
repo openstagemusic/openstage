@@ -62,7 +62,7 @@ export default function PendingRequestPanel({
 
   if (done) {
     return (
-      <section className="border border-line bg-surface/40 p-5 sm:p-6">
+      <section className="border-t border-line pt-6">
         <h2 className="font-display text-xl font-semibold">{dict.pendingTitle}</h2>
         <p className="mt-2 text-sm text-cyan">{dict.withdrawn}</p>
       </section>
@@ -89,7 +89,7 @@ export default function PendingRequestPanel({
         type="button"
         onClick={handleWithdraw}
         disabled={busy}
-        className="mt-4 inline-flex min-h-11 items-center justify-center border border-line-strong px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white disabled:opacity-50"
+        className="mt-4 inline-flex min-h-11 items-center justify-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50"
       >
         {busy ? dict.withdrawing : dict.withdraw}
       </button>

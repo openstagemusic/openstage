@@ -193,7 +193,7 @@ export default function RegisterForm({
           aria-labelledby="check-email-title"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-sm border border-line bg-surface p-6 shadow-2xl shadow-black/40">
+          <div className="w-full max-w-sm border-l-2 border-cyan/60 pl-4">
             <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
               OpenStage
             </p>

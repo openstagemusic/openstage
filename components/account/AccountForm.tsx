@@ -392,7 +392,7 @@ export default function AccountForm({
           </div>
 
           <div className="border-t border-line pt-5">
-            <h3 className="font-display text-lg font-semibold">{dict.imagesTitle}</h3>
+            <h3 className="font-poster text-xl uppercase leading-none tracking-[-0.01em]">{dict.imagesTitle}</h3>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.imagesText}</p>
 
             <div className="mt-4 space-y-5">
@@ -426,7 +426,7 @@ export default function AccountForm({
           </div>
 
           <div className="border-t border-line pt-5">
-            <h3 className="font-display text-lg font-semibold">{dict.epkTitle}</h3>
+            <h3 className="font-poster text-xl uppercase leading-none tracking-[-0.01em]">{dict.epkTitle}</h3>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.epkText}</p>
 
             <div className="mt-4 space-y-5">
@@ -521,7 +521,7 @@ export default function AccountForm({
           </div>
 
           <div className="border-t border-line pt-5">
-            <h3 className="font-display text-lg font-semibold">{dict.imagesTitle}</h3>
+            <h3 className="font-poster text-xl uppercase leading-none tracking-[-0.01em]">{dict.imagesTitle}</h3>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.imagesText}</p>
 
             <div className="mt-4 space-y-5">
@@ -558,7 +558,7 @@ export default function AccountForm({
 
       {socialFields.length > 0 ? (
         <section className="border-t border-line pt-5">
-          <h3 className="font-display text-lg font-semibold">{dict.linksTitle}</h3>
+          <h3 className="font-poster text-xl uppercase leading-none tracking-[-0.01em]">{dict.linksTitle}</h3>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{dict.linksText}</p>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -589,7 +589,7 @@ export default function AccountForm({
 
       {artist ? (
         <section className="border-t border-line pt-5">
-          <h3 className="font-display text-lg font-semibold">{dict.playlistTrackTitle}</h3>
+          <h3 className="font-poster text-xl uppercase leading-none tracking-[-0.01em]">{dict.playlistTrackTitle}</h3>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
             {dict.playlistTrackText}
           </p>

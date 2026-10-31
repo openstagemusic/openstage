@@ -55,10 +55,10 @@ export default function EpkPhotoField({
           <img
             src={value}
             alt=""
-            className="h-28 w-28 border border-line object-cover"
+            className="h-28 w-28 rounded-full border border-line object-cover"
           />
         ) : (
-          <div className="flex h-28 w-28 items-center justify-center border border-line bg-surface/40 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-line bg-surface/40 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
             EPK
           </div>
         )}
@@ -75,7 +75,7 @@ export default function EpkPhotoField({
             type="button"
             disabled={busy}
             onClick={() => inputRef.current?.click()}
-            className="inline-flex min-h-10 items-center border border-line px-3 py-2 font-mono text-[9px] uppercase tracking-[0.1em] text-white transition-colors hover:border-cyan/50 hover:text-cyan disabled:opacity-50"
+            className="inline-flex min-h-10 items-center border-b border-line pb-1 font-mono text-[9px] uppercase tracking-[0.1em] text-white transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50"
           >
             {busy ? labels.uploading : value ? labels.choose : labels.choose}
           </button>

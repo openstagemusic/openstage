@@ -86,6 +86,15 @@
 - Restyling: schede directory come poster, navbar senza pulsanti scatolati, un solo primario
   per vista (`components/ui/actions.ts`).
 
+**Passata di linguaggio visivo (31 ottobre 2026)**
+
+- Campi editoriali condivisi (`.os-field`, `.os-field-label`, `.os-note`): riga sotto al campo,
+  niente scatole né sfondi. Valgono per account, creazione evento, filtri, booking, contatti.
+- Riquadri tolti da: dashboard e sottomenu (i miei eventi, preferiti, per te, messaggi,
+  impostazioni), account, scheda evento, claim, notifiche, pagine legali, login/registrazione.
+- Schede e azioni: i pulsanti secondari sono link sottolineati; resta un solo primario per vista.
+- Control room admin lasciata com'è (richiesta esplicita).
+
 **Resta da fare (11B.2b):** widget programmazione, export di eventi e programmazione, promemoria
 booking.
 

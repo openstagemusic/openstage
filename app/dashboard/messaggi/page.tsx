@@ -65,7 +65,7 @@ export default async function MessagesPage() {
           <p className="text-sm leading-relaxed text-muted">{t.inboxEmpty}</p>
           <LocaleLink
             href="/artisti"
-            className="mt-4 inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan/50 hover:text-cyan"
+            className="mt-4 inline-flex min-h-11 items-center gap-2 bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
           >
             {t.inboxCta} <span aria-hidden="true">→</span>
           </LocaleLink>
