@@ -170,6 +170,8 @@ export default async function RootLayout({
               title={dict.spotify.embedTitle}
               collapseLabel={dict.spotify.playerCollapse}
               expandLabel={dict.spotify.playerExpand}
+              enableLabel={dict.spotify.playerEnable}
+              enableHint={dict.spotify.playerEnableHint}
             />
           ) : null}
         </LocaleProvider>

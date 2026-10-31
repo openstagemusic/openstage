@@ -25,6 +25,17 @@ npm run manuale -- --anteprima  # rigenera anche docs/manuale/anteprima.html
 Le variabili principali sono Supabase, Turnstile, Resend e la coda email, Telegram (due bot:
 code admin e attività), URL del sito e, facoltativamente, Spotify e Photon.
 
+
+## Privacy e dati
+
+- Testi legali reali in `lib/legal/content.ts`, mostrati da `/privacy`, `/terms`, `/cookies`.
+- Titolare: `OpenStage — Francesco Sorrentino` (dicitura da confermare); contatto `ciao@getopenstage.it`.
+- Cookie: solo tecnici (sessione, lingua, ritorno OAuth, preferenza player). Nessun banner perché
+  non ci sono cookie di profilazione.
+- Il player Spotify è **click-to-load**: nessun iframe di terze parti prima del consenso.
+- Export dati: `/dashboard/impostazioni/esporta` (JSON).
+- Cancellazione account: `/dashboard/impostazioni`, conferma scritta `ELIMINA`. Le FK `set null`
+  proteggono schede, thread e messaggi delle altre persone; le serate restano online.
 ## Struttura
 
 | Percorso | Contenuto |

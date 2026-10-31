@@ -5,35 +5,55 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "openstage:spotify-collapsed";
+const ENABLED_KEY = "openstage:spotify-enabled";
 
 /**
  * Player Spotify persistente.
  *
- * Vive nel layout: cambiando pagina l'iframe non viene smontato e la musica
- * continua. Il pulsante a destra lo riduce a icona senza interrompere l'audio
- * (l'iframe resta montato, cambia solo la visibilità). La scelta è ricordata
- * nel browser.
+ * Il player è un contenuto di terze parti: **non si carica da solo**. Finché
+ * non premi «Attiva il player» non parte nessuna richiesta verso Spotify,
+ * quindi nessun cookie o storage di terze parti al primo caricamento. La scelta
+ * resta nel browser; da lì in poi il player vive nel layout e la musica continua
+ * cambiando pagina.
+ *
+ * Il pulsante a destra lo riduce a icona senza interrompere l'audio (l'iframe
+ * resta montato, cambia solo la visibilità).
  */
 export default function SpotifyPlayerDock({
   embedUrl,
   title,
   collapseLabel,
   expandLabel,
+  enableLabel,
+  enableHint,
 }: {
   embedUrl: string | null;
   title: string;
   collapseLabel: string;
   expandLabel: string;
+  enableLabel: string;
+  enableHint: string;
 }) {
+  const [enabled, setEnabled] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
+    setEnabled(window.localStorage.getItem(ENABLED_KEY) === "1");
     const saved = window.localStorage.getItem(STORAGE_KEY) === "1";
     setCollapsed(saved);
     document.documentElement.classList.toggle("spotify-collapsed", saved);
 
     return () => document.documentElement.classList.remove("spotify-collapsed");
   }, []);
+
+  function activate() {
+    try {
+      window.localStorage.setItem(ENABLED_KEY, "1");
+    } catch {
+      // Storage bloccato: il player vale solo per questa pagina.
+    }
+    setEnabled(true);
+  }
 
   function update(next: boolean) {
     setCollapsed(next);
@@ -47,6 +67,34 @@ export default function SpotifyPlayerDock({
 
   if (!embedUrl) {
     return null;
+  }
+
+  // Consenso al contenuto di terze parti: barra sobria, nessun iframe.
+  if (!enabled) {
+    return (
+      <div className="spotify-dock fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 backdrop-blur print:hidden">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <p className="max-w-xl font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+            {enableHint}
+          </p>
+          <button
+            type="button"
+            onClick={activate}
+            className="inline-flex min-h-10 items-center gap-2 border-b border-line-strong pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-3.5 w-3.5"
+              fill="currentColor"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            {enableLabel}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

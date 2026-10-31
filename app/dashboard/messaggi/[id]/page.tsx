@@ -168,7 +168,7 @@ export default async function BookingThreadPage({
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-cyan">
-                    {mine ? t.you : thread.counterpartName}
+                    {mine ? t.you : message.senderId ? thread.counterpartName : t.deletedAccount}
                   </span>
                   <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
                     {date.format(new Date(message.createdAt))}

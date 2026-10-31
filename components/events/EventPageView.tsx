@@ -10,7 +10,6 @@ import SaveEventButton from "@/components/map/SaveEventButton";
 import { cityPath } from "@/lib/cities/paths";
 import { googleCalendarUrl } from "@/lib/events/calendar";
 import {
-  formatEventDate,
   formatEventDateLong,
   formatEventRange,
   formatEventRangeLong,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import DeleteAccountForm from "@/components/account/DeleteAccountForm";
 import PreferencesForm from "@/components/notifications/PreferencesForm";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -31,6 +32,32 @@ export default async function NotificationSettingsPage() {
       </header>
 
       <PreferencesForm preferences={preferences} dict={t} />
+
+      <section className="mt-12 border-t border-line pt-6">
+        <h2 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em]">
+          {dict.accountDanger.dataTitle}
+        </h2>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+          {dict.accountDanger.dataText}
+        </p>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a
+          href="/dashboard/impostazioni/esporta"
+          className="mt-4 inline-flex min-h-11 items-center gap-2 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
+        >
+          {dict.accountDanger.exportCta} <span aria-hidden="true">↓</span>
+        </a>
+      </section>
+
+      <section className="mt-12 border-t border-pink/30 pt-6">
+        <h2 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em] text-pink">
+          {dict.accountDanger.deleteTitle}
+        </h2>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+          {dict.accountDanger.deleteText}
+        </p>
+        <DeleteAccountForm dict={dict.accountDanger} />
+      </section>
     </div>
   );
 }
