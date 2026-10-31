@@ -260,7 +260,25 @@ async function main() {
     console.log(`${mark} ${item.name.padEnd(width)} ${item.detail}`);
   }
 
+  const failedItems = results.filter((item) => !item.ok);
   console.log(`\n${results.length - failed}/${results.length} controlli superati.`);
+
+  // Su GitHub Actions il file di riepilogo rende leggibile un fallimento anche
+  // senza aprire i log (che richiedono l'accesso al repository).
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (summaryPath) {
+    const lines = failedItems.length
+      ? [
+          `### Smoke: ${failedItems.length} controlli falliti su ${results.length}`,
+          "",
+          "| Controllo | Dettaglio |",
+          "| --- | --- |",
+          ...failedItems.map((item) => `| \`${item.name}\` | ${item.detail.replace(/\|/g, "\\|")} |`),
+        ]
+      : [`### Smoke: ${results.length}/${results.length} controlli superati`];
+    fs.appendFileSync(summaryPath, `${lines.join("\n")}\n`, "utf8");
+  }
+
   if (failed > 0) process.exit(1);
 }
 

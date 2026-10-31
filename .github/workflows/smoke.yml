@@ -10,6 +10,9 @@ name: Smoke
 # Su `push` il deploy di Vercel parte nello stesso momento: prima di misurare si
 # aspetta che la produzione serva la build nuova (gli header di sicurezza sono il
 # segnale più semplice: ci sono da questa versione in poi).
+#
+# I controlli falliti finiscono nel riepilogo del job, così si leggono senza
+# aprire i log.
 
 on:
   push:
@@ -26,7 +29,7 @@ concurrency:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -38,12 +41,13 @@ jobs:
       - name: Installa le dipendenze
         run: npm ci --ignore-scripts
 
-      - name: Chrome del runner
+      - name: Chrome per Puppeteer
         run: |
-          if [ ! -x /usr/bin/google-chrome ]; then
-            sudo apt-get update && sudo apt-get install -y google-chrome-stable
-          fi
-          google-chrome --version
+          npx --yes @puppeteer/browsers install chrome@stable --path "$RUNNER_TEMP/chrome"
+          CHROME_BIN=$(find "$RUNNER_TEMP/chrome" -type f -name chrome -perm -u+x | head -n 1)
+          echo "CHROME_PATH=$CHROME_BIN" >> "$GITHUB_ENV"
+          echo "Chrome: $CHROME_BIN"
+          "$CHROME_BIN" --version
 
       - name: Aspetta che la produzione serva la build nuova
         if: github.event_name == 'push'
@@ -64,5 +68,4 @@ jobs:
         run: node scripts/smoke.mjs
         env:
           BASE_URL: https://getopenstage.it
-          CHROME_PATH: /usr/bin/google-chrome
           SMOKE_TIMEOUT_MS: "60000"
