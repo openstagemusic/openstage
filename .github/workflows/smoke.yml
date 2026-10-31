@@ -1,0 +1,49 @@
+name: Smoke
+
+# Il test che deve restare verde: le pagine pubbliche rispondono, hanno titolo e
+# h1, la lingua giusta e nessun errore in console (idratazione compresa).
+#
+# Non fa login e non pubblica niente: quelle prove si fanno a mano nel beta test.
+# Gira **contro la produzione**, quindi non ha bisogno di segreti: se
+# getopenstage.it è rotta, il workflow diventa rosso.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Ogni mattina alle 06:00 UTC: un sito che si sveglia rotto si scopre così.
+    - cron: "0 6 * * *"
+
+concurrency:
+  group: smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installa le dipendenze
+        run: npm ci --ignore-scripts
+
+      - name: Chrome del runner
+        run: |
+          if [ ! -x /usr/bin/google-chrome ]; then
+            sudo apt-get update && sudo apt-get install -y google-chrome-stable
+          fi
+          google-chrome --version
+
+      - name: Smoke sulla produzione
+        run: node scripts/smoke.mjs
+        env:
+          BASE_URL: https://getopenstage.it
+          CHROME_PATH: /usr/bin/google-chrome
+          SMOKE_TIMEOUT_MS: "60000"

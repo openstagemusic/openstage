@@ -5,6 +5,7 @@ import { listCityDirectory } from "@/lib/cities/queries";
 import { listArtists, listVenues } from "@/lib/directory/queries";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listEvents } from "@/lib/events/queries";
+import { listPublishedHelpSlugs } from "@/lib/help/queries";
 import type { Locale } from "@/lib/i18n/config";
 import { getSiteUrl } from "@/lib/seo/site";
 import { listPublishedPlaylists } from "@/lib/spotify/queries";
@@ -36,7 +37,7 @@ const STATIC_PATHS = [
   "/per-le-venue",
   "/about",
   "/contatti",
-  "/faq",
+  "/aiuto",
   "/privacy",
   "/terms",
   "/cookies",
@@ -60,12 +61,13 @@ function entry(path: string, lastModified?: Date): MetadataRoute.Sitemap[number]
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [artists, venues, events, cities, playlists] = await Promise.all([
+  const [artists, venues, events, cities, playlists, help] = await Promise.all([
     listArtists({ perPage: MAX_PER_SECTION }),
     listVenues({ perPage: MAX_PER_SECTION }),
     listEvents({ perPage: MAX_PER_SECTION }),
     listCityDirectory(),
     listPublishedPlaylists(),
+    listPublishedHelpSlugs(),
   ]);
 
   return [
@@ -80,5 +82,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((city) => city.indexable)
       .map((city) => entry(cityPath(city.label), new Date(city.nextEventAt ?? Date.now()))),
     ...events.events.map((event) => entry(eventPath(event), new Date(event.startsAt))),
+    // Le guide del centro assistenza sono contenuto pubblico: entrano nella mappa.
+    ...help.map((article) =>
+      entry(`/aiuto/${article.slug}`, article.updatedAt ? new Date(article.updatedAt) : undefined)
+    ),
   ];
 }

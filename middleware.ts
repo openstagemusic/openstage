@@ -51,6 +51,15 @@ export async function middleware(request: NextRequest) {
     response.cookies.set(LOCALE_COOKIE, locale, LOCALE_COOKIE_OPTIONS);
   }
 
+  // Incorniciamento: le pagine normali non si mettono in un iframe altrui
+  // (clickjacking); il widget è nato per stare dentro un `<iframe>`, quindi lì
+  // la regola si ribalta. Il resto degli header di sicurezza sta in `next.config.ts`.
+  if (rest === "/widget" || rest.startsWith("/widget/")) {
+    response.headers.set("Content-Security-Policy", "frame-ancestors *");
+  } else {
+    response.headers.set("X-Frame-Options", "DENY");
+  }
+
   return response;
 }
 

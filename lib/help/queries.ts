@@ -311,3 +311,25 @@ export async function getAdminHelpArticle(id: string): Promise<{
     position: data.position,
   };
 }
+
+/** Solo slug e data di aggiornamento: serve alla mappa del sito, non alle pagine. */
+export async function listPublishedHelpSlugs(): Promise<
+  Array<{ slug: string; updatedAt: string | null }>
+> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("help_articles")
+    .select("slug, updated_at")
+    .eq("status", "published")
+    .order("position", { ascending: true });
+
+  if (error) {
+    console.error("[help] listPublishedHelpSlugs:", error.message);
+    return [];
+  }
+
+  return (data as { slug: string; updated_at: string | null }[] | null ?? []).map((row) => ({
+    slug: row.slug,
+    updatedAt: row.updated_at,
+  }));
+}
