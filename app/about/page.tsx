@@ -82,9 +82,28 @@ export default async function AboutPage() {
           </ul>
         </PageSection>
 
+        <PageSection number="03" title={t.toolsTitle}>
+          <ul className="border-t border-line">
+            {t.tools.map((tool, index) => (
+              <li
+                key={tool.title}
+                className="grid grid-cols-[2.5rem_1fr] gap-4 border-b border-line py-5"
+              >
+                <span className="font-mono text-[10px] tracking-[0.12em] text-cyan">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-display text-base font-semibold">{tool.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{tool.text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </PageSection>
+
         <PageSection
           id="cosa-non-siamo"
-          number="03"
+          number="04"
           title={t.notTitle}
         >
           <ul className="space-y-4">

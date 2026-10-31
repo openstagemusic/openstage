@@ -360,7 +360,7 @@ export const en = {
     pactTitle: "The pact.",
     pactText: "Pro is a subscription to tools, not a toll on visibility.",
     pactPoints: [
-      "The base plan stays free forever.",
+      "What is free stays free forever.",
       "Contact and booking stay free.",
       "Pro updates are included, at no extra cost.",
       "No automatic renewals, no surprises.",
@@ -1106,49 +1106,64 @@ export const en = {
       secondaryCta: "Create an account",
     },
     about: {
-      title: "About us",
+      title: "About",
       description:
-        "OpenStage exists to give real visibility to underground and independent music.",
-      eyebrow: "About OpenStage",
+        "OpenStage is the free map of independent live music: real nights, emerging artists and neighbourhood venues. No advertising, no pay-to-play.",
+      eyebrow: "Who OpenStage is",
       headline: "The independent scene,",
       accent: "without middlemen.",
       lead:
-        "OpenStage is the free, independent map of live music in Italy: emerging artists, neighbourhood venues and the people who go out to listen.",
+        "OpenStage is the free map of independent live music: emerging artists, neighbourhood venues and people who go out to listen. Free for listeners, for those who play and for those who open their doors.",
       storyTitle: "Why we exist",
       story: [
-        "Most gigs do not live on a ticketing platform. They live on a poster, in a WhatsApp group, on a story that disappears in 24 hours. We built OpenStage so that a night can still be found after the story is gone.",
-        "Artists and venues publish their own dates. Fans search by city, date and distance. No checkout, no pay-to-play, no algorithm selling visibility.",
-        "We start from Italy, city by city, because the independent scene is local before it is global.",
+        "Most gigs do not live on a ticketing platform. They live on a poster, in a WhatsApp group, in a story that disappears after 24 hours. We built OpenStage so a night can be found even when the story is gone.",
+        "Artists and venues publish their dates. People search by city, date and distance. No checkout, no pay-to-play, no algorithm selling visibility.",
+        "Over time the platform grew without changing its mind: page with images, EPK, real stats, contacts and booking, a booking board, multi-day festivals. Free tools, no subscriptions, no plan to activate.",
       ],
       principlesTitle: "What we believe",
       principles: [
         {
           title: "Underground first",
-          text: "Emerging artists and small venues are the protagonists, not the background.",
+          text: "Emerging artists and small venues are the main characters, not the background.",
         },
         {
-          title: "Free, forever",
-          text: "No paywall for fans, artists or venues on the base plan. No subscription traps.",
+          title: "Free, without asterisks",
+          text: "No paywall, no subscription, no advertising. What you see is all there is, and it stays free.",
         },
         {
-          title: "Authentic by design",
+          title: "Authenticity before hype",
           text: "Real events, real places, real people. No fake numbers and no vanity metrics.",
         },
         {
-          title: "Frictionless discovery",
+          title: "Discovery without friction",
           text: "Finding tonight's gig should be as easy as opening a map.",
+        },
+      ],
+      toolsTitle: "What you find here",
+      tools: [
+        {
+          title: "For listeners",
+          text: "Agenda, map and cities to find the night, save dates and follow the artists you like. You can already search without an account.",
+        },
+        {
+          title: "For those who play",
+          text: "Page with images, printable EPK, dates and festivals, contacts and booking, a booking board and real stats. All free.",
+        },
+        {
+          title: "For those who open their doors",
+          text: "Programme and archive, direct contact with artists, calls with an application cap, venue closing. No commission.",
         },
       ],
       notTitle: "What we are not",
       not: [
-        "Not a ticket office: we do not take payments, commissions or booking fees.",
-        "Not a review site: there are no public ratings of artists or venues.",
-        "Not a pay-to-play showcase: nobody can buy a place in search, on the map or in the featured wall.",
-        "Not another social network: we are here to make real nights findable.",
+        "We are not a ticket office: we take no payments, commissions or booking fees.",
+        "We are not a review site: there are no public ratings of artists or venues.",
+        "We are not a pay-to-play showcase: nobody can buy a place in search, on the map or in the featured wall.",
+        "We are not another social network: we are here to make real nights findable.",
       ],
       ctaTitle: "The scene is already here.",
       ctaText: "Open the map, find a night, or bring your own.",
-      primaryCta: "Explore events",
+      primaryCta: "Explore the events",
       secondaryCta: "For artists",
       tertiaryCta: "For venues",
     },
@@ -1201,7 +1216,7 @@ export const en = {
       items: [
         {
           q: "Is OpenStage free?",
-          a: "Yes. The base plan is free for fans, artists and venues. There is no paywall to discover events, publish a page or add a date.",
+          a: "Yes. OpenStage is free for fans, artists and venues, with no subscriptions and no paywall: discovering events, publishing a page or adding a date costs nothing.",
         },
         {
           q: "Do I need an account to look for events?",

@@ -154,3 +154,4 @@ fatta dentro la fase indicata · **🟠 da decidere** = importante ma senza una 
 | B108 | **Pagine errore e README** | ✅ fatta | Fase 13.4 | **Fatta il 31 ottobre 2026**: `error.tsx` e `global-error.tsx` editoriali, README con privacy, export e cancellazione |
 | B109 | **Anteprime social di artisti e locali** | ✅ fatta | Fase 13.5 | **Fatta il 31 ottobre 2026**: rotta OG per le schede, card con nome, meta e banner/avatar; metadata aggiornati |
 | B110 | **Serate simili e visti di recente** | ✅ fatta | Fase 13.5 | **Fatta il 31 ottobre 2026**: simili per città/genere in fondo alla scheda; ultimi 4 visti in Home con `localStorage`, nessun cookie |
+| B111 | **Chi siamo aggiornata** | ✅ fatta | Fase 13.5 | **Fatta il 31 ottobre 2026**: testo riscritto sull'OpenStage attuale, nuova sezione “Cosa trovi qui”, eliminati “piano base” e i riferimenti al Pro (anche in FAQ) |

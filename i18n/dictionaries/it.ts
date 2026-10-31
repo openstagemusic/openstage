@@ -358,7 +358,7 @@ export const it: Dictionary = {
     pactTitle: "Il patto.",
     pactText: "Il Pro è un abbonamento a strumenti, non un pedaggio sulla visibilità.",
     pactPoints: [
-      "Il piano base resta gratuito per sempre.",
+      "Quello che è gratis resta gratuito per sempre.",
       "Contatti e booking restano gratuiti.",
       "Gli aggiornamenti Pro sono inclusi, senza costi extra.",
       "Nessun rinnovo automatico, nessuna sorpresa.",
@@ -1112,17 +1112,17 @@ export const it: Dictionary = {
     about: {
       title: "Chi siamo",
       description:
-        "OpenStage esiste per dare visibilità reale alla musica underground e indipendente.",
+        "OpenStage è la mappa gratuita del live indipendente: serate vere, artisti emergenti e locali di zona. Nessuna pubblicità, nessun pay-to-play.",
       eyebrow: "Chi è OpenStage",
       headline: "La scena indipendente,",
       accent: "senza intermediari.",
       lead:
-        "OpenStage è la mappa gratuita e indipendente del live italiano: artisti emergenti, locali di quartiere e persone che escono per ascoltare.",
+        "OpenStage è la mappa gratuita del live indipendente: artisti emergenti, locali di quartiere e persone che escono per ascoltare. Gratis per chi ascolta, per chi suona e per chi apre le porte.",
       storyTitle: "Perché esistiamo",
       story: [
         "La maggior parte dei concerti non vive su una piattaforma di ticketing. Vive su una locandina, in un gruppo WhatsApp, in una storia che sparisce dopo 24 ore. Abbiamo costruito OpenStage perché una serata si possa trovare anche quando la storia non c'è più.",
         "Artisti e locali pubblicano le proprie date. Chi cerca filtra per città, data e distanza. Niente checkout, niente pay-to-play, nessun algoritmo che vende visibilità.",
-        "Partiamo dall'Italia, città per città, perché la scena indipendente è locale prima di essere globale.",
+        "Con il tempo la piattaforma è cresciuta senza cambiare idea: scheda con immagini, EPK, statistiche vere, contatti e booking, bacheca ingaggi, festival su più giorni. Strumenti gratuiti, nessun abbonamento, nessun piano da attivare.",
       ],
       principlesTitle: "In cosa crediamo",
       principles: [
@@ -1131,8 +1131,8 @@ export const it: Dictionary = {
           text: "Artisti emergenti e piccoli locali sono i protagonisti, non lo sfondo.",
         },
         {
-          title: "Gratis, per sempre",
-          text: "Nessun paywall per fan, artisti o locali nel piano base. Nessuna trappola in abbonamento.",
+          title: "Gratis, senza asterischi",
+          text: "Nessun paywall, nessun abbonamento, nessuna pubblicità. Quello che vedi è tutto quello che c'è, e resta gratuito.",
         },
         {
           title: "Autenticità prima dell'hype",
@@ -1141,6 +1141,21 @@ export const it: Dictionary = {
         {
           title: "Scoperta senza attrito",
           text: "Trovare il concerto di stasera deve essere facile come aprire una mappa.",
+        },
+      ],
+      toolsTitle: "Cosa trovi qui",
+      tools: [
+        {
+          title: "Per chi ascolta",
+          text: "Agenda, mappa e città per trovare la serata, salvare le date e seguire gli artisti che ti piacciono. Senza account puoi già cercare.",
+        },
+        {
+          title: "Per chi suona",
+          text: "Scheda con immagini, EPK stampabile, date e festival, contatti e booking, bacheca ingaggi e statistiche vere. Tutto gratis.",
+        },
+        {
+          title: "Per chi apre le porte",
+          text: "Programmazione e archivio, contatti diretti con gli artisti, chiamate con tetto di candidature, chiusura del locale. Nessuna commissione.",
         },
       ],
       notTitle: "Cosa non siamo",
@@ -1205,7 +1220,7 @@ export const it: Dictionary = {
       items: [
         {
           q: "OpenStage è gratis?",
-          a: "Sì. Il piano base è gratuito per fan, artisti e locali. Non c'è nessun paywall per scoprire gli eventi, pubblicare una scheda o aggiungere una data.",
+          a: "Sì. OpenStage è gratuito per fan, artisti e locali, senza abbonamenti e senza paywall: scoprire gli eventi, pubblicare una scheda o aggiungere una data non costa nulla.",
         },
         {
           q: "Serve un account per cercare eventi?",
