@@ -9,6 +9,7 @@ import PageCta from "@/components/pages/PageCta";
 import PageHero from "@/components/pages/PageHero";
 import PageSection from "@/components/pages/PageSection";
 import JsonLd from "@/components/seo/JsonLd";
+import Pagination from "@/components/ui/Pagination";
 import { cityPath } from "@/lib/cities/paths";
 import { getCityBySlug, listUpcomingEventsForCity } from "@/lib/cities/queries";
 import { listArtists, listVenues } from "@/lib/directory/queries";
@@ -17,18 +18,20 @@ import { eventPath } from "@/lib/events/paths";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
+import { ITEMS_PER_PAGE } from "@/lib/pagination";
 import { absoluteUrl } from "@/lib/seo/site";
 
 type CityPageProps = {
   params: Promise<{ city: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 function fillCity(template: string, city: string): string {
   return template.replace(/\{city\}/g, city);
 }
 
-export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
-  const [{ city }, locale] = await Promise.all([params, getLocale()]);
+export async function generateMetadata({ params, searchParams }: CityPageProps): Promise<Metadata> {
+  const [{ city }, query, locale] = await Promise.all([params, searchParams, getLocale()]);
   const summary = await getCityBySlug(city);
 
   if (!summary) return {};
@@ -42,7 +45,9 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     description,
     // Una città con meno di tre serate future è utile a chi ha il link, ma non
     // abbastanza solida per un motore di ricerca: resta fuori indice.
-    robots: summary.indexable ? undefined : { index: false, follow: true },
+    // Le pagine 2, 3… di una città non si indicizzano: la prima basta.
+    robots:
+      summary.indexable && !query.page ? undefined : { index: false, follow: true },
     openGraph: { title, description, type: "website" },
   };
 }
@@ -53,8 +58,9 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
  * Tre blocchi, tutti da dati reali: prossime serate, artisti e locali. Se una
  * sezione è vuota lo dice e offre l'elenco filtrato, invece di lasciare un buco.
  */
-export default async function CityPage({ params }: CityPageProps) {
+export default async function CityPage({ params, searchParams }: CityPageProps) {
   const { city } = await params;
+  const query = await searchParams;
   const locale = await getLocale();
   const summary = await getCityBySlug(city);
 
@@ -70,8 +76,12 @@ export default async function CityPage({ params }: CityPageProps) {
   const dict = getDictionary(locale);
   const t = dict.pages.cities;
 
+  // Le serate si paginano: una città piena non deve nascondere il resto.
+  const totalPages = Math.max(1, Math.ceil(summary.eventCount / ITEMS_PER_PAGE));
+  const page = Math.min(Math.max(1, Number.parseInt(query.page ?? "", 10) || 1), totalPages);
+
   const [events, artists, venues] = await Promise.all([
-    listUpcomingEventsForCity(summary),
+    listUpcomingEventsForCity(summary, ITEMS_PER_PAGE, (page - 1) * ITEMS_PER_PAGE),
     listArtists({ filters: { city: summary.label }, perPage: 6 }),
     listVenues({ filters: { city: summary.label }, perPage: 6 }),
   ]);
@@ -152,7 +162,24 @@ export default async function CityPage({ params }: CityPageProps) {
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
         <PageSection number="01" title={t.upcomingTitle} eyebrow={summary.label}>
           {events.length > 0 ? (
-            <EventRows events={events} locale={locale} dict={dict} />
+            <>
+              <EventRows events={events} locale={locale} dict={dict} />
+
+              {totalPages > 1 ? (
+                <div className="mt-10">
+                  <Pagination
+                    currentPage={page}
+                    totalItems={summary.eventCount}
+                    basePath={cityPath(summary.label)}
+                    labels={{
+                      previous: dict.pagination.previous,
+                      next: dict.pagination.next,
+                      label: dict.pagination.label,
+                    }}
+                  />
+                </div>
+              ) : null}
+            </>
           ) : (
             <div className="border-y border-line py-8">
               <p className="max-w-xl text-sm leading-relaxed text-muted">{t.upcomingEmpty}</p>

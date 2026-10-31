@@ -148,3 +148,4 @@ fatta dentro la fase indicata · **🟠 da decidere** = importante ma senza una 
 | B102 | **Serie/festival multi-giorno** | ✅ fatta | Fase 12.3 | **Fatta il 31 ottobre 2026**: data di fine facoltativa, niente ricorrenza automatica, niente generazione di date |
 | B103 | **Pagine pubbliche aggiornate alla Fase 12** | ✅ fatta | Fase 12 | **Fatta il 31 ottobre 2026**: strumenti aggiornati per artisti e venue, sezione notifiche, nuova `/per-i-fan`, illustrazioni SVG disegnate in casa |
 | B104 | **Fascia chiamate in Home** | ✅ fatta | Fase 12 | **Fatta il 31 ottobre 2026**: compare solo con chiamate aperte, conteggio reale, due più recenti, link a `/calls`; niente dati finti se è vuota |
+| B105 | **Impaginazione completa** | ✅ fatta | Fase 12 | **Fatta il 31 ottobre 2026**: ellissi nella paginazione, `/calls` paginata, città paginata (12 per pagina, noindex dalla 2), link e pagine archivio per le serate passate di artisti e locali |

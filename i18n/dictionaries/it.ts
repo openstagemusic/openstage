@@ -1320,6 +1320,7 @@ export const it: Dictionary = {
     upcomingTitle: "Eventi in programma",
     upcomingEmpty: "Al momento non ci sono eventi in programma.",
     pastTitle: "Serate passate",
+    pastAll: "Tutte le passate",
     capacity: "Capienza",
     capacityPeople: "posti",
     address: "Indirizzo",

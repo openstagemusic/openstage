@@ -1316,6 +1316,7 @@ export const en = {
     upcomingTitle: "Upcoming events",
     upcomingEmpty: "There are no upcoming events right now.",
     pastTitle: "Past events",
+    pastAll: "All past dates",
     capacity: "Capacity",
     capacityPeople: "people",
     address: "Address",

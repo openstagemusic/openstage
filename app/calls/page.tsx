@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 
 import LocaleLink from "@/components/i18n/LocaleLink";
 import PageHero from "@/components/pages/PageHero";
+import Pagination from "@/components/ui/Pagination";
 import { periodLabel } from "@/lib/calls/format";
-import { listOpenCalls, type CallRole } from "@/lib/calls/queries";
+import { countOpenCalls, listOpenCalls, type CallRole } from "@/lib/calls/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { ITEMS_PER_PAGE } from "@/lib/pagination";
 import { getLocale } from "@/lib/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,7 +21,7 @@ const ROLES: CallRole[] = ["artist", "band", "dj", "performer", "technician", "o
 export default async function CallsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ruolo?: string }>;
+  searchParams: Promise<{ ruolo?: string; page?: string }>;
 }) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
@@ -28,7 +30,15 @@ export default async function CallsPage({
   const params = await searchParams;
   const role = ROLES.includes(params.ruolo as CallRole) ? (params.ruolo as CallRole) : null;
 
-  const calls = await listOpenCalls({ role });
+  const total = await countOpenCalls({ role });
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+  const page = Math.min(Math.max(1, Number.parseInt(params.page ?? "", 10) || 1), totalPages);
+
+  const calls = await listOpenCalls({
+    role,
+    limit: ITEMS_PER_PAGE,
+    offset: (page - 1) * ITEMS_PER_PAGE,
+  });
 
   return (
     <div>
@@ -111,6 +121,22 @@ export default async function CallsPage({
             </LocaleLink>
           </div>
         )}
+
+        {total > ITEMS_PER_PAGE ? (
+          <div className="mt-10">
+            <Pagination
+              currentPage={page}
+              totalItems={total}
+              basePath="/calls"
+              params={role ? { ruolo: role } : undefined}
+              labels={{
+                previous: dict.pagination.previous,
+                next: dict.pagination.next,
+                label: dict.pagination.label,
+              }}
+            />
+          </div>
+        ) : null}
 
         <p className="mt-8 max-w-2xl font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
           {t.note}

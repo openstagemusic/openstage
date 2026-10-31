@@ -281,7 +281,15 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
       {past.length > 0 ? (
         <>
-          <h2 className="mt-12 font-display text-2xl font-semibold">{t.pastTitle}</h2>
+          <div className="mt-12 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="font-display text-2xl font-semibold">{t.pastTitle}</h2>
+            <Link
+              href={`${artistPath(artist)}/archivio`}
+              className="border-b border-line pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+            >
+              {t.pastAll} →
+            </Link>
+          </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {past.map((event) => (

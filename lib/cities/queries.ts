@@ -190,7 +190,8 @@ export const getCityBySlug = cache(async (slug: string): Promise<CitySummary | n
  */
 export async function listUpcomingEventsForCity(
   city: CitySummary,
-  limit = 40
+  limit = 12,
+  offset = 0
 ): Promise<PublicEvent[]> {
   const supabase = await createClient();
   const now = new Date().toISOString();
@@ -203,7 +204,9 @@ export async function listUpcomingEventsForCity(
       .gte("starts_at", now)
       .eq("city_key", city.key)
       .order("starts_at", { ascending: true })
-      .limit(limit),
+      // Si chiede fino a `offset + limit`: la fusione con le righe senza città
+      // avviene dopo, e il taglio deve cadere sulla lista ordinata.
+      .limit(offset + limit),
     supabase
       .from("events")
       .select(EVENT_SELECT)
@@ -235,5 +238,5 @@ export async function listUpcomingEventsForCity(
 
   return [...events.values()]
     .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
-    .slice(0, limit);
+    .slice(offset, offset + limit);
 }

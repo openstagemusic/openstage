@@ -127,6 +127,7 @@ export async function listOpenCalls(filters: {
   city?: string | null;
   role?: CallRole | null;
   limit?: number;
+  offset?: number;
 } = {}): Promise<PublicCall[]> {
   const supabase = await createClient();
 
@@ -136,7 +137,9 @@ export async function listOpenCalls(filters: {
     .eq("status", "open")
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false })
-    .limit(filters.limit ?? 60);
+    .limit(filters.limit ?? 12);
+
+  if (filters.offset) query = query.range(filters.offset, filters.offset + (filters.limit ?? 12) - 1);
 
   if (filters.city) query = query.eq("city", filters.city);
   if (filters.role) query = query.eq("role_wanted", filters.role);
@@ -259,13 +262,21 @@ export async function listCallApplications(callId: string): Promise<CallApplicat
 
 
 /** Quante chiamate sono aperte adesso. Serve alla fascia in Home. */
-export async function countOpenCalls(): Promise<number> {
+export async function countOpenCalls(
+  filters: { role?: CallRole | null; city?: string | null } = {}
+): Promise<number> {
   const supabase = await createClient();
-  const { count, error } = await supabase
+
+  let query = supabase
     .from("calls")
     .select("id", { count: "exact", head: true })
     .eq("status", "open")
     .gt("expires_at", new Date().toISOString());
+
+  if (filters.role) query = query.eq("role_wanted", filters.role);
+  if (filters.city) query = query.eq("city", filters.city);
+
+  const { count, error } = await query;
 
   if (error) {
     console.error("[calls] countOpenCalls:", error.message);

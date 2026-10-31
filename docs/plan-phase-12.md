@@ -127,3 +127,15 @@ La Fase 12 ha cambiato il prodotto: le pagine lo raccontano.
 - **Home**: sottotitolo riscritto per chi ascolta (mappa delle serate, gratis, senza pubblicità) e
   **fascia "Cercasi artisti"** tra il bento e la playlist: appare solo con chiamate aperte, mostra
   le due più recenti e il conteggio reale.
+
+---
+
+## Impaginazione (31 ottobre 2026)
+
+- **Paginazione**: aggiunti i puntini quando i numeri saltano (prima si vedevano 1 · 4 5 6 · 20 di fila).
+- **/calls**: 12 per pagina con paginazione e filtro per ruolo conservato; il tetto invisibile di 60
+  non taglia più niente.
+- **/citta**: le serate passano da 40 in blocco a **12 per pagina** con paginazione; le pagine 2+
+  restano `noindex` con la prima come canonica.
+- **Profili artista e locale**: link “Tutte le passate” e nuove pagine `/artisti/[slug]/archivio` e
+  `/locali/[slug]/archivio` (fino a 60 serate, `noindex`, canonical alla scheda).
