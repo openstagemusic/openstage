@@ -19,7 +19,7 @@ import { createClient } from "@/lib/supabase/server";
 const ARTIST_SELECT =
   "id, slug, name, city, genre, spotify_url, bio, profile_id, website_url, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, epk_photo_url, epk_rider, epk_contact, avatar_url, banner_url";
 const VENUE_SELECT =
-  "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, avatar_url, banner_url";
+  "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, avatar_url, banner_url, closed_at, closed_note";
 
 export type PublicArtist = {
   id: string;
@@ -56,6 +56,9 @@ export type PublicVenue = {
   links: SocialUrls;
   avatarUrl: string | null;
   bannerUrl: string | null;
+  /** Chiusura del locale: se c'è una data, la sala ha chiuso. */
+  closedAt: string | null;
+  closedNote: string | null;
   latitude: number | null;
   longitude: number | null;
   capacity: number | null;
@@ -108,6 +111,8 @@ type VenueRow = {
   linktree_url: string | null;
   avatar_url: string | null;
   banner_url: string | null;
+  closed_at: string | null;
+  closed_note: string | null;
 };
 
 /**
@@ -171,6 +176,8 @@ function toVenue(row: VenueRow, verified: Set<string>): PublicVenue {
     website: row.website,
     avatarUrl: row.avatar_url,
     bannerUrl: row.banner_url,
+    closedAt: row.closed_at,
+    closedNote: row.closed_note,
     links: {
       website: row.website,
       instagram: row.instagram_url,
@@ -264,7 +271,12 @@ export async function listVenues({
   const offset = Math.max(0, (page - 1) * perPage);
   const term = cleanTerm(filters.query ?? "");
 
-  let query = supabase.from("venues").select(VENUE_SELECT, { count: "exact" });
+  // Un locale chiuso non si propone più: la pagina resta raggiungibile, ma
+  // non compare tra i locali da contattare.
+  let query = supabase
+    .from("venues")
+    .select(VENUE_SELECT, { count: "exact" })
+    .is("closed_at", null);
 
   if (term) query = query.ilike("name", `%${term}%`);
   const city = filters.city ? cityKey(filters.city) : null;

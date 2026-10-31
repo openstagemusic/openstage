@@ -126,6 +126,7 @@ export type SaveEventResult = {
     | "rateLimited"
     | "suspended"
     | "noPage"
+    | "closedVenue"
     | "saveFailed";
   /**
    * Serate che assomigliano a questa, quando si sta creando.
@@ -192,6 +193,10 @@ export async function saveEventAction(input: {
   if (input.eventId === null) {
     if (session.role === "artist" && !ownArtist) return { ok: false, error: "noPage" };
     if (session.role === "venue" && !ownVenue) return { ok: false, error: "noPage" };
+    // Un locale chiuso non pubblica nuove serate: prima si riapre.
+    if (session.role === "venue" && ownVenue?.closedAt) {
+      return { ok: false, error: "closedVenue" };
+    }
   }
 
   // Una serata **nuova** non può stare nel passato (tranne le ultime ore: un

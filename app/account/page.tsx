@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { closeVenueAction, reopenVenueAction } from "@/app/actions/venue-status";
 import { redirect } from "next/navigation";
 
 import AccountForm, { type AccountSubject } from "@/components/account/AccountForm";
@@ -213,6 +214,69 @@ export default async function AccountPage() {
             ) : null}
 
             <AccountForm subject={subject} dict={t} social={dict.social} />
+          </section>
+        ) : null}
+
+
+        {venue ? (
+          <section className="border-t border-line pt-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em]">
+                {t.venueStatusTitle}
+              </h2>
+              <span
+                className={`font-mono text-[10px] uppercase tracking-[0.12em] ${
+                  venue.closedAt ? "text-pink" : "text-cyan"
+                }`}
+              >
+                {venue.closedAt ? t.venueStatusClosed : t.venueStatusOpen}
+              </span>
+            </div>
+
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+              {t.venueStatusText}
+            </p>
+
+            {venue.closedAt ? (
+              <form action={reopenVenueAction} className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                  {t.venueStatusClosedNote}{" "}
+                  {new Intl.DateTimeFormat(locale === "it" ? "it-IT" : "en-GB", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  }).format(new Date(venue.closedAt))}
+                </span>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 items-center gap-2 bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+                >
+                  {t.venueStatusReopen}
+                  <span aria-hidden="true">→</span>
+                </button>
+              </form>
+            ) : (
+              <form action={closeVenueAction} className="mt-5 flex max-w-xl flex-col gap-4">
+                <div>
+                  <label htmlFor="closed-note" className="os-field-label">
+                    {t.venueStatusNote}
+                  </label>
+                  <input
+                    id="closed-note"
+                    name="note"
+                    maxLength={280}
+                    placeholder={t.venueStatusNotePlaceholder}
+                    className="os-field text-sm"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-fit border-b border-pink/50 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-pink transition-colors hover:border-pink"
+                >
+                  {t.venueStatusClose}
+                </button>
+              </form>
+            )}
           </section>
         ) : null}
 

@@ -206,6 +206,7 @@ export const it: Dictionary = {
     notesAdd: "Aggiungi nota",
     emptyFilter: "Nessuna richiesta in questo stato.",
     notesDelete: "Elimina nota",
+    closed: "Il locale ha chiuso: non riceve nuove richieste di contatto.",
     freeNote: "Il contatto è gratuito. OpenStage non prende una percentuale e non vende visibilità.",
   },
   epk: {
@@ -1086,6 +1087,7 @@ export const it: Dictionary = {
     noResultsText: "Prova con un altro nome oppure togli un filtro.",
     suggestVenue: "Non trovi il locale?",
     suggestVenueCta: "Segnalacelo",
+    badgeClosed: "Chiuso",
     badgeUnclaimed: "Non reclamato",
     badgeVerified: "Verificato",
     upcomingTitle: "Eventi in programma",
@@ -1866,6 +1868,15 @@ export const it: Dictionary = {
     linksTitle: "Link e social",
     linksText:
       "Sito e profili ufficiali: compaiono come icone sulla scheda pubblica. Accetto link completi oppure @nome utente per Instagram, TikTok e SoundCloud.",
+    venueStatusTitle: "Stato del locale",
+    venueStatusOpen: "Aperto",
+    venueStatusClosed: "Chiuso",
+    venueStatusText: "Se chiudi, le serate future vengono annullate con il motivo e la scheda smette di ricevere richieste. Le serate passate restano online come archivio.",
+    venueStatusNote: "Nota pubblica (facoltativa)",
+    venueStatusNotePlaceholder: "Es. chiuso per lavori, riapriamo a marzo.",
+    venueStatusClose: "Chiudi il locale",
+    venueStatusReopen: "Riapri il locale",
+    venueStatusClosedNote: "Locale chiuso il",
     invalidLink: "Controlla i link: uno o più indirizzi non sono validi.",
     imagesTitle: "Immagine e banner",
     imagesText:
@@ -2273,6 +2284,7 @@ export const it: Dictionary = {
       "Il tuo profilo non è ancora verificato: l'evento resta in bozza finché OpenStage non ti verifica. Ci pensiamo noi.",
     backToList: "Torna ai miei eventi",
     notFound: "Questo evento non esiste o non è tuo.",
+    saveClosedVenue: "Il locale � chiuso: riaprilo dal tuo account per pubblicare nuove serate.",
     saveFailed: "Non siamo riusciti a salvare. Riprova.",
     conflict:
       "Qualcuno ha modificato questa serata nel frattempo (forse un'altra scheda aperta). Ricarica la pagina prima di salvare, così non cancelli quelle modifiche.",

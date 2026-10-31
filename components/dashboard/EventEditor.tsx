@@ -504,6 +504,7 @@ export default function EventEditor({
     rateLimited: t.tooManyEvents,
     suspended: t.suspendedAccount,
     noPage: t.noPageCreate,
+  closedVenue: t.saveClosedVenue,
     saveFailed: t.saveFailed,
   };
 

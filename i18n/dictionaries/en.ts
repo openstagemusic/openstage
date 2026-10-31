@@ -208,6 +208,7 @@ export const en = {
     notesAdd: "Add note",
     emptyFilter: "No requests in this state.",
     notesDelete: "Delete note",
+    closed: "The venue has closed: it no longer receives requests.",
     freeNote: "Contact is free. OpenStage takes no percentage and does not sell visibility.",
   },
   epk: {
@@ -1082,6 +1083,7 @@ export const en = {
     noResultsText: "Try another name or remove a filter.",
     suggestVenue: "Can't find the venue?",
     suggestVenueCta: "Tell us",
+    badgeClosed: "Closed",
     badgeUnclaimed: "Unclaimed",
     badgeVerified: "Verified",
     upcomingTitle: "Upcoming events",
@@ -1862,6 +1864,15 @@ export const en = {
     linksTitle: "Links and social",
     linksText:
       "Website and official profiles: they appear as icons on the public page. Full links or @handle for Instagram, TikTok and SoundCloud are accepted.",
+    venueStatusTitle: "Venue status",
+    venueStatusOpen: "Open",
+    venueStatusClosed: "Closed",
+    venueStatusText: "If you close it, future dates are cancelled with the reason and the page stops receiving requests. Past dates stay online as an archive.",
+    venueStatusNote: "Public note (optional)",
+    venueStatusNotePlaceholder: "E.g. closed for works, back in March.",
+    venueStatusClose: "Close the venue",
+    venueStatusReopen: "Reopen the venue",
+    venueStatusClosedNote: "Closed on",
     invalidLink: "Check the links: one or more addresses are not valid.",
     imagesTitle: "Image and banner",
     imagesText:
@@ -2268,6 +2279,7 @@ export const en = {
       "Your profile is not verified yet: the event stays in draft until OpenStage verifies you. We take care of it.",
     backToList: "Back to my events",
     notFound: "This event does not exist or is not yours.",
+    saveClosedVenue: "The venue is closed: reopen it from your account to publish new dates.",
     saveFailed: "We could not save it. Please try again.",
     conflict:
       "Someone edited this night in the meantime (maybe another open tab). Reload the page before saving, so you do not overwrite their changes.",

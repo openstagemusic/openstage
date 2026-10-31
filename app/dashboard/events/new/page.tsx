@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import EventEditor from "@/components/dashboard/EventEditor";
+import LocaleLink from "@/components/i18n/LocaleLink";
 import NeedsPageNotice from "@/components/dashboard/NeedsPageNotice";
 import { canManageEvents } from "@/lib/auth/roles";
 import { isProfileVerified, listCityOptions } from "@/lib/dashboard/queries";
@@ -56,6 +57,28 @@ export default async function NewEventPage() {
         <div className="mt-8">
           <NeedsPageNotice role={session.role === "artist" ? "artist" : "venue"} dict={dict.dashboard} />
         </div>
+      </div>
+    );
+  }
+
+  // Un locale chiuso non pubblica nuove serate: prima si riapre.
+  if (venue?.closedAt) {
+    return (
+      <div>
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+          {dict.dashboard.navNew}
+        </p>
+        <h1 className="mt-3 font-poster text-4xl uppercase leading-[0.95] tracking-[-0.02em]">
+          {dict.account.venueStatusTitle}
+        </h1>
+        <p className="mt-6 max-w-2xl os-note os-note-pink">{dict.editor.saveClosedVenue}</p>
+        <LocaleLink
+          href="/account"
+          className="mt-6 inline-flex min-h-11 items-center gap-2 bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+        >
+          {dict.account.venueStatusReopen}
+          <span aria-hidden="true">→</span>
+        </LocaleLink>
       </div>
     );
   }

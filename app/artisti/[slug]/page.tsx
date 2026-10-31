@@ -137,7 +137,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         ← {t.backToArtists}
       </Link>
 
-      <div className="relative mt-8 overflow-hidden border border-line">
+      <div className="relative mt-8 overflow-hidden">
         <div className="absolute inset-0">
           {artist.bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element

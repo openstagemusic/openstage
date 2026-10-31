@@ -15,6 +15,7 @@ export default function BookingPanel({
   viewerRole,
   isAuthenticated,
   subjectPath,
+  closed = false,
   dict,
 }: {
   subjectType: "artist" | "venue";
@@ -24,9 +25,12 @@ export default function BookingPanel({
   isAuthenticated: boolean;
   /** Percorso pubblico della scheda, per tornare dopo il login. */
   subjectPath: string;
+  /** Il locale ha chiuso: nessuna nuova richiesta. */
+  closed?: boolean;
   dict: Dictionary["booking"];
 }) {
   const canContact =
+    !closed &&
     isAuthenticated &&
     ((subjectType === "artist" && viewerRole === "venue") ||
       (subjectType === "venue" && viewerRole === "artist"));
@@ -45,14 +49,16 @@ export default function BookingPanel({
 
       <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <p className="max-w-xl text-sm leading-relaxed text-muted">
-          {!profileId
-            ? dict.unclaimed
-            : canContact || !isAuthenticated
-              ? dict.sectionLead
-              : dict.onlyRoles}
+          {closed
+            ? dict.closed
+            : !profileId
+              ? dict.unclaimed
+              : canContact || !isAuthenticated
+                ? dict.sectionLead
+                : dict.onlyRoles}
         </p>
 
-        {profileId ? (
+        {profileId && !closed ? (
           !isAuthenticated ? (
             <LocaleLink
               href={`/login?next=${encodeURIComponent(subjectPath)}`}

@@ -153,7 +153,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
         ← {t.backToVenues}
       </Link>
 
-      <div className="relative mt-8 overflow-hidden border border-line">
+      <div className="relative mt-8 overflow-hidden">
         <div className="absolute inset-0">
           {venue.bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -193,6 +193,11 @@ export default async function VenuePage({ params }: VenuePageProps) {
                 {t.capacity}: {venue.capacity} {t.capacityPeople}
               </span>
             ) : null}
+            {venue.closedAt ? (
+              <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-pink">
+                {t.badgeClosed}
+              </span>
+            ) : null}
             {venue.verified ? (
               <VerifiedBadge label={t.badgeVerified} />
             ) : venue.claimed ? null : (
@@ -212,6 +217,12 @@ export default async function VenuePage({ params }: VenuePageProps) {
             </div>
           ) : null}
 
+          {venue.closedAt && venue.closedNote ? (
+            <p className="mt-5 max-w-xl border-l-2 border-pink pl-4 text-sm leading-relaxed text-muted">
+              {venue.closedNote}
+            </p>
+          ) : null}
+
           <div className="mt-6">
             <FollowButton
               subjectType="venue"
@@ -229,6 +240,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
       </div>
 
       <BookingPanel
+        closed={Boolean(venue.closedAt)}
         subjectType="venue"
         subjectId={venue.id}
         profileId={venue.profileId}
