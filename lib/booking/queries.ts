@@ -1,11 +1,21 @@
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { createClient } from "@/lib/supabase/server";
 
+export type BookingStatus = "new" | "open" | "confirmed" | "declined" | "archived";
+
+export type BookingNote = {
+  id: string;
+  body: string;
+  createdAt: string;
+};
+
 export type BookingThreadSummary = {
   id: string;
   subject: string;
   eventDate: string | null;
   feeText: string | null;
+  status: BookingStatus;
+  reminderAt: string | null;
   lastMessageAt: string;
   counterpartName: string;
   counterpartSlug: string;
@@ -25,6 +35,8 @@ export type BookingThread = BookingThreadSummary & {
   artistProfileId: string | null;
   venueProfileId: string | null;
   messages: BookingMessage[];
+  /** Note private: solo quelle di chi sta leggendo. */
+  notes: BookingNote[];
 };
 
 type ThreadRow = {
@@ -32,6 +44,8 @@ type ThreadRow = {
   subject: string;
   event_date: string | null;
   fee_text: string | null;
+  status: BookingStatus;
+  reminder_at: string | null;
   last_message_at: string;
   artist_id: string;
   venue_id: string;
@@ -61,7 +75,7 @@ export async function listBookingThreads(
   let query = supabase
     .from("booking_threads")
     .select(
-      "id, subject, event_date, fee_text, last_message_at, artist_id, venue_id, artists ( name, slug, profile_id ), venues ( name, slug, profile_id )"
+      "id, subject, event_date, fee_text, status, reminder_at, last_message_at, artist_id, venue_id, artists ( name, slug, profile_id ), venues ( name, slug, profile_id )"
     )
     .order("last_message_at", { ascending: false });
 
@@ -86,6 +100,8 @@ export async function listBookingThreads(
         subject: row.subject,
         eventDate: row.event_date,
         feeText: row.fee_text,
+        status: row.status,
+        reminderAt: row.reminder_at,
         lastMessageAt: row.last_message_at,
         counterpartName: counterpart.name,
         counterpartSlug: counterpart.slug,
@@ -104,7 +120,7 @@ export async function getBookingThread(
   const { data, error } = await supabase
     .from("booking_threads")
     .select(
-      "id, subject, event_date, fee_text, last_message_at, artist_id, venue_id, artists ( name, slug, profile_id ), venues ( name, slug, profile_id )"
+      "id, subject, event_date, fee_text, status, reminder_at, last_message_at, artist_id, venue_id, artists ( name, slug, profile_id ), venues ( name, slug, profile_id )"
     )
     .eq("id", threadId)
     .maybeSingle();
@@ -131,11 +147,23 @@ export async function getBookingThread(
     return null;
   }
 
+  const { data: notes, error: notesError } = await supabase
+    .from("booking_notes")
+    .select("id, body, created_at")
+    .eq("thread_id", threadId)
+    .order("created_at", { ascending: false });
+
+  if (notesError) {
+    console.error("[booking] getBookingThread notes:", notesError.message);
+  }
+
   return {
     id: row.id,
     subject: row.subject,
     eventDate: row.event_date,
     feeText: row.fee_text,
+    status: row.status,
+    reminderAt: row.reminder_at,
     lastMessageAt: row.last_message_at,
     counterpartName: counterpart.name,
     counterpartSlug: counterpart.slug,
@@ -150,6 +178,13 @@ export async function getBookingThread(
         senderId: message.sender_id,
         body: message.body,
         createdAt: message.created_at,
+      })
+    ),
+    notes: ((notes as Array<{ id: string; body: string; created_at: string }> | null) ?? []).map(
+      (note) => ({
+        id: note.id,
+        body: note.body,
+        createdAt: note.created_at,
       })
     ),
   };

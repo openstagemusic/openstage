@@ -54,7 +54,7 @@ export default function BookingReplyForm({
       />
 
       {error ? (
-        <p role="alert" className="mt-3 border-l-2 border-pink bg-pink/10 px-3 py-2 text-xs text-white">
+        <p role="alert" className="mt-3 os-note os-note-pink">
           {error}
         </p>
       ) : null}

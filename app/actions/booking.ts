@@ -145,8 +145,125 @@ export async function sendBookingMessageAction(input: {
     return { ok: false, error: "failed" };
   }
 
+  // La prima risposta dell'altra parte apre la trattativa: nessuno deve
+  // ricordarsi di cambiare stato a mano.
+  const { data: thread } = await supabase
+    .from("booking_threads")
+    .select("created_by, status")
+    .eq("id", threadId)
+    .maybeSingle();
+
+  if (thread && thread.status === "new" && thread.created_by !== session.id) {
+    await supabase
+      .from("booking_threads")
+      .update({ status: "open", updated_at: new Date().toISOString() })
+      .eq("id", threadId);
+  }
+
   revalidatePath(`/dashboard/messaggi/${threadId}`);
   revalidatePath("/dashboard/messaggi");
   revalidatePath("/dashboard/notifiche");
   return { ok: true, threadId };
+}
+
+const BOOKING_STATUSES = new Set(["new", "open", "confirmed", "declined", "archived"]);
+
+function refreshBooking(threadId?: string) {
+  revalidatePath("/dashboard/messaggi");
+  revalidatePath("/dashboard");
+  if (threadId) revalidatePath(`/dashboard/messaggi/${threadId}`);
+}
+
+/** Cambia lo stato della trattativa. La RLS limita ai due partecipanti. */
+export async function setBookingStatusAction(formData: FormData): Promise<void> {
+  const session = await getSessionProfile();
+  if (!session) return;
+
+  const threadId = String(formData.get("threadId") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+
+  if (!threadId || !BOOKING_STATUSES.has(status)) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("booking_threads")
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq("id", threadId);
+
+  if (error) {
+    console.error("[booking] status:", error.message);
+    return;
+  }
+
+  refreshBooking(threadId);
+}
+
+/** Promemoria facoltativo: un giorno, nessuna notifica automatica. */
+export async function setBookingReminderAction(formData: FormData): Promise<void> {
+  const session = await getSessionProfile();
+  if (!session) return;
+
+  const threadId = String(formData.get("threadId") ?? "").trim();
+  const raw = String(formData.get("reminder") ?? "").trim();
+  const reminder = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null;
+
+  if (!threadId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("booking_threads")
+    .update({ reminder_at: reminder, updated_at: new Date().toISOString() })
+    .eq("id", threadId);
+
+  if (error) {
+    console.error("[booking] reminder:", error.message);
+    return;
+  }
+
+  refreshBooking(threadId);
+}
+
+/** Nota privata: la vede solo chi la scrive, non è un messaggio del thread. */
+export async function addBookingNoteAction(formData: FormData): Promise<void> {
+  const session = await getSessionProfile();
+  if (!session) return;
+
+  const threadId = String(formData.get("threadId") ?? "").trim();
+  const body = clean(formData.get("body"), 2000);
+
+  if (!threadId || body.length < 1) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("booking_notes").insert({
+    thread_id: threadId,
+    author_id: session.id,
+    body,
+  });
+
+  if (error) {
+    console.error("[booking] note:", error.message);
+    return;
+  }
+
+  refreshBooking(threadId);
+}
+
+export async function deleteBookingNoteAction(formData: FormData): Promise<void> {
+  const session = await getSessionProfile();
+  if (!session) return;
+
+  const noteId = String(formData.get("noteId") ?? "").trim();
+  const threadId = String(formData.get("threadId") ?? "").trim();
+
+  if (!noteId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("booking_notes").delete().eq("id", noteId);
+
+  if (error) {
+    console.error("[booking] delete note:", error.message);
+    return;
+  }
+
+  refreshBooking(threadId);
 }
