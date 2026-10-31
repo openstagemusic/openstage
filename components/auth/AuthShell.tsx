@@ -54,7 +54,7 @@ export default function AuthShell({
             ))}
           </ul>
 
-          <p className="mt-10 hidden font-mono text-[9px] uppercase tracking-[0.18em] text-muted/70 lg:block">
+          <p className="mt-10 hidden font-mono text-[9px] uppercase tracking-[0.18em] text-muted lg:block">
             {tagline}
           </p>
         </div>

@@ -121,7 +121,7 @@ export default function ResetPasswordForm({ dict }: { dict: Dictionary["auth"] }
         <p role="alert" className={authErrorClass}>
           {dict.resetSessionMissing}
         </p>
-        <Link href="/forgot-password" className="text-sm text-cyan hover:underline">
+        <Link href="/forgot-password" className="text-sm text-cyan underline decoration-cyan/50 underline-offset-4 hover:decoration-cyan">
           {dict.forgotPassword}
         </Link>
       </div>

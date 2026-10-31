@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { authErrorMessage } from "@/lib/auth/error-messages";
+import { useDismissible } from "@/lib/ui/use-dismissible";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
@@ -36,6 +37,18 @@ export default function RegisterForm({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // L'avviso "controlla la posta" è un avviso modale: si chiude con Esc e il
+  // focus torna al pulsante che l'ha aperto, non resta dietro la tendina.
+  useDismissible({
+    open: notice !== null,
+    onClose: () => setNotice(null),
+    panelRef: dialogRef,
+    returnFocusRef: submitRef,
+    moveFocus: true,
+  });
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const configured = isSupabaseConfigured();
@@ -173,7 +186,7 @@ export default function RegisterForm({
         </p>
       ) : null}
 
-      <button type="submit" disabled={loading} className={authPrimaryButtonClass}>
+      <button ref={submitRef} type="submit" disabled={loading} className={authPrimaryButtonClass}>
         {loading ? dict.loading : dict.registerSubmit}
       </button>
 
@@ -188,9 +201,12 @@ export default function RegisterForm({
 
       {notice ? (
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="check-email-title"
+          aria-describedby="check-email-text"
+          tabIndex={-1}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
         >
           <div className="w-full max-w-sm border-l-2 border-cyan/60 pl-4">
@@ -200,7 +216,9 @@ export default function RegisterForm({
             <h3 id="check-email-title" className="mt-2 font-display text-xl font-semibold">
               {dict.checkEmailTitle}
             </h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted">{notice}</p>
+            <p id="check-email-text" className="mt-3 text-sm leading-relaxed text-muted">
+              {notice}
+            </p>
             <button
               type="button"
               onClick={() => setNotice(null)}

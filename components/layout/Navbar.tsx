@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import LogoutButton from "@/components/auth/LogoutButton";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
@@ -11,6 +11,7 @@ import { canManageEvents, ROLE_LABEL_KEY, type UserRole } from "@/lib/auth/roles
 import type { Locale } from "@/lib/i18n/config";
 import { stripLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
+import { useDismissible } from "@/lib/ui/use-dismissible";
 
 type NavbarProps = {
   locale: Locale;
@@ -29,6 +30,7 @@ const roleBadgeClass: Record<UserRole, string> = {
 
 export default function Navbar({ locale, dict, userEmail, userRole, notificationCount }: NavbarProps) {
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   // Il percorso può mostrare il prefisso di lingua (`/it/locali`): per capire
   // quale voce è attiva serve la parte che viene dopo.
   const pathname = stripLocale(usePathname());
@@ -37,6 +39,13 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  // Esc chiude il menu e riporta il focus sul pulsante che l'ha aperto.
+  useDismissible({
+    open,
+    onClose: () => setOpen(false),
+    returnFocusRef: menuButtonRef,
+  });
 
   const links = [
     { href: "/", label: dict.explore },
@@ -181,6 +190,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
         </div>
 
         <button
+          ref={menuButtonRef}
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-label={open ? dict.closeMenu : dict.openMenu}

@@ -1,12 +1,13 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import Link from "@/components/i18n/LocaleLink";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { stripLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
+import { useDismissible } from "@/lib/ui/use-dismissible";
 
 export type DashboardNavItem = { href: string; label: string };
 
@@ -25,6 +26,8 @@ type DashboardShellProps = {
  */
 export default function DashboardShell({ items, dict, children }: DashboardShellProps) {
   const [open, setOpen] = useState(false);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const pathname = stripLocale(usePathname());
 
   // La rotta più specifica vince: /dashboard/events/new non deve attivare
@@ -36,6 +39,15 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   const isActive = (href: string) => href === activeHref;
+
+  // Esc chiude il pannello, il focus entra nel menu e torna al pulsante.
+  useDismissible({
+    open,
+    onClose: () => setOpen(false),
+    panelRef,
+    returnFocusRef: openButtonRef,
+    moveFocus: true,
+  });
 
   const current = items.find((item) => isActive(item.href));
 
@@ -74,9 +86,11 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
       <div className="min-w-0 flex-1">
         <div className="mb-6 flex items-center gap-3 lg:hidden">
           <button
+            ref={openButtonRef}
             type="button"
             onClick={() => setOpen(true)}
             aria-expanded={open}
+            aria-controls="dashboard-menu"
             className="inline-flex min-h-11 items-center gap-2 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
           >
             <span className="mr-2 inline-block align-middle" aria-hidden="true">
@@ -103,7 +117,15 @@ export default function DashboardShell({ items, dict, children }: DashboardShell
             className="absolute inset-0 bg-black/70"
           />
 
-          <div className="absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto border-r border-line bg-surface p-4">
+          <div
+            ref={panelRef}
+            id="dashboard-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label={dict.menu}
+            tabIndex={-1}
+            className="absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto border-r border-line bg-surface p-4 outline-none"
+          >
             <div className="flex items-center justify-between gap-2">
               <span className="font-display text-base font-semibold">{dict.title}</span>
               <button

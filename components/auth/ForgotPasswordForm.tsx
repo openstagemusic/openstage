@@ -114,7 +114,7 @@ export default function ForgotPasswordForm({ dict }: { dict: Dictionary["auth"] 
       </button>
 
       <p className="text-center text-xs text-muted">
-        <Link href="/login" className="text-cyan hover:underline">
+        <Link href="/login" className="text-cyan underline decoration-cyan/50 underline-offset-4 hover:decoration-cyan">
           {dict.backToLogin}
         </Link>
       </p>

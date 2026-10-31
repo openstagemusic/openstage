@@ -86,7 +86,7 @@ export default async function TakedownPage({ searchParams }: TakedownPageProps) 
 
             <p className="mt-8 max-w-xl text-xs leading-relaxed text-muted">
               {t.privacyNote}{" "}
-              <Link href="/privacy" className="text-cyan hover:underline">
+              <Link href="/privacy" className="text-cyan underline decoration-cyan/50 underline-offset-4 hover:decoration-cyan">
                 {dict.footer.privacy}
               </Link>
             </p>

@@ -42,7 +42,7 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
           onClick={() => change(item)}
           aria-pressed={item === locale}
           className={cn(
-            "border-b pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
+            "inline-flex min-h-6 min-w-6 items-center justify-center border-b pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
             item === locale
               ? "border-cyan text-cyan"
               : "border-transparent text-muted hover:text-white"

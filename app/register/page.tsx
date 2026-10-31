@@ -38,7 +38,7 @@ export default async function RegisterPage({
           {dict.auth.haveAccount}{" "}
           <Link
             href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"}
-            className="text-cyan hover:underline"
+            className="text-cyan underline decoration-cyan/50 underline-offset-4 hover:decoration-cyan"
           >
             {dict.nav.login}
           </Link>

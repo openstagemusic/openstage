@@ -181,7 +181,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                 <div className="flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
                   <p className="max-w-md text-xs leading-relaxed text-muted">
                     {t.privacy}{" "}
-                    <Link href="/privacy" className="text-cyan hover:underline">
+                    <Link href="/privacy" className="text-cyan underline decoration-cyan/50 underline-offset-4 hover:decoration-cyan">
                       {t.privacyCta}
                     </Link>
                   </p>

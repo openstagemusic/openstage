@@ -98,7 +98,7 @@ export default function DirectoryFilters({
           placeholder={placeholder}
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          className="w-full bg-transparent py-2 text-sm text-white outline-none placeholder:text-muted/70"
+          className="w-full bg-transparent py-2 text-sm text-white outline-none placeholder:text-muted"
         />
       </div>
 

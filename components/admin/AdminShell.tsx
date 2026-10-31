@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import LogoutButton from "@/components/auth/LogoutButton";
 import Link from "@/components/i18n/LocaleLink";
@@ -9,6 +9,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { AdminGroup } from "@/lib/admin/modules";
 import { stripLocale } from "@/lib/i18n/locale-path";
 import { cn } from "@/lib/utils";
+import { useDismissible } from "@/lib/ui/use-dismissible";
 
 export type AdminNavModule = {
   key: string;
@@ -41,6 +42,8 @@ export default function AdminShell({
   children,
 }: AdminShellProps) {
   const [open, setOpen] = useState(false);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const pathname = stripLocale(usePathname());
 
   const activeHref = modules
@@ -71,7 +74,9 @@ export default function AdminShell({
                 if (item.status === "soon") {
                   return (
                     <li key={item.key}>
-                      <span className={cn(className, "cursor-default opacity-60")}>
+                      {/* "Prossimamente": si legge, non si clicca. Niente opacità sul
+                          testo: a 10px scenderebbe sotto il contrasto minimo. */}
+                      <span className={cn(className, "cursor-default")}>
                         {item.label}
                         <span className="text-[8px] text-muted">{dict.nav.soon}</span>
                       </span>
@@ -92,6 +97,14 @@ export default function AdminShell({
       ))}
     </div>
   );
+
+  useDismissible({
+    open,
+    onClose: () => setOpen(false),
+    panelRef,
+    returnFocusRef: openButtonRef,
+    moveFocus: true,
+  });
 
   return (
     <div className="min-h-dvh bg-bg">
@@ -118,9 +131,11 @@ export default function AdminShell({
             ) : null}
             <LogoutButton label={logoutLabel} />
             <button
+              ref={openButtonRef}
               type="button"
               onClick={() => setOpen(true)}
               aria-expanded={open}
+              aria-controls="admin-menu"
               className="inline-flex h-9 items-center border border-line px-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white lg:hidden"
             >
               ☰
@@ -163,7 +178,15 @@ export default function AdminShell({
             onClick={() => setOpen(false)}
             className="absolute inset-0 bg-black/70"
           />
-          <div className="absolute inset-y-0 left-0 w-80 max-w-[88vw] overflow-y-auto border-r border-line bg-surface p-4">
+          <div
+            ref={panelRef}
+            id="admin-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label={dict.controlRoom}
+            tabIndex={-1}
+            className="absolute inset-y-0 left-0 w-80 max-w-[88vw] overflow-y-auto border-r border-line bg-surface p-4 outline-none"
+          >
             <div className="flex items-center justify-between gap-2">
               <span className="font-display text-base font-semibold">{dict.controlRoom}</span>
               <button

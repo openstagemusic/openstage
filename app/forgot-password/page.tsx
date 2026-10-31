@@ -27,7 +27,7 @@ export default async function ForgotPasswordPage() {
       footer={
         <p>
           {dict.auth.backToLogin}{" "}
-          <Link href="/login" className="text-cyan hover:underline">
+          <Link href="/login" className="text-cyan underline decoration-cyan/50 underline-offset-4 hover:decoration-cyan">
             {dict.nav.login}
           </Link>
         </p>
