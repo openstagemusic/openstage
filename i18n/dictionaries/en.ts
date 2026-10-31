@@ -185,7 +185,9 @@ export const en = {
   epk: {
     eyebrow: "EPK",
     back: "Back to the page",
-    print: "Print",
+    print: "Print / PDF",
+    printHint:
+      "Choose “Save as PDF” and turn off headers and footers: links stay clickable and the player is not printed.",
     bio: "Bio",
     links: "Links",
     dates: "Upcoming dates",

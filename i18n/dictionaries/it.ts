@@ -183,7 +183,9 @@ export const it: Dictionary = {
   epk: {
     eyebrow: "EPK",
     back: "Torna alla scheda",
-    print: "Stampa",
+    print: "Stampa / PDF",
+    printHint:
+      "Nel dialogo scegli «Salva come PDF» e togli intestazioni e piè di pagina: i link restano cliccabili e il player non viene stampato.",
     bio: "Bio",
     links: "Link",
     dates: "Prossime date",

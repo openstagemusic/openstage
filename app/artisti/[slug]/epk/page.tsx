@@ -12,7 +12,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
-import { hasAnySocialLink } from "@/lib/social/links";
+import { SOCIAL_KINDS } from "@/lib/social/links";
 
 type EpkPageProps = {
   params: Promise<{ slug: string }>;
@@ -56,6 +56,20 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
   const events = (await listUpcomingEventsByArtist(artist.id)).slice(0, 8);
   const photo = artist.epkPhotoUrl ?? artist.avatarUrl;
 
+  // In stampa le icone social non servono: servono gli indirizzi, leggibili e
+  // cliccabili anche dentro il PDF.
+  const linkRows = SOCIAL_KINDS.filter((kind) => Boolean(artist.links[kind])).map((kind) => ({
+    kind,
+    label: dict.social[kind],
+    url: artist.links[kind] ?? "",
+  }));
+
+  // Un contatto che è un'email diventa un link: nel PDF si deve poter cliccare.
+  const contactHref =
+    artist.epkContact && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(artist.epkContact.trim())
+      ? `mailto:${artist.epkContact.trim()}`
+      : null;
+
   return (
     <div className="epk-page mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16 print:max-w-none print:px-0 print:py-0">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
@@ -65,9 +79,13 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
         >
           ← {t.back}
         </LocaleLink>
-        <PrintButton label={t.print} />
+        <div className="flex flex-col items-start gap-1 sm:items-end">
+          <PrintButton label={t.print} />
+          <span className="max-w-[15rem] text-[11px] leading-snug text-muted sm:text-right">
+            {t.printHint}
+          </span>
+        </div>
       </div>
-
       <header className="mt-8 grid gap-6 border-t border-line pt-8 sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-start print:mt-0 print:border-black/20 print:pt-0">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -95,11 +113,17 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
           </p>
 
           {artist.epkContact ? (
-            <p className="mt-4 text-sm text-white">
+            <p className="mt-4 text-sm">
               <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                 {t.contact}:{" "}
               </span>
-              {artist.epkContact}
+              {contactHref ? (
+                <a href={contactHref} className="underline decoration-line-strong underline-offset-4">
+                  {artist.epkContact}
+                </a>
+              ) : (
+                artist.epkContact
+              )}
             </p>
           ) : null}
         </div>
@@ -114,12 +138,31 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
         </section>
       ) : null}
 
-      {hasAnySocialLink(artist.links) ? (
+      {linkRows.length > 0 ? (
         <section className="mt-8 border-t border-line pt-6 print:border-black/20">
           <h2 className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan">{t.links}</h2>
-          <div className="mt-3">
+
+          <div className="mt-3 print:hidden">
             <SocialLinks links={artist.links} dict={dict.social} />
           </div>
+
+          {/* In stampa le icone non si possono cliccare: sotto gli indirizzi
+              completi, che restano link vivi anche nel PDF. */}
+          <ul className="mt-3 hidden print:block">
+            {linkRows.map((row) => (
+              <li
+                key={row.kind}
+                className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-line py-2 print:border-black/20"
+              >
+                <span className="w-32 shrink-0 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                  {row.label}
+                </span>
+                <a href={row.url} className="break-all text-sm">
+                  {row.url}
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 
@@ -158,7 +201,10 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
       ) : null}
 
       <footer className="mt-10 border-t border-line pt-4 font-mono text-[9px] uppercase tracking-[0.14em] text-muted print:border-black/20">
-        {t.footer} · {absoluteUrl(withLocale(locale, artistPath(artist)))}
+        {t.footer} ·{" "}
+        <a href={absoluteUrl(withLocale(locale, artistPath(artist)))} className="lowercase">
+          {absoluteUrl(withLocale(locale, artistPath(artist)))}
+        </a>
       </footer>
     </div>
   );

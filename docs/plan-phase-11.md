@@ -51,7 +51,9 @@
 - Pagina `/artisti/[slug]/epk` condivisibile con bio, foto, generi, link, rider, contatto e
   prossime date; `noindex` e canonical alla scheda.
 - Versione stampabile: navbar, footer e player nascosti in stampa, testo nero su bianco.
-- Link “EPK” sulla scheda artista e in Account. PDF in un secondo momento.
+- Stampa = PDF: i link diventano indirizzi completi cliccabili, il contatto email è un `mailto:`
+  e il pulsante legge "Stampa / PDF" con l'avviso su intestazioni e piè di pagina del browser.
+- Link "EPK" sulla scheda artista e in Account. PDF in un secondo momento.
 
 ### 11B.1c — Avatar e banner (fatto)
 

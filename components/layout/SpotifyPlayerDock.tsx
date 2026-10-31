@@ -100,7 +100,7 @@ export default function SpotifyPlayerDock({
           onClick={() => update(false)}
           aria-label={expandLabel}
           title={expandLabel}
-          className="spotify-dock-toggle inline-flex h-11 w-11 items-center justify-center border border-line-strong bg-bg/95 text-cyan shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur transition-colors hover:border-cyan/60 hover:text-white"
+          className="spotify-dock-toggle inline-flex h-11 w-11 items-center justify-center border border-line-strong bg-bg/95 text-cyan shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur transition-colors hover:border-cyan/60 hover:text-white print:hidden"
         >
           <svg
             viewBox="0 0 24 24"

@@ -639,4 +639,15 @@ html.spotify-collapsed body:has(.spotify-dock) {
   .epk-page a {
     text-decoration: underline;
   }
+
+  /* Sotto una foto con trasparenza ci va il bianco, non il nero della stampa. */
+  .epk-page img {
+    background: #ffffff !important;
+  }
+
+  /* Il player, anche ridotto a icona, non entra nel PDF. */
+  .spotify-dock,
+  .spotify-dock-toggle {
+    display: none !important;
+  }
 }
