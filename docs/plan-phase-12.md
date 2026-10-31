@@ -30,11 +30,15 @@ esistono più, e la mappa manda gente davanti a una saracinesca.
 
 ---
 
-## 12.2 — Bacheca ingaggi (prossimo)
+## 12.2 — Bacheca ingaggi (fatta)
 
 Una chiamata è un annuncio di un locale (o di un artista) che cerca una figura
 per una data o un periodo. Non è un mercatino: pochi annunci, verificati, con
 scadenza.
+
+**Fatto il 31 ottobre 2026**, con le regole decise insieme: tetto di candidature
+scelto dall'autore e modificabile in corsa, chiusura anticipata, candidatura come
+thread di booking, compenso dichiarato, scadenza automatica.
 
 **Modello**
 
@@ -62,7 +66,7 @@ scadenza.
   alzare in corsa dalla dashboard.
 - Candidatura: si apre un thread di booking collegato (`call_id`), con un
   messaggio iniziale precompilato. Nessun contatto fuori dal sistema.
-- `noindex` dopo la scadenza; le chiamate aperte sono indicizzabili.
+- `noindex` su ogni annuncio: sono temporanei, la pagina che si indicizza è `/calls`.
 
 **Interfaccia**
 

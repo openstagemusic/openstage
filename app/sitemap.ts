@@ -29,6 +29,7 @@ const STATIC_PATHS = [
   "/mappa",
   "/artisti",
   "/locali",
+  "/calls",
   "/citta",
   "/per-gli-artisti",
   "/per-le-venue",

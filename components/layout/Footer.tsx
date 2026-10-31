@@ -86,6 +86,11 @@ export default function Footer({
               </Link>
             </li>
             <li>
+              <Link href="/calls" className={LINK}>
+                {dict.calls}
+              </Link>
+            </li>
+            <li>
               <Link href="/per-le-venue" className={LINK}>
                 {dict.forVenues}
               </Link>

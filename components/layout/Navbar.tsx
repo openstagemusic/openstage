@@ -43,6 +43,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
     { href: "/mappa", label: dict.map },
     { href: "/artisti", label: dict.artists },
     { href: "/locali", label: dict.venues },
+    { href: "/calls", label: dict.calls },
     { href: "/per-gli-artisti", label: dict.forArtists },
     { href: "/per-le-venue", label: dict.forVenues },
     { href: "/about", label: dict.about },
