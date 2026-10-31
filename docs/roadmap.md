@@ -26,11 +26,13 @@
 | **9A** | ✅ follow di artisti/locali, notifica nuovi eventi, digest, conteggio follower |
 | **9B** | ⏸ **rimandata**: manca un premio chiaro e una regola anti-abuso |
 | **10** | ✅ **10A, 10B, 10D e 10E fatte**; playlist reale attiva. **10C** (gestione playlist da admin) resta facoltativa. Piano: `docs/plan-phase-10.md` |
-| **11** | ✅ **11A dormiente**, **11B.1a-d** (booking/Messaggi, EPK, avatar/banner, pagine pubbliche) e **11B.2** (analytics, statistiche, restyling) fatti. Prossimo: **11B.2b** widget ed export programmazione. Vendita congelata; Pro e pagamenti nella **Fase 15** |
-| **12** | ⬜ serie, locale chiuso, bacheca ingaggi |
-| **13** | ⬜ SEO, legal, cancellazione account, audit e polish |
-| **14** | ⬜ Help Center completo (B73), dopo la 13 |
+| **11** | ✅ **11A dormiente**, **11B.1a–d** (booking, EPK, avatar/banner, pagine pubbliche) e **11B.2** (analytics, statistiche, widget, export, pipeline booking) fatti. Vendita congelata |
+| **12** | ✅ locale chiuso, bacheca ingaggi con tetto candidature, festival multi-giorno. Piano: `docs/plan-phase-12.md` |
+| **13** | ✅ testi legali, Spotify click-to-load, cancellazione/export, audit RLS, pagine errore, OG schede, serate simili, visti di recente. Piano: `docs/plan-phase-13.md` |
+| **14** | ▶ **prossima**: Help Center completo (B73) |
+| **14B** | ⬜ **chiusura e collaudo**: B60 (città estere), B13 (accessibilità), B06, B45, pulizia fixture, test E2E, **beta test per ruoli**, report finale |
 | **15** | ⏸ **condizionale**: monetizzazione solo con posizione fiscale/ente/fiscal host |
+| **16** | ⬜ **lancio e ascolto**: esecuzione del playbook, calendario, asset, misura delle prime 4 settimane |
 
 La regola sui canali è in **`docs/notifications-email-policy.md`**: email solo per ciò che
 serve anche a chi non entra nel sito; il resto è in-app. La quota Resend riservata alle email
@@ -50,9 +52,11 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 | **9 — Community: segui e inviti virali** | **"Segui"** artista e locale (tabella `follows`, base per il digest della Fase 7) · **inviti virali** `/invite/CODICE` nel dashboard artista, con riscatto automatico (3 invitati con email verificata e almeno 1 evento pubblicato). **Stato: 9A completa il 28 ottobre 2026 (follow + conteggio pubblico dei follower, commit `a4a8665`); 9B inviti rimandata** | nessuno |
 | **10 — Spotify e Area Artista/Locale** | Form Spotify nel profilo (brani/album/ID), **sticky player** persistente, `/playlists` con le playlist OpenStage; **moduli ruolo-specifici** per artista e locale dentro il guscio della 5.5D (profilo, eventi, completezza, strumenti). **Niente dashboard duplicate**. Divisa in **10A** Spotify (link validati, player, `/playlists` con tabella `spotify_playlists`, dock) e **10B** moduli ruolo (completezza, prossime serate, follower del proprietario, azioni rapide); **10C** gestione playlist da admin. Piano: `docs/plan-phase-10.md`. **Stato: 10A, 10B, 10D e 10E fatte** (Spotify, `/playlists`, sezione playlist in Home, dock, moduli ruolo, link social con icone, proposte con verifica link e coda admin). **Playlist reale attiva dal 29 ottobre 2026** | nessuno (embed Spotify è gratuito, nessuna API key) |
 | **11 — Strumenti gratuiti (vendita congelata)** | **11A** costruita e dormiente: entitlements, gating, pagina Pro, box richieste. **11B.1a**: contatti/booking **gratuiti** + inbox Messaggi; **11B.1b**: EPK artista (fatto); **11B.1c**: avatar/banner (fatto); **11B.1d**: pagine pubbliche che spiegano cosa si può fare (fatto). **11B.2**: analytics e statistiche (fatte); restano widget ed export programmazione. **11C pagamenti congelata**. Zero incassi, zero donazioni, zero sponsor pagati, zero pubblicità. Il Pro va nascosto o trasformato in “Strumenti”; la monetizzazione torna nella **Fase 15**. | **nessuno**: Vercel Hobby, Supabase Free, Resend/MapTiler/GitHub free; dominio unico costo |
-| **12 — Serie, locali chiusi, bacheca ingaggi** | 12.1 ricorrenza/`serie_id` (**B41**) · 12.2 locale chiuso (**B42**) · 12.3 **`/calls`** "cercasi artisti" + candidature | nessuno nuovo |
-| **13 — SEO, legal, audit e polish finale** | **B09 + B44 + B45** (OG di default, favicon, anteprime delle schede) · `/privacy`, `/terms`, `/cookies` **reali** per GDPR e pagamenti + banner cookie · **notice & takedown** · audit RLS · pagina **500** · README + checklist env · pulizia fixture · **B46/B47** (serate simili, visti di recente) · generatore social AI (facoltativo). **Non si rifanno le pagine della 5.5**: qui solo rifiniture e contenuti | Anthropic solo se si fa il generatore |
-| **14 — Help Center completo** | **B73**: `/aiuto` con ricerca, categorie, articoli, feedback utile/non utile e CTA ai contatti; contenuti gestiti dalla control room (`/admin/aiuto`), non da Zendesk. Tabelle `help_categories`, `help_articles`, `help_feedback`; Markdown IT/EN, bozza/pubblicato, SEO con `pg_trgm`/full-text. `/faq` viene assorbita o reindirizzata. Solo dopo la 13, con l'audit dei ticket reali | nessuno |
+| **✅ 12 — Serie, locali chiusi, bacheca ingaggi** | **12.1** locale chiuso con annullamento delle date future e riapertura · **12.2** `/calls` con compenso dichiarato, tetto di candidature scelto e modificabile, chiusura anticipata, candidatura = thread di booking · **12.3** festival multi-giorno con `ends_at`, senza ricorrenza. Piano: `docs/plan-phase-12.md` | nessuno |
+| **✅ 13 — SEO, legal, audit e polish finale** | Testi legali reali (privacy, termini, cookie), Spotify **click-to-load**, cancellazione account con export, audit RLS, `error.tsx`/`global-error.tsx`, OG per eventi e schede, serate simili, visti di recente, README con checklist env. Piano: `docs/plan-phase-13.md` | nessuno |
+| **14 — Help Center completo** | **B73**: `/aiuto` con categorie, ricerca (`pg_trgm`/full-text), articoli Markdown IT/EN, bozza/pubblicato, domande correlate, feedback utile/non utile, CTA ai contatti; gestione da `/admin/aiuto`; `/faq` assorbita o reindirizzata. Contenuti scritti sui casi reali (contatti, claim, pubblicazione, booking). | nessuno |
+| **14B — Chiusura e collaudo** | **B60** città estere e paese · **B13** accessibilità (axe + tastiera) · **B06** `role_chosen_at` · **B45** limite sulle rotte OG · pulizia fixture · **test E2E** (Playwright su GitHub Actions) · **beta test per ruoli** (`docs/plan-beta-tests.md`) · **report finale** (`docs/report-finale.md`) | nessuno |
+| **16 — Lancio e ascolto** | **B112** playbook (`docs/launch-playbook.md`): post Indie Hackers, timeline -7/0/+7, guerrilla locale, marketing a costo zero, checklist Product Hunt. Esecuzione, calendario, asset e misura delle prime 4 settimane. Fase operativa, non di prodotto. | nessuno |
 | **15 — Sostenibilità (condizionale)** | Pass Pro, sponsor o donazioni solo dopo una posizione fiscale o un ente/fiscal host che gestisce gli incassi; 30–50 locali attivi, 100+ artisti, 20–30 in waitlist. Sempre zero pay-to-play. | commercialista, eventuale P.IVA/ente, Vercel Pro, PayPal |
 
 ## Ordine operativo (deciso il 23 ottobre 2026)
@@ -75,13 +79,19 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
    premio e regola anti-abuso.
 10. **10A → 10B** — Spotify, Area artista/locale e link social. **Completate il 28 ottobre
     2026**; il dock si accende quando arrivano playlist reali.
-11. **11B.1 → 11B.2** — strumenti gratuiti: contatti/booking, EPK, analytics, export, widget.
-    **11C pagamenti congelata**. La monetizzazione torna nella **Fase 15**, solo con fiscalità.
-    fiscalità, lancio). Niente beta: vendita al lancio.
-12. **12** — serie, locali chiusi e bacheca ingaggi.
-13. **13** — SEO, legal, cancellazione account, audit RLS e polish finale: è il **cancello
-    d'ingresso** all'apertura pubblica.
-14. **14** — Help Center completo (B73), dopo la 13.
+11. **11B.1 → 11B.2** - strumenti gratuiti: contatti/booking, EPK, analytics, export,
+    widget, pipeline booking. **11C pagamenti congelata**; la monetizzazione torna nella
+    **Fase 15**, solo con fiscalità.
+12. **Fase 12** - locale chiuso, bacheca ingaggi, festival multi-giorno. **Completata** il
+    31 ottobre 2026.
+13. **Fase 13** - testi legali, cancellazione account ed export, audit RLS, pagine errore,
+    anteprime social, serate simili. **Completata** il 31 ottobre 2026.
+14. **Fase 14** - Help Center completo (B73). **Prossima**.
+15. **Fase 14B** - chiusura: B60 città estere, B13 accessibilità, B06, B45, pulizia fixture,
+    test E2E, **beta test per ruoli** (`docs/plan-beta-tests.md`) e **report finale**
+    (`docs/report-finale.md`).
+16. **Fase 16** - lancio e ascolto: playbook, calendario, asset, misura delle prime quattro
+    settimane. La **Fase 15** (monetizzazione) resta condizionale e non blocca il lancio.
 
 La 5.5 non è un "grande restyling" unico: ogni blocco è indipendente, verificabile e
 committabile. Non si mescolano restyling e logica nella stessa modifica.
