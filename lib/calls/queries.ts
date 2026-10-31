@@ -256,3 +256,21 @@ export async function listCallApplications(callId: string): Promise<CallApplicat
     ];
   });
 }
+
+
+/** Quante chiamate sono aperte adesso. Serve alla fascia in Home. */
+export async function countOpenCalls(): Promise<number> {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("calls")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "open")
+    .gt("expires_at", new Date().toISOString());
+
+  if (error) {
+    console.error("[calls] countOpenCalls:", error.message);
+    return 0;
+  }
+
+  return count ?? 0;
+}

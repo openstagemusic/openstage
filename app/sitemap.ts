@@ -31,6 +31,7 @@ const STATIC_PATHS = [
   "/locali",
   "/calls",
   "/citta",
+  "/per-i-fan",
   "/per-gli-artisti",
   "/per-le-venue",
   "/about",

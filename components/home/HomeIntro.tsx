@@ -33,6 +33,12 @@ export default function HomeIntro({ dict }: { dict: Dictionary }) {
               {t.aboutCta} <span aria-hidden="true">↗</span>
             </Link>
             <Link
+              href="/per-i-fan"
+              className="home-arrow-link inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white"
+            >
+              {dict.pages.forFans.title} <span aria-hidden="true">→</span>
+            </Link>
+            <Link
               href="/per-gli-artisti"
               className="home-arrow-link inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white"
             >

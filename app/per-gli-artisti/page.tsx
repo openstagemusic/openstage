@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import Link from "@/components/i18n/LocaleLink";
+import FeatureArt from "@/components/pages/FeatureArt";
 import FreeTools from "@/components/pages/FreeTools";
 import PageCta from "@/components/pages/PageCta";
 import PageHero from "@/components/pages/PageHero";
@@ -61,10 +62,23 @@ export default async function ForArtistsPage() {
         </PageSection>
 
         <PageSection number="03" title={t.toolsTitle}>
+          <FeatureArt variant="dashboard" className="mb-6" />
           <FreeTools items={t.tools} note={t.toolsNote} />
         </PageSection>
 
-        <PageSection number="04" title={t.claimTitle}>
+        <PageSection number="04" title={t.alertsTitle}>
+          <p className="text-sm leading-relaxed text-muted sm:text-base">{t.alertsText}</p>
+          <ul className="mt-5 grid gap-5 border-t border-line pt-5 sm:grid-cols-2">
+            {t.alerts.map((alert) => (
+              <li key={alert.title}>
+                <h3 className="font-display text-sm font-semibold">{alert.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{alert.text}</p>
+              </li>
+            ))}
+          </ul>
+        </PageSection>
+
+        <PageSection number="05" title={t.claimTitle}>
           <p className="text-sm leading-relaxed text-muted sm:text-base">{t.claimText}</p>
           <p className="mt-4 border-l border-cyan/50 pl-4 text-sm leading-relaxed text-white/80">
             {t.claimNote}
@@ -77,7 +91,7 @@ export default async function ForArtistsPage() {
           </Link>
         </PageSection>
 
-        <PageSection number="05" title={t.rulesTitle}>
+        <PageSection number="06" title={t.rulesTitle}>
           <ul className="space-y-4">
             {t.rules.map((rule) => (
               <li key={rule} className="flex gap-3 text-sm leading-relaxed text-muted">

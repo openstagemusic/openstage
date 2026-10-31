@@ -8,6 +8,7 @@ import BentoGrid from "@/components/home/BentoGrid";
 import CityStrip from "@/components/home/CityStrip";
 import HeroPosters from "@/components/home/HeroPosters";
 import HomeIntro from "@/components/home/HomeIntro";
+import CallsBand from "@/components/home/CallsBand";
 import PlaylistSection from "@/components/home/PlaylistSection";
 import GlobeMap from "@/components/map/GlobeMap";
 import Reveal from "@/components/motion/Reveal";
@@ -26,6 +27,7 @@ import {
   listMapEvents,
   listSavedEventIds,
 } from "@/lib/events/queries";
+import { countOpenCalls, listOpenCalls } from "@/lib/calls/queries";
 import { listCityDirectory } from "@/lib/cities/queries";
 import { getVisitorLocation } from "@/lib/geo/visitor";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -58,8 +60,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const params = await searchParams;
 
-  const [visitor, session, savedIds, genres, featured, counters, cityDirectory, playlists] =
-    await Promise.all([
+  const [
+    visitor,
+    session,
+    savedIds,
+    genres,
+    featured,
+    counters,
+    cityDirectory,
+    playlists,
+    homeCalls,
+    callsCount,
+  ] = await Promise.all([
     getVisitorLocation(),
     getSessionProfile(),
     listSavedEventIds(),
@@ -68,6 +80,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     getDiscoveryCounters(),
     listCityDirectory(),
     listPublishedPlaylists(),
+    listOpenCalls({ limit: 2 }),
+    countOpenCalls(),
   ]);
 
   // In Home le città restano poche e in ordine alfabetico: l'elenco completo,
@@ -324,7 +338,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <BentoGrid dict={dict} counters={counters} />
       </Reveal>
 
-      {/* 06 - Playlist della redazione: solo se ce n'è una pubblicata. */}
+      {/* 06 - Bacheca: solo se ci sono chiamate aperte, con i dati veri. */}
+      {callsCount > 0 ? (
+        <Reveal>
+          <CallsBand calls={homeCalls} count={callsCount} locale={locale} dict={dict} />
+        </Reveal>
+      ) : null}
+
+      {/* 07 - Playlist della redazione: solo se ce n'è una pubblicata. */}
       {playlists.length > 0 ? (
         <Reveal>
           <PlaylistSection

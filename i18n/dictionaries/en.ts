@@ -13,6 +13,7 @@ export const en = {
   },
   nav: {
     calls: "Calls",
+    forFans: "For fans",
     explore: "Explore",
     artists: "Artists",
     venues: "Venues",
@@ -54,6 +55,7 @@ export const en = {
     social: "Social",
     linksLabel: "Useful links",
     calls: "Calls",
+    forFans: "For fans",
     takePart: "Take part",
     forArtists: "For artists",
     forVenues: "For venues",
@@ -413,6 +415,11 @@ export const en = {
     discoveryTitle: "Find the closest night.",
     discoverySubtitle:
       "The globe shows the live shows coming up. Rotate it, zoom in, tap a pin: every point is a real event.",
+    callsEyebrow: "Board",
+    callsTitle: "Looking for artists.",
+    callsCountOne: "open call",
+    callsCountMany: "open calls",
+    callsAll: "All calls",
     playlistEyebrow: "Playlist",
     playlistTitle: "The soundtrack of the scene.",
     playlistText:
@@ -862,6 +869,10 @@ export const en = {
           text: "Profile image, banner, bio, genre, city, Spotify and socials. If images are missing, the page uses the OpenStage placeholder.",
         },
         {
+          title: "Dashboard and stats",
+          text: "One dashboard to manage dates, messages and your page. Views, followers, saves and requests: real numbers, day by day, with CSV export.",
+        },
+        {
           title: "EPK / press kit",
           text: "A page with photo, rider, contact and upcoming dates to send to venues and festivals: shareable and printable, no watermark.",
         },
@@ -870,8 +881,12 @@ export const en = {
           text: "Venues write to you from your page and requests land in a private inbox, with the reply in the same thread. Free, tomorrow too.",
         },
         {
-          title: "Dates, posters and calendar",
-          text: "Every date has its own page, calendar file and ready social images. You can keep it as a draft until everything is set.",
+          title: "Booking board",
+          text: "See who is looking for a band, a DJ or a technician and apply. The application becomes a conversation in your inbox, not a lost email.",
+        },
+        {
+          title: "Dates, festivals and calendar",
+          text: "Every date has its own page, calendar file and ready social images. A festival can last more than a day: just set the last one.",
         },
         {
           title: "A track for the playlist",
@@ -880,6 +895,27 @@ export const en = {
       ],
       toolsNote:
         "No pay-to-play: search, map and featured dates are not for sale, and there is no paid plan to activate.",
+      alertsTitle: "Notifications, without noise",
+      alertsText:
+        "We only ping you when there is something to do. Notifications stay in the app and you delete them, one by one or all at once.",
+      alerts: [
+        {
+          title: "Cancelled or moved dates",
+          text: "If a date you saved or care about changes, you know straight away.",
+        },
+        {
+          title: "New dates from pages you follow",
+          text: "You choose which artists and venues to follow. No algorithm decides for you.",
+        },
+        {
+          title: "Contact and booking requests",
+          text: "When a venue writes to you, a notification arrives: the conversation stays in the dashboard.",
+        },
+        {
+          title: "No vanity metrics",
+          text: "We do not ping you because someone looked at your profile. Only facts that need a reply.",
+        },
+      ],
       claimTitle: "Already on OpenStage?",
       claimText:
         "Some artist pages are created by our editorial team from real gigs. If the page is yours, open it and choose “This is me”. You will need a public link that proves it: your website, a social page or a press page with your name.",
@@ -929,24 +965,49 @@ export const en = {
           text: "Profile image, banner, address, capacity and location: the room stays findable even in weeks without gigs.",
         },
         {
-          title: "Programme and archive",
-          text: "Publish every date with poster, times, entry and directions; past dates stay as the archive of your room.",
+          title: "Dashboard and stats",
+          text: "One dashboard to manage the programme, messages and your page. Views, followers, saves and requests: real numbers, day by day, with CSV export.",
+        },
+        {
+          title: "Programme, archive and festivals",
+          text: "Publish every date with poster, times, entry and directions; a festival can last more than a day. Past dates stay as the archive of your room.",
+        },
+        {
+          title: "Booking board with a cap",
+          text: "Post a call, choose how many applications to receive and close it when you find someone. You can change the cap while it is open.",
         },
         {
           title: "Direct contact with artists",
           text: "Write to artists from their page: the conversation stays in a private inbox, with its history. Free, tomorrow too.",
         },
         {
-          title: "Artists linked to the date",
-          text: "Link an existing artist page or type the name of a guest who is not on OpenStage yet.",
-        },
-        {
-          title: "Followers and notifications",
-          text: "People who follow you get a notification when you publish a date. The room fills with the right people, not a bought boost.",
+          title: "Closing and reopening",
+          text: "If the venue closes, future dates are cancelled with the reason, the page says so and contact stops. Reopening deletes nothing.",
         },
       ],
       toolsNote:
         "No fees on the door and no checkout: if you sell tickets elsewhere, the link stays yours. No paid advertising.",
+      alertsTitle: "Notifications, without noise",
+      alertsText:
+        "We only ping you when there is something to do. Notifications stay in the app and you delete them, one by one or all at once.",
+      alerts: [
+        {
+          title: "New dates from pages you follow",
+          text: "People who follow your room get a notice when you publish. No bought boost.",
+        },
+        {
+          title: "Contact and booking requests",
+          text: "When an artist writes to you or applies to a call, a notification arrives.",
+        },
+        {
+          title: "Cancelled dates",
+          text: "If a date falls through, whoever saved it reads why: it does not just vanish.",
+        },
+        {
+          title: "No vanity metrics",
+          text: "We do not ping you because someone looked at your page. Only facts that need a reply.",
+        },
+      ],
       claimTitle: "Is this your venue?",
       claimText:
         "OpenStage can create a venue page from a real event. If the page is yours, choose “I manage this venue” and send a public proof link. A staff member approves the request.",
@@ -962,6 +1023,82 @@ export const en = {
       ctaText: "Create your venue profile and publish the next night.",
       primaryCta: "Create a venue account",
       secondaryCta: "Find your venue",
+    },
+    forFans: {
+      title: "For fans",
+      description: "Find gigs near you, free and without ads.",
+      eyebrow: "For fans",
+      headline: "The right night,",
+      accent: "tonight.",
+      lead:
+        "Agenda, map and cities: find who is playing near you, save the dates and follow artists. Free, without ads.",
+      introTitle: "A map, not a feed.",
+      introText:
+        "No algorithm deciding what you should see and no ranking to chase. Open the map, filter by city, date or distance, and look at real nights published by the people who organise them.",
+      stepsTitle: "How it works",
+      steps: [
+        {
+          title: "Open the map",
+          text: "The globe starts on your area: every pin is a real night, with date, place and poster.",
+        },
+        {
+          title: "Filter or search",
+          text: "Tonight, this weekend, free, a few steps away. The search stays in the address: you can share it.",
+        },
+        {
+          title: "Save, follow, go",
+          text: "Save nights, follow artists and venues, get a notice when something changes. Then go out.",
+        },
+      ],
+      toolsTitle: "What you can do",
+      tools: [
+        {
+          title: "Save nights",
+          text: "A saved night goes to Favourites with a reminder: you find it again in a month.",
+        },
+        {
+          title: "Follow artists and venues",
+          text: "Follow the pages you care about and get a notice when they publish a date. No algorithm.",
+        },
+        {
+          title: "Notifications that matter",
+          text: "Only useful alerts: cancelled night, moved date, new date from someone you follow. You delete them, even all at once.",
+        },
+        {
+          title: "Editorial playlist",
+          text: "The OpenStage selection, to listen to while you look for the next night.",
+        },
+      ],
+      toolsNote:
+        "You do not need an account to search: you need one to save, follow and get alerts. Free, without paywalls.",
+      alertsTitle: "Notifications, without noise",
+      alertsText:
+        "We only ping you when something you chose to follow changes. They stay in the app and you delete them.",
+      alerts: [
+        {
+          title: "Cancelled or moved night",
+          text: "If a date you saved falls through, you read why on the page: it does not vanish.",
+        },
+        {
+          title: "New dates from pages you follow",
+          text: "A notice when an artist or a venue you follow publishes a night.",
+        },
+        {
+          title: "No vanity metrics",
+          text: "No alert because someone looked at a profile. Only facts that concern you.",
+        },
+      ],
+      rulesTitle: "What you will not find here",
+      rules: [
+        "No paywall: searching, filtering and reading a page is free and always will be.",
+        "No advertising and no bought featured nights: the showcase is chosen by the editors.",
+        "No ticketing: if a night has a ticket link, it takes you where tickets are sold.",
+        "No fake reviews and no inflated counts: only real dates and places.",
+      ],
+      ctaTitle: "Tonight, live music.",
+      ctaText: "Open the map and see what is a few steps away.",
+      primaryCta: "Explore the nights",
+      secondaryCta: "Create an account",
     },
     about: {
       title: "About us",

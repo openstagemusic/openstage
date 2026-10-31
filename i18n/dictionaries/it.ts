@@ -11,6 +11,7 @@ export const it: Dictionary = {
   },
   nav: {
     calls: "Chiamate",
+    forFans: "Per i fan",
     explore: "Esplora",
     artists: "Artisti",
     venues: "Locali",
@@ -52,6 +53,7 @@ export const it: Dictionary = {
     social: "Social",
     linksLabel: "Link utili",
     calls: "Chiamate",
+    forFans: "Per i fan",
     takePart: "Partecipa",
     forArtists: "Per gli artisti",
     forVenues: "Per le venue",
@@ -397,7 +399,7 @@ export const it: Dictionary = {
     badge: "Musica dal vivo indipendente e underground",
     title: "Trova il concerto di stasera, come aprire una mappa.",
     subtitle:
-      "OpenStage dà visibilità reale ad artisti emergenti e locali di zona. Gratis per sempre — per fan, artisti e locali.",
+      "La mappa delle serate dal vivo vicino a te: concerti, club e locali indipendenti, stasera o questo weekend. Gratis, senza pubblicità e senza pay-to-play.",
     hero: {
       line1: "Stasera",
       line2: "si suona.",
@@ -412,6 +414,11 @@ export const it: Dictionary = {
     discoveryTitle: "Trova la serata più vicina.",
     discoverySubtitle:
       "Il globo mostra i concerti in programma. Ruotalo, ingrandisci, tocca un pin: ogni punto è un evento reale.",
+    callsEyebrow: "Bacheca",
+    callsTitle: "Cercasi artisti.",
+    callsCountOne: "chiamata aperta",
+    callsCountMany: "chiamate aperte",
+    callsAll: "Tutte le chiamate",
     playlistEyebrow: "Playlist",
     playlistTitle: "La colonna sonora della scena.",
     playlistText:
@@ -866,6 +873,10 @@ export const it: Dictionary = {
           text: "Immagine profilo, banner, bio, genere, città, Spotify e social. Se mancano le immagini, la scheda usa il placeholder OpenStage.",
         },
         {
+          title: "Dashboard e statistiche",
+          text: "Una dashboard per gestire date, messaggi e scheda. Visualizzazioni, follower, salvataggi e richieste: numeri veri, giorno per giorno, con export CSV.",
+        },
+        {
           title: "EPK / press kit",
           text: "Una pagina con foto, rider, contatto e prossime date da mandare a locali e festival: condivisibile e stampabile, senza filigrana.",
         },
@@ -874,8 +885,12 @@ export const it: Dictionary = {
           text: "I locali ti scrivono dalla tua scheda e le richieste arrivano in una inbox privata, con la risposta nello stesso thread. Gratis, anche domani.",
         },
         {
-          title: "Date, locandine e calendario",
-          text: "Ogni serata ha la sua pagina, il file calendario e le immagini social pronte. Puoi tenerla in bozza finché non è tutto a posto.",
+          title: "Bacheca ingaggi",
+          text: "Guarda chi cerca una band, un DJ o un tecnico e candidati. La candidatura diventa una conversazione nella tua inbox, non una mail dispersa.",
+        },
+        {
+          title: "Date, festival e calendario",
+          text: "Ogni serata ha la sua pagina, il file calendario e le immagini social pronte. Un festival può durare più giorni: basta indicare l'ultimo.",
         },
         {
           title: "Brano per la playlist",
@@ -884,6 +899,27 @@ export const it: Dictionary = {
       ],
       toolsNote:
         "Niente pay-to-play: ricerca, mappa e serate in evidenza non si comprano, e non c'è un piano a pagamento da attivare.",
+      alertsTitle: "Notifiche, senza rumore",
+      alertsText:
+        "Ti avvisiamo solo quando c'è qualcosa da fare. Le notifiche restano nell'app, le cancelli tu, una alla volta o tutte.",
+      alerts: [
+        {
+          title: "Serate annullate o spostate",
+          text: "Se una data che hai salvato o che riguarda la tua scena cambia, lo sai subito.",
+        },
+        {
+          title: "Nuove date delle schede che segui",
+          text: "Scegli tu quali artisti e locali seguire. Nessun algoritmo decide per te.",
+        },
+        {
+          title: "Richieste di contatto e booking",
+          text: "Quando un locale ti scrive, arriva una notifica: la conversazione resta nella dashboard.",
+        },
+        {
+          title: "Niente metriche di vanità",
+          text: "Non ti avvisiamo perché qualcuno ha guardato il profilo. Solo fatti che richiedono una risposta.",
+        },
+      ],
       claimTitle: "Sei già su OpenStage?",
       claimText:
         "Alcune schede artista sono create dalla redazione partendo da concerti reali. Se la pagina è tua, aprila e scegli “Sono io”. Ti serve un link pubblico che lo dimostri: il tuo sito, una pagina social o una pagina stampa con il tuo nome.",
@@ -933,24 +969,49 @@ export const it: Dictionary = {
           text: "Immagine profilo, banner, indirizzo, capienza e posizione: la sala resta trovabile anche nelle settimane senza concerti.",
         },
         {
-          title: "Programmazione e archivio",
-          text: "Pubblichi ogni serata con locandina, orari, ingresso e come arrivare; quelle passate restano come archivio della sala.",
+          title: "Dashboard e statistiche",
+          text: "Una dashboard per gestire programmazione, messaggi e scheda. Visualizzazioni, follower, salvataggi e richieste: numeri veri, giorno per giorno, con export CSV.",
+        },
+        {
+          title: "Programmazione, archivio e festival",
+          text: "Pubblichi ogni serata con locandina, orari, ingresso e come arrivare; un festival può durare più giorni. Quelle passate restano come archivio della sala.",
+        },
+        {
+          title: "Bacheca ingaggi con tetto",
+          text: "Pubblichi una chiamata, scegli quante candidature ricevere e chiudi quando hai trovato. Il limite lo cambi anche a chiamata aperta.",
         },
         {
           title: "Contatti diretti con gli artisti",
           text: "Scrivi agli artisti dalla loro scheda: la conversazione resta in una inbox privata, con lo storico. Gratis, anche domani.",
         },
         {
-          title: "Artisti collegati alla serata",
-          text: "Colleghi una scheda artista esistente oppure scrivi il nome di un ospite che non è ancora su OpenStage.",
-        },
-        {
-          title: "Follower e notifiche",
-          text: "Chi ti segue riceve una notifica quando pubblichi una serata. La sala si riempie con le persone giuste, non con un boost comprato.",
+          title: "Chiusura e riapertura",
+          text: "Se il locale chiude, le serate future si annullano con il motivo, la scheda lo dice e il contatto si spegne. Riaprire non cancella niente.",
         },
       ],
       toolsNote:
         "Niente commissioni sull'ingresso e niente checkout: se vendi biglietti altrove, il link resta tuo. Nessuna pubblicità a pagamento.",
+      alertsTitle: "Notifiche, senza rumore",
+      alertsText:
+        "Ti avvisiamo solo quando c'è qualcosa da fare. Le notifiche restano nell'app, le cancelli tu, una alla volta o tutte.",
+      alerts: [
+        {
+          title: "Nuove date delle schede che segui",
+          text: "Chi segue la tua sala riceve un avviso quando pubblichi. Nessun boost comprato.",
+        },
+        {
+          title: "Richieste di contatto e booking",
+          text: "Quando un artista ti scrive o si candida a una chiamata, arriva una notifica.",
+        },
+        {
+          title: "Serate annullate",
+          text: "Se una data salta, chi l'aveva salvata lo legge con il motivo: non sparisce nel nulla.",
+        },
+        {
+          title: "Niente metriche di vanità",
+          text: "Non ti avvisiamo perché qualcuno ha guardato la scheda. Solo fatti che richiedono una risposta.",
+        },
+      ],
       claimTitle: "È il tuo locale?",
       claimText:
         "OpenStage può creare la pagina di un locale partendo da un evento reale. Se la pagina è tua, scegli “Sono il gestore” e invia un link pubblico come prova. La richiesta viene approvata dallo staff.",
@@ -966,6 +1027,82 @@ export const it: Dictionary = {
       ctaText: "Crea il profilo del locale e pubblica la prossima serata.",
       primaryCta: "Crea un account locale",
       secondaryCta: "Cerca il tuo locale",
+    },
+    forFans: {
+      title: "Per i fan",
+      description: "Trova i concerti vicino a te, gratis e senza pubblicità.",
+      eyebrow: "Per i fan",
+      headline: "La serata giusta,",
+      accent: "stasera.",
+      lead:
+        "Agenda, mappa e città: scopri chi suona vicino a te, salva le serate e segui gli artisti. Gratis, senza pubblicità.",
+      introTitle: "Una mappa, non un feed.",
+      introText:
+        "Nessun algoritmo che decide cosa devi vedere e nessuna classifica da inseguire. Apri la mappa, filtra per città, data o distanza, e guarda le serate vere pubblicate da chi le organizza.",
+      stepsTitle: "Come funziona",
+      steps: [
+        {
+          title: "Apri la mappa",
+          text: "Il globo parte dalla tua zona: ogni pin è una serata reale, con data, luogo e locandina.",
+        },
+        {
+          title: "Filtra o cerca",
+          text: "Stasera, questo weekend, gratis, a due passi da casa. La ricerca resta nell'indirizzo: puoi condividerla.",
+        },
+        {
+          title: "Salva, segui, vai",
+          text: "Salvi le serate, segui artisti e locali, ricevi un avviso quando cambiano qualcosa. Poi esci e vai.",
+        },
+      ],
+      toolsTitle: "Cosa puoi fare",
+      tools: [
+        {
+          title: "Salvare le serate",
+          text: "Una serata salvata finisce nei Preferiti, con il promemoria: la ritrovi anche tra un mese.",
+        },
+        {
+          title: "Seguire artisti e locali",
+          text: "Segui le schede che ti interessano e ricevi una notifica quando pubblicano una data. Niente algoritmo.",
+        },
+        {
+          title: "Notifiche che servono",
+          text: "Solo avvisi utili: serata annullata, data spostata, nuova data di chi segui. Le cancelli tu, anche tutte.",
+        },
+        {
+          title: "Playlist della redazione",
+          text: "La selezione musicale di OpenStage, da ascoltare mentre cerchi la prossima serata.",
+        },
+      ],
+      toolsNote:
+        "Non serve un account per cercare: serve per salvare, seguire e ricevere avvisi. Gratis, senza paywall.",
+      alertsTitle: "Notifiche, senza rumore",
+      alertsText:
+        "Ti avvisiamo solo quando cambia qualcosa che hai scelto di seguire. Restano nell'app e le cancelli tu.",
+      alerts: [
+        {
+          title: "Serata annullata o spostata",
+          text: "Se una data che hai salvato salta, leggi il motivo sulla pagina: non sparisce nel nulla.",
+        },
+        {
+          title: "Nuove date di chi segui",
+          text: "Un avviso quando un artista o un locale che segui pubblica una serata.",
+        },
+        {
+          title: "Niente metriche di vanità",
+          text: "Nessun avviso perché qualcuno ha guardato un profilo. Solo fatti che ti riguardano.",
+        },
+      ],
+      rulesTitle: "Cosa non trovi qui",
+      rules: [
+        "Nessun paywall: cercare, filtrare e leggere una scheda è gratis e lo sarà sempre.",
+        "Nessuna pubblicità e nessuna serata in evidenza comprata: la vetrina la sceglie la redazione.",
+        "Nessuna biglietteria: se una serata ha un link ai biglietti, ti porta dove si compra.",
+        "Nessuna recensione finta e nessun conteggio gonfiato: solo date e luoghi reali.",
+      ],
+      ctaTitle: "Stasera si suona.",
+      ctaText: "Apri la mappa e guarda cosa c'è a due passi da casa.",
+      primaryCta: "Esplora le serate",
+      secondaryCta: "Crea un account",
     },
     about: {
       title: "Chi siamo",
