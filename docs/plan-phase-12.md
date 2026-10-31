@@ -137,5 +137,7 @@ La Fase 12 ha cambiato il prodotto: le pagine lo raccontano.
   non taglia più niente.
 - **/citta**: le serate passano da 40 in blocco a **12 per pagina** con paginazione; le pagine 2+
   restano `noindex` con la prima come canonica.
+- **Directory**: una pagina fuori intervallo (link vecchio) non fa più fallire la query: si conteggia
+  prima e si atterra sull'ultima pagina valida.
 - **Profili artista e locale**: link “Tutte le passate” e nuove pagine `/artisti/[slug]/archivio` e
   `/locali/[slug]/archivio` (fino a 60 serate, `noindex`, canonical alla scheda).

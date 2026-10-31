@@ -234,32 +234,43 @@ export async function listArtists({
   perPage = ITEMS_PER_PAGE,
 }: DirectoryOptions = {}): Promise<DirectoryResult<PublicArtist>> {
   const supabase = await createClient();
-  const offset = Math.max(0, (page - 1) * perPage);
   const term = cleanTerm(filters.query ?? "");
-
-  let query = supabase.from("artists").select(ARTIST_SELECT, { count: "exact" });
-
-  if (term) query = query.ilike("name", `%${term}%`);
   // La città si confronta sulla chiave normalizzata: "Milano", "milano" e
-  // "Milano (MI)" sono la stessa città (migration `0024`).
+  // "Milano (MI)" sono la stessa città (migration 0024).
   const city = filters.city ? cityKey(filters.city) : null;
+
+  let countQuery = supabase.from("artists").select("id", { count: "exact", head: true });
+  if (term) countQuery = countQuery.ilike("name", `%${term}%`);
+  if (city) countQuery = countQuery.eq("city_key", city);
+  if (filters.genre) countQuery = countQuery.eq("genre", filters.genre);
+
+  // Conteggio prima della pagina: un link vecchio con `page=5` non deve far
+  // fallire la query con "range not satisfiable".
+  const { count } = await countQuery;
+  const total = count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const offset = (safePage - 1) * perPage;
+
+  let query = supabase.from("artists").select(ARTIST_SELECT);
+  if (term) query = query.ilike("name", `%${term}%`);
   if (city) query = query.eq("city_key", city);
   if (filters.genre) query = query.eq("genre", filters.genre);
 
-  const { data, error, count } = await query
+  const { data, error } = await query
     .order("name", { ascending: true })
     .order("id", { ascending: true })
     .range(offset, offset + perPage - 1);
 
   if (error) {
     console.error("[directory] listArtists:", error.message);
-    return { items: [], total: 0 };
+    return { items: [], total };
   }
 
   const verified = await verifiedProfileIds();
   const rows = data as unknown as ArtistRow[];
 
-  return { items: rows.map((row) => toArtist(row, verified)), total: count ?? 0 };
+  return { items: rows.map((row) => toArtist(row, verified)), total };
 }
 
 export async function listVenues({
@@ -268,34 +279,42 @@ export async function listVenues({
   perPage = ITEMS_PER_PAGE,
 }: DirectoryOptions = {}): Promise<DirectoryResult<PublicVenue>> {
   const supabase = await createClient();
-  const offset = Math.max(0, (page - 1) * perPage);
   const term = cleanTerm(filters.query ?? "");
+  const city = filters.city ? cityKey(filters.city) : null;
+
+  let countQuery = supabase
+    .from("venues")
+    .select("id", { count: "exact", head: true })
+    .is("closed_at", null);
+  if (term) countQuery = countQuery.ilike("name", `%${term}%`);
+  if (city) countQuery = countQuery.eq("city_key", city);
+
+  const { count } = await countQuery;
+  const total = count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const offset = (safePage - 1) * perPage;
 
   // Un locale chiuso non si propone più: la pagina resta raggiungibile, ma
   // non compare tra i locali da contattare.
-  let query = supabase
-    .from("venues")
-    .select(VENUE_SELECT, { count: "exact" })
-    .is("closed_at", null);
-
+  let query = supabase.from("venues").select(VENUE_SELECT).is("closed_at", null);
   if (term) query = query.ilike("name", `%${term}%`);
-  const city = filters.city ? cityKey(filters.city) : null;
   if (city) query = query.eq("city_key", city);
 
-  const { data, error, count } = await query
+  const { data, error } = await query
     .order("name", { ascending: true })
     .order("id", { ascending: true })
     .range(offset, offset + perPage - 1);
 
   if (error) {
     console.error("[directory] listVenues:", error.message);
-    return { items: [], total: 0 };
+    return { items: [], total };
   }
 
   const verified = await verifiedProfileIds();
   const rows = data as unknown as VenueRow[];
 
-  return { items: rows.map((row) => toVenue(row, verified)), total: count ?? 0 };
+  return { items: rows.map((row) => toVenue(row, verified)), total };
 }
 
 /** Valori realmente presenti in tabella, per riempire i menu dei filtri. */
