@@ -1267,8 +1267,8 @@ export const en = {
     cities: {
       title: "Cities",
       description:
-        "Live music city by city: upcoming events, artists and venues in each Italian city.",
-      eyebrow: "Cities / Italy",
+        "Live music city by city: upcoming events, artists and venues, anywhere.",
+      eyebrow: "Cities / Live",
       headline: "Live music,",
       accent: "city by city.",
       lead:
@@ -1282,7 +1282,8 @@ export const en = {
       emptyText:
         "As soon as an artist or venue publishes an event, its city appears here.",
       mapCta: "Open the map",
-      cityEyebrow: "City / Italy",
+      cityEyebrow: "City page",
+      cityEyebrowCountry: "City page / {country}",
       cityLead:
         "{city} on OpenStage: upcoming events, artists and venues, from real published dates.",
       cityMetaTitle: "{city} · live music and gigs",
@@ -2193,6 +2194,7 @@ export const en = {
     spotifyLinkNotFound: "This Spotify link does not exist: check the address.",
     spotifyCheckUnavailable: "I cannot verify the link right now: try again shortly.",
     bio: "About",
+    country: "Country",
     address: "Address",
     website: "Website",
     capacity: "Capacity (people)",
@@ -2532,6 +2534,8 @@ export const en = {
     cityHint:
       "Write the city, or an address to find the place: picking a suggestion moves the map and drops the pin there.",
     cityKnown: "city already on OpenStage",
+    country: "Country",
+    countryHint: "Leave Italy if the night is here. Pick a country only for a date abroad.",
     placeSearchEmpty: "No place found: place the pin on the map by hand.",
     placeSearchError:
       "Place search is not answering right now: place the pin on the map by hand.",
@@ -2625,6 +2629,7 @@ export const en = {
       venueNameTooLong: "The venue name is too long (120 characters max).",
       artistInvalid: "The artist you picked no longer exists: try searching again.",
       cityRequired: "Write the city.",
+      countryInvalid: "Invalid country: use the two-letter code (IT, GB, ES…).",
       cityTooLong: "The city name is too long (80 characters max).",
       directionsTooLong: "The directions are too long (400 characters max): keep them to the point.",
       locationRequired: "Place the pin on the map: that is how people find the night.",

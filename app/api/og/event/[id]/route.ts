@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 
+import { allowOgRequest, tooManyRequests } from "@/lib/seo/og-rate-limit";
+
 import { formatEventDateLong } from "@/lib/events/format";
 import { getEventById } from "@/lib/events/queries";
 import { isCancelled, placeName } from "@/lib/events/types";
@@ -36,6 +38,8 @@ const SIZE = { width: 1200, height: 630 };
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, { params }: RouteContext) {
+  if (!allowOgRequest(request)) return tooManyRequests();
+
   const { id } = await params;
 
   const event = await getEventById(id);

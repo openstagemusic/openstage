@@ -1271,8 +1271,8 @@ export const it: Dictionary = {
     cities: {
       title: "Città",
       description:
-        "Il live città per città: prossime serate, artisti e locali in ogni città italiana.",
-      eyebrow: "Città / Italia",
+        "Il live città per città: prossime serate, artisti e locali, ovunque.",
+      eyebrow: "Città / Dal vivo",
       headline: "Il live,",
       accent: "città per città.",
       lead:
@@ -1285,7 +1285,8 @@ export const it: Dictionary = {
       emptyTitle: "Ancora nessuna città.",
       emptyText: "Appena un artista o un locale pubblica una serata, la sua città compare qui.",
       mapCta: "Apri la mappa",
-      cityEyebrow: "Pagina città / Italia",
+      cityEyebrow: "Pagina città",
+      cityEyebrowCountry: "Pagina città / {country}",
       cityLead:
         "{city} su OpenStage: prossime serate, artisti e locali, da date pubblicate davvero.",
       cityMetaTitle: "{city} · concerti e serate live",
@@ -2197,6 +2198,7 @@ export const it: Dictionary = {
     spotifyLinkNotFound: "Questo link Spotify non esiste: controlla l'indirizzo.",
     spotifyCheckUnavailable: "Non riesco a verificare il link adesso: riprova tra poco.",
     bio: "Presentazione",
+    country: "Paese",
     address: "Indirizzo",
     website: "Sito",
     capacity: "Capienza (posti)",
@@ -2537,6 +2539,8 @@ export const it: Dictionary = {
     cityHint:
       "Scrivi la città, o un indirizzo per trovare il posto: scegliendo un suggerimento la mappa si sposta e il pin si posa lì.",
     cityKnown: "città già su OpenStage",
+    country: "Paese",
+    countryHint: "Lascia l'Italia se la serata è qui. Scegli il paese solo per una data all'estero.",
     placeSearchEmpty: "Nessun posto trovato: metti il pin sulla mappa a mano.",
     placeSearchError:
       "La ricerca dei posti non risponde adesso: metti il pin sulla mappa a mano.",
@@ -2630,6 +2634,7 @@ export const it: Dictionary = {
       venueNameTooLong: "Il nome del locale è troppo lungo (massimo 120 caratteri).",
       artistInvalid: "L'artista scelto non esiste più: riprova a cercarlo.",
       cityRequired: "Scrivi la città.",
+      countryInvalid: "Paese non valido: usa il codice di due lettere (IT, GB, ES…).",
       cityTooLong: "Il nome della città è troppo lungo (massimo 80 caratteri).",
       directionsTooLong:
         "Le indicazioni sono troppo lunghe (massimo 400 caratteri): vanno dritte al punto.",

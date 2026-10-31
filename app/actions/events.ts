@@ -276,6 +276,7 @@ export async function saveEventAction(input: {
     venue_name: values.venueName,
     artist_id: artistId,
     city: values.city,
+    country: values.country,
     directions_text: values.directionsText,
     latitude: values.latitude,
     longitude: values.longitude,

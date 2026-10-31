@@ -7,6 +7,7 @@ import { checkSpotifyLinkAction } from "@/app/actions/spotify";
 import EpkPhotoField from "@/components/account/EpkPhotoField";
 import ImageUploadField from "@/components/account/ImageUploadField";
 import type { Dictionary } from "@/i18n/dictionaries/en";
+import { COUNTRIES, DEFAULT_COUNTRY } from "@/lib/geo/country";
 import { createClient } from "@/lib/supabase/client";
 import { parseSpotifyLink } from "@/lib/spotify/links";
 import { validateSocialLinks, type SocialKind } from "@/lib/social/links";
@@ -48,6 +49,7 @@ export type AccountVenue = {
   id: string;
   name: string;
   city: string;
+  country: string;
   address: string;
   website: string;
   capacity: string;
@@ -253,6 +255,7 @@ export default function AccountForm({
             .update({
               name: (values as AccountVenue).name,
               city: (values as AccountVenue).city || null,
+              country: (values as AccountVenue).country || DEFAULT_COUNTRY,
               address: (values as AccountVenue).address || null,
               website: urls.website,
               instagram_url: urls.instagram,
@@ -479,6 +482,24 @@ export default function AccountForm({
 
       {venue ? (
         <>
+          <div>
+            <label htmlFor="country" className={authLabelClass}>
+              {dict.country}
+            </label>
+            <select
+              id="country"
+              value={venue.country}
+              onChange={(event) => set("country", event.target.value)}
+              className={authInputClass}
+            >
+              {COUNTRIES.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label htmlFor="address" className={authLabelClass}>
               {dict.address}

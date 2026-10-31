@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 
+import { allowOgRequest, tooManyRequests } from "@/lib/seo/og-rate-limit";
+
 import { getArtistBySlug, getVenueBySlug } from "@/lib/directory/queries";
 import { defaultLocale, isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -20,6 +22,8 @@ const SIZE = { width: 1200, height: 630 };
 type RouteContext = { params: Promise<{ kind: string; slug: string }> };
 
 export async function GET(request: Request, { params }: RouteContext) {
+  if (!allowOgRequest(request)) return tooManyRequests();
+
   const { kind, slug } = await params;
 
   if (kind !== "artist" && kind !== "venue") {

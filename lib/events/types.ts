@@ -47,6 +47,8 @@ export type PublicEvent = {
   endsAt: string | null;
   timezone: string;
   city: string | null;
+  /** Paese ISO della serata (default IT). */
+  country: string;
   /** Come arrivare, per gli spazi che un indirizzo non ce l'hanno. */
   directionsText: string | null;
   latitude: number | null;

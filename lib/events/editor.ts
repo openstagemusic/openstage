@@ -1,3 +1,5 @@
+import { DEFAULT_COUNTRY, isCountryCode } from "@/lib/geo/country";
+
 import { addDays, calendarDate, FILTER_TIMEZONE, zonedDateTime, zonedInstant } from "./timezone";
 import { EVENT_KINDS, type EventKind, type LocationPrecision } from "./types";
 
@@ -85,6 +87,7 @@ export const EDITOR_FIELDS = [
   "venueName",
   "artistId",
   "city",
+  "country",
   "directions",
   "location",
   "priceText",
@@ -111,6 +114,7 @@ export type EditorErrorCode =
   | "artistInvalid"
   | "cityRequired"
   | "cityTooLong"
+  | "countryInvalid"
   | "directionsTooLong"
   | "locationRequired"
   | "locationEmpty"
@@ -148,6 +152,8 @@ export type EventEditorState = {
    */
   artistId: string;
   city: string;
+  /** Paese ISO della serata: l'Italia è il default, fuori si sceglie. */
+  country: string;
   /** Come arrivare, per gli spazi che un indirizzo non ce l'hanno. */
   directions: string;
   latitude: number | null;
@@ -174,6 +180,7 @@ export type EventEditorValues = {
   venueName: string | null;
   artistId: string | null;
   city: string | null;
+  country: string;
   directionsText: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -337,6 +344,11 @@ export function validateEventInput(
   // volte sarebbe un modo di far sbagliare.
   else if (city === "" && !hasVenue) errors.city = "cityRequired";
 
+  // Paese: due lettere maiuscole. Chi scrive da fuori Italia lo sceglie; il
+  // default resta IT, così il caso normale non chiede niente.
+  const country = input.country.trim().toUpperCase() || DEFAULT_COUNTRY;
+  if (!isCountryCode(country)) errors.country = "countryInvalid";
+
   const latitude = input.latitude;
   const longitude = input.longitude;
   const hasPoint = isCoordinate(latitude, 90) && isCoordinate(longitude, 180);
@@ -395,6 +407,7 @@ export function validateEventInput(
       venueName: hasVenue ? null : venueName || null,
       artistId: artistId || null,
       city: city || null,
+      country,
       directionsText: directions || null,
       latitude: hasPoint ? latitude : null,
       longitude: hasPoint ? longitude : null,
@@ -444,6 +457,7 @@ export function initialEditorState(timezone = FILTER_TIMEZONE): EventEditorState
     venueName: "",
     artistId: "",
     city: "",
+    country: DEFAULT_COUNTRY,
     directions: "",
     latitude: null,
     longitude: null,
@@ -469,6 +483,7 @@ export type EditableEvent = {
   venueName: string | null;
   artistId: string | null;
   city: string | null;
+  country: string;
   directionsText: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -496,6 +511,7 @@ export function editorStateFromEvent(event: EditableEvent): EventEditorState {
     venueName: event.venueName ?? "",
     artistId: event.artistId ?? "",
     city: event.city ?? "",
+    country: event.country || DEFAULT_COUNTRY,
     directions: event.directionsText ?? "",
     latitude: event.latitude,
     longitude: event.longitude,

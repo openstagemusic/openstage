@@ -20,6 +20,7 @@ import {
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listSavedEventIds } from "@/lib/events/queries";
 import { artistRepeatsTitle, isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
+import { countryName } from "@/lib/geo/country";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -52,7 +53,9 @@ export default async function EventPageView({
 
   const hasPosition = event.latitude !== null && event.longitude !== null;
   const place = placeName(event);
-  const where = [place, event.city].filter(Boolean).join(" · ");
+  // Il paese si scrive solo se non è l'Italia: è il caso normale.
+  const country = event.country === "IT" ? null : countryName(event.country, locale);
+  const where = [place, event.city, country].filter(Boolean).join(" · ");
 
   // Su una posizione approssimativa il pin non esiste: portare a un punto
   // preciso sarebbe una bugia. Si cerca il locale e la città, e chi va decide
@@ -108,13 +111,14 @@ export default async function EventPageView({
             "@type": "PostalAddress",
             streetAddress: event.venue.address ?? undefined,
             addressLocality: event.venue.city ?? undefined,
+            addressCountry: event.country,
           },
           geo: hasPosition
             ? { "@type": "GeoCoordinates", latitude: event.latitude, longitude: event.longitude }
             : undefined,
         }
       : event.city
-        ? { "@type": "Place", name: event.city }
+        ? { "@type": "Place", name: event.city, address: { "@type": "PostalAddress", addressCountry: event.country } }
         : undefined,
     offers:
       !cancelled && !event.isFree && event.ticketUrl
@@ -252,6 +256,7 @@ export default async function EventPageView({
                   </Link>
                 </>
               ) : null}
+              {country ? <span className="text-muted"> · {country}</span> : null}
             </span>
             {event.venue?.address ? (
               <span className="mt-1 block text-xs text-muted">{event.venue.address}</span>

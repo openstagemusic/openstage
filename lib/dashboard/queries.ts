@@ -145,6 +145,7 @@ export type VenueOption = {
   id: string;
   name: string;
   city: string | null;
+  country: string;
   address: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -177,7 +178,7 @@ export async function searchVenues(query: string, limit = 6): Promise<VenueOptio
 
   const { data, error } = await supabase
     .from("venues")
-    .select("id, name, city, address, latitude, longitude")
+    .select("id, name, city, country, address, latitude, longitude")
     .or(filters)
     .order("name", { ascending: true })
     .limit(limit);

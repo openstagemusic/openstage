@@ -7,6 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { cityPath } from "@/lib/cities/paths";
 import { listCityDirectory } from "@/lib/cities/queries";
 import { formatEventDate } from "@/lib/events/format";
+import { countryName } from "@/lib/geo/country";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getPageMetadata } from "@/lib/i18n/metadata";
@@ -84,9 +85,11 @@ export default async function CitiesPage() {
                   const count = `${city.eventCount} ${
                     city.eventCount === 1 ? t.eventOne : t.eventMany
                   }`;
+                  const country =
+                    city.country === "IT" ? null : countryName(city.country, locale);
 
                   return (
-                    <li key={city.key}>
+                    <li key={`${city.country}-${city.key}`}>
                       <Link
                         href={cityPath(city.label)}
                         className="group grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-start gap-4 border-b border-line py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/40 sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:items-center sm:py-6"
@@ -101,6 +104,7 @@ export default async function CitiesPage() {
                           </span>
                           <span className="mt-1 flex flex-wrap gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                             <span>{count}</span>
+                            {country ? <span>· {country}</span> : null}
                             {next ? (
                               <span>
                                 · {t.nextEvent} {next.full}

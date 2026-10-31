@@ -58,7 +58,7 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
     //    risultante: se il database non l'ha accettata, lo diciamo.
     const { data: updated, error: profileError } = await supabase
       .from("profiles")
-      .update({ role })
+      .update({ role, role_chosen_at: new Date().toISOString() })
       .eq("id", user.id)
       .select("role")
       .single();

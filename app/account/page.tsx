@@ -88,6 +88,7 @@ export default async function AccountPage() {
             id: venue.id,
             name: venue.name,
             city: venue.city ?? "",
+            country: venue.country || "IT",
             address: venue.address ?? "",
             website: venue.website ?? "",
             capacity: venue.capacity ? String(venue.capacity) : "",

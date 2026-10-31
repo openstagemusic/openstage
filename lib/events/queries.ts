@@ -28,6 +28,7 @@ export const EVENT_SELECT = [
   "ends_at",
   "timezone",
   "city",
+  "country",
   "latitude",
   "longitude",
   "location_precision",
@@ -81,6 +82,8 @@ export type EventRow = {
   ends_at: string | null;
   timezone: string | null;
   city: string | null;
+  /** Paese ISO della serata (default IT). */
+  country: string;
   latitude: number | null;
   longitude: number | null;
   location_precision: LocationPrecision | null;
@@ -138,6 +141,7 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     endsAt: row.ends_at,
     timezone: row.timezone ?? "Europe/Rome",
     city: row.city ?? venue?.city ?? artist?.city ?? null,
+    country: row.country ?? "IT",
     latitude: row.latitude,
     longitude: row.longitude,
     locationPrecision: row.location_precision ?? "exact",

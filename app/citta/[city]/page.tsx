@@ -15,6 +15,7 @@ import { getCityBySlug, listUpcomingEventsForCity } from "@/lib/cities/queries";
 import { listArtists, listVenues } from "@/lib/directory/queries";
 import { formatEventDate } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
+import { countryName } from "@/lib/geo/country";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -97,6 +98,8 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const artistsHref = `/artisti?city=${encodeURIComponent(summary.label)}`;
   const venuesHref = `/locali?city=${encodeURIComponent(summary.label)}`;
   const pageUrl = absoluteUrl(withLocale(locale, cityPath(summary.label)));
+  // Il paese si scrive solo quando non è l'Italia: è il caso normale.
+  const country = summary.country === "IT" ? null : countryName(summary.country, locale);
 
   const data = {
     "@context": "https://schema.org",
@@ -111,7 +114,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
       address: {
         "@type": "PostalAddress",
         addressLocality: summary.label,
-        addressCountry: "IT",
+        addressCountry: summary.country,
       },
     },
     mainEntity: {
@@ -137,7 +140,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
       </div>
 
       <PageHero
-        eyebrow={t.cityEyebrow}
+        eyebrow={country ? t.cityEyebrowCountry.replace("{country}", country) : t.cityEyebrow}
         headline={summary.label}
         lead={fillCity(t.cityLead, summary.label)}
       >
@@ -145,6 +148,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
           <span className="text-violet">
             {countLabel}
           </span>
+          {country ? <span className="text-cyan">{country}</span> : null}
           {next ? (
             <span className="text-muted">
               {t.nextEvent} · {next.full}

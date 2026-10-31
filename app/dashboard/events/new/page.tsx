@@ -96,6 +96,7 @@ export default async function NewEventPage() {
   if (venue) {
     initial.venueId = venue.id;
     initial.city = venue.city ?? "";
+    initial.country = venue.country || initial.country;
     initial.latitude = venue.latitude;
     initial.longitude = venue.longitude;
   }

@@ -18,6 +18,7 @@ import { getFollowCount, isFollowing } from "@/lib/follows/queries";
 import { hasAnySocialLink } from "@/lib/social/links";
 import { venuePath } from "@/lib/events/paths";
 import { listPastEventsByVenue, listUpcomingEventsByVenue } from "@/lib/events/queries";
+import { countryName } from "@/lib/geo/country";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { absoluteUrl } from "@/lib/seo/site";
@@ -80,6 +81,8 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
   const dict = getDictionary(locale);
   const t = dict.directory;
+  // Il paese si scrive solo quando non è l'Italia.
+  const country = venue.country === "IT" ? null : countryName(venue.country, locale);
   const session = await getSessionProfile();
   const [events, past, following, followers] = await Promise.all([
     listUpcomingEventsByVenue(venue.id),
@@ -141,6 +144,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
       "@type": "PostalAddress",
       streetAddress: venue.address ?? undefined,
       addressLocality: venue.city ?? undefined,
+      addressCountry: venue.country,
     },
     maximumAttendeeCapacity: venue.capacity ?? undefined,
     geo: hasPosition
@@ -199,6 +203,11 @@ export default async function VenuePage({ params }: VenuePageProps) {
             {venue.city ? (
               <span className="border border-violet/40 bg-violet/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
                 {venue.city}
+              </span>
+            ) : null}
+            {country ? (
+              <span className="border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                {country}
               </span>
             ) : null}
             {venue.capacity ? (

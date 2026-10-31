@@ -26,6 +26,8 @@ export type CitySummary = {
   key: string;
   /** Forma da mostrare, scelta fra i valori realmente scritti. */
   label: string;
+  /** Paese ISO della città (default `IT`): "City of Westminster" non è Italia. */
+  country: string;
   /** Pezzo finale di `/citta/...`. */
   slug: string;
   /** Serate future pubblicate. */
@@ -40,6 +42,7 @@ type EmbeddedCity = { city: string | null } | Array<{ city: string | null }> | n
 
 type CityEventRow = {
   city: string | null;
+  country: string | null;
   starts_at: string;
   timezone: string | null;
   venues: EmbeddedCity;
@@ -48,13 +51,15 @@ type CityEventRow = {
 
 type CityGroup = {
   labels: string[];
+  key: string;
+  country: string;
   /** Solo le serate future contano per l'indice e per la soglia. */
   futureCount: number;
   nextEventAt: string | null;
   nextEventTimezone: string;
 };
 
-const CITY_ROW_SELECT = "city, starts_at, timezone, venues ( city ), artists ( city )";
+const CITY_ROW_SELECT = "city, country, starts_at, timezone, venues ( city ), artists ( city )";
 
 /** Quante righe leggere in una volta; oltre, il database risponde comunque a blocchi. */
 const CITY_ROWS_PAGE = 1000;
@@ -124,8 +129,13 @@ export const listCityDirectory = cache(async (): Promise<CitySummary[]> => {
     const key = cityKey(rawCity);
     if (!key) continue;
 
+    // Città omonime in paesi diversi (es. "Valencia" ES e VE) non sono la stessa
+    // pagina: il paese entra nella chiave di raggruppamento.
+    const country = row.country ?? "IT";
+    const groupKey = `${country}|${key}`;
+
     const future = new Date(row.starts_at).getTime() >= now;
-    const existing = groups.get(key);
+    const existing = groups.get(groupKey);
 
     if (existing) {
       existing.labels.push(rawCity);
@@ -142,8 +152,10 @@ export const listCityDirectory = cache(async (): Promise<CitySummary[]> => {
       continue;
     }
 
-    groups.set(key, {
+    groups.set(groupKey, {
       labels: [rawCity],
+      key,
+      country,
       futureCount: future ? 1 : 0,
       nextEventAt: future ? row.starts_at : null,
       nextEventTimezone: row.timezone ?? "Europe/Rome",
@@ -152,13 +164,14 @@ export const listCityDirectory = cache(async (): Promise<CitySummary[]> => {
 
   const cities: CitySummary[] = [];
 
-  for (const [key, group] of groups) {
+  for (const [, group] of groups) {
     const label = preferredCityLabel(group.labels);
     if (!label) continue;
 
     cities.push({
-      key,
+      key: group.key,
       label,
+      country: group.country,
       slug: slugify(label),
       eventCount: group.futureCount,
       nextEventAt: group.nextEventAt,
@@ -203,6 +216,7 @@ export async function listUpcomingEventsForCity(
       .eq("status", "published")
       .gte("starts_at", now)
       .eq("city_key", city.key)
+      .eq("country", city.country)
       .order("starts_at", { ascending: true })
       // Si chiede fino a `offset + limit`: la fusione con le righe senza città
       // avviene dopo, e il taglio deve cadere sulla lista ordinata.
@@ -233,6 +247,7 @@ export async function listUpcomingEventsForCity(
 
   for (const row of (withoutCity.data ?? []) as unknown as EventRow[]) {
     const event = toPublicEvent(row);
+    if (event.country !== city.country) continue;
     if (cityKey(event.city) === city.key) events.set(event.id, event);
   }
 

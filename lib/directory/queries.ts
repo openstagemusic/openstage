@@ -19,7 +19,7 @@ import { createClient } from "@/lib/supabase/server";
 const ARTIST_SELECT =
   "id, slug, name, city, genre, spotify_url, bio, profile_id, website_url, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, epk_photo_url, epk_rider, epk_contact, avatar_url, banner_url";
 const VENUE_SELECT =
-  "id, slug, name, city, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, avatar_url, banner_url, closed_at, closed_note";
+  "id, slug, name, city, country, address, website, latitude, longitude, capacity, profile_id, instagram_url, facebook_url, tiktok_url, youtube_url, soundcloud_url, bandcamp_url, linktree_url, avatar_url, banner_url, closed_at, closed_note";
 
 export type PublicArtist = {
   id: string;
@@ -51,6 +51,7 @@ export type PublicVenue = {
   slug: string;
   name: string;
   city: string | null;
+  country: string;
   address: string | null;
   website: string | null;
   links: SocialUrls;
@@ -96,6 +97,7 @@ type VenueRow = {
   slug: string;
   name: string;
   city: string | null;
+  country: string;
   address: string | null;
   website: string | null;
   latitude: number | null;
@@ -172,6 +174,7 @@ function toVenue(row: VenueRow, verified: Set<string>): PublicVenue {
     slug: row.slug,
     name: row.name,
     city: row.city,
+    country: row.country ?? "IT",
     address: row.address,
     website: row.website,
     avatarUrl: row.avatar_url,
