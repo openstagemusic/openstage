@@ -62,7 +62,7 @@ export default async function ForVenuesPage() {
         </PageSection>
 
         <PageSection number="03" title={t.toolsTitle}>
-          <FeatureArt variant="dashboard" className="mb-6" />
+          <FeatureArt variant="calls" className="mb-6" />
           <FreeTools items={t.tools} note={t.toolsNote} />
         </PageSection>
 
