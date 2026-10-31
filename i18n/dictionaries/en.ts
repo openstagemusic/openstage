@@ -260,7 +260,7 @@ export const en = {
     errorInvalid: "Write at least 10 characters.",
     errorAlreadyOpen: "You already have an open call.",
     errorClosed: "This call is closed.",
-    errorFull: "Applications closed: the maximum number has been reached.",
+    errorFull: "Applications closed: the maximum number has been reached. Try again later: the venue may raise the limit.",
     errorDuplicate: "You already applied to this call.",
     errorSelf: "This is your call.",
     errorFailed: "We could not send it. Please try again.",

@@ -258,7 +258,7 @@ export const it: Dictionary = {
     errorInvalid: "Scrivi almeno 10 caratteri.",
     errorAlreadyOpen: "Hai già una chiamata aperta.",
     errorClosed: "Questa chiamata è chiusa.",
-    errorFull: "Candidature chiuse: il numero massimo è stato raggiunto.",
+    errorFull: "Candidature chiuse: il numero massimo è stato raggiunto. Riprova più tardi: il locale può alzare il limite.",
     errorDuplicate: "Ti sei già candidato a questa chiamata.",
     errorSelf: "È la tua chiamata.",
     errorFailed: "Non è stato possibile inviare. Riprova.",
