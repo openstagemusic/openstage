@@ -16,6 +16,23 @@ import { isCancelled, placeName, type PublicEvent } from "./types";
 
 const DEFAULT_DURATION_MS = 3 * 60 * 60 * 1000;
 
+/**
+ * Quando finisce, per il calendario.
+ *
+ * Con `endsAt` la fine è la sera dell'ultimo giorno (23:59 UTC): un festival di
+ * tre giorni non deve comparire come una serata sola.
+ */
+function endInstant(event: PublicEvent): Date {
+  const start = new Date(event.startsAt);
+
+  if (event.endsAt) {
+    const end = new Date(`${event.endsAt}T23:59:59Z`);
+    if (Number.isFinite(end.getTime()) && end > start) return end;
+  }
+
+  return new Date(start.getTime() + DEFAULT_DURATION_MS);
+}
+
 export type CalendarLabels = {
   /** "Ingresso gratuito" — finisce nel corpo dell'evento. */
   free: string;
@@ -93,7 +110,7 @@ export function googleCalendarUrl(
   labels: CalendarLabels
 ): string {
   const start = new Date(event.startsAt);
-  const end = new Date(start.getTime() + DEFAULT_DURATION_MS);
+  const end = endInstant(event);
 
   const params = new URLSearchParams({
     action: "TEMPLATE",
@@ -121,7 +138,7 @@ export function buildIcs(
   now: Date = new Date()
 ): string {
   const start = new Date(event.startsAt);
-  const end = new Date(start.getTime() + DEFAULT_DURATION_MS);
+  const end = endInstant(event);
 
   const lines = [
     "BEGIN:VCALENDAR",

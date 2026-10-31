@@ -9,7 +9,13 @@ import ShareEventPanel from "@/components/events/ShareEventPanel";
 import SaveEventButton from "@/components/map/SaveEventButton";
 import { cityPath } from "@/lib/cities/paths";
 import { googleCalendarUrl } from "@/lib/events/calendar";
-import { formatEventDate, formatEventDateLong, timeZoneName } from "@/lib/events/format";
+import {
+  formatEventDate,
+  formatEventDateLong,
+  formatEventRange,
+  formatEventRangeLong,
+  timeZoneName,
+} from "@/lib/events/format";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listSavedEventIds } from "@/lib/events/queries";
 import { artistRepeatsTitle, isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
@@ -63,13 +69,14 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
   // Niente biglietti, niente calendario e niente "Salva" su una serata annullata:
   // si può solo leggerla e condividerla come annuncio.
   const priceLabel = event.isFree ? t.freeEntry : event.priceText;
-  const shortWhen = formatEventDate(event.startsAt, event.timezone, locale).full;
+  const shortWhen = formatEventRange(event, locale);
 
   const data = {
     "@context": "https://schema.org",
     "@type": "MusicEvent",
     name: event.title,
     startDate: event.startsAt,
+    endDate: event.endsAt ?? undefined,
     url: pageUrl,
     eventStatus: cancelled
       ? "https://schema.org/EventCancelled"
@@ -204,7 +211,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           </dt>
           <dd className="text-sm text-white">
             <span className="block">
-              {formatEventDateLong(event.startsAt, event.timezone, locale)}
+              {formatEventRangeLong(event, locale)}
             </span>
             <span className="mt-1 block text-xs text-muted">
               {timeZoneName(event.timezone, locale)}

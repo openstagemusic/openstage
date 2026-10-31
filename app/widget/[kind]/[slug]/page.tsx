@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { absoluteUrl } from "@/lib/seo/site";
 import { getArtistBySlug, getVenueBySlug } from "@/lib/directory/queries";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
-import { formatEventDate } from "@/lib/events/format";
+import { formatEventDate, formatEventRange } from "@/lib/events/format";
 import { listUpcomingEventsByArtist, listUpcomingEventsByVenue } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -87,6 +87,7 @@ export default async function WidgetPage({ params }: WidgetProps) {
         <ul className="mt-4 border-t border-line">
           {events.map((event) => {
             const when = formatEventDate(event.startsAt, event.timezone, locale);
+            const range = formatEventRange(event, locale);
 
             return (
               <li key={event.id} className="border-b border-line py-3">
@@ -97,7 +98,7 @@ export default async function WidgetPage({ params }: WidgetProps) {
                   className="group block"
                 >
                   <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-cyan">
-                    {when.isToday ? `${t.tonight} · ${when.time}` : when.full}
+                    {when.isToday ? `${t.tonight} · ${when.time}` : range}
                   </span>
                   <span className="mt-1 block font-display text-sm font-semibold leading-tight transition-colors group-hover:text-cyan">
                     {event.title}

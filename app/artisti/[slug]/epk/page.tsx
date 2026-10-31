@@ -7,7 +7,7 @@ import PrintButton from "@/components/epk/PrintButton";
 import SocialLinks from "@/components/directory/SocialLinks";
 import { getArtistBySlug } from "@/lib/directory/queries";
 import { artistPath } from "@/lib/events/paths";
-import { formatEventDate } from "@/lib/events/format";
+import { formatEventRange } from "@/lib/events/format";
 import { listUpcomingEventsByArtist } from "@/lib/events/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -182,7 +182,7 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
                   {event.venue?.name ? ` · ${event.venue.name}` : ""}
                 </span>
                 <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
-                  {formatEventDate(event.startsAt, event.timezone, locale).full}
+                  {formatEventRange(event, locale)}
                   {event.city ? ` · ${event.city}` : ""}
                 </span>
               </li>

@@ -80,9 +80,9 @@ thread di booking, compenso dichiarato, scadenza automatica.
 
 ---
 
-## 12.3 — Serie e festival (dopo)
+## 12.3 — Serie e festival (fatta)
 
-Solo multi-giorno, **nessuna ricorrenza automatica**.
+Solo multi-giorno, **nessuna ricorrenza automatica**. Fatto il 31 ottobre 2026.
 
 - `events.ends_at` (nullable) + vincolo `ends_at >= starts_at`.
 - Editor: interruttore «Dura più giorni»; se spento resta la data singola.

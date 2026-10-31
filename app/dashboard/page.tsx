@@ -14,7 +14,7 @@ import { canManageEvents } from "@/lib/auth/roles";
 import { listMyEvents, listSavedEvents } from "@/lib/dashboard/queries";
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { artistPath, venuePath } from "@/lib/events/paths";
-import { formatEventDate, isEventPast } from "@/lib/events/format";
+import { eventIsPast, formatEventDate } from "@/lib/events/format";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -117,7 +117,7 @@ export default async function DashboardPage() {
   const now = new Date();
   const upcoming = events
     .filter(
-      (event) => event.status === "published" && !isEventPast(event.startsAt, event.timezone, now)
+      (event) => event.status === "published" && !eventIsPast(event, now)
     )
     .slice(0, 4);
 

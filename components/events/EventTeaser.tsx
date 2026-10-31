@@ -2,7 +2,7 @@ import EventCover from "@/components/events/EventCover";
 import Link from "@/components/i18n/LocaleLink";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { formatEventDate } from "@/lib/events/format";
+import { formatEventDate, formatEventRange } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
 import { artistRepeatsTitle, isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
@@ -19,6 +19,7 @@ type EventTeaserProps = {
  */
 export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
   const when = formatEventDate(event.startsAt, event.timezone, locale);
+  const range = formatEventRange(event, locale);
   const where = [placeName(event), event.city].filter(Boolean).join(" · ");
   const kindLabel = dict.events.kinds[event.kind] ?? dict.events.kinds.other;
   const whenLabel = when.isToday ? dict.events.tonight : when.isTomorrow ? dict.events.tomorrow : null;
@@ -68,7 +69,7 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
           ) : null}
 
           <p className="mt-auto pt-3 text-sm text-muted">
-            <span className="text-white/80">{when.full}</span>
+            <span className="text-white/80">{range}</span>
             {where ? ` · ${where}` : ""}
           </p>
         </div>

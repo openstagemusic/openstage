@@ -3,7 +3,7 @@ import { cache } from "react";
 import { cityKey } from "@/lib/geo/city";
 import { createClient } from "@/lib/supabase/server";
 
-import { isEventPast } from "./format";
+import { eventIsPast } from "./format";
 import { eventPath } from "./paths";
 import { calendarDate } from "./timezone";
 import type { EventKind, LocationPrecision, PublicEvent } from "./types";
@@ -25,6 +25,7 @@ export const EVENT_SELECT = [
   "title",
   "description",
   "starts_at",
+  "ends_at",
   "timezone",
   "city",
   "latitude",
@@ -77,6 +78,7 @@ export type EventRow = {
   title: string;
   description: string | null;
   starts_at: string;
+  ends_at: string | null;
   timezone: string | null;
   city: string | null;
   latitude: number | null;
@@ -133,6 +135,7 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     title: row.title,
     description: row.description,
     startsAt: row.starts_at,
+    endsAt: row.ends_at,
     timezone: row.timezone ?? "Europe/Rome",
     city: row.city ?? venue?.city ?? artist?.city ?? null,
     latitude: row.latitude,
@@ -391,7 +394,7 @@ async function listPastBy(
   }
 
   return (data as unknown as EventRow[])
-    .filter((row) => isEventPast(row.starts_at, row.timezone, now))
+    .filter((row) => eventIsPast({ startsAt: row.starts_at, endsAt: row.ends_at, timezone: row.timezone }, now))
     .slice(0, limit)
     .map(toPublicEvent);
 }

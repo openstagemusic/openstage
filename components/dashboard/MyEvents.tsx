@@ -14,7 +14,7 @@ import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import type { DashboardEvent, DashboardStatus } from "@/lib/dashboard/queries";
 import { CANCEL_REASON_MAX } from "@/lib/events/editor";
-import { formatEventDate, isEventPast } from "@/lib/events/format";
+import { eventIsPast, formatEventRange } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
 import { placeName } from "@/lib/events/types";
 import { cn } from "@/lib/utils";
@@ -95,7 +95,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
   }
 
   const now = new Date();
-  const isPast = (event: DashboardEvent) => isEventPast(event.startsAt, event.timezone, now);
+  const isPast = (event: DashboardEvent) => eventIsPast(event, now);
 
   // "Passate" è una sezione di tempo, non di stato: una serata pubblicata che è
   // già andata non è più "online" per chi la organizza, anche se la pagina
@@ -166,7 +166,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
 
             <div className="mt-4 border-t border-line">
               {list.map((event) => {
-                const when = formatEventDate(event.startsAt, event.timezone, locale);
+                const when = formatEventRange(event, locale);
                 const where = [placeName(event), event.city].filter(Boolean).join(" · ");
                 // Pubblicata ma già andata: si mostra "Conclusa", non "Pubblicato".
                 const archived = event.status === "published" && isPast(event);
@@ -186,7 +186,7 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                     </div>
 
                     <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                      {[when.full, where].filter(Boolean).join(" · ")}
+                      {[when, where].filter(Boolean).join(" · ")}
                     </p>
 
                     {event.status === "draft" ? (

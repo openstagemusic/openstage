@@ -744,6 +744,38 @@ export default function EventEditor({
           </Field>
         </div>
 
+        <div className="mt-4">
+          <label className="flex cursor-pointer items-center gap-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+            <input
+              type="checkbox"
+              checked={Boolean(values.endsAt)}
+              onChange={(event) => set("endsAt", event.target.checked ? values.date : "")}
+              className="h-4 w-4 accent-cyan"
+            />
+            {t.multiDay}
+          </label>
+
+          {values.endsAt ? (
+            <div className="mt-3 max-w-xs">
+              <Field
+                id="event-ends"
+                label={t.endDate}
+                hint={t.endDateHint}
+                error={errors.endsAt ? t.errors[errors.endsAt] : null}
+              >
+                <input
+                  id="event-ends"
+                  type="date"
+                  className={inputClass}
+                  value={values.endsAt}
+                  min={values.date}
+                  onChange={(event) => set("endsAt", event.target.value)}
+                />
+              </Field>
+            </div>
+          ) : null}
+        </div>
+
         {/* --- Dove ------------------------------------------------------ */}
         <SectionHeading step="03" title={t.sectionWhere} />
 

@@ -1,7 +1,7 @@
 import Link from "@/components/i18n/LocaleLink";
 
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { formatEventDate } from "@/lib/events/format";
+import { formatEventDate, formatEventRange } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
 import { placeName, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
@@ -42,6 +42,7 @@ export default function EventRows({ events, locale, dict }: EventRowsProps) {
     <ul className="border-t border-line">
       {events.map((event) => {
         const when = formatEventDate(event.startsAt, event.timezone, locale);
+        const range = formatEventRange(event, locale);
         const { day, month } = dateParts(event, locale);
         const where = [placeName(event), event.city].filter(Boolean).join(" · ");
         const meta = [dict.events.kinds[event.kind] ?? dict.events.kinds.other, where, event.genre]
@@ -66,7 +67,7 @@ export default function EventRows({ events, locale, dict }: EventRowsProps) {
                 <span className="row-title">{event.title}</span>
                 {meta ? <span className="row-meta">{meta}</span> : null}
                 <span className="row-when">
-                  {!relativeDay ? <span className="sr-only">{when.date} </span> : null}
+                  {!relativeDay ? <span className="sr-only">{range} </span> : null}
                   {relativeDay ? <strong>{relativeDay} · </strong> : null}
                   {when.time} · {entry}
                 </span>

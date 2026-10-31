@@ -43,6 +43,8 @@ export type PublicEvent = {
   title: string;
   description: string | null;
   startsAt: string;
+  /** Ultimo giorno del festival (data locale), se dura più di un giorno. */
+  endsAt: string | null;
   timezone: string;
   city: string | null;
   /** Come arrivare, per gli spazi che un indirizzo non ce l'hanno. */

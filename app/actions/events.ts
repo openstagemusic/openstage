@@ -270,6 +270,7 @@ export async function saveEventAction(input: {
     genre: values.genre,
     description: values.description,
     starts_at: values.startsAt,
+    ends_at: values.endsAt,
     timezone: values.timezone,
     venue_id: values.venueId,
     venue_name: values.venueName,

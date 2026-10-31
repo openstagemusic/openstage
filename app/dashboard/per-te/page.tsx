@@ -6,7 +6,7 @@ import LocaleLink from "@/components/i18n/LocaleLink";
 import { listSavedEvents } from "@/lib/dashboard/queries";
 import { artistPath, venuePath } from "@/lib/events/paths";
 import { listFollowedPages } from "@/lib/follows/queries";
-import { isEventPast } from "@/lib/events/format";
+import { eventIsPast } from "@/lib/events/format";
 import { isCancelled } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -29,7 +29,7 @@ export default async function ForYouPage() {
     listFollowedPages(session.id),
   ]);
   const upcoming = saved
-    .filter((event) => !isCancelled(event) && !isEventPast(event.startsAt, event.timezone, now))
+    .filter((event) => !isCancelled(event) && !eventIsPast(event, now))
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
 
   return (

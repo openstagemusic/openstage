@@ -81,8 +81,7 @@ export function isEventPast(
 }
 
 /** Data estesa con anno, usata nella pagina dell'evento. */
-export function formatEventDateLong(
-  startsAt: string,
+export function formatEventDateLong(  startsAt: string,
   timezone: string,
   locale: string
 ): string {
@@ -117,4 +116,68 @@ export function timeZoneName(timezone: string, locale: string): string {
   } catch {
     return timezone;
   }
+}
+
+
+/**
+ * L'evento è passato?
+ *
+ * Un festival dura più giorni: resta "in corso" fino all'ultimo, non fino alla
+ * prima serata. `endsAt` è una data locale (AAAA-MM-GG).
+ */
+export function eventIsPast(
+  event: { startsAt: string; endsAt?: string | null; timezone: string | null },
+  now: Date = new Date()
+): boolean {
+  const zone = event.timezone || "Europe/Rome";
+  const lastDay = event.endsAt ?? dayKey(new Date(event.startsAt), zone);
+  return lastDay < dayKey(now, zone);
+}
+
+/** "ven 21 nov → dom 23 nov": per liste, card e widget. */
+export function formatEventRange(
+  event: { startsAt: string; endsAt?: string | null; timezone: string | null },
+  locale: string
+): string {
+  const start = formatEventDate(event.startsAt, event.timezone || "Europe/Rome", locale);
+  if (!event.endsAt) return start.full;
+
+  const end = new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(`${event.endsAt}T12:00:00Z`));
+
+  return `${start.date} → ${end}`;
+}
+
+/** "21 novembre → 23 novembre 2026 · 21:00": per la pagina evento. */
+export function formatEventRangeLong(
+  event: { startsAt: string; endsAt?: string | null; timezone: string | null },
+  locale: string
+): string {
+  const zone = event.timezone || "Europe/Rome";
+
+  if (!event.endsAt) return formatEventDateLong(event.startsAt, zone, locale);
+
+  const start = new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    timeZone: zone,
+  }).format(new Date(event.startsAt));
+
+  const end = new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${event.endsAt}T12:00:00Z`));
+
+  const time = new Intl.DateTimeFormat(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: zone,
+  }).format(new Date(event.startsAt));
+
+  return `${start} → ${end} · ${time}`;
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import EventCover from "@/components/events/EventCover";
 import SaveEventButton from "@/components/map/SaveEventButton";
-import { formatEventDate } from "@/lib/events/format";
+import { formatEventDate, formatEventRange } from "@/lib/events/format";
 import { eventPath } from "@/lib/events/paths";
 import { artistRepeatsTitle, placeName, type PublicEvent } from "@/lib/events/types";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -44,6 +44,7 @@ export default function EventCard({
   const dict = getDictionary(locale);
   const t = dict.events;
   const when = formatEventDate(event.startsAt, event.timezone, locale);
+  const range = formatEventRange(event, locale);
   const [shareState, setShareState] = useState<"idle" | "copied">("idle");
 
   const hasPosition = event.latitude !== null && event.longitude !== null;
@@ -145,7 +146,7 @@ export default function EventCard({
             <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.12em] text-cyan">
               {t.when}
             </span>
-            {when.full}
+            {range}
           </p>
           {where ? (
             <p className="text-muted">

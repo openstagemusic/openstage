@@ -79,6 +79,7 @@ export const EDITOR_FIELDS = [
   "genre",
   "date",
   "time",
+  "endsAt",
   "timezone",
   "venueId",
   "venueName",
@@ -118,7 +119,9 @@ export type EditorErrorCode =
   | "ticketInvalid"
   | "ticketUnreachable"
   | "coverInvalid"
-  | "descriptionTooLong";
+  | "descriptionTooLong"
+  | "endBeforeStart"
+  | "endTooLong";
 
 export type EditorErrors = Partial<Record<EditorField, EditorErrorCode>>;
 
@@ -132,6 +135,8 @@ export type EventEditorState = {
   date: string;
   /** Ora locale `HH:MM`. */
   time: string;
+  /** Ultimo giorno del festival (`AAAA-MM-GG`), vuoto per una serata sola. */
+  endsAt: string;
   timezone: string;
   venueId: string;
   venueName: string;
@@ -163,6 +168,7 @@ export type EventEditorValues = {
   genre: string | null;
   description: string | null;
   startsAt: string;
+  endsAt: string | null;
   timezone: string;
   venueId: string | null;
   venueName: string | null;
@@ -292,6 +298,27 @@ export function validateEventInput(
     if (new Date(startsAt).getTime() < earliest) errors.date = "dateInPast";
   }
 
+  // Festival: se c'è una data di fine deve essere dopo l'inizio, e non può
+  // durare mesi (non è una residenza, è un evento).
+  const endsRaw = input.endsAt.trim();
+  let endsAt: string | null = null;
+
+  if (endsRaw) {
+    const endDate = parseDate(endsRaw);
+    if (!endDate) {
+      errors.endsAt = "dateInvalid";
+    } else if (date && endsRaw < input.date.trim()) {
+      errors.endsAt = "endBeforeStart";
+    } else {
+      const startMs = Date.parse(`${input.date.trim()}T00:00:00Z`);
+      const endMs = Date.parse(`${endsRaw}T00:00:00Z`);
+      if (Number.isFinite(startMs) && endMs - startMs > 60 * 86_400_000) {
+        errors.endsAt = "endTooLong";
+      }
+      endsAt = endsRaw;
+    }
+  }
+
   const venueId = input.venueId.trim();
   const hasVenue = venueId !== "";
   if (hasVenue && !isUuid(venueId)) errors.venueId = "venueInvalid";
@@ -360,6 +387,7 @@ export function validateEventInput(
       genre: genre || null,
       description: description || null,
       startsAt,
+      endsAt,
       timezone,
       venueId: hasVenue ? venueId : null,
       // Il nome del locale scritto a mano serve solo se non c'è una scheda
@@ -410,6 +438,7 @@ export function initialEditorState(timezone = FILTER_TIMEZONE): EventEditorState
     description: "",
     date,
     time: "21:30",
+    endsAt: "",
     timezone,
     venueId: "",
     venueName: "",
@@ -434,6 +463,7 @@ export type EditableEvent = {
   genre: string | null;
   description: string | null;
   startsAt: string;
+  endsAt: string | null;
   timezone: string;
   venueId: string | null;
   venueName: string | null;
@@ -460,6 +490,7 @@ export function editorStateFromEvent(event: EditableEvent): EventEditorState {
     description: event.description ?? "",
     date,
     time,
+    endsAt: event.endsAt ?? "",
     timezone: event.timezone,
     venueId: event.venueId ?? "",
     venueName: event.venueName ?? "",
