@@ -33,6 +33,7 @@
 | **14B** | ⬜ **chiusura e collaudo**: B60 (città estere), B13 (accessibilità), B06, B45, pulizia fixture, test E2E, **beta test per ruoli**, report finale |
 | **15** | ⏸ **condizionale**: monetizzazione solo con posizione fiscale/ente/fiscal host |
 | **16** | ⬜ **lancio e ascolto**: esecuzione del playbook, calendario, asset, misura delle prime 4 settimane |
+| **17** | ⬜ **outreach (dopo il lancio)**: lead per regione, creazione scheda, invito al claim **uno a uno**. Catalogo delle email automatiche |
 
 La regola sui canali è in **`docs/notifications-email-policy.md`**: email solo per ciò che
 serve anche a chi non entra nel sito; il resto è in-app. La quota Resend riservata alle email
@@ -56,6 +57,7 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 | **✅ 13 — SEO, legal, audit e polish finale** | Testi legali reali (privacy, termini, cookie), Spotify **click-to-load**, cancellazione account con export, audit RLS, `error.tsx`/`global-error.tsx`, OG per eventi e schede, serate simili, visti di recente, README con checklist env. Piano: `docs/plan-phase-13.md` | nessuno |
 | **14 — Help Center completo** | **B73**: `/aiuto` con categorie, ricerca (`pg_trgm`/full-text), articoli Markdown IT/EN, bozza/pubblicato, domande correlate, feedback utile/non utile, CTA ai contatti; gestione da `/admin/aiuto`; `/faq` assorbita o reindirizzata. Contenuti scritti sui casi reali (contatti, claim, pubblicazione, booking). | nessuno |
 | **14B — Chiusura e collaudo** | **B60** città estere e paese · **B13** accessibilità (axe + tastiera) · **B06** `role_chosen_at` · **B45** limite sulle rotte OG · pulizia fixture · **test E2E** (Playwright su GitHub Actions) · **beta test per ruoli** (`docs/plan-beta-tests.md`) · **report finale** (`docs/report-finale.md`) | nessuno |
+| **17 — Outreach** | Tabella lead per regione (locali/artisti, email pubbliche), target 5+10 per regione, creazione scheda dal lead e invito al claim **singolo** riusando `admin_create_claim_invite`. Niente invii in blocco. Include il **catalogo delle email automatiche** da rivedere e modificare. Dopo il lancio. | nessuno |
 | **16 — Lancio e ascolto** | **B112** playbook (`docs/launch-playbook.md`): post Indie Hackers, timeline -7/0/+7, guerrilla locale, marketing a costo zero, checklist Product Hunt. Esecuzione, calendario, asset e misura delle prime 4 settimane. Fase operativa, non di prodotto. | nessuno |
 | **15 — Sostenibilità (condizionale)** | Pass Pro, sponsor o donazioni solo dopo una posizione fiscale o un ente/fiscal host che gestisce gli incassi; 30–50 locali attivi, 100+ artisti, 20–30 in waitlist. Sempre zero pay-to-play. | commercialista, eventuale P.IVA/ente, Vercel Pro, PayPal |
 
