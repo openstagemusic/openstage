@@ -23,10 +23,10 @@ type EventCardProps = {
 };
 
 const secondaryButtonClass =
-  "inline-flex min-h-11 items-center justify-center gap-1.5 border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white";
+  "inline-flex min-h-11 items-center justify-center gap-1.5 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan";
 
 const primaryButtonClass =
-  "inline-flex min-h-11 items-center justify-center border border-violet-strong bg-violet-strong px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet";
+  "inline-flex min-h-11 items-center justify-center bg-violet-strong px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet";
 
 /**
  * Scheda di un evento con tutte le azioni del pop-up: pagina evento, biglietti,
@@ -76,10 +76,8 @@ export default function EventCard({
   return (
     <article
       className={cn(
-        "w-full overflow-hidden border border-line-strong bg-surface/95 text-left backdrop-blur",
-        isSheet
-          ? "rounded-3xl"
-          : "max-h-[min(65vh,360px)] overflow-y-auto rounded-2xl"
+        "w-full overflow-hidden border-t-2 border-violet bg-surface/95 text-left backdrop-blur",
+        isSheet ? "" : "max-h-[min(65vh,360px)] overflow-y-auto"
       )}
     >
       {isSheet ? (
@@ -89,7 +87,7 @@ export default function EventCard({
             <button
               type="button"
               onClick={onClose}
-              className="min-h-11 border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+              className="min-h-11 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
             >
               {dict.map.close}
             </button>
@@ -112,16 +110,16 @@ export default function EventCard({
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="border border-violet/40 bg-violet/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
+              <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-violet">
                 {kindLabel}
               </span>
               {whenLabel ? (
-                <span className="border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
+                <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-cyan">
                   {whenLabel}
                 </span>
               ) : null}
               {event.isFree || event.priceText ? (
-                <span className="border border-line px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
                   {event.isFree ? t.freeEntry : event.priceText}
                 </span>
               ) : null}

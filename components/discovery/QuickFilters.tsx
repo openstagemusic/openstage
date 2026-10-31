@@ -71,13 +71,13 @@ export default function QuickFilters({
 
   const chipClass = (isActive: boolean) =>
     cn(
-      "border transition-colors",
+      "transition-colors",
       variant === "editorial"
         ? cn(
-            "rounded-none px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em]",
+            "border-b py-1 font-mono text-[10px] uppercase tracking-[0.1em]",
             isActive
-              ? "border-cyan bg-cyan text-bg"
-              : "border-line text-muted hover:border-cyan hover:text-white"
+              ? "border-cyan text-cyan"
+              : "border-transparent text-muted hover:border-line-strong hover:text-white"
           )
         : cn(
             "rounded-full px-3.5 py-1.5 text-xs font-medium",
@@ -88,10 +88,10 @@ export default function QuickFilters({
     );
 
   const selectClass = cn(
-    "border outline-none transition-colors",
+    "outline-none transition-colors",
     variant === "editorial"
-      ? "rounded-none border-line bg-transparent px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-white hover:border-cyan"
-      : "rounded-full border-white/15 bg-bg/70 px-3 py-1.5 text-xs font-medium text-white hover:border-white/30"
+      ? "border-0 border-b border-line bg-transparent px-0 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white hover:border-cyan"
+      : "rounded-full border border-white/15 bg-bg/70 px-3 py-1.5 text-xs font-medium text-white hover:border-white/30"
   );
 
   return (
@@ -103,7 +103,7 @@ export default function QuickFilters({
         className
       )}
     >
-      <div className="flex flex-wrap items-center gap-2">
+      <div className={cn("flex flex-wrap items-center", variant === "editorial" ? "gap-x-5 gap-y-2" : "gap-2")}>
         {WHEN_PRESETS.map((preset) => (
           <button
             key={preset}

@@ -24,7 +24,7 @@ export default function UnsubscribeForm({
         </p>
         <LocaleLink
           href="/"
-          className="mt-6 inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
+          className="mt-6 inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
         >
           {dict.unsubscribeBack}
         </LocaleLink>

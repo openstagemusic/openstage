@@ -39,14 +39,14 @@ export default async function PlaylistsPage() {
           <div className="grid gap-10 md:grid-cols-2">
             {playlists.map((playlist) => (
               <article key={playlist.id}>
-                <h2 className="font-display text-xl font-semibold">{playlist.title}</h2>
+                <h2 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em]">{playlist.title}</h2>
                 {playlist.description ? (
                   <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
                     {playlist.description}
                   </p>
                 ) : null}
 
-                <div className="mt-4 overflow-hidden border border-line bg-bg">
+                <div className="mt-4 border-t border-line pt-4">
                   <iframe
                     title={`${playlist.title} — ${t.embedTitle}`}
                     src={playlist.embedUrl}

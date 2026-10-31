@@ -19,10 +19,10 @@ type VenueEventsCardProps = {
 };
 
 const NAV_BUTTON =
-  "flex h-11 w-11 items-center justify-center border border-line text-lg leading-none text-white transition-colors hover:border-line-strong hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-35";
+  "flex h-11 w-11 items-center justify-center text-lg leading-none text-white transition-colors hover:text-cyan disabled:cursor-not-allowed disabled:opacity-35";
 
 const SECONDARY_ACTION =
-  "inline-flex min-h-11 items-center justify-center border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white";
+  "inline-flex min-h-11 items-center justify-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan";
 
 /**
  * Scheda di un locale con più serate: il pin è uno solo, qui le date si
@@ -72,7 +72,7 @@ export default function VenueEventsCard({
         isSheet
           ? // Rete di sicurezza: il bottom sheet non può superare lo schermo.
             "max-h-[70vh] overflow-x-hidden overflow-y-auto rounded-3xl"
-          : "overflow-hidden rounded-2xl"
+          : "overflow-hidden"
       )}
     >
       {isSheet ? (
@@ -82,7 +82,7 @@ export default function VenueEventsCard({
             <button
               type="button"
               onClick={onClose}
-              className="min-h-11 border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+              className="min-h-11 border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
             >
               {dict.map.close}
             </button>
@@ -106,7 +106,7 @@ export default function VenueEventsCard({
           <div className="mt-3">
             <Link
               href={eventPath(current)}
-              className="block border border-line bg-white/[0.03] p-3 transition-colors hover:border-cyan/50"
+              className="block border-t border-line pt-3 transition-colors hover:text-cyan"
             >
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                 {when?.isToday ? `${t.tonight} · ${when.time}` : when?.full}

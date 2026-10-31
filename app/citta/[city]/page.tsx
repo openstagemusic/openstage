@@ -131,18 +131,18 @@ export default async function CityPage({ params }: CityPageProps) {
         headline={summary.label}
         lead={fillCity(t.cityLead, summary.label)}
       >
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-white">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[10px] uppercase tracking-[0.12em]">
+          <span className="text-violet">
             {countLabel}
           </span>
           {next ? (
-            <span className="rounded-full border border-line px-2.5 py-1 text-muted">
+            <span className="text-muted">
               {t.nextEvent} · {next.full}
             </span>
           ) : null}
           <Link
             href={mapHref}
-            className="rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-1 text-cyan transition-colors hover:border-cyan/70 hover:text-white"
+            className="border-b border-cyan/40 pb-0.5 text-cyan transition-colors hover:border-cyan hover:text-white"
           >
             {t.mapCta} ↗
           </Link>

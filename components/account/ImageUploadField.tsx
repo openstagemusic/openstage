@@ -71,8 +71,8 @@ export default function ImageUploadField({
           <div
             className={
               preview === "avatar"
-                ? "flex h-24 w-24 items-center justify-center border border-line bg-surface/40 font-mono text-[9px] uppercase tracking-[0.1em] text-muted"
-                : "flex h-24 w-48 items-center justify-center border border-line bg-surface/40 font-mono text-[9px] uppercase tracking-[0.1em] text-muted"
+                ? "flex h-24 w-24 items-center justify-center border-t border-line pt-6 font-mono text-[9px] uppercase tracking-[0.1em] text-muted"
+                : "flex h-24 w-48 items-center justify-center border-t border-line pt-6 font-mono text-[9px] uppercase tracking-[0.1em] text-muted"
             }
           >
             {label}

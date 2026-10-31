@@ -92,7 +92,7 @@ export default async function TakedownPage({ searchParams }: TakedownPageProps) 
             </p>
           </div>
 
-          <section className="self-start border border-line bg-surface/40 p-5">
+          <section className="self-start border-t border-line pt-6">
             <h2 className="font-display text-xl font-semibold">{t.formTitle}</h2>
 
             {sent ? (

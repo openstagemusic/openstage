@@ -33,13 +33,13 @@ export default function ViewSwitcher({ locale }: { locale: Locale }) {
 
   const optionClass = (isActive: boolean) =>
     cn(
-      "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
+      "px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
       isActive ? "bg-white/10 text-white" : "text-muted hover:text-white"
     );
 
   return (
     <div
-      className="glass inline-flex items-center gap-1 rounded-full border border-white/10 p-1"
+      className="inline-flex items-center gap-1 border border-line bg-bg/95 p-1 backdrop-blur"
       role="group"
       aria-label={dict.showcase.viewLabel}
     >

@@ -31,7 +31,7 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
 
   return (
     <div
-      className="flex items-center border border-line text-xs"
+      className="flex items-center gap-3 text-xs"
       role="group"
       aria-label={dict.nav.language}
     >
@@ -42,8 +42,10 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
           onClick={() => change(item)}
           aria-pressed={item === locale}
           className={cn(
-            "px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors",
-            item === locale ? "bg-white text-bg" : "text-muted hover:text-white"
+            "border-b pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
+            item === locale
+              ? "border-cyan text-cyan"
+              : "border-transparent text-muted hover:text-white"
           )}
         >
           {item}

@@ -231,7 +231,7 @@ export default function GlobeMap({
         : "relative h-[54vh] min-h-[340px] sm:h-[520px]";
 
   const controlClass =
-    "pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-bg/80 px-3 py-2 text-xs font-medium text-white backdrop-blur transition-colors hover:border-white/30";
+    "pointer-events-auto inline-flex items-center gap-1.5 border border-white/15 bg-bg/80 px-3 py-2 text-xs font-medium text-white backdrop-blur transition-colors hover:border-white/30";
 
   return (
     <section className={cn(wrapperClass, className)}>
@@ -267,7 +267,7 @@ export default function GlobeMap({
               {locating ? dict.map.locating : dict.map.nearMe}
             </button>
 
-            <div className="pointer-events-auto inline-flex overflow-hidden rounded-full border border-white/15 bg-bg/80 text-xs font-medium backdrop-blur">
+            <div className="pointer-events-auto inline-flex overflow-hidden border border-white/15 bg-bg/80 text-xs font-medium backdrop-blur">
               <button
                 type="button"
                 onClick={() => setView("globe")}
@@ -319,7 +319,7 @@ export default function GlobeMap({
         {/* Contenuto extra sovrapposto (ricerca e filtri della modalità Esplora) */}
         {overlay ? (
           <div className="pointer-events-none absolute inset-x-0 top-14 z-30 flex justify-center px-3 sm:top-16">
-            <div className="pointer-events-auto w-full max-w-2xl">{overlay}</div>
+            <div className="pointer-events-auto w-full max-w-2xl border border-line bg-bg/95 p-3 backdrop-blur">{overlay}</div>
           </div>
         ) : null}
 

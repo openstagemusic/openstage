@@ -387,3 +387,62 @@ con il proprietario prima della Fase 8 (`docs/plan-fase-8.md`).
 - Retention 90 giorni; niente realtime nella prima versione.
 - Il digest settimanale è opt-in, massimo una email a settimana, solo se c'è
   qualcosa. La politica completa è in `docs/notifications-email-policy.md`.
+
+## 15. Linguaggio editoriale (Fase 11B.2)
+
+Regola generale: **un riquadro è un'eccezione, non la norma**. Una sezione si
+separa con un filo, non con una scatola; un'azione secondaria è una parola
+sottolineata, non un bottone bordato.
+
+### Campi
+- Classe unica `.os-field` (in `app/globals.css`): trasparente, nessun bordo
+  intorno, una riga sotto; al focus la riga diventa ciana.
+- Etichetta `.os-field-label`: mono, 9px, maiuscoletto, spaziatura 0.14em.
+- Vale per account, creazione/modifica evento, filtri delle directory, booking,
+  contatti, inviti. Non esistono più campi con sfondo e riquadro.
+- Le checkbox restano native (sono controlli, non campi di testo).
+
+### Note e avvisi
+- `.os-note`: filo a sinistra, testo muted, nessuno sfondo.
+- `.os-note-cyan` per le informazioni, `.os-note-pink` per gli errori.
+- Niente banner pieni, niente angoli arrotondati.
+
+### Comandi
+- `ACTION_SOLID` (`components/ui/actions.ts`): **un solo** primario pieno per
+  vista, viola, con freccia che scorre di 2px.
+- `ACTION_LINE`: link mono maiuscoletto con sottolineatura e freccia. È il
+  comando secondario standard (annulla, torna, vedi, copia, esporta).
+- `ACTION_MUTED`: come sopra, ma parte muted e si accende al passaggio.
+- Mai due primari affiancati; mai un bottone bordato dentro una scheda.
+
+### Sezioni e schede
+- Sezione: `border-t border-line pt-6` + numero mono + titolo in `font-poster`.
+- Scheda artista/locale: poster a tutta immagine (4:3), indice in alto a
+  sinistra, badge in alto a destra, avatar 44px in cerchio, nome in poster
+  sopra l'immagine, meta mono sotto. Nessun contenitore, nessun pulsante
+  interno.
+- Nelle schede profilo il banner resta sfocato dietro alla testata; l'avatar è
+  quadrato 80px nella dashboard.
+
+### Dati e grafici
+- Numeri grandi in `font-poster`, etichette in mono 9/10px maiuscoletto.
+- Tabelle: solo fili orizzontali, nessuna zebra; totali in ciano.
+- Grafici in SVG scritti a mano (`components/charts`): area con gradiente,
+  griglia al 12% di opacità, tooltip nativi via `<title>`. Nessuna libreria.
+- Le classifiche non usano barre piene: filo proporzionale sotto l'etichetta
+  (`ValueBars`).
+
+### Dove il riquadro resta
+- Pop-up della mappa e bottom sheet: un fondo `bg-surface/95` serve alla
+  leggibilità sopra la mappa, ma senza angoli arrotondati e con un filo
+  colorato in alto.
+- Immagini e locandine: la cornice è parte dell'immagine, non della card.
+- **Control room admin**: resta com'è (scelta esplicita). Non applicare questa
+  sezione ai file in `components/admin`.
+
+### Cosa non facciamo più
+- Card con bordo e sfondo per ogni contenuto.
+- Pulsanti bordati come secondari.
+- Campi con sfondo e rettangolo completo.
+- Angoli arrotondati su pannelli e schede.
+- Due pesi visivi uguali nella stessa riga di comandi.

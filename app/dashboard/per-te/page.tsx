@@ -51,7 +51,7 @@ export default async function ForYouPage() {
         </LocaleLink>
         <LocaleLink
           href="/dashboard/impostazioni"
-          className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+          className="inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
         >
           {t.forYouSettings}
         </LocaleLink>
@@ -124,7 +124,7 @@ export default async function ForYouPage() {
           <p className="mt-2 text-sm text-muted">{t.forYouEmptyText}</p>
           <LocaleLink
             href="/"
-            className="mt-4 inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong"
+            className="mt-4 inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan"
           >
             {dict.events.backToExplore}
           </LocaleLink>

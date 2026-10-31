@@ -42,7 +42,7 @@ export default async function RoleOnboardingPage() {
             </p>
           </header>
 
-          <div className="border border-line bg-surface/50 p-5 sm:p-7">
+          <div className="border-t border-line pt-6">
             <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
               {dict.onboarding.roleLockedTitle}
             </p>
@@ -81,7 +81,7 @@ export default async function RoleOnboardingPage() {
           </p>
         </header>
 
-        <div className="border border-line bg-surface/40 p-5 sm:p-7">
+        <div className="border-t border-line pt-6">
           <RolePicker dict={dict.onboarding} />
         </div>
       </div>

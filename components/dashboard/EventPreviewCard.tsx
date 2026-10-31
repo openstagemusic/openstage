@@ -35,7 +35,7 @@ export default function EventPreviewCard({ values, locale, dict }: EventPreviewC
   const price = values.isFree ? dict.events.freeEntry : values.priceText.trim();
 
   return (
-    <div className="overflow-hidden border border-line bg-surface/60">
+    <div className="overflow-hidden border-t border-line pt-6">
       {values.coverImageUrl ? (
         <EventCover src={values.coverImageUrl} className="aspect-square w-full" />
       ) : (

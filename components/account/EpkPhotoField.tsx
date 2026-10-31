@@ -58,7 +58,7 @@ export default function EpkPhotoField({
             className="h-28 w-28 rounded-full border border-line object-cover"
           />
         ) : (
-          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-line bg-surface/40 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full border-t border-line pt-6 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
             EPK
           </div>
         )}

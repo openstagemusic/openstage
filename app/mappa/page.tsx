@@ -78,11 +78,12 @@ export default async function MapPage({ searchParams }: MapPageProps) {
         backHref={query ? `/?${query}` : "/"}
         overlay={
           <Suspense fallback={null}>
-            <SearchBar locale={locale} />
+            <SearchBar locale={locale} variant="editorial" />
             <QuickFilters
               locale={locale}
               genres={genres}
               center={visitor.center}
+              variant="editorial"
               className="mt-2"
             />
           </Suspense>

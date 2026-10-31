@@ -41,7 +41,7 @@ type CoverFieldProps = {
 };
 
 const buttonClass =
-  "inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-line-strong disabled:opacity-50";
+  "inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50";
 const primaryClass =
   "inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50";
 

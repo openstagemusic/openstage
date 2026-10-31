@@ -92,10 +92,10 @@ export default function RolePicker({ dict }: { dict: Dictionary["onboarding"] })
       {options.map((option, index) => (
         <label
           key={option.value}
-          className={`flex cursor-pointer items-start gap-4 border p-4 transition-colors focus-within:ring-2 focus-within:ring-cyan/50 focus-within:ring-offset-2 focus-within:ring-offset-bg ${
+          className={`flex cursor-pointer items-start gap-4 border-l-2 py-4 pl-4 transition-colors focus-within:ring-2 focus-within:ring-cyan/50 focus-within:ring-offset-2 focus-within:ring-offset-bg ${
             role === option.value
-              ? "border-violet bg-violet/10"
-              : "border-line bg-surface/40 hover:border-line-strong hover:bg-white/[0.03]"
+              ? "border-violet"
+              : "border-line hover:border-line-strong"
           }`}
         >
           <input

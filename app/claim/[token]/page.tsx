@@ -79,7 +79,7 @@ export default async function ClaimInvitePage({
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{t.invitePageLead}</p>
 
-      <div className="mt-8 border border-line bg-surface/50 p-5">
+      <div className="mt-8 border-t border-line pt-6">
         <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
           {t.inviteFor}
         </p>

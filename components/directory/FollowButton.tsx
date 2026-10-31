@@ -59,7 +59,7 @@ export default function FollowButton({
       <span className="inline-flex flex-wrap items-center gap-3">
         <LocaleLink
           href={`/login?next=${encodeURIComponent(pathname)}`}
-          className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+          className="inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
         >
           {dict.login}
         </LocaleLink>
@@ -97,7 +97,7 @@ export default function FollowButton({
           onClick={() => void toggle()}
           className={
             following
-              ? "inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white disabled:opacity-50"
+              ? "inline-flex min-h-11 items-center border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50"
               : "inline-flex min-h-11 items-center border border-violet-strong bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet disabled:opacity-50"
           }
         >
