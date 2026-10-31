@@ -29,6 +29,7 @@ export const ADMIN_MODULES: AdminModule[] = [
   { key: "reports", href: "/admin/segnalazioni", group: "content", status: "active", labelKey: "reports" },
   { key: "quality", href: "/admin/qualita", group: "content", status: "active", labelKey: "quality" },
   { key: "playlist", href: "/admin/playlist", group: "content", status: "active", labelKey: "playlist" },
+  { key: "help", href: "/admin/aiuto", group: "content", status: "active", labelKey: "help" },
   { key: "takedown", href: "/admin/takedown", group: "content", status: "active", labelKey: "takedown" },
   { key: "tickets", href: "/admin/messaggi", group: "community", status: "active", labelKey: "tickets" },
   { key: "pro", href: "/admin/pro", group: "community", status: "active", labelKey: "pro" },

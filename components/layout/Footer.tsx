@@ -101,8 +101,8 @@ export default function Footer({
               </Link>
             </li>
             <li>
-              <Link href="/faq" className={LINK}>
-                {dict.faq}
+              <Link href="/aiuto" className={LINK}>
+                {dict.help}
               </Link>
             </li>
           </ul>
