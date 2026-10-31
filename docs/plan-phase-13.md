@@ -17,8 +17,8 @@ Esito: nessuna correzione necessaria.
 - Titolare: **OpenStage — Francesco Sorrentino** (dicitura da confermare), contatto
   `ciao@getopenstage.it`.
 - **Player Spotify click-to-load**: nessun iframe al primo caricamento; si attiva
-  con un pulsante e la scelta resta nel browser. Nessun cookie di terze parti
-  prima del consenso.
+  con un pulsante e la scelta resta nel browser. Gate applicato anche a
+  `/playlists`, che ora carica l'embed solo dopo il clic.
 - Nessun banner cookie: non ci sono cookie di profilazione. Se un giorno
   arriveranno, andrà introdotto il consenso.
 

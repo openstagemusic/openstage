@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import LocaleLink from "@/components/i18n/LocaleLink";
 import PageHero from "@/components/pages/PageHero";
+import SpotifyEmbedGate from "@/components/spotify/SpotifyEmbedGate";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 import { listPublishedPlaylists } from "@/lib/spotify/queries";
@@ -46,15 +47,12 @@ export default async function PlaylistsPage() {
                   </p>
                 ) : null}
 
-                <div className="mt-4 border-t border-line pt-4">
-                  <iframe
+                <div className="mt-4">
+                  <SpotifyEmbedGate
+                    embedUrl={playlist.embedUrl}
                     title={`${playlist.title} — ${t.embedTitle}`}
-                    src={playlist.embedUrl}
-                    width="100%"
-                    height="352"
-                    style={{ border: 0 }}
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
+                    label={dict.spotify.playerEnable}
+                    hint={dict.spotify.playerEnableHint}
                   />
                 </div>
 
