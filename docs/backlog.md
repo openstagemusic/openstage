@@ -152,3 +152,5 @@ fatta dentro la fase indicata · **🟠 da decidere** = importante ma senza una 
 | B106 | **Testi legali reali** | ✅ fatta | Fase 13.2 | **Fatta il 31 ottobre 2026**: privacy, termini e cookie policy IT/EN con titolare, sub-responsabili, conservazione e diritti; nessun banner perché nessun cookie di profilazione |
 | B107 | **Cancellazione account ed export** | ✅ fatta | Fase 13.3 | **Fatta il 31 ottobre 2026**: export JSON, cancellazione con conferma scritta, FK `set null` per non cancellare schede/thread/messaggi di altre persone |
 | B108 | **Pagine errore e README** | ✅ fatta | Fase 13.4 | **Fatta il 31 ottobre 2026**: `error.tsx` e `global-error.tsx` editoriali, README con privacy, export e cancellazione |
+| B109 | **Anteprime social di artisti e locali** | ✅ fatta | Fase 13.5 | **Fatta il 31 ottobre 2026**: rotta OG per le schede, card con nome, meta e banner/avatar; metadata aggiornati |
+| B110 | **Serate simili e visti di recente** | ✅ fatta | Fase 13.5 | **Fatta il 31 ottobre 2026**: simili per città/genere in fondo alla scheda; ultimi 4 visti in Home con `localStorage`, nessun cookie |

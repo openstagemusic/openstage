@@ -5,7 +5,7 @@ import EventPageView from "@/components/events/EventPageView";
 import ViewTracker from "@/components/analytics/ViewTracker";
 import { eventMetadata } from "@/lib/events/metadata";
 import { eventPath } from "@/lib/events/paths";
-import { getEventById } from "@/lib/events/queries";
+import { getEventById, listSimilarEvents } from "@/lib/events/queries";
 import { findEventByPath } from "@/lib/events/resolve";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
@@ -71,10 +71,12 @@ export default async function EventPage({ params }: EventPageProps) {
     permanentRedirect(withLocale(locale, canonico));
   }
 
+  const similar = await listSimilarEvents(event, 3);
+
   return (
     <>
       <ViewTracker kind="event" id={event.id} />
-      <EventPageView event={event} />
+      <EventPageView event={event} similar={similar} />
     </>
   );
 }

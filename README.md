@@ -36,6 +36,24 @@ code admin e attività), URL del sito e, facoltativamente, Spotify e Photon.
 - Export dati: `/dashboard/impostazioni/esporta` (JSON).
 - Cancellazione account: `/dashboard/impostazioni`, conferma scritta `ELIMINA`. Le FK `set null`
   proteggono schede, thread e messaggi delle altre persone; le serate restano online.
+
+## Variabili d'ambiente
+
+Tutte vanno impostate su Vercel (Production, Preview, Development). Il file `.env.example` è la lista completa.
+
+| Gruppo | Variabili | Obbligatorie |
+| --- | --- | --- |
+| Supabase | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | sì |
+| Supabase (server) | `SUPABASE_SERVICE_ROLE_KEY` | sì: admin e **cancellazione account** |
+| Sito | `NEXT_PUBLIC_SITE_URL` | sì |
+| Form sicuri | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | sì |
+| Email | `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_REPLY_TO` | sì |
+| Email (coda) | `RESEND_WEBHOOK_SECRET`, `UNSUBSCRIBE_SECRET`, `EMAIL_WORKER_SECRET`, limiti quota | per i digest |
+| Admin | `ADMIN_EMAIL` | sì |
+| Spotify | `NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID` | facoltativa |
+| Telegram | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_ADMIN_CHAT_ID`, `TELEGRAM_ACTIVITY_BOT_TOKEN`, `TELEGRAM_ACTIVITY_CHAT_ID` | facoltative |
+| AI | `AI_GATEWAY_API_KEY`, modello, budget | facoltative |
+| Geocoder | `GEOCODER_URL` | facoltativa (fallback interno) |
 ## Struttura
 
 | Percorso | Contenuto |

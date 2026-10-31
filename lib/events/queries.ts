@@ -613,3 +613,69 @@ export async function findSimilarEvents(input: {
       path: eventPath({ id: row.id, slug: row.slug, city: row.city }),
     }));
 }
+
+
+/**
+ * Serate simili a una data: prima nella stessa città, poi nello stesso genere.
+ *
+ * Serve a chi arriva su un evento e non lo conosce: senza uscita, la scheda è
+ * un vicolo cieco. Solo eventi futuri e pubblicati, mai la serata stessa.
+ */
+export async function listSimilarEvents(
+  event: PublicEvent,
+  limit = 3
+): Promise<PublicEvent[]> {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+  const seen = new Set<string>([event.id]);
+  const out: PublicEvent[] = [];
+
+  const city = event.city ? cityKey(event.city) : null;
+
+  if (city) {
+    const { data } = await supabase
+      .from("events")
+      .select(EVENT_SELECT)
+      .eq("status", "published")
+      .gte("starts_at", now)
+      .eq("city_key", city)
+      .neq("id", event.id)
+      .order("starts_at", { ascending: true })
+      .limit(limit * 4);
+
+    for (const row of (data as unknown as EventRow[] | null) ?? []) {
+      if (seen.has(row.id)) continue;
+      seen.add(row.id);
+      out.push(toPublicEvent(row));
+    }
+  }
+
+  if (out.length < limit && event.genre) {
+    const { data } = await supabase
+      .from("events")
+      .select(EVENT_SELECT)
+      .eq("status", "published")
+      .gte("starts_at", now)
+      .eq("genre", event.genre)
+      .neq("id", event.id)
+      .order("starts_at", { ascending: true })
+      .limit(limit * 4);
+
+    for (const row of (data as unknown as EventRow[] | null) ?? []) {
+      if (seen.has(row.id)) continue;
+      seen.add(row.id);
+      out.push(toPublicEvent(row));
+    }
+  }
+
+  // Prima le stesse serate di genere, poi le altre: dentro il gruppo l'ordine
+  // resta cronologico.
+  return out
+    .sort((a, b) => {
+      const sameA = a.genre === event.genre ? 0 : 1;
+      const sameB = b.genre === event.genre ? 0 : 1;
+      if (sameA !== sameB) return sameA - sameB;
+      return new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime();
+    })
+    .slice(0, limit);
+}

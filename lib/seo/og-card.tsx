@@ -194,3 +194,151 @@ export function eventOgCard({
     </div>
   );
 }
+
+
+export type ProfileOgCardProps = {
+  /** "Artista" o "Locale", già tradotto. */
+  kind: string;
+  name: string;
+  /** "Rock · Napoli" oppure "Via Roma 1 · Milano" */
+  meta: string;
+  /** Banner o avatar in base64, o null. */
+  photo: string | null;
+  tagline: string;
+};
+
+/** La card di una scheda artista o locale: stessa grammatica, un'altra porta. */
+export function profileOgCard({ kind, name, meta, photo, tagline }: ProfileOgCardProps) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        background: "#07070d",
+        padding: 56,
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -220,
+          left: -160,
+          width: 760,
+          height: 760,
+          borderRadius: 9999,
+          background: "radial-gradient(circle, rgba(139,92,246,0.45) 0%, rgba(139,92,246,0) 70%)",
+          display: "flex",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: -280,
+          right: -180,
+          width: 800,
+          height: 800,
+          borderRadius: 9999,
+          background: "radial-gradient(circle, rgba(34,211,238,0.32) 0%, rgba(34,211,238,0) 70%)",
+          display: "flex",
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          flex: 1,
+          paddingRight: 48,
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 24,
+              letterSpacing: 3,
+              color: "#22d3ee",
+              textTransform: "uppercase",
+            }}
+          >
+            {kind}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              marginTop: 24,
+              fontSize: 72,
+              lineHeight: 1.02,
+              fontWeight: 700,
+              color: "#e8e8f2",
+              textTransform: "uppercase",
+            }}
+          >
+            {name}
+          </div>
+
+          {meta ? (
+            <div style={{ display: "flex", marginTop: 24, fontSize: 28, color: "#9aa0b8" }}>
+              {meta}
+            </div>
+          ) : null}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div
+            style={{
+              display: "flex",
+              width: 56,
+              height: 6,
+              borderRadius: 3,
+              background: "linear-gradient(90deg, #8b5cf6, #22d3ee, #f472b6)",
+            }}
+          />
+          <div style={{ display: "flex", fontSize: 28, fontWeight: 700, color: "#e8e8f2" }}>
+            OpenStage
+          </div>
+          <div style={{ display: "flex", fontSize: 20, color: "#9aa0b8" }}>{tagline}</div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 430,
+          height: 518,
+          overflow: "hidden",
+          border: "1px solid rgba(255,255,255,0.16)",
+          background: photo
+            ? "#101018"
+            : "linear-gradient(135deg, rgba(139,92,246,0.65), rgba(34,211,238,0.45), rgba(244,114,182,0.55))",
+          flexShrink: 0,
+        }}
+      >
+        {photo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- ImageResponse disegna su canvas
+          <img src={photo} width={430} height={518} style={{ objectFit: "cover" }} alt="" />
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              color: "#ffffff",
+              fontSize: 40,
+              fontWeight: 700,
+              letterSpacing: 2,
+              textAlign: "center",
+              padding: 24,
+            }}
+          >
+            {kind.toUpperCase()}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -40,6 +40,7 @@ function initials(name: string) {
 
 export async function generateMetadata({ params }: VenuePageProps): Promise<Metadata> {
   const { slug } = await params;
+  const locale = await getLocale();
   const venue = await getVenueBySlug(slug);
 
   if (!venue) return {};
@@ -49,7 +50,19 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
   return {
     title: venue.name,
     description,
-    openGraph: { title: venue.name, description, type: "website" },
+    openGraph: {
+      title: venue.name,
+      description,
+      type: "website",
+      images: [
+        {
+          url: `/api/og/profile/venue/${venue.slug}?lang=${locale}`,
+          width: 1200,
+          height: 630,
+          alt: venue.name,
+        },
+      ],
+    },
   };
 }
 

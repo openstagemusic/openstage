@@ -432,6 +432,7 @@ export const it: Dictionary = {
     playlistSavePlaylist: "Salva su Spotify",
     playlistAll: "Tutte le playlist",
     playlistOfficial: "Playlist ufficiale OpenStage",
+    recentTitle: "Visti di recente",
     upcomingTitle: "Prossime serate",
     upcomingSubtitle: "Tutto quello che artisti e locali hanno pubblicato su OpenStage.",
     cities: {
@@ -629,6 +630,7 @@ export const it: Dictionary = {
     sessionExpired: "La sessione è scaduta. Accedi di nuovo.",
   },
   events: {
+    similarTitle: "Serate simili",
     newTitle: "Crea un evento",
     newSubtitle: "L'editor completo degli eventi arriva nella prossima fase.",
     backHome: "Torna alla home",

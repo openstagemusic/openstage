@@ -5,6 +5,7 @@ import { getEventById } from "@/lib/events/queries";
 import { isCancelled, placeName } from "@/lib/events/types";
 import { defaultLocale, isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { inlinePhoto } from "@/lib/seo/inline-photo";
 import { eventOgCard } from "@/lib/seo/og-card";
 
 /**
@@ -33,31 +34,6 @@ export const dynamic = "force-dynamic";
 const SIZE = { width: 1200, height: 630 };
 
 type RouteContext = { params: Promise<{ id: string }> };
-
-/** La locandina in base64, oppure `null`: mai un errore che rompe la card. */
-async function inlinePhoto(url: string | null): Promise<string | null> {
-  if (!url) return null;
-
-  try {
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(2_500),
-      cache: "no-store",
-    });
-
-    if (!response.ok) return null;
-
-    const type = response.headers.get("content-type") ?? "";
-    if (!type.startsWith("image/")) return null;
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    // Una locandina ragionevole sta sotto i 4 MB: oltre, non è una locandina.
-    if (buffer.byteLength > 4_000_000) return null;
-
-    return `data:${type};base64,${buffer.toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
 
 export async function GET(request: Request, { params }: RouteContext) {
   const { id } = await params;

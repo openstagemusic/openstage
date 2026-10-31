@@ -41,6 +41,7 @@ function initials(name: string) {
 
 export async function generateMetadata({ params }: ArtistPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const locale = await getLocale();
   const artist = await getArtistBySlug(slug);
 
   if (!artist) return {};
@@ -51,7 +52,19 @@ export async function generateMetadata({ params }: ArtistPageProps): Promise<Met
   return {
     title: artist.name,
     description,
-    openGraph: { title: artist.name, description, type: "profile" },
+    openGraph: {
+      title: artist.name,
+      description,
+      type: "profile",
+      images: [
+        {
+          url: `/api/og/profile/artist/${artist.slug}?lang=${locale}`,
+          width: 1200,
+          height: 630,
+          alt: artist.name,
+        },
+      ],
+    },
   };
 }
 

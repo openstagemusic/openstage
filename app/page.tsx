@@ -4,6 +4,7 @@ import { Fragment, Suspense } from "react";
 import QuickFilters from "@/components/discovery/QuickFilters";
 import SearchBar from "@/components/discovery/SearchBar";
 import EventRows from "@/components/home/EventRows";
+import { RecentlyViewedStrip } from "@/components/events/RecentlyViewed";
 import BentoGrid from "@/components/home/BentoGrid";
 import CityStrip from "@/components/home/CityStrip";
 import HeroPosters from "@/components/home/HeroPosters";
@@ -228,6 +229,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             {dict.nav.map} <span aria-hidden="true">↗</span>
           </Link>
         </div>
+
+        <RecentlyViewedStrip dict={dict} />
 
         <div className="mt-1">
           <Suspense fallback={<div className="h-[92px]" />}>

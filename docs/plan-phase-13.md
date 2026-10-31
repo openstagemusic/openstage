@@ -46,3 +46,14 @@ Esito: nessuna correzione necessaria.
   coerenti con il funzionamento reale, ma non sostituiscono un parere.
 - Conferma della **dicitura del titolare**.
 - Rifiniture SEO minori, se emergono dai dati reali.
+
+
+## 13.5 — SEO e scoperte (fatto)
+
+- **OG delle schede**: nuova rotta `/api/og/profile/[kind]/[slug]` (stessa grammatica
+  della card evento) e metadata aggiornati per artisti e locali.
+- **Serate simili** in fondo alla scheda evento: stessa città, poi stesso genere, solo
+  eventi futuri. Niente vicoli ciechi.
+- **Visti di recente** in Home: ultimi 4 eventi nel browser (`localStorage`), niente
+  cookie e niente database.
+- README con la tabella completa delle variabili d'ambiente.

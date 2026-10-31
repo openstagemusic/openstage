@@ -433,6 +433,7 @@ export const en = {
     playlistSavePlaylist: "Save on Spotify",
     playlistAll: "All playlists",
     playlistOfficial: "Official OpenStage playlist",
+    recentTitle: "Recently viewed",
     upcomingTitle: "Next nights",
     upcomingSubtitle: "Everything published by artists and venues on OpenStage.",
     cities: {
@@ -630,6 +631,7 @@ export const en = {
     sessionExpired: "Your session has expired. Log in again.",
   },
   events: {
+    similarTitle: "Similar nights",
     newTitle: "Create an event",
     newSubtitle: "The full event editor arrives in the next phase.",
     backHome: "Back to home",

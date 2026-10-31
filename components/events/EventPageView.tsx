@@ -1,6 +1,8 @@
 import Link from "@/components/i18n/LocaleLink";
 
 import JsonLd from "@/components/seo/JsonLd";
+import EventTeaser from "@/components/events/EventTeaser";
+import { TrackRecentlyViewed } from "@/components/events/RecentlyViewed";
 import AddToCalendar from "@/components/events/AddToCalendar";
 import EventCountdown from "@/components/events/EventCountdown";
 import EventCover from "@/components/events/EventCover";
@@ -31,7 +33,13 @@ import { getSessionProfile } from "@/lib/supabase/session";
  * quella canonica `/eventi/<citta>/<slug>` e quella storica `/eventi/<id>`, che
  * reindirizza qui. Un solo posto da mantenere, nessuna pagina duplicata.
  */
-export default async function EventPageView({ event }: { event: PublicEvent }) {
+export default async function EventPageView({
+  event,
+  similar = [],
+}: {
+  event: PublicEvent;
+  similar?: PublicEvent[];
+}) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const t = dict.events;
@@ -117,6 +125,7 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
   return (
     <article className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-14">
       <JsonLd data={data} />
+      {!cancelled ? <TrackRecentlyViewed title={event.title} meta={shortWhen} /> : null}
 
       <Link
         href="/"
@@ -393,6 +402,19 @@ export default async function EventPageView({ event }: { event: PublicEvent }) {
           />
         ) : null}
       </div>
+
+      {similar.length > 0 ? (
+        <section className="mt-12 border-t border-line pt-6">
+          <h2 className="font-poster text-2xl uppercase leading-none tracking-[-0.01em]">
+            {t.similarTitle}
+          </h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {similar.map((item) => (
+              <EventTeaser key={item.id} event={item} locale={locale} dict={dict} />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </article>
   );
 }
