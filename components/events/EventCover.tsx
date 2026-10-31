@@ -5,6 +5,13 @@ type EventCoverProps = {
   src: string | null;
   /** Forma e dimensioni del riquadro: la foto si adatta, non si taglia mai. */
   className?: string;
+  /**
+   * `true` per la locandina che apre la scheda: è l'elemento più grande della
+   * pagina e va caricata subito. Negli elenchi resta `false` (pigra).
+   */
+  priority?: boolean;
+  /** Descrizione per chi non vede la foto: di solito il titolo della serata. */
+  alt?: string;
 };
 
 /**
@@ -21,7 +28,7 @@ type EventCoverProps = {
  * Senza locandina il riquadro resta, con il fondo di OpenStage: la griglia degli
  * elenchi non si scompone e la scheda non sembra rotta, sembra in attesa.
  */
-export default function EventCover({ src, className }: EventCoverProps) {
+export default function EventCover({ src, className, priority = false, alt = "" }: EventCoverProps) {
   if (!src) {
     return (
       <div
@@ -57,9 +64,10 @@ export default function EventCover({ src, className }: EventCoverProps) {
       {/* eslint-disable-next-line @next/next/no-img-element -- locandine da URL arbitrari */}
       <img
         src={src}
-        alt=""
-        loading="lazy"
-        decoding="async"
+        alt={alt}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding={priority ? "sync" : "async"}
         referrerPolicy="no-referrer"
         className="relative h-full w-full object-contain"
       />

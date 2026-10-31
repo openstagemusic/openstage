@@ -102,11 +102,19 @@ export default async function ArtistsPage({
         </div>
 
         {items.length > 0 ? (
-          <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((artist, index) => (
-              <ArtistCard key={artist.id} artist={artist} locale={locale} index={index} />
-            ))}
-          </div>
+          <>
+            {/* Titolo di sezione per la navigazione a lettura: le schede sono h3,
+                senza un h2 in mezzo l'ordine dei titoli salterebbe un livello. */}
+            <h2 className="sr-only">
+              {dict.nav.artists} · {total} {total === 1 ? t.resultOne : t.resultMany}
+            </h2>
+
+            <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {items.map((artist, index) => (
+                <ArtistCard key={artist.id} artist={artist} locale={locale} index={index} />
+              ))}
+            </div>
+          </>
         ) : (
           <div className="mt-6 border-t border-line pt-8">
             <h2 className="font-poster text-3xl uppercase leading-none">{t.noResultsTitle}</h2>

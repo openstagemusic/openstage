@@ -400,6 +400,11 @@ export default function MapCanvas({
       minZoom: MIN_ZOOM,
       maxPitch: 60,
       cooperativeGestures,
+      // Il mondo non si ripete ai lati e la cache delle tile resta contenuta:
+      // su un telefono sono memoria e lavoro in meno per lo stesso risultato.
+      renderWorldCopies: false,
+      maxTileCacheSize: 64,
+      fadeDuration: 0,
       attributionControl: { compact: true, customAttribution: MAP_ATTRIBUTION },
       locale: {
         "CooperativeGesturesHandler.MobileHelpText": "Usa due dita per muovere la mappa",

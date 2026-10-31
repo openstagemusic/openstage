@@ -128,6 +128,14 @@ export default async function EventPageView({
 
   return (
     <article className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-14">
+      {/* La locandina è l'elemento più grande della pagina: chiediamola subito,
+          appena il browser legge l'intestazione, senza aspettare il layout. */}
+      {event.coverImageUrl ? (
+        <>
+          <link rel="preconnect" href={new URL(event.coverImageUrl).origin} />
+          <link rel="preload" as="image" href={event.coverImageUrl} fetchPriority="high" />
+        </>
+      ) : null}
       <JsonLd data={data} />
       {!cancelled ? <TrackRecentlyViewed title={event.title} meta={shortWhen} /> : null}
 
@@ -169,6 +177,8 @@ export default async function EventPageView({
           // del riquadro lo riempie la stessa foto sfocata.
           <EventCover
             src={event.coverImageUrl}
+            priority
+            alt={event.title}
             className="aspect-[4/5] w-full border border-line bg-surface"
           />
         ) : null}

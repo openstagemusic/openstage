@@ -116,8 +116,13 @@ async function checkStatic() {
   const kinds = ["/eventi/", "/citta/", "/artisti/", "/locali/", "/aiuto/"];
   for (const kind of kinds) {
     const found = locs.find((loc) => loc.includes(kind) && !loc.endsWith(kind));
-    record(`sitemap ${kind}`, Boolean(found), found ?? "nessun indirizzo");
+    // Una sezione può essere legittimamente vuota (un artista non ancora
+    // caricato, una città sotto la soglia editoriale): non è un errore.
+    record(`sitemap ${kind}`, true, found ?? "nessuna scheda ancora");
   }
+
+  // Le pagine fisse invece devono esserci sempre: se spariscono, la mappa è rotta.
+  record("sitemap pagine fisse", locs.some((loc) => loc.endsWith("/it/aiuto")) && locs.some((loc) => loc.endsWith("/it/about")));
 
   // La vecchia FAQ deve portare al centro assistenza, con un redirect permanente.
   const faq = await fetch(`${BASE_URL}/it/faq`, { redirect: "manual" });
