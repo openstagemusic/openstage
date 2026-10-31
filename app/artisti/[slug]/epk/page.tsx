@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import LocaleLink from "@/components/i18n/LocaleLink";
+import ViewTracker from "@/components/analytics/ViewTracker";
 import PrintButton from "@/components/epk/PrintButton";
 import SocialLinks from "@/components/directory/SocialLinks";
 import { getArtistBySlug } from "@/lib/directory/queries";
@@ -72,6 +73,7 @@ export default async function ArtistEpkPage({ params }: EpkPageProps) {
 
   return (
     <div className="epk-page mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16 print:max-w-none print:px-0 print:py-0">
+      <ViewTracker kind="epk" id={artist.id} />
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <LocaleLink
           href={artistPath(artist)}

@@ -37,8 +37,8 @@ export default function CopyLinkButton({
       onClick={() => void copy()}
       className={
         compact
-          ? "inline-flex min-h-9 items-center justify-center border border-line px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted transition-colors hover:border-line-strong hover:text-white"
-          : "inline-flex min-h-11 items-center justify-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-line-strong hover:text-white"
+          ? "inline-flex min-h-9 items-center justify-center border-b border-line pb-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+          : "inline-flex items-center gap-2 border-b border-line-strong pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
       }
     >
       {copied ? copiedLabel : label}

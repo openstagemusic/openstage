@@ -33,7 +33,7 @@ export default function EpkPhotoField({
     setBusy(true);
     setError(null);
 
-    const result = await uploadCoverFile(file);
+    const result = await uploadCoverFile(file, { flatten: true });
     setBusy(false);
 
     if (!result.ok) {

@@ -18,74 +18,95 @@ function initials(name: string) {
 }
 
 /**
- * Scheda del locale negli elenchi. La capienza compare solo quando il locale
- * l'ha dichiarata: nessun numero inventato.
+ * Scheda locale: stesso gesto dell'artista, in ciano. La capienza compare solo
+ * quando il locale l'ha dichiarata: nessun numero inventato.
  */
-export default function VenueCard({ venue, locale }: { venue: PublicVenue; locale: Locale }) {
+export default function VenueCard({
+  venue,
+  locale,
+  index,
+}: {
+  venue: PublicVenue;
+  locale: Locale;
+  index?: number;
+}) {
   const dict = getDictionary(locale);
   const t = dict.directory;
   const where = [venue.address, venue.city].filter(Boolean).join(" · ");
 
   return (
-    <article className="group h-full overflow-hidden border border-line bg-surface/60 transition-colors hover:border-cyan/50 focus-within:border-cyan/60">
+    <article className="group h-full">
       <Link
         href={venuePath(venue)}
         className="flex h-full flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/40"
       >
-        <div className="relative h-28 w-full overflow-hidden border-b border-line bg-bg">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-bg">
           {venue.bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={venue.bannerUrl}
               alt=""
-              className="h-full w-full object-cover opacity-80"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               loading="lazy"
             />
           ) : (
             <BrandBanner compact />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-surface/90 via-surface/20 to-transparent" />
 
-          <div className="absolute right-3 top-3">
+          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/25 to-transparent" />
+
+          <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-3">
+            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/55">
+              {typeof index === "number" ? String(index + 1).padStart(2, "0") : ""}
+            </span>
             {venue.verified ? (
               <VerifiedBadge label={t.badgeVerified} />
             ) : venue.claimed ? null : (
-              <span className="border border-line bg-bg/80 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted backdrop-blur">
+              <span className="border border-line bg-bg/70 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.12em] text-muted backdrop-blur">
                 {t.badgeUnclaimed}
               </span>
             )}
           </div>
+
+          <div className="absolute inset-x-3 bottom-3 flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-cyan/20 font-poster text-lg leading-none text-cyan backdrop-blur">
+              {venue.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={venue.avatarUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                initials(venue.name)
+              )}
+            </span>
+
+            <h3 className="min-w-0 font-poster text-2xl uppercase leading-[0.9] tracking-[-0.01em] transition-colors group-hover:text-cyan">
+              {venue.name}
+            </h3>
+          </div>
+
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-px bg-cyan opacity-0 transition-opacity group-hover:opacity-100"
+          />
         </div>
 
-        <div className="relative flex flex-1 flex-col px-5 pb-5">
-          <span className="-mt-8 flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-surface bg-cyan/15 font-poster text-2xl leading-none text-cyan">
-            {venue.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={venue.avatarUrl}
-                alt=""
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            ) : (
-              initials(venue.name)
-            )}
-          </span>
-
-          <h3 className="mt-3 font-display text-xl font-semibold leading-tight">{venue.name}</h3>
-
-          {where ? (
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-              {where}
-            </p>
-          ) : null}
-
+        <div className="flex items-baseline justify-between gap-3 pt-2.5">
+          <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+            {where || "—"}
+          </p>
           {venue.capacity ? (
-            <p className="mt-auto pt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-              {t.capacity}: {venue.capacity} {t.capacityPeople}
+            <p className="shrink-0 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+              {venue.capacity} {t.capacityPeople}
             </p>
           ) : (
-            <span className="mt-auto pt-6 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
+            <span
+              aria-hidden="true"
+              className="font-mono text-[11px] text-cyan opacity-0 transition-opacity group-hover:opacity-100"
+            >
               →
             </span>
           )}

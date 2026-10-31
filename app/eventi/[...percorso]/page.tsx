@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 
 import EventPageView from "@/components/events/EventPageView";
+import ViewTracker from "@/components/analytics/ViewTracker";
 import { eventMetadata } from "@/lib/events/metadata";
 import { eventPath } from "@/lib/events/paths";
 import { getEventById } from "@/lib/events/queries";
@@ -70,5 +71,10 @@ export default async function EventPage({ params }: EventPageProps) {
     permanentRedirect(withLocale(locale, canonico));
   }
 
-  return <EventPageView event={event} />;
+  return (
+    <>
+      <ViewTracker kind="event" id={event.id} />
+      <EventPageView event={event} />
+    </>
+  );
 }

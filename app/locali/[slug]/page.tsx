@@ -3,6 +3,7 @@ import Link from "@/components/i18n/LocaleLink";
 import { notFound } from "next/navigation";
 
 import EventTeaser from "@/components/events/EventTeaser";
+import ViewTracker from "@/components/analytics/ViewTracker";
 import JsonLd from "@/components/seo/JsonLd";
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
 import SocialLinks from "@/components/directory/SocialLinks";
@@ -143,6 +144,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <JsonLd data={data} />
+      <ViewTracker kind="venue" id={venue.id} />
 
       <Link
         href="/locali"

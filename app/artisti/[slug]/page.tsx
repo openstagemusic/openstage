@@ -3,6 +3,7 @@ import Link from "@/components/i18n/LocaleLink";
 import { notFound } from "next/navigation";
 
 import ClaimPanel, { type ClaimState } from "@/components/claims/ClaimPanel";
+import ViewTracker from "@/components/analytics/ViewTracker";
 import SocialLinks from "@/components/directory/SocialLinks";
 import VerifiedBadge from "@/components/directory/VerifiedBadge";
 import BrandBanner from "@/components/directory/BrandBanner";
@@ -127,6 +128,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <JsonLd data={data} />
+      <ViewTracker kind="artist" id={artist.id} />
 
       <Link
         href="/artisti"

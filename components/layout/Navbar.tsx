@@ -21,10 +21,10 @@ type NavbarProps = {
 };
 
 const roleBadgeClass: Record<UserRole, string> = {
-  fan: "border-white/15 text-muted",
-  artist: "border-violet/40 bg-violet/10 text-white",
-  venue: "border-cyan/40 bg-cyan/10 text-white",
-  admin: "border-pink/40 bg-pink/10 text-white",
+  fan: "text-muted",
+  artist: "text-violet",
+  venue: "text-cyan",
+  admin: "text-pink",
 };
 
 export default function Navbar({ locale, dict, userEmail, userRole, notificationCount }: NavbarProps) {
@@ -90,7 +90,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
               {userRole ? (
                 <span
                   className={cn(
-                    "rounded-none border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em]",
+                    "font-mono text-[9px] uppercase tracking-[0.12em]",
                     roleBadgeClass[userRole]
                   )}
                 >
@@ -100,7 +100,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
               <Link
                 href="/dashboard/notifiche"
                 aria-label={`${dict.notifications}${notificationCount > 0 ? ` (${notificationCount})` : ""}`}
-                className="relative inline-flex h-9 w-9 items-center justify-center border border-line text-muted transition-colors hover:border-cyan/60 hover:text-white"
+                className="relative inline-flex h-9 w-9 items-center justify-center text-muted transition-colors hover:text-white"
               >
                 <svg
                   aria-hidden="true"
@@ -116,7 +116,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
                   <path d="M10 21h4" />
                 </svg>
                 {notificationCount > 0 ? (
-                  <span className="absolute -right-2 -top-2 min-w-4 border border-bg bg-pink px-1 text-center font-mono text-[9px] leading-4 text-white">
+                  <span className="absolute -right-1 -top-1 min-w-4 border border-bg bg-pink px-1 text-center font-mono text-[9px] leading-4 text-white">
                     {notificationCount > 9 ? "9+" : notificationCount}
                   </span>
                 ) : null}
@@ -124,7 +124,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
               {userRole === "admin" ? (
                 <Link
                   href="/admin"
-                  className="inline-flex items-center whitespace-nowrap border border-cyan bg-cyan px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-bg transition-colors hover:bg-cyan/90"
+                  className="inline-flex items-center whitespace-nowrap bg-cyan px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-bg transition-colors hover:bg-cyan/90"
                 >
                   {dict.controlRoom}
                 </Link>
@@ -134,10 +134,10 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
                     href="/dashboard"
                     aria-current={isActive("/dashboard") ? "page" : undefined}
                     className={cn(
-                      "inline-flex items-center whitespace-nowrap border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors",
+                      "relative py-2 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors",
                       isActive("/dashboard")
-                        ? "border-cyan bg-cyan text-bg"
-                        : "border-cyan/50 bg-cyan/10 text-white hover:border-cyan hover:bg-cyan/20"
+                        ? "text-white after:absolute after:inset-x-0 after:-bottom-[3px] after:h-px after:bg-cyan"
+                        : "text-muted hover:text-white"
                     )}
                   >
                     {dict.dashboard}
@@ -145,14 +145,14 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
                   {canManageEvents(userRole) ? (
                     <Link
                       href="/dashboard/events/new"
-                      className="border border-violet/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet/10"
+                      className="whitespace-nowrap bg-violet-strong px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet"
                     >
                       {dict.createEvent}
                     </Link>
                   ) : (
                     <Link
                       href="/onboarding/role"
-                      className="border border-cyan/40 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-cyan/10"
+                      className="whitespace-nowrap bg-violet-strong px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white transition-colors hover:bg-violet"
                     >
                       {dict.upgrade}
                     </Link>
@@ -241,7 +241,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
                 {userRole ? (
                   <span
                     className={cn(
-                      "rounded-none border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em]",
+                      "font-mono text-[9px] uppercase tracking-[0.12em]",
                       roleBadgeClass[userRole]
                     )}
                   >
@@ -258,7 +258,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
                 <Link
                   href={canManageEvents(userRole) ? "/dashboard/events/new" : "/onboarding/role"}
                   onClick={() => setOpen(false)}
-                  className="border border-violet/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white"
+                  className="bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white"
                 >
                   {canManageEvents(userRole) ? dict.createEvent : dict.upgrade}
                 </Link>
@@ -269,7 +269,7 @@ export default function Navbar({ locale, dict, userEmail, userRole, notification
                 <Link
                   href="/login"
                   onClick={() => setOpen(false)}
-                  className="border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-white"
+                  className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted underline decoration-line-strong underline-offset-4"
                 >
                   {dict.login}
                 </Link>

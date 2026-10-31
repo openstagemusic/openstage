@@ -72,10 +72,14 @@ function canvasBlob(
  * Il PNG resta PNG (la trasparenza non si butta per principio): diventa JPEG
  * solo se, anche ridimensionato, resta oltre il tetto di peso — a quel punto
  * vale più una locandina senza trasparenza che nessuna locandina.
+ *
+ * Con `flatten` la foto viene appiattita su bianco e salvata in JPEG: serve
+ * all'EPK, dove un PNG trasparente stampato finisce nero su nero.
  */
 async function shrink(
   image: HTMLImageElement,
-  sourceType: string
+  sourceType: string,
+  flatten = false
 ): Promise<{ blob: Blob; type: string } | null> {
   const scale = Math.min(1, COVER_MAX_SIDE / Math.max(image.naturalWidth, image.naturalHeight));
   const width = Math.max(1, Math.round(image.naturalWidth * scale));
@@ -88,11 +92,16 @@ async function shrink(
   const context = canvas.getContext("2d");
   if (!context) return null;
 
+  if (flatten) {
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, width, height);
+  }
+
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
   context.drawImage(image, 0, 0, width, height);
 
-  const keepPng = sourceType === "image/png";
+  const keepPng = sourceType === "image/png" && !flatten;
   const blob = await canvasBlob(canvas, keepPng ? "image/png" : "image/jpeg", 0.9);
 
   if (blob && blob.size <= COVER_MAX_BYTES) {
@@ -137,11 +146,23 @@ async function put(blob: Blob, type: string): Promise<CoverUploadResult> {
  * Se è già leggero e di dimensioni ragionevoli parte **così com'è**: nessuna
  * ricodifica, nessuna perdita di qualità. Si tocca solo quando serve davvero.
  */
-export async function uploadCoverFile(file: File): Promise<CoverUploadResult> {
+export async function uploadCoverFile(
+  file: File,
+  options?: { flatten?: boolean }
+): Promise<CoverUploadResult> {
   if (!ALLOWED_TYPES.includes(file.type)) return { ok: false, error: "type" };
 
   const image = await loadImage(file);
   if (!image) return { ok: false, error: "unreadable" };
+
+  // `flatten`: la foto dell'EPK finisce in un PDF, quindi niente trasparenza.
+  if (options?.flatten) {
+    const flat = await shrink(image, file.type, true);
+    if (!flat) return { ok: false, error: "unreadable" };
+    if (flat.blob.size > COVER_MAX_BYTES) return { ok: false, error: "tooBig" };
+
+    return put(flat.blob, flat.type);
+  }
 
   const tooHeavy =
     file.size > COVER_MAX_BYTES ||

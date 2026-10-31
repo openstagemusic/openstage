@@ -72,13 +72,24 @@
   diretti, artisti collegati, follower e notifiche.
 - Nessun accenno al Pro, nessun prezzo, nessun analytics/export/widget (non ancora costruiti).
 
-### 11B.2 — Strumenti gratuiti
+### 11B.2 — Strumenti gratuiti (fatto, parte widget)
 
-- Analytics aggregate privacy-friendly (base).
-- Export CSV/JSON.
-- Widget programmazione base per i locali.
-- Organizzazione richieste e promemoria (base).
-- Nessuna classifica, nessun conteggio pubblico nuovo.
+**Fatto il 31 ottobre 2026**
+
+- `view_daily` + `record_view()`: un contatore per giorno e scheda, nessun dato personale; il
+  proprietario non conta le proprie visite. Beacon su evento, scheda artista, scheda locale ed EPK.
+- Dashboard ridisegnata: banner sfocato, avatar, visite 30 giorni con variazione, grafico a area,
+  registro numeri (follower, richieste, salvataggi, pubblicati), top serate, completezza scheda.
+- `/dashboard/statistiche`: 30/90 giorni, ripartizione scheda/EPK/serate, follower nel tempo,
+  tabella serata per serata con totali, export CSV.
+- Grafici in SVG scritti a mano (`components/charts`): nessuna libreria, nessun peso aggiunto.
+- Restyling: schede directory come poster, navbar senza pulsanti scatolati, un solo primario
+  per vista (`components/ui/actions.ts`).
+
+**Resta da fare (11B.2b):** widget programmazione, export di eventi e programmazione, promemoria
+booking.
+
+**Fuori da questo blocco:** notifiche email sulle statistiche (non richieste).
 
 ### Fase 12 — Community e contenuti
 

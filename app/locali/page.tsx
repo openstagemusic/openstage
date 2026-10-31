@@ -87,24 +87,24 @@ export default async function VenuesPage({
       </PageHero>
 
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 sm:pb-16">
-        <p
-          className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted"
-          aria-live="polite"
-        >
-          {total} {total === 1 ? t.resultOne : t.resultMany}
-        </p>
+        <div className="mt-2 flex items-baseline gap-3 border-t border-line pt-4" aria-live="polite">
+          <span className="font-poster text-2xl leading-none">{total}</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+            {total === 1 ? t.resultOne : t.resultMany}
+          </span>
+        </div>
 
         {items.length > 0 ? (
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((venue) => (
-              <VenueCard key={venue.id} venue={venue} locale={locale} />
+          <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((venue, index) => (
+              <VenueCard key={venue.id} venue={venue} locale={locale} index={index} />
             ))}
           </div>
         ) : (
-          <div className="mt-5 border border-line bg-surface/60 p-8">
-            <h2 className="font-display text-lg font-semibold">{t.noResultsTitle}</h2>
-            <p className="mt-2 text-sm text-muted">{t.noResultsText}</p>
-            <p className="mt-4 border-t border-line pt-4 text-sm text-muted">
+          <div className="mt-6 border-t border-line pt-8">
+            <h2 className="font-poster text-3xl uppercase leading-none">{t.noResultsTitle}</h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">{t.noResultsText}</p>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
               {t.suggestVenue}{" "}
               <Link
                 href="/contatti?argomento=venue"
