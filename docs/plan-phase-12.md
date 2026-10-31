@@ -112,3 +112,18 @@ Nessuno nuovo: Supabase, notifiche in-app, Turnstile, storage esistente.
 - Chiamate: tetto raggiunto, chiusura anticipata, scadenza, candidatura che
   finisce nella inbox, export.
 - Multi-giorno: ricerca «stasera»/«questo weekend», mappa, ICS, widget.
+
+---
+
+## Aggiornamento pagine pubbliche (31 ottobre 2026)
+
+La Fase 12 ha cambiato il prodotto: le pagine lo raccontano.
+
+- **Per gli artisti / Per le venue**: strumenti aggiornati (dashboard e statistiche, bacheca
+  ingaggi, festival multi-giorno, chiusura del locale), sezione **"Notifiche, senza rumore"** e
+  illustrazioni disegnate in SVG (nessuna foto stock).
+- **Nuova /per-i-fan**: cosa si può fare senza account, cosa serve l'account, cosa non trovi
+  (niente paywall, pubblicità, biglietteria o recensioni finte). Link in footer, Home e sitemap.
+- **Home**: sottotitolo riscritto per chi ascolta (mappa delle serate, gratis, senza pubblicità) e
+  **fascia "Cercasi artisti"** tra il bento e la playlist: appare solo con chiamate aperte, mostra
+  le due più recenti e il conteggio reale.
