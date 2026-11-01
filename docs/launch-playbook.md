@@ -117,7 +117,7 @@ Sono numeri che non dicono se qualcuno è andato a un concerto.
 
 ## 5-bis. L'account Instagram è del brand, non della città
 
-L'account è **uno solo**: `@openstage.it` (o `getopenstage`). La strategia
+L'account è **uno solo**: **`@getopenstage`** (creato il 1 novembre 2026). La strategia
 "una città alla volta" decide **cosa pubblichi**, non come si chiama il profilo.
 
 - **Nome profilo**: OpenStage — live indipendente
@@ -131,6 +131,9 @@ L'account è **uno solo**: `@openstage.it` (o `getopenstage`). La strategia
 
 Perché: un account `@openstage.bergamo` andrebbe rifatto a ogni città, e un
 artista di Brescia non seguirebbe mai un profilo che si chiama Bergamo.
+
+Profilo creato: **instagram.com/getopenstage** — foto profilo dal marchio,
+quattro storie in evidenza (Bergamo, Milano, Serate, Info).
 
 ## 6. Asset da avere pronti
 
