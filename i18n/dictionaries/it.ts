@@ -1936,7 +1936,7 @@ export const it: Dictionary = {
       saveFailed: "Non è stato possibile salvare.",
       openDirectory: "Elenco artisti",
       messageTemplate:
-        "Ciao, sono Francesco di OpenStage, la mappa gratuita delle serate dal vivo (senza pubblicità e senza pay-to-play).\n\nHo creato una scheda per {name} a {city}: {url}\n\nSe sei tu, puoi prenderla in gestione da lì — foto, bio, date e contatti: c'è il pulsante «Reclama questa scheda». Nessun costo.\n\nSe non ti interessa, dimmelo e la togliamo.",
+        "Ciao, sono Francesco di OpenStage — la mappa gratuita delle serate dal vivo: artisti emergenti, locali di zona e concerti veri, senza pubblicità e senza pay-to-play.\n\nAbbiamo creato una scheda per te: {url}\n\nSe ti interessa, puoi reclamarla da lì (c'è il pulsante «Reclama questa scheda»): in due minuti diventa tua e puoi aggiungere foto, bio e date.\n\nSaluti,\nIl team di OpenStage",
     },
     nav: {
       today: "Oggi",

@@ -1930,7 +1930,7 @@ export const en = {
       saveFailed: "We could not save it.",
       openDirectory: "Artist directory",
       messageTemplate:
-        "Hi, I'm Francesco from OpenStage, the free map of live music (no ads, no pay-to-play).\n\nI created a page for {name} in {city}: {url}\n\nIf this is you, you can take it over from there — photos, bio, dates and contacts: there is a «Claim this page» button. No cost.\n\nIf you are not interested, tell me and we will remove it.",
+        "Hi, I'm Francesco from OpenStage — the free map of live music: emerging artists, neighbourhood venues and real gigs, with no ads and no pay-to-play.\n\nWe created a page for you: {url}\n\nIf you're interested, you can claim it from there (there's a «Claim this page» button): it takes two minutes and then it's yours, with photos, bio and dates.\n\nBest,\nThe OpenStage team",
     },
     nav: {
       today: "Today",
