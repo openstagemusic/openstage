@@ -70,6 +70,37 @@ prima di creare la scheda.
 Regola: si crea la serata solo con **data, ora e luogo** verificabili. Niente
 testi copiati, niente foto senza permesso.
 
+## Inviti al claim inviati (1 novembre 2026)
+
+Quattro inviti, uno per locale, dal pannello (azione reale, email vere):
+
+| Locale | Email | Inviato | Scade |
+| --- | --- | --- | --- |
+| Ink Club | `info@inkclub.bergamo.it` | 1 nov, 15:02 | 8 nov |
+| Spazio Polaresco | `info@spaziopolaresco.it` | 1 nov, 15:03 | 8 nov |
+| Daste | `info@dastebergamo.com` | 1 nov, 15:03 | 8 nov |
+| NXT Station | `info@nxtbergamo.it` | 1 nov, 15:03 | 8 nov |
+
+Tutte e quattro risultano **inviate** (stato `sent`), non solo accodate. Il link
+è monouso e scade l'8 novembre; se non rispondono, si può reinvitare dopo la
+scadenza.
+
+Non invitati: **Edonè** (spazio chiuso fino a primavera), **Druso** (manca
+un'email pubblica).
+
+## Dove cercare i programmi (per Francesco)
+
+| Locale | Dove guardare | Cosa serve |
+| --- | --- | --- |
+| **Ink Club** | `inkclub.bergamo.it` → Calendario (oggi fermo a luglio); Instagram e newsletter dal sito | date, ora, titolo, artisti |
+| **Daste** | Instagram `@daste_bergamo` (il sito `/eventi` è un archivio vecchio) | post del mese con data e ora |
+| **Spazio Polaresco** | Instagram `@spaziopolaresco` e calendario sul sito | date e titoli |
+| **NXT Station** | `nxtbergamo.it` e i social dal sito | concerti (a novembre oggi solo stand-up) |
+| **Edonè** | Instagram `@edonebergamo` | solo da primavera |
+
+Per ogni serata: **data, ora, titolo, artista/band se c'è, ingresso**. Uno
+screenshot del post va benissimo.
+
 ## Raccolta serate: cosa non funziona (1 novembre 2026)
 
 Provati i canali pubblici:
