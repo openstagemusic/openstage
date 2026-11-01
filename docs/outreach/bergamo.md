@@ -86,6 +86,12 @@ Sei serate create e online, col locale collegato:
 Più **Calibro 35** al Druso (7 nov, già presente). Bergamo ha ora una pagina
 città viva: `/citta/bergamo`.
 
+**Locandine** (1 novembre): caricate sul nostro Storage (`event-covers/curated/`)
+e collegate a 5 schede su 6. *Video Killed the Radio Star* resta senza: lo
+screenshot di Instagram contiene il post già ritagliato dall'interfaccia, e una
+locandina tagliata è peggio del fondo grafico. Se arriva il file originale, si
+aggiunge in un minuto.
+
 ## Serate candidate (ricerca del 1 novembre 2026)
 
 Verificate sulle fonti, pronte da creare. Solo musica dal vivo o DJ set: escluse
