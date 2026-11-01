@@ -81,7 +81,7 @@ Sono numeri che non dicono se qualcuno è andato a un concerto.
 - [ ] Inviti ai locali, uno a uno
 - [ ] 3 screenshot veri: mappa con i pin, scheda evento, scheda locale
 - [ ] Una locandina quadrata per il post (titolo + città + «gratis»)
-- [ ] Bio Instagram aggiornata: una riga + link `getopenstage.it`
+- [ ] Profilo Instagram del **brand** (non della città): bio senza "Bergamo", sezioni per città nelle storie in evidenza
 - [ ] Google Search Console: proprietà verificata, sitemap inviata
 
 ### T-7 → T-0 — contatti diretti
@@ -115,6 +115,23 @@ Sono numeri che non dicono se qualcuno è andato a un concerto.
 
 ---
 
+## 5-bis. L'account Instagram è del brand, non della città
+
+L'account è **uno solo**: `@openstage.it` (o `getopenstage`). La strategia
+"una città alla volta" decide **cosa pubblichi**, non come si chiama il profilo.
+
+- **Nome profilo**: OpenStage — live indipendente
+- **Bio**: la mappa gratuita del live indipendente. Serate vere, locali di zona,
+  artisti emergenti. Nessun pay-to-play.
+- **Link**: `https://getopenstage.it`
+- **Città**: non nella bio, ma nelle **storie in evidenza** (`Bergamo`,
+  `Milano`, …) e nel testo dei post.
+- **Post fissato**: "Cos'è OpenStage" — resta in cima e spiega il progetto a chi
+  arriva per la prima volta.
+
+Perché: un account `@openstage.bergamo` andrebbe rifatto a ogni città, e un
+artista di Brescia non seguirebbe mai un profilo che si chiama Bergamo.
+
 ## 6. Asset da avere pronti
 
 | Asset | Formato | Note |
@@ -123,6 +140,8 @@ Sono numeri che non dicono se qualcuno è andato a un concerto.
 | Storia | 1080×1920 | mappa della città con i pin |
 | Reel (facoltativo) | 15–20 s | schermo registrato: apro la mappa, tocco un pin, si apre la serata |
 | Screenshot puliti | 3 | mappa, scheda evento, scheda locale |
+| Foto profilo | 512×512 | `public/brand/openstage-avatar-512.png` |
+| Copertine storie in evidenza | 1080×1080 | `public/brand/highlights/` |
 | One-pager per i locali | PDF di una pagina | cosa è, cosa non è, come si reclama la scheda |
 | Email invito claim | già nel catalogo | si modifica dalla control room |
 

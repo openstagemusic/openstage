@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "icons": "node scripts/gen-icons.mjs",
+    "highlights": "node scripts/gen-highlights.mjs",
     "manuale": "node scripts/manuale.mjs",
     "postinstall": "node scripts/copy-maplibre-worker.mjs",
     "prebuild": "node scripts/copy-maplibre-worker.mjs"
