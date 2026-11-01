@@ -5,6 +5,7 @@ import Link from "@/components/i18n/LocaleLink";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import EventCard from "@/components/map/EventCard";
+import MapTapGate from "@/components/map/MapTapGate";
 import VenueEventsCard from "@/components/map/VenueEventsCard";
 import { hasCoordinates, type PublicEvent } from "@/lib/events/types";
 import type { Locale } from "@/lib/i18n/config";
@@ -17,6 +18,12 @@ import { cn } from "@/lib/utils";
  * La mappa è pesante (MapLibre + tile): la carichiamo solo quando serve, con
  * un chunk separato che non entra nel bundle iniziale della pagina.
  */
+/**
+ * Quando la variante sarà approvata basta mettere `true`: la mappa su telefono
+ * (pagina /mappa) si apre al tocco. Fino ad allora si prova con `?mappa=tocco`.
+ */
+const TAP_TO_LOAD_ON_MOBILE = false;
+
 const MapCanvas = dynamic(() => import("@/components/map/MapCanvas"), {
   ssr: false,
   loading: () => <MapSkeleton label="" />,
@@ -91,6 +98,13 @@ export default function GlobeMap({
   const isMobile = useIsMobile();
 
   const [view, setView] = useState<"globe" | "flat">("globe");
+  /**
+   * Variante «la mappa si apre quando la chiedi». Si attiva con `?mappa=tocco`
+   * (per provarla su qualunque schermo) e, quando sarà approvata, anche su
+   * telefono. Senza il parametro il comportamento resta quello di sempre.
+   */
+  const [tapToLoad, setTapToLoad] = useState(false);
+  const [mapOpened, setMapOpened] = useState(false);
   const [mounted, setMounted] = useState(variant === "fullscreen");
   const [selection, setSelection] = useState<MapSelection | null>(null);
   const [userPosition, setUserPosition] = useState<{
@@ -124,6 +138,15 @@ export default function GlobeMap({
     const group = groups.find((item) => item.key === selection.group.key);
     return group ? { type: "venue", group } : null;
   }, [selection, events, groups]);
+
+  // La variante si accende solo se richiesta nell'indirizzo.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("mappa");
+    if (requested === "tocco") setTapToLoad(true);
+  }, []);
+
+  const gateActive =
+    !mapOpened && (tapToLoad || (TAP_TO_LOAD_ON_MOBILE && isMobile && variant === "fullscreen"));
 
   // Caricamento pigro: la mappa entra in scena solo quando si avvicina alla viewport.
   useEffect(() => {
@@ -236,7 +259,21 @@ export default function GlobeMap({
   return (
     <section className={cn(wrapperClass, className)}>
       <div ref={containerRef} className={innerClass}>
-        {mounted ? (
+        {gateActive ? (
+          <MapTapGate
+            events={events}
+            locale={locale}
+            onOpen={() => setMapOpened(true)}
+            labels={{
+              title: dict.map.tapTitle,
+              text: dict.map.tapText,
+              cta: dict.map.tapCta,
+              note: dict.map.tapNote,
+              eventOne: dict.map.eventOnMap,
+              eventMany: dict.map.eventsOnMap,
+            }}
+          />
+        ) : mounted ? (
           <MapCanvas
             events={events}
             initialCenter={initialCenter}

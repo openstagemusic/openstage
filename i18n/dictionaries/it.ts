@@ -743,6 +743,11 @@ export const it: Dictionary = {
     emptyText:
       "OpenStage cresce con la community: se conosci un locale o un artista della tua zona, segnalalo e aiutaci a riempire la mappa.",
     emptyCta: "Segnala un locale o un artista",
+    tapTitle: "La mappa si apre quando la chiedi",
+    tapText:
+      "Caricare la mappa costa dati e qualche secondo su telefono. Aprila quando vuoi vedere i pin: il resto della pagina \u00e8 gi\u00e0 pronto.",
+    tapCta: "Apri la mappa interattiva",
+    tapNote: "Si carica solo ora",
   },
   search: {
     label: "Cerca eventi",
@@ -2635,6 +2640,8 @@ export const it: Dictionary = {
       artistInvalid: "L'artista scelto non esiste più: riprova a cercarlo.",
       cityRequired: "Scrivi la città.",
       countryInvalid: "Paese non valido: usa il codice di due lettere (IT, GB, ES…).",
+      countryMismatch:
+        "Il pin è fuori dall'Italia: scegli il paese della serata qui sopra.",
       cityTooLong: "Il nome della città è troppo lungo (massimo 80 caratteri).",
       directionsTooLong:
         "Le indicazioni sono troppo lunghe (massimo 400 caratteri): vanno dritte al punto.",

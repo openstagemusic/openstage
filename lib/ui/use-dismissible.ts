@@ -24,6 +24,9 @@ export function useDismissible(options: {
   useEffect(() => {
     if (!open) return;
 
+    // Il nodo va letto adesso: alla chiusura il ref potrebbe essere già cambiato.
+    const returnTo = returnFocusRef?.current ?? null;
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.stopPropagation();
@@ -45,7 +48,7 @@ export function useDismissible(options: {
       document.removeEventListener("keydown", onKeyDown);
       // Il focus torna sempre al pulsante che ha aperto il pannello: chi usa la
       // tastiera non deve ricominciare dall'inizio della pagina.
-      returnFocusRef?.current?.focus();
+      returnTo?.focus();
     };
   }, [open, onClose, panelRef, returnFocusRef, moveFocus]);
 }

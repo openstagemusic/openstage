@@ -742,6 +742,11 @@ export const en = {
     emptyText:
       "OpenStage grows with the community: if you know a venue or an artist in your area, report it and help fill the map.",
     emptyCta: "Report a venue or an artist",
+    tapTitle: "The map opens when you ask",
+    tapText:
+      "Loading the map costs data and a few seconds on a phone. Open it when you want to see the pins: the rest of the page is already here.",
+    tapCta: "Open the interactive map",
+    tapNote: "Loads only now",
   },
   search: {
     label: "Search events",
@@ -2630,6 +2635,7 @@ export const en = {
       artistInvalid: "The artist you picked no longer exists: try searching again.",
       cityRequired: "Write the city.",
       countryInvalid: "Invalid country: use the two-letter code (IT, GB, ES…).",
+      countryMismatch: "The pin is outside Italy: pick the country of the night above.",
       cityTooLong: "The city name is too long (80 characters max).",
       directionsTooLong: "The directions are too long (400 characters max): keep them to the point.",
       locationRequired: "Place the pin on the map: that is how people find the night.",

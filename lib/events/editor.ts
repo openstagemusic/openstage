@@ -71,6 +71,17 @@ export const TIMEZONE_OPTIONS = [
   "UTC",
 ] as const;
 
+/**
+ * Il riquadro dell'Italia.
+ *
+ * Serve a un solo controllo: se il paese è l'Italia (il default) ma il pin cade
+ * fuori, quasi sempre il paese è rimasto quello di partenza mentre la città era
+ * all'estero — ed è così che un concerto a Lisbona finisce sulla pagina "Italia".
+ * Il riquadro è volutamente largo: include isole e territori vicini, meglio
+ * lasciar passare un caso limite che bloccare un evento vero.
+ */
+const ITALY_BOUNDS = { minLat: 35.4, maxLat: 47.2, minLon: 6.5, maxLon: 18.6 };
+
 /** Ampiezza dell'area quando la posizione è indicata come zona, non come punto. */
 export const RADIUS_OPTIONS_M = [500, 1500, 3000] as const;
 export const DEFAULT_RADIUS_M = 1500;
@@ -115,6 +126,7 @@ export type EditorErrorCode =
   | "cityRequired"
   | "cityTooLong"
   | "countryInvalid"
+  | "countryMismatch"
   | "directionsTooLong"
   | "locationRequired"
   | "locationEmpty"
@@ -353,6 +365,19 @@ export function validateEventInput(
   const longitude = input.longitude;
   const hasPoint = isCoordinate(latitude, 90) && isCoordinate(longitude, 180);
   if (!hasPoint) errors.location = "locationRequired";
+
+  // Paese rimasto "Italia" con il pin fuori: lo diciamo invece di pubblicare una
+  // serata estera che si presenta come italiana.
+  if (
+    hasPoint &&
+    country === "IT" &&
+    (latitude < ITALY_BOUNDS.minLat ||
+      latitude > ITALY_BOUNDS.maxLat ||
+      longitude < ITALY_BOUNDS.minLon ||
+      longitude > ITALY_BOUNDS.maxLon)
+  ) {
+    errors.country = "countryMismatch";
+  }
 
   // «Come arrivare»: due righe per gli spazi che un indirizzo non ce l'hanno.
   const directions = input.directions.trim();
