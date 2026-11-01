@@ -11,8 +11,16 @@ Ultimo aggiornamento: **1 novembre 2026** (dati verificati sulle fonti pubbliche
 
 - Ink Club — `/locali/ink-club`
 - Spazio Polaresco — `/locali/spazio-polaresco`
+- Daste — `/locali/daste`
+- NXT Station — `/locali/nxt-station`
 - Edonè — `/locali/edone` (spazio estivo: nessuna data in inverno)
 - Druso — `/locali/druso` (già presente, completata la verifica dei dati)
+
+Contatti raccolti: `info@inkclub.bergamo.it`, `info@spaziopolaresco.it`,
+`info@dastebergamo.com`, `info@nxtbergamo.it`.
+
+**Da verificare prima di creare**: Circolo Arci Maite e Ninfea Social Club
+(Sorisole). Non ho ancora un indirizzo ufficiale attendibile: non lo invento.
 
 ## Locali verificati
 
@@ -39,12 +47,12 @@ Dall'agenda di EventiBergamo risultano attivi e con programmazione musicale:
 
 | Locale | Zona |
 | --- | --- |
-| **Daste** | Bergamo Centro |
-| **NXT Station** | Bergamo Centro |
-| **Circolo Arci Maite** | Bergamo Centro |
-| **Ninfea Social Club** | Sorisole |
-| **Keller Factory** | Curno |
-| **Bolgia** | Osio Sopra |
+| **Daste** | Bergamo Centro — **creata** |
+| **NXT Station** | Bergamo Centro — **creata** |
+| **Circolo Arci Maite** | Bergamo Centro — indirizzo da verificare |
+| **Ninfea Social Club** | Sorisole — indirizzo da verificare |
+| **Keller Factory** | Curno — da valutare |
+| **Bolgia** | Osio Sopra — discoteca, fuori target |
 
 Con questi si arriva alla densità necessaria; vanno verificati indirizzo ed email
 prima di creare la scheda.
