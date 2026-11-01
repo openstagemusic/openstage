@@ -52,17 +52,15 @@ function refreshCalls(callId?: string) {
 export async function createCallAction(formData: FormData): Promise<CallActionResult> {
   const session = await getSessionProfile();
   if (!session) return { ok: false, error: "auth" };
-  if (session.role !== "artist" && session.role !== "venue") {
+  // La bacheca è dei locali: un artista non pubblica chiamate.
+  if (session.role !== "venue" && session.role !== "admin") {
     return { ok: false, error: "role" };
   }
   if (!session.verified) return { ok: false, error: "verified" };
 
-  const [artist, venue] = await Promise.all([
-    session.role === "artist" ? getArtistByProfileId(session.id) : Promise.resolve(null),
-    session.role === "venue" ? getVenueByProfileId(session.id) : Promise.resolve(null),
-  ]);
+  const venue = session.role === "venue" ? await getVenueByProfileId(session.id) : null;
 
-  const page = artist ?? venue;
+  const page = venue;
   if (!page) return { ok: false, error: "page" };
   if (venue?.closedAt) return { ok: false, error: "closed" };
 
@@ -113,7 +111,8 @@ export async function createCallAction(formData: FormData): Promise<CallActionRe
     .insert({
       created_by: session.id,
       venue_id: venue?.id ?? null,
-      artist_id: artist?.id ?? null,
+      // La bacheca è dei locali: la scheda artista resta vuota.
+      artist_id: null,
       title,
       body,
       role_wanted: roleWanted,

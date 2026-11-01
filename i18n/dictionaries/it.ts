@@ -743,6 +743,11 @@ export const it: Dictionary = {
     emptyText:
       "OpenStage cresce con la community: se conosci un locale o un artista della tua zona, segnalalo e aiutaci a riempire la mappa.",
     emptyCta: "Segnala un locale o un artista",
+    tapTitle: "La mappa si apre quando la chiedi",
+    tapText:
+      "Caricare la mappa costa dati e qualche secondo su telefono. Aprila quando vuoi vedere i pin: il resto della pagina \u00e8 gi\u00e0 pronto.",
+    tapCta: "Apri la mappa interattiva",
+    tapNote: "Si carica solo ora",
   },
   search: {
     label: "Cerca eventi",
@@ -2316,12 +2321,37 @@ export const it: Dictionary = {
     empty: "Nessuna serata in programma.",
   },
   dashboard: {
+requests: {
+      eyebrow: "Assistenza",
+      title: "Le tue richieste",
+      lead: "I messaggi che hai mandato dal modulo contatti e le risposte di OpenStage. Le stesse risposte arrivano anche via email.",
+      emptyTitle: "Nessuna richiesta",
+      emptyText: "Quando scrivi dal modulo contatti, la conversazione resta qui: puoi rileggerla anche dopo mesi.",
+      emptyCta: "Scrivici",
+      newRequest: "Nuova richiesta",
+      replyTitle: "Risposta di OpenStage",
+      noReply: "In attesa di risposta",
+      statusNew: "Inviata",
+      statusRead: "Letta",
+      statusClosed: "Chiusa",
+      topic: "Argomento",
+      topics: {
+        general: "Generale",
+        artist: "Artisti",
+        venue: "Locali",
+        report: "Segnalazione",
+        privacy: "Privacy o dati",
+        other: "Altro",
+      },
+    },
+
     title: "Dashboard",
     navEvents: "I miei eventi",
     navNew: "Crea evento",
     navSaved: "Preferiti",
     navForYou: "Per te",
     navNotifications: "Notifiche",
+    navRequests: "Le tue richieste",
     navSettings: "Impostazioni",
     navProfile: "Profilo",
     navMessages: "Messaggi",
@@ -2635,6 +2665,8 @@ export const it: Dictionary = {
       artistInvalid: "L'artista scelto non esiste più: riprova a cercarlo.",
       cityRequired: "Scrivi la città.",
       countryInvalid: "Paese non valido: usa il codice di due lettere (IT, GB, ES…).",
+      countryMismatch:
+        "Il pin è fuori dall'Italia: scegli il paese della serata qui sopra.",
       cityTooLong: "Il nome della città è troppo lungo (massimo 80 caratteri).",
       directionsTooLong:
         "Le indicazioni sono troppo lunghe (massimo 400 caratteri): vanno dritte al punto.",

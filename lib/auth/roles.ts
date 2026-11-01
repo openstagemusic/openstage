@@ -16,6 +16,14 @@ export function canManageEvents(role: UserRole | null): boolean {
   return role === "artist" || role === "venue" || role === "admin";
 }
 
+/**
+ * La bacheca ingaggi la pubblicano **solo i locali** (e l'admin): un artista
+ * cerca date, non cerca artisti. La RLS applica la stessa regola.
+ */
+export function canPostCalls(role: UserRole | null): boolean {
+  return role === "venue" || role === "admin";
+}
+
 /** Il profilo artista lo completa solo un artista (o l'admin). */
 export function canManageArtistProfile(role: UserRole | null): boolean {
   return role === "artist" || role === "admin";

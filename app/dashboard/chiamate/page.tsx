@@ -8,7 +8,7 @@ import LocaleLink from "@/components/i18n/LocaleLink";
 import { ACTION_ARROW, ACTION_LINE } from "@/components/ui/actions";
 import { listCallApplications, listMyCalls, type PublicCall } from "@/lib/calls/queries";
 import { periodLabel } from "@/lib/calls/format";
-import { canManageEvents } from "@/lib/auth/roles";
+import { canPostCalls } from "@/lib/auth/roles";
 import { listCityOptions } from "@/lib/dashboard/queries";
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -27,7 +27,7 @@ export default async function MyCallsPage() {
   const session = await getSessionProfile();
 
   if (!session) redirect(withLocale(locale, "/login"));
-  if (!canManageEvents(session.role)) redirect(withLocale(locale, "/dashboard"));
+  if (!canPostCalls(session.role)) redirect(withLocale(locale, "/dashboard"));
 
   const dict = getDictionary(locale);
   const t = dict.calls;
