@@ -1,52 +1,61 @@
 # Bergamo — riempimento e inviti (Fase 16/17, zona di partenza)
 
 Obiettivo: **15–20 serate, 5–8 locali, 5–8 artisti, 3 locali reclamati** prima
-dell'annuncio. Qui c'è da dove partire; le schede si creano solo dopo aver
-verificato i dati.
+dell'annuncio.
 
-## Locali candidati (da verificare prima di creare la scheda)
+Ultimo aggiornamento: **1 novembre 2026** (dati verificati sulle fonti pubbliche).
 
-| Locale | Zona | Fonte del dato | Cosa verificare |
-| --- | --- | --- | --- |
-| **Edonè** | Bergamo, Redona — via Agostino Gemelli 17 | Comune di Bergamo, setlist.fm, stampa locale | sito ufficiale, email contatti, programmazione |
-| **Spazio Polaresco** | Bergamo — via del Polaresco 15 | Comune di Bergamo (`spaziopolaresco.it`) | calendario serale, contatti |
-| **Ink Club** | Bergamo città | Arci (storico live club bergamasco) | se è ancora attivo, indirizzo, contatti |
-| **Druso** | Ranica (BG) | già su OpenStage | completare scheda e invitare al claim |
-| **ChorusLife Arena** | Bergamo — via Carlo Serassi 26 | sito ufficiale | è un'arena: utile per il calendario, non per la scena indie |
+## Locali verificati
 
-Da cercare ancora (canali sotto): circoli Arci di Bergamo e provincia, sale
-prova, birrerie con palco, festival estivi (Punk Rock Raduno, Lazzaretto Estate).
+| Locale | Indirizzo | Contatti | Attivo a novembre? | Fonte |
+| --- | --- | --- | --- | --- |
+| **Ink Club** (circolo Arci) | via Carducci 4/b, Bergamo | `info@inkclub.bergamo.it` · IG `@inkclubbergamo` | **Sì**: concerti e serate tutto l'anno | `inkclub.bergamo.it`, setlist.fm (date fino a ottobre 2026, Halloween party 31/10) |
+| **Spazio Polaresco** | via del Polaresco 15, Bergamo | `info@spaziopolaresco.it` · IG `@spaziopolaresco` | **Sì**: spazio polifunzionale con auditorium e sale prova | `spaziopolaresco.it` |
+| **Druso** | Ranica (BG) | già su OpenStage | **Sì**: live club | già in database |
+| **Edonè** | via Agostino Gemelli 17, Bergamo (Redona) | `edonebergamo.com` · IG `@edonebergamo` | **No**: spazio estivo, gestione 15 maggio → 14 settembre | sito ufficiale, Comune di Bergamo |
+| **ChorusLife Arena** | via Carlo Serassi 26, Bergamo | `info@choruslife.com` | Sì, ma grandi nomi | sito ufficiale |
+
+Note:
+
+- **Edonè** va creato lo stesso: è un locale reale e importante, ma la scheda
+  resterà senza date fino a primavera. Non è un buon candidato per il lancio di
+  novembre (e l'invito al claim, a spazio chiuso, ha meno senso: rimandarlo).
+- **Ink Club** è il candidato migliore: scena underground, concerti continui,
+  circolo Arci, email pubblica.
+- **Polaresco** ha programmazione più discontinua: utile per date spot.
 
 ## Dove trovare le serate vere
 
-1. **Programmi ufficiali** dei locali (sito, Instagram, newsletter).
-2. **Eppen — agenda cultura Bergamo** (`ecodibergamo.it/eventi/eppen`), categoria
-   Musica: ha un filtro per zona e per comune.
-3. **Vivere Bergamo** (`eventi.bergamo.it`), sezione Concerti.
-4. **Comitato Arci Bergamo**: la rete dei circoli, con il calendario delle attività.
-5. **Rassegne e festival**: Lazzaretto Estate (estate), Punk Rock Raduno (luglio,
-   a Edonè), feste di paese con gruppi locali.
+1. **Programmi ufficiali** di Ink Club e Polaresco (sito + Instagram).
+2. **EventiBergamo** (`eventibergamo.it`), sezione «Concerti e live»: calendario
+   settimanale con luogo e orario.
+3. **Eppen** (`ecodibergamo.it/eventi/eppen`), categoria Musica, filtro Bergamo.
+4. **Vivere Bergamo** (`eventi.bergamo.it`), sezione Concerti.
+5. **Arci Bergamo** per i circoli della provincia.
+6. **Rassegne**: Punk Rock Raduno (luglio, Edonè/Ink), Clamore (Ink Club).
 
-Regola: si crea la serata solo se c'è **data, ora e luogo** verificabili. Niente
+Regola: si crea la serata solo con **data, ora e luogo** verificabili. Niente
 testi copiati, niente foto senza permesso.
+
+## Piano immediato (novembre)
+
+1. Creare le schede: **Ink Club, Spazio Polaresco, Druso (completa), Edonè**.
+2. Raccogliere le serate di novembre da Ink Club e Polaresco + EventiBergamo.
+3. Creare 10–15 serate con locale collegato (le prime 3–4 a mano, per verificare
+   che il flusso sia giusto).
+4. Invitare al claim **Ink Club** e **Polaresco** per primi (email pubblica).
+5. Druso: invito al claim appena la scheda è completa.
+6. Solo quando ci sono almeno 10 serate future: post di lancio
+   (`docs/launch-playbook.md`).
 
 ## Artisti
 
-Non serve un censimento: bastano quelli che suonano nelle serate raccolte. Per
-ognuno: nome, città, genere, un link pubblico (Instagram, Bandcamp, Spotify).
-Se non c'è una scheda, si crea solo se l'artista suona davvero in una data reale.
-
-## Ordine di lavoro
-
-1. Verifica dei locali qui sopra (sito + email + programmazione).
-2. Creazione schede locali (dati minimi: nome, città, indirizzo, sito).
-3. Raccolta serate delle prossime 4 settimane.
-4. Creazione serate con data, ora, locale collegato.
-5. Inviti al claim, uno alla volta, dal pannello.
-6. Solo quando la zona è piena: post di lancio (testi in `docs/launch-playbook.md`).
+Si creano dalle serate raccolte: nome, città, genere, un link pubblico. Se non
+hanno una scheda, si crea solo se suonano in una data reale.
 
 ## Cosa NON facciamo
 
 - Schede con testi inventati o foto prese da Google.
 - Inviti in blocco: un invito per locale, con il nome dentro.
-- Serate senza data verificabile, anche se "sicuramente ci sarà qualcosa".
+- Serate senza data verificabile.
+- Invitare Edonè a spazio chiuso: si rimanda a primavera.
