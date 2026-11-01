@@ -137,6 +137,7 @@ export async function adminReplyToMessageAction(input: {
     name: message.name,
     topic: topicLabel,
     body,
+    locale: message.locale ?? "it",
   });
 
   if (!sent) return { ok: false, error: "failed" };

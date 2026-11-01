@@ -1870,6 +1870,51 @@ export const it: Dictionary = {
       invalid: "Titolo, testo e indirizzo sono obbligatori.",
       created: "Articolo creato.",
     },
+    emailCatalog: {
+      title: "Catalogo email",
+      lead:
+        "Tutte le email che OpenStage manda: oggetto, testo, quando partono e a chi. Quelle con il badge «modificabile» si cambiano da qui e valgono subito; le altre si leggono, con scritto dove si modificano davvero.",
+      countLabel: "email a catalogo",
+      sourceApp: "Modificabili da qui",
+      sourceAppNote:
+        "Testo salvato nel catalogo: il codice lo usa al prossimo invio, senza deploy.",
+      sourceQueue: "Coda email (database)",
+      sourceQueueNote:
+        "Il testo lo compone una funzione del database al momento dell'invio: si legge, non si modifica da qui.",
+      sourceSupabase: "Autenticazione (Supabase)",
+      sourceSupabaseNote:
+        "Conferme e recuperi password li manda Supabase: i testi si cambiano nel pannello di Supabase.",
+      audience: "A chi",
+      editable: "Modificabile",
+      readonlyBadge: "Solo lettura",
+      open: "Apri",
+      read: "Leggi",
+      backToPanel: "Pannello email",
+      backToCatalog: "Tutte le email",
+      variables: "Variabili disponibili",
+      variablesHint:
+        "Scrivi il segnaposto dove serve: al momento dell'invio viene sostituito con il dato vero.",
+      subjectIt: "Oggetto (IT)",
+      subjectEn: "Oggetto (EN)",
+      bodyIt: "Testo (IT)",
+      bodyEn: "Testo (EN, facoltativo)",
+      save: "Salva",
+      saving: "Salvo…",
+      saved: "Testo salvato: vale dal prossimo invio.",
+      saveFailed: "Non è stato possibile salvare.",
+      invalid: "Oggetto e testo in italiano sono obbligatori.",
+      readonly: "Questa email non si modifica da qui.",
+      reset: "Ripristina il testo originale",
+      resetConfirm: "Riportare il testo a quello originale? Le modifiche vanno perse.",
+      resetDone: "Testo originale ripristinato.",
+      readonlyTitle: "Perché è in sola lettura",
+      readonlyText:
+        "Il testo non è in questa pagina: la pagina lo mostra per farti leggere che cosa arriva, ma la modifica si fa dove il testo è scritto.",
+      supabaseWhere:
+        "Si modifica in Supabase → Authentication → Email Templates (progetto OpenStage). Cambiando lì il testo, cambia per tutte le email di autenticazione.",
+      queueWhere:
+        "Si modifica con una migrazione del database: il testo è dentro la funzione che accoda l'email. Se serve cambiarlo, chiedilo a chi segue il codice.",
+    },
     nav: {
       today: "Oggi",
       overview: "Panoramica",
@@ -1895,6 +1940,7 @@ export const it: Dictionary = {
       messages: "Messaggi",
       tickets: "Ticket",
       email: "Email",
+      emailCatalog: "Catalogo email",
       queue: "Coda email",
       notifications: "Notifiche",
       audit: "Audit",

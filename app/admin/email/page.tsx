@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import AdminEmailPanel from "@/components/admin/AdminEmailPanel";
+import LocaleLink from "@/components/i18n/LocaleLink";
 import { getEmailStats, listEmailLog, listEmailQueue } from "@/lib/admin/email";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -42,6 +43,12 @@ export default async function AdminEmailPage() {
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
           {dict.admin.emailPanelSubtitle}
         </p>
+        <LocaleLink
+          href="/admin/email/catalogo"
+          className="mt-4 inline-flex border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan transition-colors hover:border-cyan hover:text-white"
+        >
+          {dict.admin.nav.emailCatalog} <span aria-hidden="true">→</span>
+        </LocaleLink>
       </header>
 
       {stats ? (
