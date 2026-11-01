@@ -70,6 +70,27 @@ prima di creare la scheda.
 Regola: si crea la serata solo con **data, ora e luogo** verificabili. Niente
 testi copiati, niente foto senza permesso.
 
+## Serate candidate (ricerca del 1 novembre 2026)
+
+Verificate sulle fonti, pronte da creare. Solo musica dal vivo o DJ set: escluse
+le arene con grandi nomi (ChorusLife), la classica in chiesa e la stand-up.
+
+| Data | Ora | Locale | Evento | Ingresso | Fonte |
+| --- | --- | --- | --- | --- | --- |
+| ven 6 nov | 21:00 | NXT Platz | Amarsi Male — Lietto, Damiano Dentella, Gattotoro + Lodo Guenzi | gratis, posti limitati | nxtbergamo.it |
+| ven 6 nov | 22:00 | Daste | Video Killed the Radio Star — 80s party, Point Break DJ | 10€ con consumazione | screenshot IG `@daste_bergamo` |
+| sab 7 nov | 22:00 | Druso | Calibro 35 | — | **già pubblicata** |
+| gio 12 nov | **da verificare** | Druso | Pierpaolo Capovilla | non pubblicato | rockol.it |
+| dom 15 nov | 21:00 | NXT Platz | Stalking Blues: Love is a Liar — Domiziano Cattaneo + Roby Rota | gratis | nxtbergamo.it |
+| gio 19 nov | 20:00 | NXT Platz | Giorgio Canali — Rossosolo Live | gratis, prenotazione obbligatoria | nxtbergamo.it |
+
+Esclusi di proposito: Dire Straits Legacy, Papa Roach, Fiorella Mannoia, Gigi
+D'Alessio (ChorusLife, grandi nomi), Elvin Dhimitri e i concerti in Sala Piatti /
+chiesa (classica), Dj Winson (discoteca), Fanucchi e Fill Pill (stand-up).
+
+Altri candidati da verificare (ora e ingresso mancanti): **Born to be 80s** (7 nov,
+NXT), **Giorgio Canali** già ok. Per **Capovilla** serve l'ora dal Druso.
+
 ## Inviti al claim inviati (1 novembre 2026)
 
 Quattro inviti, uno per locale, dal pannello (azione reale, email vere):
