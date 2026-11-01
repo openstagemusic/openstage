@@ -1894,6 +1894,8 @@ export const it: Dictionary = {
       variables: "Variabili disponibili",
       variablesHint:
         "Scrivi il segnaposto dove serve: al momento dell'invio viene sostituito con il dato vero.",
+      previewTitle: "Anteprima",
+      previewHint: "Come arriva, con dati di esempio al posto delle variabili.",
       subjectIt: "Oggetto (IT)",
       subjectEn: "Oggetto (EN)",
       bodyIt: "Testo (IT)",

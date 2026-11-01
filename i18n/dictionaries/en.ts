@@ -1889,6 +1889,8 @@ export const en = {
       variables: "Available variables",
       variablesHint: "Put the placeholder where it belongs: at send time it is replaced by the real value.",
       subjectIt: "Subject (IT)",
+      previewTitle: "Preview",
+      previewHint: "How it arrives, with sample data in place of the variables.",
       subjectEn: "Subject (EN)",
       bodyIt: "Body (IT)",
       bodyEn: "Body (EN, optional)",

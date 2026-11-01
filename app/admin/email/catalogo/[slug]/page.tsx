@@ -3,12 +3,58 @@ import { notFound } from "next/navigation";
 
 import AdminEmailTemplateForm from "@/components/admin/AdminEmailTemplateForm";
 import LocaleLink from "@/components/i18n/LocaleLink";
-import { getEmailTemplate } from "@/lib/email/templates";
+import { getEmailTemplate, renderTemplate } from "@/lib/email/templates";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+/**
+ * Dati di esempio per l'anteprima: al posto di `{{variabile}}` si vede qualcosa
+ * di plausibile, così l'email si legge come arriverà davvero.
+ */
+const PREVIEW_VALUES: Record<string, Record<string, string>> = {
+  "queue-claim-invite": { name: "Druso", link: "https://getopenstage.it/claim/esempio" },
+  "app-contact-reply": {
+    name: "Marco",
+    body: "Grazie per averci scritto: la scheda del locale è stata corretta. Se serve altro siamo qui.",
+    topic: "Generale",
+  },
+  "app-contact-admin": {
+    name: "Marco Rossi",
+    email: "marco@example.com",
+    topic: "general",
+    message: "Ciao, vorrei segnalare un locale della mia zona.",
+    locale: "it",
+  },
+  "app-takedown-admin": {
+    noticeId: "a1b2c3",
+    type: "copyright",
+    reporterName: "Marco Rossi",
+    reporterEmail: "marco@example.com",
+    organization: "Etichetta\n",
+    targetUrl: "https://getopenstage.it/it/eventi/ranica/druso-balera",
+    description: "Il contenuto usa una foto senza autorizzazione.",
+    locale: "it",
+  },
+  "app-takedown-received": { name: "Marco", noticeId: "a1b2c3" },
+  "app-takedown-outcome": {
+    name: "Marco",
+    noticeId: "a1b2c3",
+    outcome: "La segnalazione è stata accolta e il contenuto è stato rimosso o modificato.",
+    action: "Azione: immagine rimossa",
+  },
+};
+
+function previewValues(slug: string, variables: string[]): Record<string, string> {
+  const known = PREVIEW_VALUES[slug] ?? {};
+  const values: Record<string, string> = {};
+  for (const variable of variables) {
+    values[variable] = known[variable] ?? `(${variable})`;
+  }
+  return values;
+}
 
 export default async function AdminEmailTemplatePage({
   params,
@@ -50,6 +96,31 @@ export default async function AdminEmailTemplatePage({
           </p>
         ) : null}
       </header>
+
+      {template.subjectIt && template.bodyIt ? (
+        <section className="mt-6 border border-line bg-surface/40 p-4">
+          <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-cyan">
+            {t.previewTitle}
+          </p>
+          <p className="mt-1 text-xs text-muted">{t.previewHint}</p>
+
+          <div className="mt-4 border border-line bg-bg p-4">
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+              {t.subjectIt}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-white">
+              {renderTemplate(template.subjectIt, previewValues(template.slug, template.variables))}
+            </p>
+
+            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+              {t.bodyIt}
+            </p>
+            <pre className="mt-1 whitespace-pre-wrap font-sans text-sm leading-relaxed text-white/90">
+              {renderTemplate(template.bodyIt, previewValues(template.slug, template.variables))}
+            </pre>
+          </div>
+        </section>
+      ) : null}
 
       {template.editable ? (
         <AdminEmailTemplateForm template={template} dict={t} />

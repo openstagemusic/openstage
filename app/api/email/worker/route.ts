@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { sendEmailDetailed } from "@/lib/email";
+import { prepareAppEmail } from "@/lib/email/templates";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type QueueRow = {
@@ -16,6 +17,12 @@ type QueueRow = {
   max_attempts: number;
   batch_id: string | null;
   recipient_count: number;
+  /** Se presente, il testo si compone dal catalogo invece che dalla riga. */
+  metadata: {
+    template_slug?: string;
+    variables?: Record<string, string>;
+    locale?: string;
+  } | null;
 };
 
 function authorized(request: NextRequest): boolean {
@@ -94,13 +101,44 @@ async function runWorker(): Promise<NextResponse> {
   let failed = 0;
 
   for (const item of batch) {
+    /*
+     * Alcune email (per ora l'invito a reclamare una scheda) hanno il testo nel
+     * catalogo: la funzione SQL accoda solo il "chi" e i dati, e il testo lo
+     * compone qui. Così si modifica dalla control room senza toccare il database.
+     * Se il catalogo non risponde, si usa la riga in coda come prima.
+     */
+    let subject = item.subject;
+    let text = item.text_body;
+    let html = item.html_body ?? undefined;
+
+    const templateSlug = item.metadata?.template_slug;
+
+    if (templateSlug) {
+      try {
+        const composed = await prepareAppEmail(
+          templateSlug,
+          item.metadata?.locale ?? "it",
+          item.metadata?.variables ?? {}
+        );
+        subject = composed.subject;
+        text = composed.text;
+        html = composed.html;
+      } catch (error) {
+        console.error(
+          "[email-worker] template non composto:",
+          templateSlug,
+          error instanceof Error ? error.message : error
+        );
+      }
+    }
+
     const result = await sendEmailDetailed({
       to: item.to_email,
       from: item.from_email,
       replyTo: item.reply_to ?? undefined,
-      subject: item.subject,
-      text: item.text_body,
-      html: item.html_body ?? undefined,
+      subject,
+      text,
+      html,
     });
 
     if (result.ok) {
@@ -120,7 +158,7 @@ async function runWorker(): Promise<NextResponse> {
         queue_id: item.id,
         category: item.category,
         to_email: item.to_email,
-        subject: item.subject,
+        subject,
         status: "sent",
         provider_id: result.id ?? null,
         batch_id: item.batch_id ?? null,
@@ -145,7 +183,7 @@ async function runWorker(): Promise<NextResponse> {
         queue_id: item.id,
         category: item.category,
         to_email: item.to_email,
-        subject: item.subject,
+        subject,
         status: "failed",
         error: result.error?.slice(0, 500) ?? "unknown",
         batch_id: item.batch_id ?? null,

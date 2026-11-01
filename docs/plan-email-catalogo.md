@@ -35,6 +35,21 @@ Fatto il **1 novembre 2026**.
 - **Le email che non si possono modificare lo dicono.** Invece di un editor che
   non salva, la pagina spiega dove si cambiano davvero.
 
+## L'invito a reclamare una scheda (1 novembre 2026)
+
+Era il caso peggiore: testo dentro la funzione SQL, tono da notifica automatica.
+Ora:
+
+- il testo è nel catalogo ed è **modificabile**;
+- la funzione `admin_create_claim_invite` accoda solo nome e link, con
+  `metadata.template_slug = 'queue-claim-invite'` e le variabili;
+- il **worker** compone oggetto e corpo dal catalogo al momento dell'invio (e
+  ricade sulla riga in coda se il catalogo non risponde);
+- il **reply-to** è `ciao@getopenstage.it`, così chi risponde parla con una persona.
+
+Lo stesso meccanismo è pronto per le altre email di coda: basta aggiungere
+`template_slug` al metadata della funzione che le accoda.
+
 ## Perché non tutte sono modificabili
 
 Le email di coda nascono dentro funzioni SQL che compongono anche le parti
