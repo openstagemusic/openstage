@@ -86,6 +86,18 @@ Sei serate create e online, col locale collegato:
 Più **Calibro 35** al Druso (7 nov, già presente). Bergamo ha ora una pagina
 città viva: `/citta/bergamo`.
 
+**Aggiunte il 1 novembre** (con locandine):
+
+| Data | Ora | Locale | Evento | Ingresso |
+| --- | --- | --- | --- | --- |
+| mar 3 nov | 21:00 | Daste | Nuovi Suoni Live — Semifinale (Carmen, Musa, garden.exe) | non dichiarato |
+| dom 8 nov | 21:00 | NXT Platz | Nuovi Suoni Live — Semifinale (Safiye, ODE, Matteo Due) | non dichiarato |
+| sab 21 nov | 21:30 | Daste | The Peawees (unica data italiana, + Manduria e Riccobellis) | 10 € + ddp, 15 € in cassa |
+
+Per le due semifinali il prezzo **non è dichiarato** dal Comune: non ho scritto
+"gratis" né un prezzo. La **finale del 29 novembre al Daste** si aggiunge quando
+l'ora sarà pubblicata.
+
 **Locandine** (1 novembre): caricate sul nostro Storage (`event-covers/curated/`)
 e collegate a 5 schede su 6. *Video Killed the Radio Star* resta senza: lo
 screenshot di Instagram contiene il post già ritagliato dall'interfaccia, e una
