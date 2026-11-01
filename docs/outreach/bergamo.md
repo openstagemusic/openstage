@@ -149,6 +149,15 @@ chiede solo di registrarsi come artista e indicare un link pubblico di prova.
 Canale: **DM Instagram** da `@getopenstage` (li manda Francesco). Per le band con
 un'email pubblica, si usa l'invito dal pannello.
 
+### Pannello outreach artisti
+
+`/admin/outreach/artisti` (control room → Persone → Outreach artisti): elenca le
+schede non reclamate con il link alla scheda, il **messaggio già compilato** con
+nome, città e link, un pulsante **«Copia messaggio»** e un campo per salvare
+l'handle Instagram (accetta `@nome` o l'indirizzo intero). Serve perché gli
+artisti quasi mai hanno un'email pubblica: il canale è il DM, e mandarlo a mano
+resta la scelta giusta — l'account non rischia blocchi e il messaggio è umano.
+
 ## Inviti al claim inviati (1 novembre 2026)
 
 Quattro inviti, uno per locale, dal pannello (azione reale, email vere):

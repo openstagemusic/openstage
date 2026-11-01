@@ -1917,6 +1917,27 @@ export const it: Dictionary = {
       queueWhere:
         "Si modifica con una migrazione del database: il testo è dentro la funzione che accoda l'email. Se serve cambiarlo, chiedilo a chi segue il codice.",
     },
+    outreach: {
+      title: "Outreach artisti",
+      lead:
+        "Le schede non reclamate, con il messaggio pronto da mandare in DM su Instagram. Copia, apri il profilo, incolla: il messaggio contiene già nome, città e link della scheda.",
+      countLabel: "schede da contattare",
+      empty: "Nessuna scheda artista senza proprietario: o sono tutte reclamate, o non ne hai ancora create.",
+      copyMessage: "Copia messaggio",
+      copied: "Copiato",
+      copyFailed: "Non riesco a copiare: seleziona il testo e copialo a mano.",
+      preview: "Vedi il messaggio",
+      openProfile: "Apri la scheda",
+      openInstagram: "Instagram",
+      instagram: "Profilo Instagram",
+      saveHandle: "Salva",
+      saving: "Salvo…",
+      invalidHandle: "Handle non valido: usa solo lettere, numeri, punti e underscore.",
+      saveFailed: "Non è stato possibile salvare.",
+      openDirectory: "Elenco artisti",
+      messageTemplate:
+        "Ciao, sono Francesco di OpenStage, la mappa gratuita delle serate dal vivo (senza pubblicità e senza pay-to-play).\n\nHo creato una scheda per {name} a {city}: {url}\n\nSe sei tu, puoi prenderla in gestione da lì — foto, bio, date e contatti: c'è il pulsante «Reclama questa scheda». Nessun costo.\n\nSe non ti interessa, dimmelo e la togliamo.",
+    },
     nav: {
       today: "Oggi",
       overview: "Panoramica",
@@ -1931,6 +1952,7 @@ export const it: Dictionary = {
       artists: "Artisti",
       venues: "Locali",
       claims: "Claim e verifiche",
+      outreach: "Outreach artisti",
       events: "Eventi",
       drafts: "Bozze",
       reports: "Segnalazioni",

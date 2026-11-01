@@ -1911,6 +1911,27 @@ export const en = {
       queueWhere:
         "Edit it with a database migration: the body is inside the function that queues the email. Ask whoever maintains the code.",
     },
+    outreach: {
+      title: "Artist outreach",
+      lead:
+        "Unclaimed pages with the DM message ready to send. Copy it, open the profile, paste: the message already contains name, city and page link.",
+      countLabel: "pages to contact",
+      empty: "No unclaimed artist pages: either they are all claimed or you have not created any yet.",
+      copyMessage: "Copy message",
+      copied: "Copied",
+      copyFailed: "I cannot copy it: select the text and copy it by hand.",
+      preview: "Show the message",
+      openProfile: "Open the page",
+      openInstagram: "Instagram",
+      instagram: "Instagram profile",
+      saveHandle: "Save",
+      saving: "Saving…",
+      invalidHandle: "Invalid handle: use letters, numbers, dots and underscores only.",
+      saveFailed: "We could not save it.",
+      openDirectory: "Artist directory",
+      messageTemplate:
+        "Hi, I'm Francesco from OpenStage, the free map of live music (no ads, no pay-to-play).\n\nI created a page for {name} in {city}: {url}\n\nIf this is you, you can take it over from there — photos, bio, dates and contacts: there is a «Claim this page» button. No cost.\n\nIf you are not interested, tell me and we will remove it.",
+    },
     nav: {
       today: "Today",
       overview: "Overview",
@@ -1925,6 +1946,7 @@ export const en = {
       artists: "Artists",
       venues: "Venues",
       claims: "Claims and verifications",
+      outreach: "Artist outreach",
       events: "Events",
       drafts: "Drafts",
       reports: "Reports",
