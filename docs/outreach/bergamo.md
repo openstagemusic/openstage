@@ -125,6 +125,30 @@ chiesa (classica), Dj Winson (discoteca), Fanucchi e Fill Pill (stand-up).
 Altri candidati da verificare (ora e ingresso mancanti): **Born to be 80s** (7 nov,
 NXT), **Giorgio Canali** già ok. Per **Capovilla** serve l'ora dal Druso.
 
+## Artisti creati (1 novembre 2026)
+
+Sette schede, tutte online e in `/artisti`:
+
+| Artista | Città | Fonte del dato |
+| --- | --- | --- |
+| Carmen | Bergamo | semifinalista Nuovi Suoni Live 2026 |
+| Musa | Bergamo | semifinalista Nuovi Suoni Live 2026 |
+| garden.exe | Bergamo | semifinalista Nuovi Suoni Live 2026 |
+| Safiye | Bergamo | semifinalista Nuovi Suoni Live 2026 |
+| ODE | Bergamo | semifinalista Nuovi Suoni Live 2026 |
+| Matteo Due | Bergamo | semifinalista Nuovi Suoni Live 2026 |
+| Spread | Bergamo | "Rock band from Bergamo", IG `@spread_band_` |
+
+Nessuna immagine profilo: Instagram non permette il download degli avatar e non
+abbiamo foto concesse. Le schede mostrano le iniziali; l'artista carica la sua
+quando reclama.
+
+**Come arriva il claim** (senza email): la scheda ha già il pulsante «Reclama
+questa scheda» → serve solo portare l'artista lì. Il claim artista è immediato e
+chiede solo di registrarsi come artista e indicare un link pubblico di prova.
+Canale: **DM Instagram** da `@getopenstage` (li manda Francesco). Per le band con
+un'email pubblica, si usa l'invito dal pannello.
+
 ## Inviti al claim inviati (1 novembre 2026)
 
 Quattro inviti, uno per locale, dal pannello (azione reale, email vere):
