@@ -5,6 +5,15 @@ dell'annuncio.
 
 Ultimo aggiornamento: **1 novembre 2026** (dati verificati sulle fonti pubbliche).
 
+## Stato: 1 novembre 2026
+
+**Create** (dati verificati, senza foto né testi copiati):
+
+- Ink Club — `/locali/ink-club`
+- Spazio Polaresco — `/locali/spazio-polaresco`
+- Edonè — `/locali/edone` (spazio estivo: nessuna data in inverno)
+- Druso — `/locali/druso` (già presente, completata la verifica dei dati)
+
 ## Locali verificati
 
 | Locale | Indirizzo | Contatti | Attivo a novembre? | Fonte |
@@ -24,6 +33,22 @@ Note:
   circolo Arci, email pubblica.
 - **Polaresco** ha programmazione più discontinua: utile per date spot.
 
+## Altri locali emersi dall'agenda (da valutare)
+
+Dall'agenda di EventiBergamo risultano attivi e con programmazione musicale:
+
+| Locale | Zona |
+| --- | --- |
+| **Daste** | Bergamo Centro |
+| **NXT Station** | Bergamo Centro |
+| **Circolo Arci Maite** | Bergamo Centro |
+| **Ninfea Social Club** | Sorisole |
+| **Keller Factory** | Curno |
+| **Bolgia** | Osio Sopra |
+
+Con questi si arriva alla densità necessaria; vanno verificati indirizzo ed email
+prima di creare la scheda.
+
 ## Dove trovare le serate vere
 
 1. **Programmi ufficiali** di Ink Club e Polaresco (sito + Instagram).
@@ -36,6 +61,13 @@ Note:
 
 Regola: si crea la serata solo con **data, ora e luogo** verificabili. Niente
 testi copiati, niente foto senza permesso.
+
+## Nota sull'offerta di novembre
+
+La settimana 2–5 novembre ha **6 concerti in arrivo** nell'agenda cittadina, e
+alcuni sono tributi o balera. L'offerta verificabile è quindi sottile: per
+arrivare a 15–20 serate servono i weekend (7–8, 14–15, 21–22, 28–29) e i canali
+diretti dei locali, non solo l'agenda.
 
 ## Piano immediato (novembre)
 
