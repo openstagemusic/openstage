@@ -70,6 +70,23 @@ prima di creare la scheda.
 Regola: si crea la serata solo con **data, ora e luogo** verificabili. Niente
 testi copiati, niente foto senza permesso.
 
+## Raccolta serate: cosa non funziona (1 novembre 2026)
+
+Provati i canali pubblici:
+
+| Fonte | Esito |
+| --- | --- |
+| Ink Club → `/calendario` | calendario fermo a **luglio** |
+| Daste → `/eventi` | archivio storico 2021–2024, non la programmazione corrente |
+| NXT Station → sito | solo stand-up a novembre/dicembre, nessun concerto |
+| Spazio Polaresco → sito | calendario caricato via JavaScript, non leggibile |
+| EventiBergamo / Eppen | pochi giorni alla volta (6 concerti in arrivo il 2–5 novembre) |
+
+Conclusione: **la raccolta automatica non basta**. Le programmazioni vere
+passano da Instagram e newsletter, che non sono leggibili da qui. Servono gli
+screenshot o i link dei post dei locali, oppure il lavoro va fatto a mano
+settimana per settimana.
+
 ## Nota sull'offerta di novembre
 
 La settimana 2–5 novembre ha **6 concerti in arrivo** nell'agenda cittadina, e
