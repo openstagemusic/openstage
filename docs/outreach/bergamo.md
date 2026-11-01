@@ -101,13 +101,15 @@ Quattro inviti, uno per locale, dal pannello (azione reale, email vere):
 | Spazio Polaresco | `info@spaziopolaresco.it` | 1 nov, 15:03 | 8 nov |
 | Daste | `info@dastebergamo.com` | 1 nov, 15:03 | 8 nov |
 | NXT Station | `info@nxtbergamo.it` | 1 nov, 15:03 | 8 nov |
+| Druso | `amministrazionedruso@gmail.com` | 1 nov, 15:52 | 8 nov |
 
 Tutte e quattro risultano **inviate** (stato `sent`), non solo accodate. Il link
 è monouso e scade l'8 novembre; se non rispondono, si può reinvitare dopo la
 scadenza.
 
-Non invitati: **Edonè** (spazio chiuso fino a primavera), **Druso** (manca
-un'email pubblica).
+Non invitata: **Edonè** (spazio chiuso fino a primavera). Il **Druso** ha
+ricevuto l'invito il 1 novembre alle 15:52: `amministrazionedruso@gmail.com`,
+trovata sul loro sito.
 
 ## Dove cercare i programmi (per Francesco)
 
