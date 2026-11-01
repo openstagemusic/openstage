@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
  * Quando la variante sarà approvata basta mettere `true`: la mappa su telefono
  * (pagina /mappa) si apre al tocco. Fino ad allora si prova con `?mappa=tocco`.
  */
-const TAP_TO_LOAD_ON_MOBILE = false;
+const TAP_TO_LOAD_ON_MOBILE = true;
 
 const MapCanvas = dynamic(() => import("@/components/map/MapCanvas"), {
   ssr: false,

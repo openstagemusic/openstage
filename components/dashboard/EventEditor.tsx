@@ -25,7 +25,7 @@ import {
 import { formatEventDate } from "@/lib/events/format";
 import type { SimilarEvent } from "@/lib/events/queries";
 import { EVENT_KINDS } from "@/lib/events/types";
-import { COUNTRIES } from "@/lib/geo/country";
+import { countryOptions } from "@/lib/geo/country";
 import type { GeocodePlace } from "@/lib/geo/geocoder";
 
 // MapLibre ha bisogno del browser: la mini mappa entra solo nel client.
@@ -334,6 +334,8 @@ export default function EventEditor({
     setValues((current) => ({
       ...current,
       city: place.city ?? current.city,
+      // Il paese lo dice OpenStreetMap: scegliendo "Lagos" non resta l'Italia.
+      country: place.country ?? current.country,
       latitude: place.latitude,
       longitude: place.longitude,
     }));
@@ -993,7 +995,7 @@ export default function EventEditor({
               value={values.country}
               onChange={(event) => set("country", event.target.value)}
             >
-              {COUNTRIES.map((country) => (
+              {countryOptions(locale).map((country) => (
                 <option key={country.code} value={country.code}>
                   {country.label}
                 </option>

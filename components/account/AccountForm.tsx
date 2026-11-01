@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { checkSpotifyLinkAction } from "@/app/actions/spotify";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import EpkPhotoField from "@/components/account/EpkPhotoField";
 import ImageUploadField from "@/components/account/ImageUploadField";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { COUNTRIES, DEFAULT_COUNTRY } from "@/lib/geo/country";
+import { countryOptions, DEFAULT_COUNTRY } from "@/lib/geo/country";
 import { createClient } from "@/lib/supabase/client";
 import { parseSpotifyLink } from "@/lib/spotify/links";
 import { validateSocialLinks, type SocialKind } from "@/lib/social/links";
@@ -93,6 +94,7 @@ export default function AccountForm({
   dict: Dictionary["account"];
   social: Dictionary["social"];
 }) {
+  const locale = useLocale();
   const router = useRouter();
   const [values, setValues] = useState<AccountArtist | AccountVenue>(subject.values);
   const [error, setError] = useState<string | null>(null);
@@ -492,7 +494,7 @@ export default function AccountForm({
               onChange={(event) => set("country", event.target.value)}
               className={authInputClass}
             >
-              {COUNTRIES.map((country) => (
+              {countryOptions(locale).map((country) => (
                 <option key={country.code} value={country.code}>
                   {country.label}
                 </option>

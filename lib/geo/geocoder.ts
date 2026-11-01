@@ -39,6 +39,8 @@ export type GeocodePlace = {
    * città è la città stessa. `null` quando OpenStreetMap non lo dice.
    */
   city: string | null;
+  /** Paese ISO 3166-1 alpha-2 dichiarato da OpenStreetMap ("IT", "NG"…). */
+  country: string | null;
   latitude: number;
   longitude: number;
   /** Con che ingrandimento mostrare il posto sulla mappa. */
@@ -112,6 +114,12 @@ function placeDetail(properties: PhotonProperties): string {
   return [...new Set(values)].join(" · ");
 }
 
+/** `countrycode` è già ISO a due lettere: è il dato che serve al campo Paese. */
+function placeCountry(properties: PhotonProperties): string | null {
+  const code = text(properties.countrycode)?.toUpperCase();
+  return code && /^[A-Z]{2}$/.test(code) ? code : null;
+}
+
 function placeCity(properties: PhotonProperties, name: string): string | null {
   const city = text(properties.city);
   if (city) return city;
@@ -158,6 +166,7 @@ function toPlace(feature: PhotonFeature, index: number): GeocodePlace | null {
     name,
     detail: placeDetail(properties),
     city: placeCity(properties, name),
+    country: placeCountry(properties),
     latitude,
     longitude,
     zoom: placeZoom(properties),
@@ -248,6 +257,7 @@ function isPlace(value: unknown): value is GeocodePlace {
     typeof place.name === "string" &&
     typeof place.detail === "string" &&
     (place.city === null || typeof place.city === "string") &&
+    (place.country === null || place.country === undefined || typeof place.country === "string") &&
     typeof place.latitude === "number" &&
     Number.isFinite(place.latitude) &&
     typeof place.longitude === "number" &&
@@ -279,7 +289,11 @@ async function readCached(canonical: string): Promise<GeocodePlace[] | null> {
   if (!data) return null;
 
   const results = (data as { results: unknown }).results;
-  const places = Array.isArray(results) ? results.filter(isPlace) : [];
+  // Le voci salvate prima che esistesse il paese non ce l'hanno: si accettano
+  // lo stesso e il campo resta vuoto (verrà riempito al prossimo salvataggio).
+  const places = Array.isArray(results)
+    ? results.filter(isPlace).map((place) => ({ ...place, country: place.country ?? null }))
+    : [];
 
   return places.length > 0 ? places : null;
 }

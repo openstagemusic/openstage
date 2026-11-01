@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import DashboardShell, { type DashboardNavItem } from "@/components/dashboard/DashboardShell";
-import { canManageEvents } from "@/lib/auth/roles";
+import { canManageEvents, canPostCalls } from "@/lib/auth/roles";
 import { isCurrentUserAdmin } from "@/lib/claims/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -31,14 +31,18 @@ export default async function DashboardLayout({
           { href: "/dashboard/events/new", label: t.navNew },
           { href: "/dashboard/statistiche", label: t.navStats },
           { href: "/dashboard/widget", label: t.navWidget },
-          { href: "/dashboard/chiamate", label: dict.calls.eyebrow },
         ]
+      : []),
+    // La bacheca ingaggi è dei locali: un artista non la vede nemmeno nel menu.
+    ...(canPostCalls(session.role)
+      ? [{ href: "/dashboard/chiamate", label: dict.calls.eyebrow }]
       : []),
     ...(session.role === "artist" || session.role === "venue"
       ? [{ href: "/dashboard/messaggi", label: t.navMessages }]
       : []),
     { href: "/dashboard/saved", label: t.navSaved },
     { href: "/dashboard/per-te", label: t.navForYou },
+    { href: "/dashboard/richieste", label: t.navRequests },
     { href: "/dashboard/notifiche", label: t.navNotifications },
     { href: "/dashboard/impostazioni", label: t.navSettings },
     { href: "/account", label: t.navProfile },

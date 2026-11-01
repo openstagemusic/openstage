@@ -1,7 +1,8 @@
 # Esperimento — mappa che si apre al tocco (`?mappa=tocco`)
 
-**Stato: pronto, non pubblicato.** Sta su un branch locale; in produzione il
-comportamento è quello di sempre.
+**Stato: attiva su telefono in `/mappa` dal 1 novembre 2026.** Sulla Home e su
+computer resta la mappa immediata. Il parametro `?mappa=tocco` forza la variante
+ovunque, per provarla.
 
 ## Il problema
 
@@ -58,8 +59,9 @@ pigramente quando entrava nello schermo, e chi ci arriva la vuole vedere.
 3. Non tenerla: si torna alla mappa immediata e si accetta il blocco di 3 secondi
    su telefoni lenti.
 
-Per attivarla in automatico su telefono: `components/map/GlobeMap.tsx`, costante
-`TAP_TO_LOAD_ON_MOBILE = true`. Il parametro `?mappa=tocco` resta come prova.
+L'interruttore è `TAP_TO_LOAD_ON_MOBILE` in `components/map/GlobeMap.tsx` (ora
+`true`, solo per `variant === "fullscreen"` e sotto i 768 px). Il parametro
+`?mappa=tocco` resta come prova su qualunque schermo.
 
 ## Cosa tocca
 

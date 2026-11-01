@@ -47,20 +47,21 @@ differenze fra pagine, non la cifra assoluta.
 | Locali `/it/locali` | 90 | 3,2 s | 160 ms | 0,054 |
 | Scheda evento | 78 | 4,8 s | 190 ms | 0,003 |
 | Aiuto `/it/aiuto` | 86 | 3,6 s | 180 ms | 0,001 |
-| Mappa `/it/mappa` | **66** | 2,3 s | **3.350 ms** | 0,083 |
+| Mappa `/it/mappa` | **88** | 3,5 s | **170 ms** | 0,083 |
 
 **Letto così:**
 
 - Tutte le pagine di contenuto stanno fra **78 e 90** su mobile: sotto il "verde" di
   Lighthouse (90) ma con CLS quasi nullo e nessun salto di layout. Il peso vero è il
   **TTFB** (server rendering con sessione e database) più il download del documento.
-- La **mappa** è l'unico caso serio: `maplibre-gl` costa ~700 kB di JavaScript e
-  l'inizializzazione blocca il thread per 3,3 s su un telefono lento. Mitigazioni già
-  fatte (`renderWorldCopies: false`, `maxTileCacheSize: 64`, `fadeDuration: 0`,
-  caricamento dinamico del canvas): portano la pagina da 59 a 66.
-- **Da fare dopo il lancio**: sulla mappa mobile caricare il canvas solo dopo un tocco
-  ("Apri la mappa interattiva") oppure mostrare prima un'immagine statica MapTiler.
-  È una scelta di prodotto, non un bug.
+- La **mappa** era l'unico caso serio: `maplibre-gl` costa ~700 kB di JavaScript e
+  l'inizializzazione bloccava il thread per 3,3 s su un telefono lento. **Risolto** il
+  1 novembre 2026: su telefono la mappa si apre al tocco (`?mappa=tocco` per provarla),
+  con un invito che mostra quante serate ci sono e quali sono le prossime. Misure:
+  prestazioni 66 → **88**, TBT 3.350 → **170 ms**, TTI 8,7 → 3,5 s. Dettagli in
+  `docs/esperimento-mappa-tocco.md`.
+- Il costo che resta è il **TTFB** delle pagine dinamiche: la cache pubblica (punto 4
+  qui sotto) è la prossima leva.
 
 ### Perché i numeri mobile non sono più alti
 
@@ -198,8 +199,7 @@ Da provare a mano prima del lancio (richiede le tue credenziali e un'email vera)
 
 ## 9. Cosa resta, in ordine di priorità
 
-1. **Mappa su mobile** (§2): gate al tocco o anteprima statica. Impatto alto, lavoro medio.
-2. **CSP** in report-only, poi con nonce. Impatto medio, lavoro medio.
+1. **CSP** in report-only, poi con nonce. Impatto medio, lavoro medio.
 3. **Playwright** per i flussi con login e scrittura (B05). Impatto alto sulla sicurezza
    dei rilasci, lavoro medio.
 4. **Cache pubblica**: valutare `revalidate` per le schede evento senza sessione, così il
