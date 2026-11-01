@@ -32,7 +32,7 @@
 | **14** | ▶ **prossima**: Help Center completo (B73) |
 | **14B** | ✅ **chiusura e collaudo**: B60 paese, B13 accessibilità, B06, B45, fixture rimosse, smoke test in CI, `docs/report-finale.md` |
 | **15** | ⏸ **condizionale**: monetizzazione solo con posizione fiscale/ente/fiscal host |
-| **16** | ⬜ **lancio e ascolto**: esecuzione del playbook, calendario, asset, misura delle prime 4 settimane |
+| **16** | 🟡 **lancio e ascolto**: playbook fatto (`docs/launch-playbook.md`), ora densità della zona di partenza e lancio |
 | **17** | ⬜ **outreach (dopo il lancio)**: lead per regione, creazione scheda, invito al claim **uno a uno**. Catalogo delle email automatiche |
 
 La regola sui canali è in **`docs/notifications-email-policy.md`**: email solo per ciò che
@@ -58,7 +58,7 @@ di autenticazione non può essere consumata da digest o avvisi di vanità.
 | **✅ 14 — Help Center completo** | **B73**: `/aiuto` con ricerca, categorie, 12 guide Markdown IT/EN, feedback utile/non utile, guide correlate e CTA contatti; gestione da `/admin/aiuto`; `/faq` reindirizzata. Piano: `docs/plan-phase-14.md` | nessuno |
 | **✅ 14B — Chiusura e collaudo** | **B60** città estere e paese · **B13** accessibilità (axe + tastiera) · **B06** `role_chosen_at` · **B45** limite sulle rotte OG · pulizia fixture · fixture rimosse · **smoke test** in GitHub Actions (`scripts/smoke.mjs`) · **beta test per ruoli** (`docs/plan-beta-tests.md`) · **report finale** (`docs/report-finale.md`). **Fatta il 31 ottobre 2026**. Playwright per i flussi con login resta in B05 | nessuno |
 | **17 — Outreach** | Tabella lead per regione (locali/artisti, email pubbliche), target 5+10 per regione, creazione scheda dal lead e invito al claim **singolo** riusando `admin_create_claim_invite`. Niente invii in blocco. Include il **catalogo delle email automatiche** da rivedere e modificare. Dopo il lancio. | nessuno |
-| **16 — Lancio e ascolto** | **B112** playbook (`docs/launch-playbook.md`): post Indie Hackers, timeline -7/0/+7, guerrilla locale, marketing a costo zero, checklist Product Hunt. Esecuzione, calendario, asset e misura delle prime 4 settimane. Fase operativa, non di prodotto. | nessuno |
+| **🟡 16 — Lancio e ascolto** | **B112 fatta**: `docs/launch-playbook.md` (prerequisito di densità, calendario T-14/T+30, testi pronti, regole, target). **Resta l'esecuzione**: riempimento della zona di partenza, contatti uno a uno, lancio e misura delle prime 4 settimane. `docs/plan-phase-16.md` | Google Search Console; account Instagram |
 | **15 — Sostenibilità (condizionale)** | Pass Pro, sponsor o donazioni solo dopo una posizione fiscale o un ente/fiscal host che gestisce gli incassi; 30–50 locali attivi, 100+ artisti, 20–30 in waitlist. Sempre zero pay-to-play. | commercialista, eventuale P.IVA/ente, Vercel Pro, PayPal |
 
 ## Ordine operativo (deciso il 23 ottobre 2026)
