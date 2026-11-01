@@ -69,6 +69,9 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: base,
     title: { default: dict.meta.title, template: "%s · OpenStage" },
     description: dict.meta.description,
+    // Verifica di proprietà per Google Search Console (metodo «Tag HTML»).
+    // È un token pubblico, non un segreto: serve a dimostrare che il sito è nostro.
+    verification: { google: "p166zz-d9oObqNNAAskWLi0M8JlOocjCKh2V4AMdVBk" },
     icons: {
       // Nei tab piccoli vale lo slash; il monogramma O/S resta per installazione e iOS.
       icon: [
