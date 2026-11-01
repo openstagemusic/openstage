@@ -70,6 +70,22 @@ prima di creare la scheda.
 Regola: si crea la serata solo con **data, ora e luogo** verificabili. Niente
 testi copiati, niente foto senza permesso.
 
+## Serate pubblicate (1 novembre 2026)
+
+Sei serate create e online, col locale collegato:
+
+| Data | Ora | Locale | Evento | Ingresso | Scheda |
+| --- | --- | --- | --- | --- | --- |
+| ven 6 nov | 21:00 | NXT Platz | Amarsi Male | gratis | `/eventi/bergamo/amarsi-male` |
+| ven 6 nov | 22:00 | Daste | Video Killed the Radio Star | 10 € con consumazione | `/eventi/bergamo/video-killed-the-radio-star` |
+| sab 7 nov | 21:00 | NXT Platz | Born to be 80s | gratis | `/eventi/bergamo/born-to-be-80s` |
+| gio 12 nov | 21:30 | Druso | Pierpaolo Capovilla e i Cattivi Maestri | 15 € | `/eventi/ranica/pierpaolo-capovilla-e-i-cattivi-maestri` |
+| dom 15 nov | 21:00 | NXT Platz | Stalking Blues: Love is a Liar | gratis | `/eventi/bergamo/stalking-blues-love-is-a-liar` |
+| gio 19 nov | 20:00 | NXT Platz | Giorgio Canali — Rossosolo Live | gratis, prenotazione | `/eventi/bergamo/giorgio-canali-rossosolo-live` |
+
+Più **Calibro 35** al Druso (7 nov, già presente). Bergamo ha ora una pagina
+città viva: `/citta/bergamo`.
+
 ## Serate candidate (ricerca del 1 novembre 2026)
 
 Verificate sulle fonti, pronte da creare. Solo musica dal vivo o DJ set: escluse
