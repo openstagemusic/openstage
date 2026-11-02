@@ -319,7 +319,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
         <GlobeMap
           events={mapEvents}
-          initialCenter={visitor.center}
+          initialCenter={filters.center ?? visitor.center}
           initialZoom={visitor.fromIp ? REGION_ZOOM : DEFAULT_ZOOM}
           savedEventIds={savedEventIds}
           isAuthenticated={isAuthenticated}

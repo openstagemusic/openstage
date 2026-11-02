@@ -665,6 +665,7 @@ export const it: Dictionary = {
     share: "Condividi",
     shareCopied: "Link copiato",
     freeEntry: "Ingresso gratuito",
+    priceTbd: "Prezzo da definire",
     openInMaps: "Apri in Google Maps",
     previousEvent: "Evento precedente",
     nextEvent: "Evento successivo",

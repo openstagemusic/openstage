@@ -665,6 +665,7 @@ export const en = {
     share: "Share",
     shareCopied: "Link copied",
     freeEntry: "Free entry",
+    priceTbd: "Price to be confirmed",
     openInMaps: "Open in Google Maps",
     previousEvent: "Previous event",
     nextEvent: "Next event",

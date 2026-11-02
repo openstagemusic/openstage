@@ -68,7 +68,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
       <h1 className="sr-only">{dict.map.title}</h1>
       <GlobeMap
         events={mapEvents}
-        initialCenter={visitor.center}
+        initialCenter={filters.center ?? visitor.center}
         initialZoom={visitor.fromIp ? REGION_ZOOM : DEFAULT_ZOOM}
         savedEventIds={[...savedIds]}
         isAuthenticated={Boolean(session)}

@@ -78,7 +78,7 @@ export default async function EventPageView({
 
   // Niente biglietti, niente calendario e niente "Salva" su una serata annullata:
   // si può solo leggerla e condividerla come annuncio.
-  const priceLabel = event.isFree ? t.freeEntry : event.priceText;
+  const priceLabel = event.isFree ? t.freeEntry : (event.priceText ?? t.priceTbd);
   const shortWhen = formatEventRange(event, locale);
 
   const data = {

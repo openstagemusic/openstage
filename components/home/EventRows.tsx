@@ -48,7 +48,7 @@ export default function EventRows({ events, locale, dict }: EventRowsProps) {
         const meta = [dict.events.kinds[event.kind] ?? dict.events.kinds.other, where, event.genre]
           .filter(Boolean)
           .join(" · ");
-        const entry = event.isFree ? dict.events.freeEntry : (event.priceText ?? dict.showcase.paid);
+        const entry = event.isFree ? dict.events.freeEntry : (event.priceText ?? dict.events.priceTbd);
         const relativeDay = when.isToday
           ? dict.events.tonight
           : when.isTomorrow

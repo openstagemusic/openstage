@@ -55,11 +55,9 @@ export default function EventTeaser({ event, locale, dict }: EventTeaserProps) {
                 {whenLabel}
               </span>
             ) : null}
-            {event.isFree || event.priceText ? (
-              <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
-                {event.isFree ? dict.events.freeEntry : event.priceText}
-              </span>
-            ) : null}
+            <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+              {event.isFree ? dict.events.freeEntry : (event.priceText ?? dict.events.priceTbd)}
+            </span>
           </div>
 
           <h3 className="mt-3 font-display text-lg font-semibold leading-tight">{event.title}</h3>

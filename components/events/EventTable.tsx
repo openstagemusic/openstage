@@ -85,7 +85,7 @@ export default function EventTable({ events, locale, dict }: EventTableProps) {
                   {dict.events.kinds[event.kind] ?? dict.events.kinds.other}
                 </td>
                 <td className="hidden px-4 py-3 text-muted md:table-cell">
-                  {event.isFree ? dict.events.freeEntry : (event.priceText ?? dict.showcase.paid)}
+                  {event.isFree ? dict.events.freeEntry : (event.priceText ?? dict.events.priceTbd)}
                 </td>
               </tr>
             );
