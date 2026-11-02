@@ -178,6 +178,13 @@ Non invitata: **Edonè** (spazio chiuso fino a primavera). Il **Druso** ha
 ricevuto l'invito il 1 novembre alle 15:52: `amministrazionedruso@gmail.com`,
 trovata sul loro sito.
 
+## Segnali di apertura (2 novembre 2026)
+
+**Daste** ha messo like all'ultima storia e l'ha ripostata: è il primo locale che
+reagisce a un tag. Cambia il tono del sollecito del 5 novembre — non è più un
+primo contatto, è una conversazione già aperta. Il messaggio parte da lì: «grazie
+per aver ripostato la storia, se vuoi prendere in gestione la scheda è tua».
+
 ## Dove cercare i programmi (per Francesco)
 
 | Locale | Dove guardare | Cosa serve |
