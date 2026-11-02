@@ -93,9 +93,10 @@ export function parseDiscoveryFilters(
     kind: EVENT_KINDS.find((item) => item === kindRaw) ?? null,
     freeOnly: single(raw.free) === "1",
     radiusKm,
-    // Il raggio ha senso solo con un centro: se la URL non ce l'ha si ripiega
-    // sulla posizione del visitatore (dai geo-header).
-    center: radiusKm ? urlCenter ?? fallbackCenter : null,
+    // Il centro dell'indirizzo vale sempre, anche senza raggio: è dove devono
+    // aprirsi la mappa e i link condivisi. Il ripiego sul visitatore serve solo
+    // quando la URL non dice niente.
+    center: urlCenter ?? (radiusKm ? fallbackCenter : null),
     view: single(raw.vista) === "table" ? "table" : "cards",
     page: Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1,
   };
