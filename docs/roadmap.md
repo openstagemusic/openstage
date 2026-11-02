@@ -33,6 +33,7 @@
 | **14B** | ✅ **chiusura e collaudo**: B60 paese, B13 accessibilità, B06, B45, fixture rimosse, smoke test in CI, `docs/report-finale.md` |
 | **15** | ⏸ **condizionale**: monetizzazione solo con posizione fiscale/ente/fiscal host |
 | **16** | 🟡 **lancio e ascolto**: playbook fatto (`docs/launch-playbook.md`), ora densità della zona di partenza e lancio |
+| **14C** | ⏳ **multi-artista**: lineup per serata (`docs/plan-multi-artista.md`), dopo il lancio | nessuno |
 | **17** | ⬜ **outreach (dopo il lancio)**: lead per regione, creazione scheda, invito al claim **uno a uno**. Catalogo delle email automatiche |
 
 La regola sui canali è in **`docs/notifications-email-policy.md`**: email solo per ciò che
