@@ -20,9 +20,19 @@ La base senza cui il resto non esiste: la lineup è una tabella, non un campo.
    visibile a locale e admin. Salvataggio transazionale con
    `set_event_lineup(event, principale, altri)`.
 
+## Blocco 2 — richiesta di ingresso (fatto il 3 novembre 2026)
+
+- Tabella `event_join_requests` con una sola richiesta aperta per serata/artista.
+- Pulsante **«Sono in questa serata»** sulla scheda evento: compare solo a un
+  artista loggato con scheda, non al creatore, non a chi è già in lineup, non su
+  eventi passati o annullati. Lo stato si chiede a `/api/lineup/join`, così la
+  scheda resta statica.
+- Coda admin `/admin/richieste-lineup`: approva o rifiuta.
+- Approvazione transazionale con `decide_event_join_request`: riga in lineup +
+  notifica all'artista (se ha un account) + chiusura della richiesta.
+
 ## Cosa non entra (blocchi successivi)
 
-- Richiesta di ingresso in lineup dalla scheda evento + coda admin.
 - Pulsanti «Esci dalla lineup» e «Chiedi una modifica».
 - Notifiche a tutta la lineup.
 - Controllo «serata già esistente» nel form di creazione (esiste già

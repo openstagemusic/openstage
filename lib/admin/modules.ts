@@ -38,6 +38,13 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "active",
     labelKey: "outreachChannels",
   },
+  {
+    key: "lineupRequests",
+    href: "/admin/richieste-lineup",
+    group: "people",
+    status: "active",
+    labelKey: "lineupRequests",
+  },
   { key: "events", href: "/admin/eventi", group: "content", status: "active", labelKey: "events" },
   { key: "drafts", href: "/admin/bozze", group: "content", status: "active", labelKey: "drafts" },
   { key: "reports", href: "/admin/segnalazioni", group: "content", status: "active", labelKey: "reports" },

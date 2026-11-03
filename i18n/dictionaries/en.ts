@@ -683,6 +683,18 @@ export const en = {
       "Event added by OpenStage: the venue and the artist have not claimed their page yet.",
     when: "When",
     lineup: "Artists",
+    lineupJoinCta: "I'm playing this night",
+    lineupJoinTitle: "Ask to join the bill",
+    lineupJoinHint:
+      "The request goes to OpenStage. If approved, the night also appears on your page: you will not be able to edit it.",
+    lineupJoinNote: "Note (optional)",
+    lineupJoinPlaceholder: "Who you are, what you play…",
+    lineupJoinSend: "Send request",
+    lineupJoinSending: "Sending…",
+    lineupJoinCancel: "Cancel",
+    lineupJoinPending: "Request sent: waiting for approval.",
+    lineupJoinMember: "You are on the bill",
+    lineupJoinError: "We could not send the request.",
     where: "Where",
     emptyTitle: "No events scheduled yet",
     emptyText:
@@ -1995,6 +2007,18 @@ export const en = {
       messageDirect:
         "Hi, I'm Francesco from OpenStage, the free map of live music in Bergamo and its province.\n\nI'm writing because I follow your listings: if you ever need a source for dates, or want to flag a gig, it's on getopenstage.it.\n\nThere's nothing to pay and I'm not asking anything in return: I just want the dates to reach the people looking for them.\n\nThanks,\nFrancesco — OpenStage",
     },
+    lineupRequests: {
+      title: "Lineup requests",
+      lead:
+        "Artists asking to join a night that is already published. Approving puts them on the bill and the night shows on their page too; it stays one single night.",
+      countLabel: "waiting",
+      empty: "No requests waiting.",
+      openEvent: "Open the night",
+      approve: "Approve",
+      reject: "Reject",
+      working: "Working…",
+      failed: "We could not save it. Try again.",
+    },
     nav: {
       today: "Today",
       overview: "Overview",
@@ -2011,6 +2035,7 @@ export const en = {
       claims: "Claims and verifications",
       outreach: "Artist outreach",
       outreachChannels: "Outreach channels",
+      lineupRequests: "Lineup requests",
       events: "Events",
       drafts: "Drafts",
       reports: "Reports",

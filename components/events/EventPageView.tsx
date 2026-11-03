@@ -5,6 +5,7 @@ import EventTeaser from "@/components/events/EventTeaser";
 import { TrackRecentlyViewed } from "@/components/events/RecentlyViewed";
 import AddToCalendar from "@/components/events/AddToCalendar";
 import EventCountdown from "@/components/events/EventCountdown";
+import LineupJoinButton from "@/components/events/LineupJoinButton";
 import EventCover from "@/components/events/EventCover";
 import ReportEventButton from "@/components/events/ReportEventButton";
 import ShareEventPanel from "@/components/events/ShareEventPanel";
@@ -236,6 +237,8 @@ export default async function EventPageView({
               );
             })()
           ) : null}
+
+          {cancelled ? null : <LineupJoinButton eventId={event.id} dict={t} />}
 
           {cancelled ? null : (
             <EventCountdown

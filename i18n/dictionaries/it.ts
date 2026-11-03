@@ -683,6 +683,18 @@ export const it: Dictionary = {
       "Evento inserito da OpenStage: il locale e l'artista non hanno ancora reclamato la scheda.",
     when: "Quando",
     lineup: "Artisti",
+    lineupJoinCta: "Sono in questa serata",
+    lineupJoinTitle: "Chiedi di entrare in lineup",
+    lineupJoinHint:
+      "La richiesta arriva a OpenStage. Se viene approvata, la serata compare anche sulla tua pagina: non potrai modificarla.",
+    lineupJoinNote: "Nota (facoltativa)",
+    lineupJoinPlaceholder: "Chi sei, cosa suoni…",
+    lineupJoinSend: "Invia richiesta",
+    lineupJoinSending: "Invio…",
+    lineupJoinCancel: "Annulla",
+    lineupJoinPending: "Richiesta inviata: in attesa di approvazione.",
+    lineupJoinMember: "Sei in lineup",
+    lineupJoinError: "Non è stato possibile inviare la richiesta.",
     where: "Dove",
     emptyTitle: "Ancora nessun evento in programma",
     emptyText:
@@ -2001,6 +2013,18 @@ export const it: Dictionary = {
       messageDirect:
         "Ciao, sono Francesco di OpenStage, la mappa gratuita delle serate dal vivo a Bergamo e provincia.\n\nVi scrivo perché seguo la vostra agenda: se vi serve una fonte per le date, o se volete segnalare una serata, la trovate su getopenstage.it.\n\nNon c'è niente da pagare e non chiedo niente in cambio: mi interessa che le date arrivino a chi le cerca.\n\nGrazie,\nFrancesco — OpenStage",
     },
+    lineupRequests: {
+      title: "Richieste lineup",
+      lead:
+        "Artisti che chiedono di entrare in una serata già pubblicata. Approvando, la serata compare anche sulla loro pagina; la serata resta una sola.",
+      countLabel: "in attesa",
+      empty: "Nessuna richiesta in attesa.",
+      openEvent: "Apri la serata",
+      approve: "Approva",
+      reject: "Rifiuta",
+      working: "…",
+      failed: "Non è stato possibile. Riprova.",
+    },
     nav: {
       today: "Oggi",
       overview: "Panoramica",
@@ -2017,6 +2041,7 @@ export const it: Dictionary = {
       claims: "Claim e verifiche",
       outreach: "Outreach artisti",
       outreachChannels: "Canali di outreach",
+      lineupRequests: "Richieste lineup",
       events: "Eventi",
       drafts: "Bozze",
       reports: "Segnalazioni",
