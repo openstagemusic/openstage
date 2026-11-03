@@ -32,6 +32,7 @@ export default function LineupJoinButton({
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const [left, setLeft] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,10 +57,59 @@ export default function LineupJoinButton({
   }
 
   if (state === "member") {
+    async function leave() {
+      if (!window.confirm(dict.lineupLeaveConfirm)) return;
+      setBusy(true);
+      setError(false);
+
+      try {
+        const response = await fetch("/api/lineup/leave", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ eventId }),
+        });
+        const payload = (await response.json()) as { ok?: boolean };
+
+        if (!payload.ok) {
+          setError(true);
+          return;
+        }
+
+        setLeft(true);
+      } catch {
+        setError(true);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    if (left) {
+      return (
+        <p className="mt-4 border-l-2 border-line-strong pl-3 text-sm text-muted">
+          {dict.lineupLeaveDone}
+        </p>
+      );
+    }
+
     return (
-      <p className="mt-4 inline-flex items-center gap-2 border border-cyan/40 bg-cyan/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
-        {dict.lineupJoinMember}
-      </p>
+      <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-line pt-4">
+        <p className="inline-flex items-center gap-2 border border-cyan/40 bg-cyan/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
+          {dict.lineupJoinMember}
+        </p>
+        <button
+          type="button"
+          onClick={() => void leave()}
+          disabled={busy}
+          className="inline-flex min-h-10 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-pink hover:text-pink disabled:opacity-40"
+        >
+          {busy ? dict.lineupJoinSending : dict.lineupLeaveCta}
+        </button>
+        {error ? (
+          <p role="alert" className="os-note os-note-pink">
+            {dict.lineupLeaveError}
+          </p>
+        ) : null}
+      </div>
     );
   }
 

@@ -74,6 +74,15 @@ export async function setEventStatusAction(input: {
     })
     .eq("id", input.eventId);
 
+  // Chi è in lineup non ha salvato la serata, ma ci suona: va avvisato come chi
+  // l'aveva messa tra i preferiti. La funzione è idempotente.
+  if (!error && input.status === "cancelled") {
+    const { error: notifyError } = await supabase.rpc("notify_event_cancelled", {
+      p_event: input.eventId,
+    });
+    if (notifyError) console.error("[events] notify_event_cancelled:", notifyError.message);
+  }
+
   revalidatePath("/dashboard");
 
   return result(error);

@@ -31,10 +31,21 @@ La base senza cui il resto non esiste: la lineup è una tabella, non un campo.
 - Approvazione transazionale con `decide_event_join_request`: riga in lineup +
   notifica all'artista (se ha un account) + chiusura della richiesta.
 
+## Blocco 3 — uscire e avvisare (fatto il 3 novembre 2026)
+
+- **«Non posso più suonare»**: chi è in lineup e non ha creato la serata esce con
+  un tocco. La riga sparisce e il gestore (e il locale, se ha un account) riceve
+  una notifica. Chi ha creato la serata non esce: la serata è sua.
+- **Annullamento**: quando una serata viene annullata, `notify_event_cancelled`
+  avvisa **tutta la lineup**, non solo chi l'aveva salvata. Idempotente.
+
+Resta fuori da questo blocco **«Chiedi una modifica»**: richiede una coda
+dedicata e va progettato insieme alle notifiche, altrimenti diventa un doppione
+delle richieste di lineup.
+
 ## Cosa non entra (blocchi successivi)
 
-- Pulsanti «Esci dalla lineup» e «Chiedi una modifica».
-- Notifiche a tutta la lineup.
+- «Chiedi una modifica» con coda dedicata.
 - Controllo «serata già esistente» nel form di creazione (esiste già
   `findSimilarEvents`: va collegato al pulsante «Unisciti»).
 - Statistiche dashboard per artista in lineup.
