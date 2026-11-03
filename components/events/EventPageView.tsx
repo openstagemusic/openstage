@@ -5,7 +5,7 @@ import EventTeaser from "@/components/events/EventTeaser";
 import { TrackRecentlyViewed } from "@/components/events/RecentlyViewed";
 import AddToCalendar from "@/components/events/AddToCalendar";
 import EventCountdown from "@/components/events/EventCountdown";
-import LineupJoinButton from "@/components/events/LineupJoinButton";
+import LineupJoinLink, { LineupMemberActions } from "@/components/events/LineupJoinButton";
 import EventCover from "@/components/events/EventCover";
 import ReportEventButton from "@/components/events/ReportEventButton";
 import ShareEventPanel from "@/components/events/ShareEventPanel";
@@ -205,40 +205,7 @@ export default async function EventPageView({
             {event.title}
           </h1>
 
-          {event.lineup.length > 0 ? (
-            (() => {
-              const names = event.lineup.map((item) => item.name.trim().toLowerCase()).join("|");
-              const repeats = names === event.title.trim().toLowerCase();
-              if (event.lineup.length === 1 && repeats) return null;
-
-              return (
-                <p className="mt-3 text-lg text-white/80">
-                  {event.lineup.length > 1 ? (
-                    <span className="mr-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-                      {t.lineup}:
-                    </span>
-                  ) : null}
-                  {event.lineup.map((item, index) => (
-                    <span key={`${item.id ?? item.name}-${index}`}>
-                      {index > 0 ? <span className="text-muted"> · </span> : null}
-                      {item.slug ? (
-                        <Link
-                          href={artistPath({ slug: item.slug })}
-                          className="transition-colors hover:text-cyan"
-                        >
-                          {item.name}
-                        </Link>
-                      ) : (
-                        <span>{item.name}</span>
-                      )}
-                    </span>
-                  ))}
-                </p>
-              );
-            })()
-          ) : null}
-
-          {cancelled ? null : <LineupJoinButton eventId={event.id} dict={t} />}
+          {cancelled ? null : <LineupMemberActions eventId={event.id} dict={t} />}
 
           {cancelled ? null : (
             <EventCountdown
@@ -335,6 +302,31 @@ export default async function EventPageView({
             ) : null}
           </dd>
         </div>
+
+        {event.lineup.length > 0 ? (
+          <div className="grid gap-2 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+            <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-cyan">
+              {t.lineup}
+            </dt>
+            <dd className="text-sm text-white">
+              {event.lineup.map((item, index) => (
+                <span key={`${item.id ?? item.name}-${index}`}>
+                  {index > 0 ? <span className="text-muted"> · </span> : null}
+                  {item.slug ? (
+                    <Link
+                      href={artistPath({ slug: item.slug })}
+                      className="transition-colors hover:text-cyan"
+                    >
+                      {item.name}
+                    </Link>
+                  ) : (
+                    item.name
+                  )}
+                </span>
+              ))}
+            </dd>
+          </div>
+        ) : null}
       </dl>
         </div>
       </header>
@@ -419,6 +411,8 @@ export default async function EventPageView({
           }}
           className="w-full justify-center sm:w-auto"
         />
+
+        {cancelled ? null : <LineupJoinLink eventId={event.id} dict={t} />}
 
         {/* Segnalare serve su una serata che si tiene: su una annullata non c'è
             niente da moderare. Serve una sessione, perché una segnalazione

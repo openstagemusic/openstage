@@ -9,6 +9,7 @@ import { isCurrentUserAdmin, listUnverifiedProfiles } from "@/lib/claims/queries
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
 import { getLocale } from "@/lib/i18n/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,12 @@ export default async function AdminPage() {
     listUnverifiedProfiles(),
     countOpenTakedownNotices(),
   ]);
+
+  const supabase = await createClient();
+  const { count: lineupRequests } = await supabase
+    .from("event_join_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "pending");
 
   return (
     <div>
@@ -83,6 +90,7 @@ export default async function AdminPage() {
         metrics={metrics}
         profilesToVerify={unverified.length}
         takedownOpen={takedownOpen}
+        lineupRequests={lineupRequests ?? 0}
         dict={t}
       />
 

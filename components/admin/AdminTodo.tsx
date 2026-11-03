@@ -13,11 +13,13 @@ export default function AdminTodo({
   metrics,
   profilesToVerify,
   takedownOpen,
+  lineupRequests,
   dict,
 }: {
   metrics: AdminMetrics | null;
   profilesToVerify: number;
   takedownOpen: number;
+  lineupRequests: number;
   dict: Dictionary["admin"];
 }) {
   if (!metrics) return null;
@@ -29,6 +31,7 @@ export default function AdminTodo({
     href?: string;
   }> = [
     { label: dict.kpiPending, value: metrics.claimsPending, href: "/admin/claim" },
+    { label: dict.kpiLineupRequests, value: lineupRequests, href: "/admin/richieste-lineup" },
     { label: dict.kpiVerify, value: metrics.claimsToVerify, href: "/admin/claim" },
     { label: dict.kpiUnverified, value: profilesToVerify, href: "/admin/utenti" },
     { label: dict.kpiDrafts, value: metrics.eventsDraft, href: "/admin/bozze" },

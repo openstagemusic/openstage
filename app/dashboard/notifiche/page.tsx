@@ -27,7 +27,7 @@ const TYPES: NotificationType[] = [
 export default async function NotificationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; letto?: string }>;
 }) {
   const locale = await getLocale();
   const session = await getSessionProfile();
@@ -40,8 +40,11 @@ export default async function NotificationsPage({
   const type = TYPES.includes(params.type as NotificationType)
     ? (params.type as NotificationType)
     : null;
+  // «Lette» è un filtro di stato, non un tipo: sta in fondo alla barra e non
+  // si mescola con "Eventi annullati", "Sistema" e gli altri.
+  const onlyRead = params.letto === "1";
 
-  const notifications = await listNotifications(session.id, type);
+  const notifications = await listNotifications(session.id, type, onlyRead ? "read" : null);
   const hasUnread = notifications.some((notification) => notification.readAt === null);
 
   return (
@@ -80,6 +83,22 @@ export default async function NotificationsPage({
             {t.types[item]}
           </LocaleLink>
         ))}
+
+        {/* In fondo: le lette restano consultabili e cancellabili da qui. */}
+        <span className="text-muted" aria-hidden="true">
+          |
+        </span>
+        <LocaleLink
+          href="/dashboard/notifiche?letto=1"
+          aria-current={onlyRead ? "page" : undefined}
+          className={
+            onlyRead
+              ? "border-b border-cyan pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-cyan"
+              : "border-b border-transparent pb-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:text-white"
+          }
+        >
+          {t.filterRead}
+        </LocaleLink>
       </div>
 
       {notifications.length > 0 ? (

@@ -55,9 +55,13 @@ export const getUnreadNotificationCount = cache(async (profileId: string): Promi
   return count ?? 0;
 });
 
-/** Le notifiche del profilo, dalla più recente. Filtro per tipo facoltativo. */
+/** Le notifiche del profilo, dalla più recente. Filtri per tipo e per stato. */
 export const listNotifications = cache(
-  async (profileId: string, type?: NotificationType | null): Promise<Notification[]> => {
+  async (
+    profileId: string,
+    type?: NotificationType | null,
+    state?: "read" | "unread" | null
+  ): Promise<Notification[]> => {
     const supabase = await createClient();
 
     let query = supabase
@@ -69,6 +73,8 @@ export const listNotifications = cache(
       .limit(100);
 
     if (type) query = query.eq("type", type);
+    if (state === "read") query = query.not("read_at", "is", null);
+    if (state === "unread") query = query.is("read_at", null);
 
     const { data, error } = await query;
 
