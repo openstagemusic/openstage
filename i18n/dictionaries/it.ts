@@ -2726,6 +2726,12 @@ requests: {
     lineupSearchPlaceholder: "Cerca un altro artista…",
     lineupRemove: "Togli dalla lineup",
     lineupEmpty: "Nessun artista trovato con questo nome.",
+    lineupNameLabel: "Nome senza scheda",
+    lineupNamePlaceholder: "es. The Blue Notes",
+    lineupAddName: "Aggiungi nome",
+    lineupRemoveName: "Togli il nome",
+    artistNotOnStage:
+      "Se l'artista non è su OpenStage, scrivilo nella lineup: comparirà lo stesso sulla scheda, come testo.",
     duplicatesTitle: "Esiste già una serata simile",
     duplicatesHint:
       "Non è un errore: controlla che non sia la stessa. Se è un'altra serata, creala comunque.",

@@ -93,6 +93,7 @@ export default async function EditEventPage({
           initialLineup={event.lineup
             .filter((item) => Boolean(item.id) && item.id !== event.artist?.id)
             .map((item) => ({ id: item.id as string, name: item.name }))}
+          initialLineupNames={event.lineup.filter((item) => item.freeText).map((item) => item.name)}
           cities={cities}
           genres={genres}
           mapCenter={{

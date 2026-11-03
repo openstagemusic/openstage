@@ -2720,6 +2720,12 @@ requests: {
     lineupSearchPlaceholder: "Search another artist…",
     lineupRemove: "Remove from the bill",
     lineupEmpty: "No artist found with that name.",
+    lineupNameLabel: "Name without a page",
+    lineupNamePlaceholder: "e.g. The Blue Notes",
+    lineupAddName: "Add name",
+    lineupRemoveName: "Remove the name",
+    artistNotOnStage:
+      "If the artist is not on OpenStage, write it in the bill: it will still appear on the page, as text.",
     duplicatesTitle: "A similar night already exists",
     duplicatesHint:
       "This is not an error: check it is not the same one. If it is a different night, create it anyway.",

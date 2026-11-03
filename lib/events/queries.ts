@@ -170,6 +170,15 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     });
   }
 
+  // Se il nome scritto a mano ripete l'artista principale, si tiene la scheda:
+  // «Musa · Musa» sulla pagina non serve a nessuno.
+  const mainName = artist?.name.trim().toLowerCase() ?? null;
+  const deduped = mainName
+    ? lineup.filter(
+        (item) => !(item.freeText && item.name.trim().toLowerCase() === mainName)
+      )
+    : lineup;
+
   // "Non reclamato" non è un campo salvato: è un fatto delle schede collegate.
   // L'evento l'ha messo OpenStage se **almeno una** delle due esiste e
   // **nessuna** è stata reclamata. Senza artista né locale non c'è nessuna
@@ -208,7 +217,7 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     artist: artist
       ? { id: artist.id, slug: artist.slug, name: artist.name, city: artist.city }
       : null,
-    lineup,
+    lineup: deduped,
     venue: venue
       ? {
           id: venue.id,

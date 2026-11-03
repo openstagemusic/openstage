@@ -56,6 +56,8 @@ type EventEditorProps = {
   artistLocked: boolean;
   /** Gli altri artisti già in lineup, escluso il principale. */
   initialLineup?: { id: string; name: string }[];
+  /** I nomi senza scheda già in lineup. */
+  initialLineupNames?: string[];
   cities: string[];
   genres: string[];
   /** Dove aprire la mini mappa se non c'è ancora un pin. */
@@ -131,6 +133,7 @@ export default function EventEditor({
   linkedArtist,
   artistLocked,
   initialLineup,
+  initialLineupNames,
   cities,
   genres,
   mapCenter,
@@ -174,6 +177,8 @@ export default function EventEditor({
   const [searchingArtists, setSearchingArtists] = useState(false);
   // Lineup: gli altri artisti della serata, oltre al principale.
   const [lineup, setLineup] = useState<{ id: string; name: string }[]>(initialLineup ?? []);
+  const [lineupNames, setLineupNames] = useState<string[]>(initialLineupNames ?? []);
+  const [lineupNameDraft, setLineupNameDraft] = useState("");
   const [lineupQuery, setLineupQuery] = useState("");
   const [lineupResults, setLineupResults] = useState<ArtistOption[]>([]);
   const [searchingLineup, setSearchingLineup] = useState(false);
@@ -355,6 +360,24 @@ export default function EventEditor({
 
   function removeFromLineup(id: string) {
     setLineup((current) => current.filter((item) => item.id !== id));
+  }
+
+  function addLineupName() {
+    const name = lineupNameDraft.trim().slice(0, 120);
+    if (!name) return;
+
+    const key = name.toLowerCase();
+    const alreadyThere =
+      lineupNames.some((item) => item.toLowerCase() === key) ||
+      lineup.some((item) => item.name.toLowerCase() === key) ||
+      (artist ? artist.name.toLowerCase() === key : false);
+
+    if (!alreadyThere) setLineupNames((current) => [...current, name]);
+    setLineupNameDraft("");
+  }
+
+  function removeLineupName(name: string) {
+    setLineupNames((current) => current.filter((item) => item !== name));
   }
 
   /**
@@ -624,6 +647,7 @@ export default function EventEditor({
       expectedUpdatedAt: mode === "edit" ? updatedAt : null,
       confirmDuplicate,
       lineupArtistIds: lineup.map((item) => item.id),
+      lineupArtistNames: lineupNames,
     });
 
     setBusy(null);
@@ -1039,6 +1063,10 @@ export default function EventEditor({
           </div>
         )}
 
+        {!artistLocked ? (
+          <p className="mt-2 text-xs leading-relaxed text-muted">{t.artistNotOnStage}</p>
+        ) : null}
+
         {/* --- Gli altri artisti in lineup ------------------------------- */}
         {!artistLocked ? (
           <div className="mt-6 border-t border-line pt-4">
@@ -1103,6 +1131,55 @@ export default function EventEditor({
                 <p className="mt-1 text-xs text-muted">{t.lineupEmpty}</p>
               ) : null}
             </div>
+
+            <div className="mt-4 flex flex-wrap items-end gap-2">
+              <div className="min-w-0 flex-1">
+                <label htmlFor="event-lineup-name" className="os-field-label">
+                  {t.lineupNameLabel}
+                </label>
+                <input
+                  id="event-lineup-name"
+                  className={inputClass}
+                  value={lineupNameDraft}
+                  onChange={(event) => setLineupNameDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter") return;
+                    event.preventDefault();
+                    addLineupName();
+                  }}
+                  placeholder={t.lineupNamePlaceholder}
+                  maxLength={120}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={addLineupName}
+                disabled={!lineupNameDraft.trim()}
+                className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan disabled:opacity-40"
+              >
+                {t.lineupAddName}
+              </button>
+            </div>
+
+            {lineupNames.length > 0 ? (
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {lineupNames.map((name) => (
+                  <li key={name}>
+                    <span className="inline-flex items-center gap-2 border border-dashed border-line-strong px-3 py-2 text-sm text-white">
+                      {name}
+                      <button
+                        type="button"
+                        onClick={() => removeLineupName(name)}
+                        aria-label={`${t.lineupRemoveName}: ${name}`}
+                        className="font-mono text-xs text-muted transition-colors hover:text-pink"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         ) : null}
 

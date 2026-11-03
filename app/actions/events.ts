@@ -187,6 +187,8 @@ export async function saveEventAction(input: {
   confirmDuplicate?: boolean;
   /** Gli altri artisti in lineup (schede), escluso il principale. */
   lineupArtistIds?: string[];
+  /** Nomi senza scheda, scritti a mano. */
+  lineupArtistNames?: string[];
 }): Promise<SaveEventResult> {
   const session = await getSessionProfile();
 
@@ -329,9 +331,9 @@ export async function saveEventAction(input: {
       return { ok: false, error: existing ? "conflict" : "notFound" };
     }
 
-    await saveLineup(supabase, data.id, artistId, input.lineupArtistIds);
+    await saveLineup(supabase, data.id, artistId, input.lineupArtistIds, input.lineupArtistNames);
 
-    if (input.lineupArtistIds !== undefined) revalidatePath("/", "layout");
+    if (input.lineupArtistIds !== undefined || input.lineupArtistNames !== undefined) revalidatePath("/", "layout");
 
     revalidatePath("/dashboard");
 
@@ -415,11 +417,11 @@ export async function saveEventAction(input: {
 
   if (!data) return { ok: false, error: "saveFailed" };
 
-  await saveLineup(supabase, data.id, artistId, input.lineupArtistIds);
+  await saveLineup(supabase, data.id, artistId, input.lineupArtistIds, input.lineupArtistNames);
 
   // La scheda pubblica è statica: senza questo, la lineup nuova non si vede
   // finché la cache non scade da sola.
-  if (input.lineupArtistIds !== undefined) revalidatePath("/", "layout");
+  if (input.lineupArtistIds !== undefined || input.lineupArtistNames !== undefined) revalidatePath("/", "layout");
 
   revalidatePath("/dashboard");
 
@@ -443,16 +445,21 @@ async function saveLineup(
   supabase: Awaited<ReturnType<typeof createClient>>,
   eventId: string,
   mainArtistId: string | null,
-  lineupIds: string[] | undefined
+  lineupIds: string[] | undefined,
+  lineupNames: string[] | undefined
 ): Promise<void> {
-  if (lineupIds === undefined) return;
+  if (lineupIds === undefined && lineupNames === undefined) return;
 
-  const ids = [...new Set(lineupIds.filter((id) => Boolean(id)))].slice(0, 20);
+  const ids = [...new Set((lineupIds ?? []).filter((id) => Boolean(id)))].slice(0, 20);
+  const names = [...new Set((lineupNames ?? []).map((name) => name.trim()).filter(Boolean))]
+    .slice(0, 20)
+    .map((name) => name.slice(0, 120));
 
   const { error } = await supabase.rpc("set_event_lineup", {
     p_event: eventId,
     p_main: mainArtistId,
     p_artists: ids,
+    p_names: names,
   });
 
   if (error) console.error("[events] set_event_lineup:", error.message);
@@ -504,3 +511,4 @@ export async function unmergeEventAction(input: { eventId: string }): Promise<Ev
 
   return { ok: true, error: null };
 }
+
