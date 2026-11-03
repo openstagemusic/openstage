@@ -54,6 +54,8 @@ type EventEditorProps = {
   linkedArtist: { id: string; name: string } | null;
   /** Un artista non sceglie: la serata è la sua. */
   artistLocked: boolean;
+  /** Gli altri artisti già in lineup, escluso il principale. */
+  initialLineup?: { id: string; name: string }[];
   cities: string[];
   genres: string[];
   /** Dove aprire la mini mappa se non c'è ancora un pin. */
@@ -128,6 +130,7 @@ export default function EventEditor({
   linkedVenueName,
   linkedArtist,
   artistLocked,
+  initialLineup,
   cities,
   genres,
   mapCenter,
@@ -169,6 +172,11 @@ export default function EventEditor({
   const [artistQuery, setArtistQuery] = useState("");
   const [artistResults, setArtistResults] = useState<ArtistOption[]>([]);
   const [searchingArtists, setSearchingArtists] = useState(false);
+  // Lineup: gli altri artisti della serata, oltre al principale.
+  const [lineup, setLineup] = useState<{ id: string; name: string }[]>(initialLineup ?? []);
+  const [lineupQuery, setLineupQuery] = useState("");
+  const [lineupResults, setLineupResults] = useState<ArtistOption[]>([]);
+  const [searchingLineup, setSearchingLineup] = useState(false);
   // Serate che assomigliano a questa: si avvisa, non si blocca.
   const [duplicates, setDuplicates] = useState<SimilarEvent[]>([]);
   const pendingStatus = useRef<"draft" | "published" | "cancelled">("draft");
@@ -293,6 +301,57 @@ export default function EventEditor({
     setArtist(null);
     setValues((current) => ({ ...current, artistId: "" }));
     setMessage(null);
+  }
+
+  // Ricerca per la lineup: stesse regole dell'artista principale, ma qui non
+  // si sostituisce niente — si aggiunge.
+  useEffect(() => {
+    if (artistLocked) return;
+
+    const term = lineupQuery.trim();
+
+    if (term.length < 2) {
+      setLineupResults([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
+      setSearchingLineup(true);
+
+      try {
+        const response = await fetch(`/api/artists?q=${encodeURIComponent(term)}`);
+        const payload = (await response.json()) as { artists?: ArtistOption[] };
+        if (cancelled) return;
+
+        const taken = new Set([artist?.id, ...lineup.map((item) => item.id)].filter(Boolean));
+        setLineupResults((payload.artists ?? []).filter((option) => !taken.has(option.id)));
+      } catch {
+        if (!cancelled) setLineupResults([]);
+      } finally {
+        if (!cancelled) setSearchingLineup(false);
+      }
+    }, 320);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [lineupQuery, artistLocked, artist, lineup]);
+
+  function addToLineup(option: ArtistOption) {
+    setLineup((current) =>
+      current.some((item) => item.id === option.id)
+        ? current
+        : [...current, { id: option.id, name: option.name }]
+    );
+    setLineupQuery("");
+    setLineupResults([]);
+  }
+
+  function removeFromLineup(id: string) {
+    setLineup((current) => current.filter((item) => item.id !== id));
   }
 
   // La mappa vola su un posto scelto fuori dalla mappa (locale collegato o città
@@ -528,6 +587,7 @@ export default function EventEditor({
       // In creazione non c'è niente da proteggere: la riga non esiste ancora.
       expectedUpdatedAt: mode === "edit" ? updatedAt : null,
       confirmDuplicate,
+      lineupArtistIds: lineup.map((item) => item.id),
     });
 
     setBusy(null);
@@ -903,6 +963,73 @@ export default function EventEditor({
             ) : null}
           </div>
         )}
+
+        {/* --- Gli altri artisti in lineup ------------------------------- */}
+        {!artistLocked ? (
+          <div className="mt-6 border-t border-line pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
+              {t.lineupTitle}
+            </p>
+            <p className="mt-1 text-xs text-muted">{t.lineupHint}</p>
+
+            {lineup.length > 0 ? (
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {lineup.map((item) => (
+                  <li key={item.id}>
+                    <span className="inline-flex items-center gap-2 border border-line bg-white/[0.03] px-3 py-2 text-sm text-white">
+                      {item.name}
+                      <button
+                        type="button"
+                        onClick={() => removeFromLineup(item.id)}
+                        aria-label={`${t.lineupRemove}: ${item.name}`}
+                        className="font-mono text-xs text-muted transition-colors hover:text-pink"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            <div className="relative mt-3">
+              <label htmlFor="event-lineup-search" className="os-field-label">
+                {t.lineupAdd}
+              </label>
+              <input
+                id="event-lineup-search"
+                className={inputClass}
+                value={lineupQuery}
+                onChange={(event) => setLineupQuery(event.target.value)}
+                placeholder={t.lineupSearchPlaceholder}
+                autoComplete="off"
+              />
+
+              {lineupResults.length > 0 ? (
+                <ul className="absolute z-20 mt-1 w-full overflow-hidden border border-line bg-surface">
+                  {lineupResults.map((option) => (
+                    <li key={option.id}>
+                      <button
+                        type="button"
+                        onClick={() => addToLineup(option)}
+                        className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/5"
+                      >
+                        <span className="text-white">{option.name}</span>
+                        {option.city ? (
+                          <span className="block text-xs text-muted">{option.city}</span>
+                        ) : null}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
+              {lineupQuery.trim().length >= 2 && !searchingLineup && lineupResults.length === 0 ? (
+                <p className="mt-1 text-xs text-muted">{t.lineupEmpty}</p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {!linkedVenue ? (

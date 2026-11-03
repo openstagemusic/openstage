@@ -176,6 +176,8 @@ export async function saveEventAction(input: {
   expectedUpdatedAt?: string | null;
   /** «Sì, lo so che esiste già una serata simile»: si salva comunque. */
   confirmDuplicate?: boolean;
+  /** Gli altri artisti in lineup (schede), escluso il principale. */
+  lineupArtistIds?: string[];
 }): Promise<SaveEventResult> {
   const session = await getSessionProfile();
 
@@ -318,6 +320,8 @@ export async function saveEventAction(input: {
       return { ok: false, error: existing ? "conflict" : "notFound" };
     }
 
+    await saveLineup(supabase, data.id, artistId, input.lineupArtistIds);
+
     revalidatePath("/dashboard");
 
     return {
@@ -400,6 +404,8 @@ export async function saveEventAction(input: {
 
   if (!data) return { ok: false, error: "saveFailed" };
 
+  await saveLineup(supabase, data.id, artistId, input.lineupArtistIds);
+
   revalidatePath("/dashboard");
 
   return {
@@ -408,6 +414,33 @@ export async function saveEventAction(input: {
     status: data.status as SaveEventResult["status"],
     updatedAt: data.updated_at,
   };
+}
+
+/**
+ * Riscrive la lineup di una serata in una transazione sola.
+ *
+ * Il lavoro vero lo fa `set_event_lineup` nel database: cancellare e reinserire
+ * dal client lascerebbe la lineup vuota se la seconda chiamata fallisce. La
+ * funzione controlla anche i permessi, così la regola vale pure chiamandola
+ * fuori dal sito.
+ */
+async function saveLineup(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  eventId: string,
+  mainArtistId: string | null,
+  lineupIds: string[] | undefined
+): Promise<void> {
+  if (lineupIds === undefined) return;
+
+  const ids = [...new Set(lineupIds.filter((id) => Boolean(id)))].slice(0, 20);
+
+  const { error } = await supabase.rpc("set_event_lineup", {
+    p_event: eventId,
+    p_main: mainArtistId,
+    p_artists: ids,
+  });
+
+  if (error) console.error("[events] set_event_lineup:", error.message);
 }
 
 /**

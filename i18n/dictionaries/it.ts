@@ -682,6 +682,7 @@ export const it: Dictionary = {
     unclaimedNote:
       "Evento inserito da OpenStage: il locale e l'artista non hanno ancora reclamato la scheda.",
     when: "Quando",
+    lineup: "Artisti",
     where: "Dove",
     emptyTitle: "Ancora nessun evento in programma",
     emptyText:
@@ -2687,6 +2688,13 @@ requests: {
     artistHint:
       "Se l'artista ha una scheda su OpenStage, collegalo: la serata comparirà anche sulla sua pagina.",
     artistLockedHint: "La serata è tua: l'artista è la tua scheda, non si cambia.",
+    lineupTitle: "Altri artisti in lineup",
+    lineupHint:
+      "Se sul palco ci sono altre band o artisti con una scheda su OpenStage, aggiungili: la serata comparirà anche sulle loro pagine. Resta una serata sola.",
+    lineupAdd: "Aggiungi alla lineup",
+    lineupSearchPlaceholder: "Cerca un altro artista…",
+    lineupRemove: "Togli dalla lineup",
+    lineupEmpty: "Nessun artista trovato con questo nome.",
     duplicatesTitle: "Esiste già una serata simile",
     duplicatesHint:
       "Non è un errore: controlla che non sia la stessa. Se è un'altra serata, creala comunque.",

@@ -90,6 +90,9 @@ export default async function EditEventPage({
           linkedVenueName={event.venue?.name ?? null}
           linkedArtist={event.artist ? { id: event.artist.id, name: event.artist.name } : null}
           artistLocked={Boolean(ownArtist)}
+          initialLineup={event.lineup
+            .filter((item) => Boolean(item.id) && item.id !== event.artist?.id)
+            .map((item) => ({ id: item.id as string, name: item.name }))}
           cities={cities}
           genres={genres}
           mapCenter={{

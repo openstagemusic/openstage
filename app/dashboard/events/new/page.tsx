@@ -153,6 +153,7 @@ export default async function NewEventPage() {
           linkedVenueName={venue?.name ?? null}
           linkedArtist={artist ? { id: artist.id, name: artist.name } : null}
           artistLocked={Boolean(artist)}
+          initialLineup={[]}
           cities={cities}
           genres={genres}
           mapCenter={mapCenter}

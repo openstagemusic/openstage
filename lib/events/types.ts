@@ -26,6 +26,21 @@ export type EventArtist = {
   city: string | null;
 };
 
+/**
+ * Una voce della lineup.
+ *
+ * `id` e `slug` sono nulli quando il nome è scritto a mano: una band senza
+ * scheda su OpenStage non ha una pagina da linkare, ma resta in cartellone.
+ */
+export type LineupArtist = {
+  id: string | null;
+  slug: string | null;
+  name: string;
+  city: string | null;
+  /** true quando non c'è una scheda collegata. */
+  freeText: boolean;
+};
+
 export type EventVenue = {
   id: string;
   slug: string;
@@ -85,6 +100,8 @@ export type PublicEvent = {
    */
   mergedInto: string | null;
   artist: EventArtist | null;
+  /** Tutti gli artisti in cartellone, in ordine. Il primo è il principale. */
+  lineup: LineupArtist[];
   venue: EventVenue | null;
 };
 

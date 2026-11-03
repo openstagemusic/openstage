@@ -682,6 +682,7 @@ export const en = {
     unclaimedNote:
       "Event added by OpenStage: the venue and the artist have not claimed their page yet.",
     when: "When",
+    lineup: "Artists",
     where: "Where",
     emptyTitle: "No events scheduled yet",
     emptyText:
@@ -2681,6 +2682,13 @@ requests: {
     artistHint:
       "If the artist has a page on OpenStage, link it: the night will show on their page too.",
     artistLockedHint: "The night is yours: the artist is your own page, it cannot change.",
+    lineupTitle: "Other artists on the bill",
+    lineupHint:
+      "If other bands or artists with an OpenStage page are playing, add them: the night will show on their pages too. It stays one single night.",
+    lineupAdd: "Add to the bill",
+    lineupSearchPlaceholder: "Search another artist…",
+    lineupRemove: "Remove from the bill",
+    lineupEmpty: "No artist found with that name.",
     duplicatesTitle: "A similar night already exists",
     duplicatesHint:
       "This is not an error: check it is not the same one. If it is a different night, create it anyway.",

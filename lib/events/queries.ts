@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { eventIsPast } from "./format";
 import { eventPath } from "./paths";
 import { calendarDate } from "./timezone";
-import type { EventKind, LocationPrecision, PublicEvent } from "./types";
+import type { EventKind, LineupArtist, LocationPrecision, PublicEvent } from "./types";
 
 /**
  * Lettura degli eventi pubblici.
@@ -50,6 +50,7 @@ export const EVENT_SELECT = [
   "cancel_reason",
   "merged_into",
   "artists ( id, slug, name, city, profile_id )",
+  "event_artists ( position, artist_id, artist_name, artists ( id, slug, name, city, profile_id ) )",
   "venues ( id, slug, name, city, address, website, profile_id )",
 ].join(", ");
 
@@ -71,6 +72,13 @@ type VenueRow = {
   address: string | null;
   website: string | null;
   profile_id: string | null;
+};
+
+type LineupRow = {
+  position: number;
+  artist_id: string | null;
+  artist_name: string | null;
+  artists: Embedded<ArtistRow>;
 };
 
 export type EventRow = {
@@ -113,6 +121,7 @@ export type EventRow = {
   /** Se valorizzata, questa scheda è un doppione unito a un'altra. */
   merged_into?: string | null;
   artists: Embedded<ArtistRow>;
+  event_artists: Embedded<LineupRow> | null;
   venues: Embedded<VenueRow>;
 };
 
@@ -124,6 +133,42 @@ function first<T>(value: Embedded<T>): T | null {
 export function toPublicEvent(row: EventRow): PublicEvent {
   const artist = first(row.artists);
   const venue = first(row.venues);
+
+  // La lineup è la verità; `artist_id` resta come principale. Se la tabella non
+  // ha righe (evento vecchio, o creato prima di questa funzione), la lineup è
+  // l'artista principale: mai una lista vuota con un artista collegato.
+  const lineupRows = Array.isArray(row.event_artists)
+    ? [...row.event_artists].sort((a, b) => a.position - b.position)
+    : row.event_artists
+      ? [row.event_artists]
+      : [];
+
+  const lineup: LineupArtist[] = [];
+  const seen = new Set<string>();
+
+  for (const item of lineupRows) {
+    const linked = first(item.artists);
+    const key = linked?.id ?? `name:${(item.artist_name ?? "").trim().toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    lineup.push({
+      id: linked?.id ?? null,
+      slug: linked?.slug ?? null,
+      name: linked?.name ?? item.artist_name ?? "",
+      city: linked?.city ?? null,
+      freeText: !linked,
+    });
+  }
+
+  if (lineup.length === 0 && artist) {
+    lineup.push({
+      id: artist.id,
+      slug: artist.slug,
+      name: artist.name,
+      city: artist.city,
+      freeText: false,
+    });
+  }
 
   // "Non reclamato" non è un campo salvato: è un fatto delle schede collegate.
   // L'evento l'ha messo OpenStage se **almeno una** delle due esiste e
@@ -163,6 +208,7 @@ export function toPublicEvent(row: EventRow): PublicEvent {
     artist: artist
       ? { id: artist.id, slug: artist.slug, name: artist.name, city: artist.city }
       : null,
+    lineup,
     venue: venue
       ? {
           id: venue.id,
@@ -357,8 +403,56 @@ async function listUpcomingBy(
   return (data as unknown as EventRow[]).map(toPublicEvent);
 }
 
-export function listUpcomingEventsByArtist(artistId: string, limit = 24): Promise<PublicEvent[]> {
-  return listUpcomingBy("artist_id", artistId, limit);
+/**
+ * Gli eventi in cui l'artista compare, anche quando non è il principale.
+ *
+ * La lineup è la verità, ma `events.artist_id` resta per compatibilità: si
+ * leggono entrambe e si uniscono. Se un giorno il backfill non basterà più,
+ * questa funzione continua a funzionare.
+ */
+async function lineupEventIds(artistId: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("event_artists")
+    .select("event_id")
+    .eq("artist_id", artistId);
+
+  if (error) {
+    console.error("[events] lineupEventIds:", error.message);
+    return [];
+  }
+
+  return (data as { event_id: string }[] | null)?.map((row) => row.event_id) ?? [];
+}
+
+function artistFilter(artistId: string, ids: string[]): string {
+  return ids.length > 0
+    ? `artist_id.eq.${artistId},id.in.(${ids.join(",")})`
+    : `artist_id.eq.${artistId}`;
+}
+
+export async function listUpcomingEventsByArtist(
+  artistId: string,
+  limit = 24
+): Promise<PublicEvent[]> {
+  const supabase = await createClient();
+  const ids = await lineupEventIds(artistId);
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(EVENT_SELECT)
+    .eq("status", "published")
+    .or(artistFilter(artistId, ids))
+    .gte("starts_at", new Date().toISOString())
+    .order("starts_at", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    console.error("[events] listUpcomingEventsByArtist:", error.message);
+    return [];
+  }
+
+  return (data as unknown as EventRow[]).map(toPublicEvent);
 }
 
 export function listUpcomingEventsByVenue(venueId: string, limit = 24): Promise<PublicEvent[]> {
@@ -403,8 +497,31 @@ async function listPastBy(
     .map(toPublicEvent);
 }
 
-export function listPastEventsByArtist(artistId: string, limit = 6): Promise<PublicEvent[]> {
-  return listPastBy("artist_id", artistId, limit);
+export async function listPastEventsByArtist(artistId: string, limit = 6): Promise<PublicEvent[]> {
+  const supabase = await createClient();
+  const ids = await lineupEventIds(artistId);
+  const now = new Date();
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(EVENT_SELECT)
+    .eq("status", "published")
+    .or(artistFilter(artistId, ids))
+    .lt("starts_at", now.toISOString())
+    .order("starts_at", { ascending: false })
+    .limit(limit * 2);
+
+  if (error) {
+    console.error("[events] listPastEventsByArtist:", error.message);
+    return [];
+  }
+
+  return (data as unknown as EventRow[])
+    .filter((row) =>
+      eventIsPast({ startsAt: row.starts_at, endsAt: row.ends_at, timezone: row.timezone }, now)
+    )
+    .slice(0, limit)
+    .map(toPublicEvent);
 }
 
 export function listPastEventsByVenue(venueId: string, limit = 6): Promise<PublicEvent[]> {

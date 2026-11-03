@@ -19,7 +19,7 @@ import {
 } from "@/lib/events/format";
 import { artistPath, eventPath, venuePath } from "@/lib/events/paths";
 import { listSavedEventIds } from "@/lib/events/queries";
-import { artistRepeatsTitle, isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
+import { isCancelled, placeName, type PublicEvent } from "@/lib/events/types";
 import { countryName } from "@/lib/geo/country";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { withLocale } from "@/lib/i18n/locale-path";
@@ -204,12 +204,37 @@ export default async function EventPageView({
             {event.title}
           </h1>
 
-          {event.artist && !artistRepeatsTitle(event) ? (
-            <p className="mt-3 text-lg text-white/80">
-              <Link href={artistPath(event.artist)} className="transition-colors hover:text-cyan">
-                {event.artist.name}
-              </Link>
-            </p>
+          {event.lineup.length > 0 ? (
+            (() => {
+              const names = event.lineup.map((item) => item.name.trim().toLowerCase()).join("|");
+              const repeats = names === event.title.trim().toLowerCase();
+              if (event.lineup.length === 1 && repeats) return null;
+
+              return (
+                <p className="mt-3 text-lg text-white/80">
+                  {event.lineup.length > 1 ? (
+                    <span className="mr-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                      {t.lineup}:
+                    </span>
+                  ) : null}
+                  {event.lineup.map((item, index) => (
+                    <span key={`${item.id ?? item.name}-${index}`}>
+                      {index > 0 ? <span className="text-muted"> · </span> : null}
+                      {item.slug ? (
+                        <Link
+                          href={artistPath({ slug: item.slug })}
+                          className="transition-colors hover:text-cyan"
+                        >
+                          {item.name}
+                        </Link>
+                      ) : (
+                        <span>{item.name}</span>
+                      )}
+                    </span>
+                  ))}
+                </p>
+              );
+            })()
           ) : null}
 
           {cancelled ? null : (
