@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 import { getArtistByProfileId } from "@/lib/directory/queries";
 import { createClient } from "@/lib/supabase/server";
@@ -35,6 +36,9 @@ export async function POST(request: Request) {
     console.error("[lineup] leave:", error.message);
     return NextResponse.json({ ok: false, error: "failed" }, { status: 400 });
   }
+
+  // La scheda evento è statica: senza questo, l'uscita non si vede.
+  revalidatePath("/", "layout");
 
   return NextResponse.json({ ok: true });
 }

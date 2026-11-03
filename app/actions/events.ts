@@ -331,6 +331,8 @@ export async function saveEventAction(input: {
 
     await saveLineup(supabase, data.id, artistId, input.lineupArtistIds);
 
+    if (input.lineupArtistIds !== undefined) revalidatePath("/", "layout");
+
     revalidatePath("/dashboard");
 
     return {
@@ -414,6 +416,10 @@ export async function saveEventAction(input: {
   if (!data) return { ok: false, error: "saveFailed" };
 
   await saveLineup(supabase, data.id, artistId, input.lineupArtistIds);
+
+  // La scheda pubblica è statica: senza questo, la lineup nuova non si vede
+  // finché la cache non scade da sola.
+  if (input.lineupArtistIds !== undefined) revalidatePath("/", "layout");
 
   revalidatePath("/dashboard");
 

@@ -34,5 +34,7 @@ export async function decideJoinRequestAction(input: {
 
   revalidatePath("/admin/richieste-lineup");
   revalidatePath("/admin");
+  // La lineup è cambiata: la scheda pubblica è statica e va rigenerata.
+  revalidatePath("/", "layout");
   return { ok: true };
 }
