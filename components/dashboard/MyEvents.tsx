@@ -203,79 +203,92 @@ export default function MyEvents({ events, verified, dict }: MyEventsProps) {
                     {archived ? (
                       <p className="mt-1 text-xs text-muted">{dict.pastNote}</p>
                     ) : null}
+                    {!event.canManage ? (
+                      <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.12em] text-violet">
+                        {dict.inLineupNote}
+                      </p>
+                    ) : null}
 
                     <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-                      <LocaleLink href={`/dashboard/events/${event.id}`} className={ghostButton}>
-                        {dict.edit}
-                      </LocaleLink>
-
-                      {event.status !== "published" && verified ? (
-                        <button
-                          type="button"
-                          disabled={busy !== null}
-                          onClick={() =>
-                            run(`publish-${event.id}`, () =>
-                              setEventStatusAction({ eventId: event.id, status: "published" })
-                            )
-                          }
-                          className={primaryButton}
-                        >
-                          {busy === `publish-${event.id}`
-                            ? event.status === "cancelled"
-                              ? dict.republishing
-                              : dict.publishing
-                            : event.status === "cancelled"
-                              ? dict.republish
-                              : dict.publish}
-                        </button>
-                      ) : null}
-
-                      {event.status === "published" ? (
+                      {event.canManage ? (
                         <>
-                          {!archived ? (
+                          <LocaleLink href={`/dashboard/events/${event.id}`} className={ghostButton}>
+                            {dict.edit}
+                          </LocaleLink>
+
+                          {event.status !== "published" && verified ? (
                             <button
                               type="button"
                               disabled={busy !== null}
-                              onClick={() => {
-                                setReason("");
-                                setCancellingId(event.id);
-                              }}
-                              className={ghostButton}
+                              onClick={() =>
+                                run(`publish-${event.id}`, () =>
+                                  setEventStatusAction({ eventId: event.id, status: "published" })
+                                )
+                              }
+                              className={primaryButton}
                             >
-                              {dict.cancelEvent}
+                              {busy === `publish-${event.id}`
+                                ? event.status === "cancelled"
+                                  ? dict.republishing
+                                  : dict.publishing
+                                : event.status === "cancelled"
+                                  ? dict.republish
+                                  : dict.publish}
                             </button>
                           ) : null}
 
-                          <LocaleLink href={eventPath(event)} className={ghostButton}>
-                            {dict.viewPublic}
-                          </LocaleLink>
-                        </>
-                      ) : null}
+                          {event.status === "published" ? (
+                            <>
+                              {!archived ? (
+                                <button
+                                  type="button"
+                                  disabled={busy !== null}
+                                  onClick={() => {
+                                    setReason("");
+                                    setCancellingId(event.id);
+                                  }}
+                                  className={ghostButton}
+                                >
+                                  {dict.cancelEvent}
+                                </button>
+                              ) : null}
 
-                      {event.status === "cancelled" ? (
+                              <LocaleLink href={eventPath(event)} className={ghostButton}>
+                                {dict.viewPublic}
+                              </LocaleLink>
+                            </>
+                          ) : null}
+
+                          {event.status === "cancelled" ? (
+                            <LocaleLink href={eventPath(event)} className={ghostButton}>
+                              {dict.viewPublic}
+                            </LocaleLink>
+                          ) : null}
+
+                          {/*
+                            L'eliminazione è per tutti gli stati, ma è l'ultima
+                            strada: chi ha una serata che non si tiene dovrebbe
+                            annullarla, così chi l'aveva salvata legge il motivo.
+                          */}
+                          <button
+                            type="button"
+                            disabled={busy !== null}
+                            onClick={() => {
+                              if (!window.confirm(dict.confirmDelete)) return;
+                              void run(`delete-${event.id}`, () =>
+                                deleteEventAction({ eventId: event.id })
+                              );
+                            }}
+                            className={dangerButton}
+                          >
+                            {busy === `delete-${event.id}` ? dict.deleting : dict.deleteEvent}
+                          </button>
+                        </>
+                      ) : (
                         <LocaleLink href={eventPath(event)} className={ghostButton}>
                           {dict.viewPublic}
                         </LocaleLink>
-                      ) : null}
-
-                      {/*
-                        L'eliminazione è per tutti gli stati, ma è l'ultima
-                        strada: chi ha una serata che non si tiene dovrebbe
-                        annullarla, così chi l'aveva salvata legge il motivo.
-                      */}
-                      <button
-                        type="button"
-                        disabled={busy !== null}
-                        onClick={() => {
-                          if (!window.confirm(dict.confirmDelete)) return;
-                          void run(`delete-${event.id}`, () =>
-                            deleteEventAction({ eventId: event.id })
-                          );
-                        }}
-                        className={dangerButton}
-                      >
-                        {busy === `delete-${event.id}` ? dict.deleting : dict.deleteEvent}
-                      </button>
+                      )}
                     </div>
 
                     {cancellingId === event.id ? (

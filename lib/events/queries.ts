@@ -419,7 +419,7 @@ async function listUpcomingBy(
  * leggono entrambe e si uniscono. Se un giorno il backfill non basterà più,
  * questa funzione continua a funzionare.
  */
-async function lineupEventIds(artistId: string): Promise<string[]> {
+export async function listLineupEventIds(artistId: string): Promise<string[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("event_artists")
@@ -427,7 +427,7 @@ async function lineupEventIds(artistId: string): Promise<string[]> {
     .eq("artist_id", artistId);
 
   if (error) {
-    console.error("[events] lineupEventIds:", error.message);
+    console.error("[events] listLineupEventIds:", error.message);
     return [];
   }
 
@@ -445,7 +445,7 @@ export async function listUpcomingEventsByArtist(
   limit = 24
 ): Promise<PublicEvent[]> {
   const supabase = await createClient();
-  const ids = await lineupEventIds(artistId);
+  const ids = await listLineupEventIds(artistId);
 
   const { data, error } = await supabase
     .from("events")
@@ -508,7 +508,7 @@ async function listPastBy(
 
 export async function listPastEventsByArtist(artistId: string, limit = 6): Promise<PublicEvent[]> {
   const supabase = await createClient();
-  const ids = await lineupEventIds(artistId);
+  const ids = await listLineupEventIds(artistId);
   const now = new Date();
 
   const { data, error } = await supabase
@@ -809,3 +809,4 @@ export async function listSimilarEvents(
     })
     .slice(0, limit);
 }
+

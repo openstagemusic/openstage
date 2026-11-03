@@ -1,7 +1,7 @@
 import { cache } from "react";
 
 import { getArtistByProfileId, getVenueByProfileId } from "@/lib/directory/queries";
-import { EVENT_SELECT, toPublicEvent, type EventRow } from "@/lib/events/queries";
+import { EVENT_SELECT, listLineupEventIds, toPublicEvent, type EventRow } from "@/lib/events/queries";
 import type { PublicEvent } from "@/lib/events/types";
 import { cityKey, preferredCityLabel } from "@/lib/geo/city";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +21,11 @@ export type DashboardEvent = PublicEvent & {
   status: DashboardStatus;
   /** Quando è stata salvata l'ultima volta: serve a non sovrascriversi a vicenda. */
   updatedAt: string;
+  /**
+   * Se questo profilo amministra la serata. Falso per le serate in cui è solo
+   * in lineup: si vedono, ma non si modificano.
+   */
+  canManage: boolean;
 };
 
 type DashboardRow = EventRow & { status: DashboardStatus; updated_at: string };
@@ -42,7 +47,10 @@ async function myEventFilters(profileId: string): Promise<string[]> {
 /** Gli eventi creati o collegati a questo profilo, in ordine di data. */
 export const listMyEvents = cache(async (profileId: string): Promise<DashboardEvent[]> => {
   const supabase = await createClient();
-  const filters = await myEventFilters(profileId);
+  const [filters, artist] = await Promise.all([
+    myEventFilters(profileId),
+    getArtistByProfileId(profileId),
+  ]);
 
   const { data, error } = await supabase
     .from("events")
@@ -55,10 +63,35 @@ export const listMyEvents = cache(async (profileId: string): Promise<DashboardEv
     return [];
   }
 
-  return (data as unknown as DashboardRow[]).map((row) => ({
+  const managed = (data as unknown as DashboardRow[]) ?? [];
+  const managedIds = new Set(managed.map((row) => row.id));
+
+  // Le serate in cui il profilo è **solo** in lineup: si vedono, perché ci
+  // suona, ma non si amministrano. Senza questo, un artista che entra in una
+  // serata creata da altri non la trova da nessuna parte.
+  const lineupIds = artist ? await listLineupEventIds(artist.id) : [];
+  const missing = lineupIds.filter((id) => !managedIds.has(id));
+
+  let lineupRows: DashboardRow[] = [];
+
+  if (missing.length > 0) {
+    const { data: extra, error: extraError } = await supabase
+      .from("events")
+      .select(`${EVENT_SELECT}, updated_at`)
+      .in("id", missing)
+      .order("starts_at", { ascending: true });
+
+    if (extraError) console.error("[dashboard] listMyEvents lineup:", extraError.message);
+    lineupRows = (extra as unknown as DashboardRow[]) ?? [];
+  }
+
+  const rows = [...managed, ...lineupRows].sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+
+  return rows.map((row) => ({
     ...toPublicEvent(row),
     status: row.status,
     updatedAt: row.updated_at,
+    canManage: managedIds.has(row.id),
   }));
 });
 
@@ -136,7 +169,13 @@ export const getMyEvent = cache(
 
     const row = data as unknown as DashboardRow;
 
-    return { ...toPublicEvent(row), status: row.status, updatedAt: row.updated_at };
+    return {
+      ...toPublicEvent(row),
+      status: row.status,
+      updatedAt: row.updated_at,
+      // Se arrivi qui, la serata è tua: la query filtra già i permessi.
+      canManage: true,
+    };
   }
 );
 

@@ -1,3 +1,4 @@
+import { listLineupEventIds } from "@/lib/events/queries";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -135,12 +136,37 @@ export async function getProfileAnalytics({
   const previousStart = dayBefore(days * 2);
   const today = isoDay(utcToday());
 
-  const { data: eventRows } = await supabase
-    .from("events")
-    .select("id, title, city, slug, starts_at, status")
-    .eq("created_by", profileId)
-    .order("starts_at", { ascending: false })
-    .limit(200);
+  const eventFilters = [`created_by.eq.${profileId}`];
+  eventFilters.push(role === "artist" ? `artist_id.eq.${pageId}` : `venue_id.eq.${pageId}`);
+
+  // Un artista in lineup suona anche in serate che non ha creato: senza queste,
+  // le statistiche raccontano solo metà del suo cartellone.
+  const lineupIds = role === "artist" ? await listLineupEventIds(pageId) : [];
+
+  const [managedResult, lineupResult] = await Promise.all([
+    supabase
+      .from("events")
+      .select("id, title, city, slug, starts_at, status")
+      .or(eventFilters.join(","))
+      .order("starts_at", { ascending: false })
+      .limit(200),
+    lineupIds.length > 0
+      ? supabase
+          .from("events")
+          .select("id, title, city, slug, starts_at, status")
+          .in("id", lineupIds)
+          .limit(200)
+      : Promise.resolve({ data: [] as Record<string, unknown>[], error: null }),
+  ]);
+
+  const merged = new Map<string, Record<string, unknown>>();
+  for (const row of [...(managedResult.data ?? []), ...(lineupResult.data ?? [])]) {
+    merged.set(row.id as string, row);
+  }
+
+  const eventRows = [...merged.values()]
+    .sort((a, b) => String(b.starts_at).localeCompare(String(a.starts_at)))
+    .slice(0, 200);
 
   const events = (eventRows ?? []).map((row) => ({
     id: row.id as string,

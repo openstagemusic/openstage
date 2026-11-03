@@ -2597,6 +2597,8 @@ requests: {
     edit: "Edit",
     draftNote: "Not visible to the public yet.",
     pastNote: "This event has already happened: the page stays readable.",
+    inLineupNote:
+      "You are on the bill: the organiser manages this night. You can leave from the public page.",
     cancelledNote:
       "Cancelled: no longer in search, but the page stays online with the reason.",
     cancelReasonLabel: "Why are you cancelling? (optional — it shows on the public page)",

@@ -2603,6 +2603,8 @@ requests: {
     edit: "Modifica",
     draftNote: "Non è ancora visibile al pubblico.",
     pastNote: "Serata già andata: la pagina resta leggibile.",
+    inLineupNote:
+      "Sei in lineup: la serata la gestisce chi l'ha creata. Puoi uscirne dalla scheda pubblica.",
     cancelledNote:
       "Annullato: non compare più nella ricerca, ma la pagina resta raggiungibile con il motivo.",
     cancelReasonLabel: "Perché annulli? (facoltativo — si legge sulla pagina pubblica)",
