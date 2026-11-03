@@ -100,6 +100,18 @@ export async function POST(request: Request) {
   const message = (body.message ?? "").trim().slice(0, 400);
 
   const supabase = await createClient();
+
+  // Già in lineup: non serve una richiesta. Succede quando il controllo
+  // «esiste già questa serata?» propone una serata in cui l'artista è già.
+  const { data: inLineup } = await supabase
+    .from("event_artists")
+    .select("artist_id")
+    .eq("event_id", eventId)
+    .eq("artist_id", artist.id)
+    .maybeSingle();
+
+  if (inLineup) return NextResponse.json({ ok: true, state: "member" });
+
   const { error } = await supabase.from("event_join_requests").insert({
     event_id: eventId,
     artist_id: artist.id,

@@ -179,6 +179,9 @@ export default function EventEditor({
   const [searchingLineup, setSearchingLineup] = useState(false);
   // Serate che assomigliano a questa: si avvisa, non si blocca.
   const [duplicates, setDuplicates] = useState<SimilarEvent[]>([]);
+  // Quando l'artista sceglie una serata già esistente invece di crearne una.
+  const [joinRequested, setJoinRequested] = useState<string | null>(null);
+  const [joinBusy, setJoinBusy] = useState<string | null>(null);
   const pendingStatus = useRef<"draft" | "published" | "cancelled">("draft");
   const [errors, setErrors] = useState<Partial<Record<EditorField, EditorErrorCode>>>({});
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
@@ -352,6 +355,37 @@ export default function EventEditor({
 
   function removeFromLineup(id: string) {
     setLineup((current) => current.filter((item) => item.id !== id));
+  }
+
+  /**
+   * «Unisciti» invece di «crea comunque».
+   *
+   * È il caso che genera i doppioni: un artista sta per creare una serata che
+   * esiste già. Qui chiede di entrare in quella, e la serata resta una sola.
+   */
+  async function askToJoinExisting(id: string) {
+    setJoinBusy(id);
+
+    try {
+      const response = await fetch("/api/lineup/join", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ eventId: id }),
+      });
+      const payload = (await response.json()) as { ok?: boolean };
+
+      if (!payload.ok) {
+        setMessage({ tone: "error", text: t.joinExistingFailed });
+        return;
+      }
+
+      setJoinRequested(id);
+      setMessage(null);
+    } catch {
+      setMessage({ tone: "error", text: t.joinExistingFailed });
+    } finally {
+      setJoinBusy(null);
+    }
   }
 
   // La mappa vola su un posto scelto fuori dalla mappa (locale collegato o città
@@ -1352,6 +1386,23 @@ export default function EventEditor({
                   >
                     {t.duplicateSee}
                   </a>
+
+                  {artistLocked ? (
+                    joinRequested === item.id ? (
+                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
+                        {t.joinExistingSent}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void askToJoinExisting(item.id)}
+                        disabled={joinBusy !== null}
+                        className="inline-flex min-h-9 items-center border border-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan disabled:opacity-40"
+                      >
+                        {joinBusy === item.id ? t.joinExistingSending : t.joinExisting}
+                      </button>
+                    )
+                  ) : null}
                 </li>
               ))}
             </ul>

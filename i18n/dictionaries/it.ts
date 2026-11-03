@@ -2727,6 +2727,10 @@ requests: {
     duplicatesTitle: "Esiste già una serata simile",
     duplicatesHint:
       "Non è un errore: controlla che non sia la stessa. Se è un'altra serata, creala comunque.",
+    joinExisting: "Unisciti a questa",
+    joinExistingSending: "Invio…",
+    joinExistingSent: "Richiesta inviata",
+    joinExistingFailed: "Non è stato possibile inviare la richiesta. Riprova.",
     duplicateSee: "Vedi",
     duplicateCreateAnyway: "Crea comunque",
     duplicateCancel: "No, torna al modulo",

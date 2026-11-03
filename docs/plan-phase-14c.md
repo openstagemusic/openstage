@@ -46,10 +46,20 @@ delle richieste di lineup.
 ## Cosa non entra (blocchi successivi)
 
 - «Chiedi una modifica» con coda dedicata.
-- Controllo «serata già esistente» nel form di creazione (esiste già
-  `findSimilarEvents`: va collegato al pulsante «Unisciti»).
 - Statistiche dashboard per artista in lineup.
 - Fusioni con unione delle lineup.
+
+## Controllo duplicati con «Unisciti» (fatto il 3 novembre 2026)
+
+Quando il salvataggio trova una serata simile, l'artista non ha più solo due
+strade (creare comunque o annullare): accanto a ogni serata c'è **«Unisciti a
+questa»**, che invia la richiesta di ingresso in lineup. La serata resta una
+sola. Per un locale il pulsante non compare: non è un artista, e la serata
+esistente si apre e si gestisce.
+
+Il server rifiuta la richiesta se l'artista è già in lineup (risponde
+`state: member`): il caso si presenta proprio qui, quando la serata proposta è
+quella in cui suona già.
 
 ## Come si prova
 

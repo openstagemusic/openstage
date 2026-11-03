@@ -2721,6 +2721,10 @@ requests: {
     duplicatesTitle: "A similar night already exists",
     duplicatesHint:
       "This is not an error: check it is not the same one. If it is a different night, create it anyway.",
+    joinExisting: "Join this one",
+    joinExistingSending: "Sending…",
+    joinExistingSent: "Request sent",
+    joinExistingFailed: "We could not send the request. Try again.",
     duplicateSee: "See",
     duplicateCreateAnyway: "Create anyway",
     duplicateCancel: "No, back to the form",
