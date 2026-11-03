@@ -2733,6 +2733,12 @@ requests: {
     joinExistingSending: "Invio…",
     joinExistingSent: "Richiesta inviata",
     joinExistingFailed: "Non è stato possibile inviare la richiesta. Riprova.",
+    joinModalEyebrow: "Richiesta inviata",
+    joinModalTitle: "La serata esiste già",
+    joinModalText:
+      "La tua richiesta per «{event}» è in attesa di approvazione. Non serve creare un'altra serata: resta una sola, e la troverai anche sulla tua pagina.",
+    joinModalOpen: "Vai alla serata",
+    joinModalBack: "Torna alla dashboard",
     duplicateSee: "Vedi",
     duplicateCreateAnyway: "Crea comunque",
     duplicateCancel: "No, torna al modulo",

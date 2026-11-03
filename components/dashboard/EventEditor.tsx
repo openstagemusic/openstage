@@ -179,8 +179,8 @@ export default function EventEditor({
   const [searchingLineup, setSearchingLineup] = useState(false);
   // Serate che assomigliano a questa: si avvisa, non si blocca.
   const [duplicates, setDuplicates] = useState<SimilarEvent[]>([]);
-  // Quando l'artista sceglie una serata già esistente invece di crearne una.
-  const [joinRequested, setJoinRequested] = useState<string | null>(null);
+  // Quando l'artista sceglie una serata già esistente: il modulo si chiude.
+  const [joinedEvent, setJoinedEvent] = useState<SimilarEvent | null>(null);
   const [joinBusy, setJoinBusy] = useState<string | null>(null);
   const pendingStatus = useRef<"draft" | "published" | "cancelled">("draft");
   const [errors, setErrors] = useState<Partial<Record<EditorField, EditorErrorCode>>>({});
@@ -361,16 +361,18 @@ export default function EventEditor({
    * «Unisciti» invece di «crea comunque».
    *
    * È il caso che genera i doppioni: un artista sta per creare una serata che
-   * esiste già. Qui chiede di entrare in quella, e la serata resta una sola.
+   * esiste già. Qui chiede di entrare in quella, e il modulo si chiude subito:
+   * restare sul form con «Pubblica» a portata di mano è il modo più facile per
+   * creare comunque la seconda serata.
    */
-  async function askToJoinExisting(id: string) {
-    setJoinBusy(id);
+  async function askToJoinExisting(item: SimilarEvent) {
+    setJoinBusy(item.id);
 
     try {
       const response = await fetch("/api/lineup/join", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ eventId: id }),
+        body: JSON.stringify({ eventId: item.id }),
       });
       const payload = (await response.json()) as { ok?: boolean };
 
@@ -379,7 +381,7 @@ export default function EventEditor({
         return;
       }
 
-      setJoinRequested(id);
+      setJoinedEvent(item);
       setMessage(null);
     } catch {
       setMessage({ tone: "error", text: t.joinExistingFailed });
@@ -694,10 +696,49 @@ export default function EventEditor({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      {joinedEvent ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="join-ok-title"
+        >
+          <div className="absolute inset-0 bg-black/80" />
+          <div className="relative w-full max-w-md border border-cyan/40 bg-bg p-6 shadow-[0_30px_80px_rgba(0,0,0,.6)]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan">
+              {t.joinModalEyebrow}
+            </p>
+            <h2 id="join-ok-title" className="mt-3 font-display text-xl font-semibold">
+              {t.joinModalTitle}
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              {t.joinModalText.replace("{event}", joinedEvent.title)}
+            </p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a
+                href={`/${locale}${joinedEvent.path}`}
+                className="inline-flex min-h-11 items-center bg-violet-strong px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:bg-violet"
+              >
+                {t.joinModalOpen}
+              </a>
+              <button
+                type="button"
+                onClick={() => router.push(`/${locale}/dashboard`)}
+                className="inline-flex min-h-11 items-center border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+              >
+                {t.joinModalBack}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <form
         className="min-w-0"
         onSubmit={(event) => {
           event.preventDefault();
+          if (joinedEvent) return;
           void submit(mode === "create" ? "draft" : currentStatus);
         }}
       >
@@ -1388,20 +1429,14 @@ export default function EventEditor({
                   </a>
 
                   {artistLocked ? (
-                    joinRequested === item.id ? (
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-cyan">
-                        {t.joinExistingSent}
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => void askToJoinExisting(item.id)}
-                        disabled={joinBusy !== null}
-                        className="inline-flex min-h-9 items-center border border-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan disabled:opacity-40"
-                      >
-                        {joinBusy === item.id ? t.joinExistingSending : t.joinExisting}
-                      </button>
-                    )
+                    <button
+                      type="button"
+                      onClick={() => void askToJoinExisting(item)}
+                      disabled={joinBusy !== null}
+                      className="inline-flex min-h-9 items-center border border-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-colors hover:border-cyan hover:text-cyan disabled:opacity-40"
+                    >
+                      {joinBusy === item.id ? t.joinExistingSending : t.joinExisting}
+                    </button>
                   ) : null}
                 </li>
               ))}

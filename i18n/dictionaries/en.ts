@@ -2727,6 +2727,12 @@ requests: {
     joinExistingSending: "Sending…",
     joinExistingSent: "Request sent",
     joinExistingFailed: "We could not send the request. Try again.",
+    joinModalEyebrow: "Request sent",
+    joinModalTitle: "The night already exists",
+    joinModalText:
+      "Your request for «{event}» is waiting for approval. You do not need to create another night: it stays one, and it will also appear on your page.",
+    joinModalOpen: "Open the night",
+    joinModalBack: "Back to dashboard",
     duplicateSee: "See",
     duplicateCreateAnyway: "Create anyway",
     duplicateCancel: "No, back to the form",
