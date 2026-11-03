@@ -76,3 +76,7 @@ Al 3 novembre **nessun evento ha `artist_id`**: la colonna è vuota su tutte le
 serate. Quindi la sezione artisti delle schede è vuota ovunque, e il backfill non
 ha copiato niente. Il primo uso reale sarà quando si collega un artista a una
 serata dall'editor.
+
+**Aggiornamento:** la semifinale di Nuovi Suoni all'NXT dell'8 novembre ha in
+lineup **Safiye, Matteo Due e ODE** (cartellone confermato). È l'unica serata con
+artisti collegati, ed è quella che si usa per verificare schede e statistiche.
