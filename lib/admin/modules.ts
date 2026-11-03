@@ -31,6 +31,13 @@ export const ADMIN_MODULES: AdminModule[] = [
     status: "active",
     labelKey: "outreach",
   },
+  {
+    key: "outreachChannels",
+    href: "/admin/outreach/canali",
+    group: "people",
+    status: "active",
+    labelKey: "outreachChannels",
+  },
   { key: "events", href: "/admin/eventi", group: "content", status: "active", labelKey: "events" },
   { key: "drafts", href: "/admin/bozze", group: "content", status: "active", labelKey: "drafts" },
   { key: "reports", href: "/admin/segnalazioni", group: "content", status: "active", labelKey: "reports" },

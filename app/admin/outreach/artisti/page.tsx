@@ -100,6 +100,12 @@ export default async function AdminOutreachArtistsPage() {
         >
           {t.openDirectory}
         </LocaleLink>
+        <LocaleLink
+          href="/admin/outreach/canali"
+          className="border-b border-line pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-cyan hover:text-cyan"
+        >
+          {dict.admin.outreachChannels.title}
+        </LocaleLink>
       </div>
     </div>
   );
