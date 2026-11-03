@@ -6,14 +6,24 @@ Un'evidenza vuota, aperta, mostra il nulla: meglio meno evidenze ma piene.
 
 ## Da fare (B124)
 
-1. Generare **9 storie verticali 1080×1920** in `public/brand/storie/`, stesso
-   stile dei post (`public/brand/instagram/`): sfondo `#07070D`, gradienti
-   viola/ciano/rosa, Space Grotesk + Inter + JetBrains Mono, logo `OPEN/STAGE`.
-2. Pubblicarle come storie normali e toccare **«Evidenzia»** → cartella giusta.
-3. **Eliminare l'evidenza `MILANO`** (menu sull'evidenza → Elimina) finché non ci
-   sono serate reali a Milano.
+1. ~~Generare 9 storie verticali 1080×1920~~ **fatto il 3 novembre**: file in
+   `public/brand/storie/`, online su `https://getopenstage.it/brand/storie/<nome>.jpg`.
+2. Pubblicarle come storie normali, **in ordine**, e toccare «Evidenzia» → cartella.
+3. ~~Eliminare l'evidenza `MILANO`~~ **fatto il 3 novembre**.
 4. Rinominare `SERATE` in `COME FUNZIONA` se il contenuto parla dei filtri e
    della scheda (più chiaro di «serate», che sembra programmazione).
+
+### Ordine di pubblicazione
+
+| Cartella | File, nell'ordine |
+| --- | --- |
+| **BERGAMO** | `01-bergamo-mappa.jpg` → `02-bergamo-serate.jpg` → `03-bergamo-scheda.jpg` |
+| **SERATE / COME FUNZIONA** | `04-come-funziona-filtri.jpg` → `05-come-funziona-salva.jpg` → `06-come-funziona-aggiornata.jpg` |
+| **INFO** | `07-info-cose.jpg` → `08-info-regole.jpg` → `09-info-reclama.jpg` |
+
+Nella raccolta conta l'ordine di pubblicazione: la prima pubblicata è la prima
+che si vede aprendo l'evidenza. Pubblica dalla 1 alla 3, non al contrario.
+
 
 ## Contenuti (sempre veri, niente programmazione settimanale)
 
