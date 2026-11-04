@@ -1,8 +1,8 @@
-# TikTok @getopenstage — tre video pronti
+# TikTok @getopenstage — copioni e descrizioni
 
 Immagini in `public/brand/tiktok/`, verticali 1080×1920.
-Formato: **carosello foto** (Photo Mode) o video con le card in sequenza.
-Durata: 15–20 secondi. Un video a settimana, sempre lo stesso giorno.
+Formato: carosello foto (Photo Mode) o video con le card in sequenza.
+Durata: 15–20 secondi.
 
 **Audio.** Non usare la canzone della band se non hai i diritti: TikTok la
 silenzierebbe. Usa un sound indie in tendenza, oppure una registrazione tua dal
@@ -12,73 +12,104 @@ vivo.
 
 ## Video 1 — Cos'è OpenStage
 
-Card: `01-cose-1` → `01-cose-5` (3 secondi l'una)
+**Titolo (prima riga, quella che si legge nel feed):**
+`Ogni settimana a Bergamo ci sono 20 serate. Tu ne scopri tre.`
 
-| Card | Testo a schermo | Voce fuori campo (facoltativa) |
-| --- | --- | --- |
-| 1 | Ogni settimana ci sono 20 serate. Ne scopri tre. | «Ogni settimana a Bergamo ci sono venti serate.» |
-| 2 | Le altre finiscono tra storie, locandine e gruppi WhatsApp. | — |
-| 3 | OpenStage le mette su una mappa. | «Apri, guarda i pin, esci di casa.» |
-| 4 | Date vere. Locali veri. Nessun pay-to-play. | — |
-| 5 | Sempre gratis. Per tutti. getopenstage.it | «Gratis, per sempre.» |
-
-**Didascalia**
+**Descrizione:**
 
 ```
-Le serate della tua città, su una mappa. Gratis.
-#bergamo #bergamomusica #concertibergamo #musicadalvivo #indieitaliano
+Ogni settimana a Bergamo ci sono venti serate. Tu ne scopri tre.
+
+Le altre finiscono tra storie che scadono, locandine salvate e gruppi WhatsApp dove il messaggio si perde in due ore.
+
+OpenStage è la mappa gratuita della musica dal vivo: date, locali e band della tua città in un posto solo. Apri, guarda i pin, esci di casa. Senza saltare tra dieci profili diversi e senza chiedere a nessuno «ma stasera cosa c'è?».
+
+Nessuna pubblicità, nessun pay-to-play, nessun algoritmo che decide chi merita un palco. Chi suona non paga per esserci, chi ascolta non paga per cercare.
+
+Se sei un locale o una band, la scheda si reclama ed è tua: aggiorni le serate, le foto e i contatti, e la mappa resta viva.
+
+Date vere. Locali veri. Band vere. Tutte su getopenstage.it 👉 link in bio.
+
+#bergamo #bergamomusica #concertibergamo #musicadalvivo #indieitaliano #localidabergamo
 ```
 
 ---
 
 ## Video 2 — Questa settimana (6–8 novembre)
 
-Card: `02-settimana-1` → `02-settimana-5`
+**Titolo:**
+`Cosa fare a Bergamo questo weekend: otto serate dal 6 all'8 novembre`
 
-| Card | Testo a schermo |
-| --- | --- |
-| 1 | Questa settimana a Bergamo. |
-| 2 | Venerdì 6 — Amarsi Male · NXT (gratis) · Video Killed · Daste (10 €) |
-| 3 | Sabato 7 — Born to be 80s · NXT (gratis) · Calibro 35 · Druso (da 25 €) |
-| 4 | Domenica 8 — Cek & The Stompers · Druso (10 €) · Nuovi Suoni · NXT (semifinale) |
-| 5 | Sei serate. Una mappa. getopenstage.it |
-
-**Didascalia**
+**Descrizione:**
 
 ```
-Sei serate in tre giorni. Scegli la tua.
-#bergamo #bergamomusica #weekendabergamo #concertibergamo #drusobg #nxtbergamo #dastebergamo
+Cosa fare a Bergamo questo weekend? Otto serate in tre giorni, e sono tutte sulla mappa.
+
+Venerdì 6
+· Amarsi Male al NXT (21:00, gratis)
+· Video Killed the Radio Star al Daste (22:00, 80s party)
+
+Sabato 7
+· Born to be 80s al NXT (21:00, gratis)
+· Calibro 35 vs L.A. al Druso (22:00, da 25 €)
+· Lightroom — Gender Reveal Party al Daste (22:00, ingresso libero)
+
+Domenica 8
+· Cek & The Stompers al Druso (18:00, 10 €)
+· The Box — Techno Toast al Daste (dalle 14:00, biglietti su DICE)
+· Nuovi Suoni Live, semifinale al NXT (21:00)
+
+Dal blues al funk, dall'indie al party: c'è roba per chi vuole ascoltare e per chi vuole ballare. Ogni serata ha la sua scheda con orario, prezzo, indirizzo e biglietti — su getopenstage.it 👉 link in bio.
+
+Salva il video e mandalo a chi dice sempre «non c'è mai niente da fare».
+
+#bergamo #bergamomusica #weekendabergamo #concertibergamo #drusobg #nxtbergamo #dastebergamo #musicadalvivo
 ```
 
 ---
 
 ## Video 3 — Come si legge una scheda
 
-Card: `03-scheda-1` → `03-scheda-5`
+**Titolo:**
+`Come trovare una serata a Bergamo senza perdere mezz'ora`
 
-| Card | Testo a schermo |
-| --- | --- |
-| 1 | Una serata, una pagina. |
-| 2 | Data e ora, senza cercarle nei commenti. |
-| 3 | Il locale, l'indirizzo e la mappa. |
-| 4 | Quanto costa. Dove si compra. |
-| 5 | Il resto è musica. getopenstage.it |
-
-**Didascalia**
+**Descrizione:**
 
 ```
-Data, ora, prezzo, indirizzo e biglietti: tutto in una pagina.
-#bergamo #musicadalvivo #concertibergamo #indieitaliano #openstage
+Come trovare una serata a Bergamo senza perdere mezz'ora tra storie e locandine.
+
+Su OpenStage ogni serata ha una pagina sola. Dentro c'è tutto quello che serve prima di uscire di casa:
+
+· quando — data e ora, senza cercarle nei commenti
+· dove — il locale, l'indirizzo e la mappa per arrivarci
+· quanto — prezzo e ingresso gratuito, scritti chiaramente
+· biglietti — il link diretto alla prevendita, quando esiste
+
+Niente «ma a che ora inizia?», niente post di tre settimane fa con la data vecchia, niente informazioni perse tra i commenti.
+
+E se una data cambia, la scheda cambia con lei: la mappa resta aggiornata, e chi l'aveva salvata non si presenta a un concerto annullato.
+
+Apri getopenstage.it 👉 link in bio, cerca la tua città e guarda cosa c'è stasera.
+
+#bergamo #bergamomusica #concertibergamo #musicadalvivo #indieitaliano #openstage
 ```
 
 ---
 
+## Una cosa onesta sulla lunghezza
+
+Le descrizioni lunghe aiutano perché TikTok le legge come **testo di ricerca**:
+se qualcuno cerca «concerti Bergamo» o «cosa fare a Bergamo», una caption con
+quelle parole ha più possibilità di uscire. Ma non triplicano le visualizzazioni
+da sole: contano le prime 3 card, il primo secondo e quante persone arrivano in
+fondo.
+
+Quindi: descrizione lunga **e** prime card che si leggono in due secondi.
+
 ## Regole pratiche
 
-- **Testo grande**: su TikTok si guarda senza audio, il testo deve leggersi in
-  due secondi.
-- **Primo secondo**: la card 1 deve dire subito di cosa si parla. Niente loghi
-  animati.
+- **Testo grande**: si guarda senza audio, deve leggersi in due secondi.
+- **Primo secondo**: la card 1 dice subito di cosa si parla. Niente loghi animati.
 - **Un video a settimana**, sempre lo stesso giorno (giovedì sera funziona: la
   gente programma il weekend).
 - **Rispondi ai commenti** con una serata vera: è così che un video diventa

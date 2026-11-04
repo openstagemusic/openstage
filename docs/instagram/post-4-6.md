@@ -12,17 +12,19 @@ Questo weekend a Bergamo si suona. 🎶
 
 Venerdì 6
 · Amarsi Male al NXT (21:00, gratis)
-· Video Killed the Radio Star al Daste (22:00, 10 €)
+· Video Killed the Radio Star al Daste (22:00, 80s party)
 
 Sabato 7
 · Born to be 80s al NXT (21:00, gratis)
 · Calibro 35 vs L.A. al Druso (22:00, da 25 €)
+· Lightroom al Daste (22:00, ingresso libero)
 
 Domenica 8
 · Cek & The Stompers al Druso (18:00, 10 €)
+· The Box — Techno Toast al Daste (dalle 14:00, DICE)
 · Nuovi Suoni Live, semifinale al NXT (21:00)
 
-Sei serate, tre giorni. Le trovi tutte su getopenstage.it.
+Otto serate, tre giorni. Le trovi tutte su getopenstage.it.
 
 @nxtbergamo @daste_bergamo @drusobg
 
