@@ -80,7 +80,7 @@ e orari della fonte:
 | Data | Ora | Locale | Evento | Ingresso |
 | --- | --- | --- | --- | --- |
 | dom 8 nov | 18:00 | Druso | Cek and the Stompers | 10 € |
-| mer 11 nov | 18:00 | Druso | Biondini Bandini Mazzucconi interpretano Guccini | 15 € |
+| dom 13 dic | 18:00 | Druso | Biondini Bandini Mazzucconi interpretano Guccini | 15 € |
 | ven 13 nov | 22:00 | Druso | Santamarea (opening Martina Marchetti) | 15 € |
 | sab 21 nov | 23:00 | Druso | Indie Power | 8 € |
 | sab 28 nov | 22:00 | Druso | Savana Funk | 15 € |
@@ -95,6 +95,13 @@ Capovilla, che era già online senza immagine.
 **Da verificare:** «Biondini Bandini Mazzucconi interpretano Guccini» (11 nov)
 risulta su mailticket ma **non** nel calendario del sito del Druso. Possibile
 annullamento o mancata pubblicazione: senza conferma, la serata va tolta.
+
+**Corretto (4 novembre):** la pagina del biglietto dice **domenica 13 dicembre**,
+non 11 novembre. La lista del locale riportava una data sbagliata. Serata
+spostata e collegata alle prevendite.
+
+**Descrizioni e link biglietti (4 novembre):** tutte e cinque le serate Druso
+hanno ora una descrizione vera (fonte: mailticket) e il link «Biglietti».
 
 | Data | Ora | Locale | Evento | Ingresso | Scheda |
 | --- | --- | --- | --- | --- | --- |
