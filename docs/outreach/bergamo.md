@@ -87,6 +87,15 @@ e orari della fonte:
 
 Portano le serate future da 9 a 14.
 
+**Locandine (4 novembre):** cinque copertine prese dal sito del Druso
+(`drusobg.com/event-list`), ridimensionate e caricate sul nostro Storage —
+Cek and the Stompers, Santamarea, Indie Power, Savana Funk e anche Pierpaolo
+Capovilla, che era già online senza immagine.
+
+**Da verificare:** «Biondini Bandini Mazzucconi interpretano Guccini» (11 nov)
+risulta su mailticket ma **non** nel calendario del sito del Druso. Possibile
+annullamento o mancata pubblicazione: senza conferma, la serata va tolta.
+
 | Data | Ora | Locale | Evento | Ingresso | Scheda |
 | --- | --- | --- | --- | --- | --- |
 | ven 6 nov | 21:00 | NXT Platz | Amarsi Male | gratis | `/eventi/bergamo/amarsi-male` |
