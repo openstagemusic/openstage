@@ -111,6 +111,10 @@ online, con link DICE per Video Killed the Radio Star e The Peawees. Fonti:
 (7/11) e The Box — Techno Toast (8/11). Segnalate, non pubblicate: sono party,
 fuori dal target indie.
 
+**Pubblicate il 4 novembre:** Lightroom (7/11, ingresso libero) e The Box
+(8/11, techno toast con brunch su prenotazione), con locandina dal sito del
+Daste e biglietti DICE per The Box. Portano le serate future a 16.
+
 | Data | Ora | Locale | Evento | Ingresso | Scheda |
 | --- | --- | --- | --- | --- | --- |
 | ven 6 nov | 21:00 | NXT Platz | Amarsi Male | gratis | `/eventi/bergamo/amarsi-male` |
