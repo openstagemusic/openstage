@@ -103,6 +103,14 @@ spostata e collegata alle prevendite.
 **Descrizioni e link biglietti (4 novembre):** tutte e cinque le serate Druso
 hanno ora una descrizione vera (fonte: mailticket) e il link «Biglietti».
 
+**NXT e Daste (4 novembre):** descrizioni riscritte per le sette serate già
+online, con link DICE per Video Killed the Radio Star e The Peawees. Fonti:
+`dastebergamo.com/eventi`, DICE, Eppen, Facebook NXT.
+
+**Non ancora in mappa, dal sito del Daste:** Lightroom — Gender Reveal Party
+(7/11) e The Box — Techno Toast (8/11). Segnalate, non pubblicate: sono party,
+fuori dal target indie.
+
 | Data | Ora | Locale | Evento | Ingresso | Scheda |
 | --- | --- | --- | --- | --- | --- |
 | ven 6 nov | 21:00 | NXT Platz | Amarsi Male | gratis | `/eventi/bergamo/amarsi-male` |
