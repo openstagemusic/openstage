@@ -74,6 +74,19 @@ testi copiati, niente foto senza permesso.
 
 Sei serate create e online, col locale collegato:
 
+**Aggiunte il 4 novembre dal calendario del Druso** (`mailticket.it`), con prezzi
+e orari della fonte:
+
+| Data | Ora | Locale | Evento | Ingresso |
+| --- | --- | --- | --- | --- |
+| dom 8 nov | 18:00 | Druso | Cek and the Stompers | 10 € |
+| mer 11 nov | 18:00 | Druso | Biondini Bandini Mazzucconi interpretano Guccini | 15 € |
+| ven 13 nov | 22:00 | Druso | Santamarea (opening Martina Marchetti) | 15 € |
+| sab 21 nov | 23:00 | Druso | Indie Power | 8 € |
+| sab 28 nov | 22:00 | Druso | Savana Funk | 15 € |
+
+Portano le serate future da 9 a 14.
+
 | Data | Ora | Locale | Evento | Ingresso | Scheda |
 | --- | --- | --- | --- | --- | --- |
 | ven 6 nov | 21:00 | NXT Platz | Amarsi Male | gratis | `/eventi/bergamo/amarsi-male` |
