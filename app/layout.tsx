@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Anton, IBM_Plex_Mono, Inter, Space_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
 
@@ -178,6 +179,7 @@ export default async function RootLayout({
             />
           ) : null}
         </LocaleProvider>
+        <Analytics />
       </body>
     </html>
   );
