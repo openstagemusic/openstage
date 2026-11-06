@@ -87,6 +87,12 @@ e orari della fonte:
 
 Portano le serate future da 9 a 14.
 
+**Finale Nuovi Suoni (6 novembre):** pubblicata la finale del **29 novembre al
+Daste**, ore 21:00. Il comunicato del Comune dice «indicativamente dalle 21:00
+alle 00:00», quindi l'orario è segnato come indicativo nella descrizione. I
+finalisti sono **tre**, confermato dal bando. Il prezzo non è dichiarato: la
+scheda mostra «Prezzo da definire».
+
 **Locandine (4 novembre):** cinque copertine prese dal sito del Druso
 (`drusobg.com/event-list`), ridimensionate e caricate sul nostro Storage —
 Cek and the Stompers, Santamarea, Indie Power, Savana Funk e anche Pierpaolo
