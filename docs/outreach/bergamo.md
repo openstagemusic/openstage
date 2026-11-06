@@ -93,6 +93,9 @@ alle 00:00», quindi l'orario è segnato come indicativo nella descrizione. I
 finalisti sono **tre**, confermato dal bando. Il prezzo non è dichiarato: la
 scheda mostra «Prezzo da definire».
 
+**Da fare quando esce:** caricare la **locandina della finale** sulla scheda
+(`cover_image_url`). Oggi la scheda non ha copertina.
+
 **Locandine (4 novembre):** cinque copertine prese dal sito del Druso
 (`drusobg.com/event-list`), ridimensionate e caricate sul nostro Storage —
 Cek and the Stompers, Santamarea, Indie Power, Savana Funk e anche Pierpaolo
