@@ -262,6 +262,24 @@ scheda), `starts_at`, `city`, `city_key`, `status` (**enum**: `draft`/`published
 `merged_status`, `auto_hidden_at`, `auto_hidden_status`. **`is_unclaimed` non esiste più**:
 lo stato "inserito da OpenStage" si calcola dall'assenza dei `profile_id` collegati.
 
+**`event_artists`** — la lineup di una serata (Fase 14C).
+`id`, `event_id` (cascade), `artist_id` (nullable, `on delete restrict`) **oppure**
+`artist_name` (testo libero, per chi non ha una scheda: uno dei due, mai entrambi),
+`position` (0 = principale, 101+ gli altri, 201+ i nomi scritti a mano). Un artista con
+scheda compare una volta sola per serata (indice unico parziale). `events.artist_id` resta
+come **artista principale** per compatibilità, ma la verità è la tabella.
+
+**`event_join_requests`** — «sono in questa serata» (Fase 14C).
+`id`, `event_id`, `artist_id`, `message`, `status` (`pending`/`approved`/`rejected`),
+`decided_by`, `decided_at`, `created_at`. Una sola richiesta aperta per coppia serata/artista
+(indice unico parziale su `pending`). La lettura è dell'artista stesso o dell'admin.
+
+**`outreach_channels`** — canali di outreach (Fase 17).
+`id`, `name`, `kind` (`gruppo-facebook`/`telegram`/`instagram`/`testata`/`radio`/`newsletter`/
+`comunita`/`altro`), `area` (`Bergamo`/`Provincia`/`Italia`), `url` (unico), `rules`, `note`,
+`status` (`todo`/`contacted`/`replied`/`discarded`), `contacted_at`. Solo admin. Registra i
+contatti, non li invia.
+
 **`follows`** - artisti e locali seguiti da un profilo (Fase 9A).
 `follower_id` più `artist_id` oppure `venue_id` (uno solo), con chiave unica per coppia e RLS
 sulla propria riga. Il trigger vieta di seguire la propria scheda.
@@ -376,6 +394,11 @@ resta in Supabase Auth.
 | `admin_create_claim_invite(...)`, `accept_claim_invite(...)`, `admin_revoke_claim_invite(...)` | Invito, accettazione e revoca del claim |
 | `admin_update_contact_ticket(...)`, `admin_log_contact_reply(...)` | Priorità/assegnazione ticket, risposta e notifica in-app |
 | `notify_admin_telegram(...)`, `notify_activity_telegram(...)` | Avvisi Telegram con dedupe, via rotta Vercel protetta |
+| `set_event_lineup(event, main, artists[], names[])` | Riscrive la lineup in una transazione sola: principale, schede e nomi liberi. Controlla i permessi (creatore, locale proprietario, admin) |
+| `decide_event_join_request(id, approve)` | Approva o rifiuta «sono in questa serata». Se approva, scrive la riga in lineup e manda la notifica all'artista, tutto insieme |
+| `leave_event_lineup(event)` | L'artista esce dalla lineup. Il creatore non può uscire dalla propria serata. Avvisa il gestore e il locale |
+| `notify_event_cancelled(event)` | Avvisa **tutta la lineup** quando una serata viene annullata. Idempotente: una notifica per artista |
+| `owner_event_saves(profile)` | Salvataggi per serata: conta gli eventi creati, quelli del locale posseduto e quelli in cui il profilo è in lineup |
 | `admin_log_ai_run(...)`, `admin_ai_usage()` | Registro esecuzioni AI, token, costo stimato e limiti |
 | `admin_send_manual_notification(...)` | Notifica in-app manuale a utente o ruolo, con audit |
 | `follow_count(subject_type, subject_id)` | Restituisce solo il **numero** di follower di una scheda: `SECURITY DEFINER`, eseguibile da anon e authenticated. La tabella `follows` resta privata, quindi nessuno può leggere chi segue chi |
@@ -471,6 +494,33 @@ Le migrazioni stanno in `supabase/migrations/` e vanno applicate **in ordine**, 
 | `0060_pro_request_monthly.sql` | Limite di una richiesta Pro ogni 30 giorni, anche nel database |
 | `0061_booking_threads.sql` | Thread e messaggi di booking gratuiti, RLS, notifiche in-app |
 | `0062_artist_epk.sql` | Foto, rider e contatto pubblico dell'EPK artista |
+| `0063_profile_images.sql` | Avatar e banner per profili, artisti e locali |
+| `0064_view_daily.sql` | Visualizzazioni aggregate per giorno |
+| `0065_owner_analytics.sql` | Statistiche del proprietario: serie follower, salvataggi per evento |
+| `0066_notifications_delete.sql` | Cancellazione delle notifiche |
+| `0067_booking_pipeline.sql` | Pipeline di booking tra artista e locale |
+| `0068_venue_closed.sql` | Locale chiuso: chiusura e riapertura, annullamento delle date future |
+| `0069_calls.sql` | Bacheca ingaggi `/calls`, candidature e tetti |
+| `0070_event_ends_at.sql` | Festival multi-giorno con `ends_at`, senza ricorrenza |
+| `0071_telegram_role_alerts.sql` | Avvisi Telegram per ruolo |
+| `0072_account_deletion.sql` | Cancellazione account con export |
+| `0073_help_center.sql` | Centro assistenza: guide, feedback, gestione admin |
+| `0074_role_chosen_at.sql` | `profiles.role_chosen_at`: quando è stato scelto il ruolo |
+| `0075_country.sql` | Paese su eventi e locali, default IT |
+| `0076_function_grants.sql` | Permessi espliciti sulle funzioni |
+| `0077_contact_replies_readable.sql` | Risposte ai ticket leggibili nell'area personale |
+| `0078_email_catalog.sql` | Catalogo delle email modificabili dalla control room |
+| `0079_claim_invite_template.sql` | Testo dell'invito al claim nel catalogo email |
+| `0080_outreach_channels.sql` | Tabella dei canali di outreach con regole e stato |
+| `0081_event_artists.sql` | Lineup: tabella, backfill, RLS; l'artista collegato non amministra più la serata |
+| `0082_set_event_lineup.sql` | Riscrittura transazionale della lineup |
+| `0083_event_join_requests.sql` | Richieste «sono in questa serata» e funzione di decisione |
+| `0084_lineup_leave_and_cancel.sql` | Uscita dalla lineup e notifiche a tutta la lineup |
+| `0085_notifications_priority_fix.sql` | Corregge la priorità delle notifiche di lineup |
+| `0086_telegram_join_request.sql` | Avviso Telegram per le nuove richieste di lineup |
+| `0087_lineup_free_names.sql` | Nomi senza scheda nella lineup |
+| `0088_lineup_names_keep_case.sql` | La deduplica dei nomi tiene la grafia scritta |
+| `0089_owner_event_saves_lineup.sql` | Salvataggi anche per serate in lineup e locali collegati |
 
 > Lo storico ufficiale è nella tabella `supabase_migrations.schema_migrations` (voci `0001`…
 > `0051`). Se si aggiunge una migrazione, va aggiunta **anche** quella riga, altrimenti

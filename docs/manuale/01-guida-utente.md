@@ -29,15 +29,21 @@ email transazionali, centro notifiche e digest, Area Fan, control room admin con
 claim a invito, centro assistenza, pannello comunicazione con quota e retry, avvisi Telegram,
 assistente AI per bozze e verifica schede, creazione eventi per conto di artisti/locali,
 ingresso gratuito, qualità dati, backup cifrato con prova di ripristino, liste admin con
-ricerca, filtri, paginazione ed export, notice & takedown e follow di artisti e locali.
+ricerca, filtri, paginazione ed export, notice & takedown, follow di artisti e locali,
+bacheca ingaggi, festival multi-giorno, locale chiuso, testi legali e cancellazione account,
+Help Center completo, paesi esteri, accessibilità verificata, **multi-artista**.
 
-**In arrivo:** strumenti gratuiti (contatti/booking, EPK, analytics, export, widget), Help Center completo e rifiniture SEO. **Vendita, donazioni e sponsor pagati sono congelati.** Il backup è attivo e la prova di
-ripristino è già passata.
+**In arrivo:** lancio della zona di Bergamo, outreach ai locali e alle band, misura delle
+prime settimane. **Vendita, donazioni e sponsor pagati sono congelati.**
 
 **Da sapere oggi:** gli eventi presenti sono reali. Possono essere inseriti dalla redazione
 oppure pubblicati da artisti e locali dopo il reclamo della scheda. La Home mostra le serate
 in programma; le passate restano nelle pagine di artista, locale e dashboard. Chi non ha una
 scheda attiva non può creare eventi: prima deve creare o reclamare la propria pagina.
+
+**Il multi-artista, in una riga:** una serata può avere più artisti in cartellone. Li aggiunge
+chi gestisce la serata; un artista può chiedere di entrare in una serata che esiste già, e chi
+è in lineup può uscirne.
 
 # I ruoli e le loro regole
 
@@ -279,6 +285,52 @@ salvate.
 Accanto al pulsante vedi il **numero dei follower** della scheda: è un totale reale, visibile
 anche senza accesso e nascosto quando è zero. Non è una classifica e non mostra chi segue:
 solo il numero.
+
+## Più artisti su una serata
+
+Una serata può avere più artisti in cartellone. La lista si chiama **lineup** e compare sulla
+scheda evento, sotto la data e il luogo, con il link alla scheda di ognuno.
+
+**Chi gestisce la serata** (chi l'ha creata, il locale proprietario o l'admin) può:
+
+- aggiungere alla lineup artisti che hanno una scheda su OpenStage;
+- scrivere un **nome senza scheda** (una band che non è ancora sul sito): compare come testo, non come link;
+- togliere un artista dalla lineup.
+
+**Un artista che suona in una serata già pubblicata** non deve crearne una copia:
+
+1. dalla scheda evento tocca **Sono in questa serata** (compare solo a un artista con scheda);
+2. scrive una nota facoltativa e invia;
+3. la richiesta arriva all'admin, che approva o rifiuta;
+4. approvata, la serata compare anche sulla sua pagina.
+
+**Chi è in lineup** vede il badge **Sei in lineup** e il pulsante **Non posso più suonare**:
+esce subito, e il gestore della serata riceve un avviso. Non può modificare la serata: quella
+resta a chi l'ha creata. Se la serata viene annullata, l'avviso arriva a tutta la lineup.
+
+In **Dashboard → I miei eventi** le serate in cui sei solo in lineup compaiono in sola lettura,
+con la nota che la serata la gestisce chi l'ha creata.
+
+## Il centro notifiche
+
+**Dashboard → Notifiche** raccoglie gli avvisi: nuove serate degli artisti seguiti, promemoria,
+annullamenti, inviti a reclamare una scheda, messaggi.
+
+I filtri in alto separano per tipo (eventi annullati, sistema, ecc.). In fondo c'è **Lette**:
+le notifiche già lette restano consultabili e si possono cancellare da lì, una per una. Il
+cestino accanto a ogni riga elimina; **Elimina tutte** svuota lo storico.
+
+## La bacheca ingaggi
+
+**`/calls`** raccoglie gli annunci di locali e artisti che cercano qualcuno per una data o un
+periodo: ruolo, compenso dichiarato, scadenza. Le candidature aprono una conversazione
+privata. Nessun annuncio si mette in evidenza pagando.
+
+## Aiuto
+
+**`/aiuto`** è il centro assistenza: ricerca, categorie e guide in italiano e inglese, con la
+possibilità di dire se una guida è stata utile. Se non trovi la risposta, dal fondo della
+guida arrivi al modulo contatti.
 
 # Reclamare la tua scheda
 

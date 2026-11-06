@@ -967,6 +967,97 @@ build.
 **Prossimo:** aggiornare Home e pagine “Per gli artisti / Per le venue” per spiegare cosa si
 può fare e usare.
 
+## Fase 12 - Serie, locali chiusi, bacheca ingaggi (31 ottobre 2026)
+
+Tre cose che mancavano al ciclo di vita di una serata.
+
+**Locale chiuso** (`venues.closed_at`, `closed_note`): chiudere un locale annulla le serate
+future con il motivo, e la riapertura non le riporta in vita da sola. Un locale chiuso non
+pubblica nuove date.
+
+**Bacheca ingaggi** (`/calls`): annunci di locali e artisti che cercano qualcuno per una data.
+Compenso dichiarato, tetto di candidature scelto da chi pubblica, chiusura anticipata. Una
+candidatura apre un thread di booking, non una mail.
+
+**Festival multi-giorno**: `events.ends_at` per gli eventi che durano più di un giorno, senza
+ricorrenza automatica: una residenza resta una serie di righe, non una regola.
+
+Piano: `docs/plan-phase-12.md`.
+
+## Fase 13 - SEO, legal, audit e polish (31 ottobre 2026)
+
+- testi legali reali (privacy, termini, cookie);
+- cancellazione dell'account con export JSON;
+- audit delle policy RLS e delle funzioni;
+- pagine `error.tsx` e `global-error.tsx`;
+- anteprime social per artisti e locali (`/api/og/profile/...`);
+- Spotify con click-to-load, serate simili, visti di recente;
+- README con la checklist delle variabili.
+
+Piano: `docs/plan-phase-13.md`.
+
+## Fase 14 - Help Center completo (1 novembre 2026)
+
+`/aiuto` con ricerca, categorie, dodici guide in italiano e inglese, feedback «utile / non
+utile», guide correlate e passaggio al modulo contatti. Le guide si gestiscono da
+`/admin/aiuto`; `/faq` reindirizza al centro assistenza.
+
+## Fase 14B - Chiusura e collaudo (1 novembre 2026)
+
+- **B60** città estere e paese corretto;
+- **B13** accessibilità: axe su 31 pagine × 2 viewport, **zero violazioni**;
+- **B06** `role_chosen_at`;
+- **B45** limite sulle rotte Open Graph;
+- fixture rimosse, **smoke test 38/38** in GitHub Actions;
+- header di sicurezza;
+- report completo in `docs/report-finale.md`.
+
+## Fase 14C - Multi-artista (3-6 novembre 2026)
+
+Una serata non ha più un artista solo.
+
+**La lineup** vive in `event_artists`: artista principale, altre schede, nomi scritti a mano.
+`events.artist_id` resta per compatibilità, ma la verità è la tabella. La scheda evento mostra
+gli artisti sotto «Dove», e le serate di un artista si leggono anche quando non è il
+principale: scheda artista, EPK e widget.
+
+**Permessi corretti**: prima l'artista collegato poteva modificare la serata perché la RLS lo
+considerava proprietario. Ora la amministrano chi l'ha creata, il locale proprietario e
+l'admin. Stare in lineup non è amministrare.
+
+**Ingresso su richiesta**: dalla scheda evento, un artista loggato con scheda tocca «Sono in
+questa serata», scrive una nota, e la richiesta arriva in `/admin/richieste-lineup`. Solo
+l'approvazione scrive in lineup. Il pulsante non compare a fan, anonimi, creatori o a chi è
+già in lineup.
+
+**Uscita**: «Non posso più suonare» toglie l'artista e avvisa il gestore. Chi ha creato la
+serata non esce dalla propria lineup.
+
+**Annullamento**: quando una serata salta, `notify_event_cancelled` avvisa tutta la lineup,
+non solo chi l'aveva salvata.
+
+**Doppioni**: nel form di creazione, accanto a ogni serata simile c'è «Unisciti a questa». Il
+modulo si chiude con un popup di conferma, così non si crea la seconda serata.
+
+**Nomi senza scheda**: una band che non è su OpenStage si scrive in lineup e compare come
+testo, non come link.
+
+**Dashboard e statistiche**: le serate in lineup compaiono in «I miei eventi» in sola lettura;
+i salvataggi si contano anche per le serate in lineup e per i locali collegati.
+
+Dettaglio: `docs/plan-multi-artista.md` e `docs/plan-phase-14c.md`.
+
+## Lancio e outreach (novembre 2026)
+
+- **Fase 16**: playbook in `docs/launch-playbook.md`, calendario, testi pronti. Zona di
+  partenza: Bergamo e provincia.
+- **Fase 17**: canali di outreach in `/admin/outreach/canali` (gruppi Facebook, Telegram,
+  testate, radio), con regole per canale e stato del contatto. L'invio resta manuale: nessuna
+  automazione su Instagram, Facebook o TikTok.
+- **Bot Telegram**: avvisa ticket, claim, segnalazioni, bozze, email fallite e, dalla Fase
+  14C, anche le richieste di lineup.
+- **Social**: profilo Instagram e TikTok del brand, con materiali in `public/brand/`.
+
 ## Come si aggiorna questo diario
 
 A ogni fine fase si aggiunge una sezione con lo stesso schema: obiettivo, cosa è stato
