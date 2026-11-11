@@ -12,8 +12,16 @@ export function eventMetadata(event: PublicEvent, locale: Locale): Metadata {
     event.description?.slice(0, 160) ??
     [event.artist?.name, event.venue?.name, event.city].filter(Boolean).join(" · ");
 
+  // Il titolo SEO porta il locale quando non c'è già: chi cerca «calibro 35
+  // druso» deve riconoscere la pagina prima di aprirla. Si confronta la prima
+  // parola del locale, così «Nuovi Suoni … al NXT» non diventa «… · NXT Station».
+  const place = event.venue?.name ?? event.venueName ?? event.city;
+  const placeKey = place?.trim().split(/\s+/)[0]?.toLowerCase() ?? null;
+  const hasPlace = placeKey ? event.title.toLowerCase().includes(placeKey) : false;
+  const title = place && !hasPlace ? `${event.title} · ${place}` : event.title;
+
   return {
-    title: event.title,
+    title,
     description,
     // L'anteprima non è la locandina grezza: è una card 1200×630 disegnata dal
     // server (`/api/og/event/<id>`), con titolo, data e luogo sopra la
@@ -21,7 +29,7 @@ export function eventMetadata(event: PublicEvent, locale: Locale): Metadata {
     // immagine non cambia sotto i piedi a chi la mette in cache.
     openGraph: {
       type: "article",
-      title: event.title,
+      title,
       description,
       images: [
         {

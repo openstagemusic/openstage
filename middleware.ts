@@ -28,10 +28,16 @@ export async function middleware(request: NextRequest) {
       : localeFromCountry(request.headers.get("x-vercel-ip-country"));
 
     const url = request.nextUrl.clone();
-    url.pathname = rest === "/" ? `/${preferred}` : `/${preferred}${rest}`;
+    const isRoot = rest === "/";
 
-    const redirect = NextResponse.redirect(url);
-    redirect.cookies.set(LOCALE_COOKIE, preferred, LOCALE_COOKIE_OPTIONS);
+    // La home sceglie la lingua (307: dipende da chi arriva). Tutti gli altri
+    // indirizzi senza lingua sono **legacy**: vanno consolidati sull'italiano
+    // con un 308, altrimenti Google continua a indicizzare l'URL di partenza
+    // (`/citta/bergamo`) e non sa che esiste `/it/citta/bergamo`.
+    url.pathname = isRoot ? `/${preferred}` : `/it${rest}`;
+
+    const redirect = NextResponse.redirect(url, isRoot ? 307 : 308);
+    redirect.cookies.set(LOCALE_COOKIE, isRoot ? preferred : "it", LOCALE_COOKIE_OPTIONS);
     return redirect;
   }
 
