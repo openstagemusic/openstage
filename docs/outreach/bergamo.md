@@ -3,7 +3,7 @@
 Obiettivo: **15–20 serate, 5–8 locali, 5–8 artisti, 3 locali reclamati** prima
 dell'annuncio.
 
-Ultimo aggiornamento: **1 novembre 2026** (dati verificati sulle fonti pubbliche).
+Ultimo aggiornamento: **11 novembre 2026** (dati verificati sulle fonti pubbliche).
 
 ## Stato: 1 novembre 2026
 
@@ -123,6 +123,14 @@ fuori dal target indie.
 **Pubblicate il 4 novembre:** Lightroom (7/11, ingresso libero) e The Box
 (8/11, techno toast con brunch su prenotazione), con locandina dal sito del
 Daste e biglietti DICE per The Box. Portano le serate future a 16.
+
+**Aggiunta l'11 novembre — Mai dire 90** (sab 14 nov, NXT Platz, gratis):
+party anni '90 con DJ-set, vocalist e corpo di ballo. Locandina presa dal sito
+del NXT e caricata su Storage (`event-covers/curated/mai-dire-90.jpg`); scheda
+`/eventi/bergamo/mai-dire-90`. **L'ora non è pubblicata** da NXT: ho messo le
+21:00 come indicativa, dichiarandolo nella descrizione. Il link Slesh che
+compare sul sito del locale è il buono consumazione da 12 €, non un biglietto:
+non l'ho collegato, la serata è a ingresso libero.
 
 | Data | Ora | Locale | Evento | Ingresso | Scheda |
 | --- | --- | --- | --- | --- | --- |
