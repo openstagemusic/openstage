@@ -96,6 +96,47 @@ Apri getopenstage.it 👉 link in bio, cerca la tua città e guarda cosa c'è st
 
 ---
 
+## Video 4 — Questo weekend (12–15 novembre)
+
+Immagini: `public/brand/tiktok/04-weekend-1.jpg` … `04-weekend-6.jpg`.
+Video pronto: `public/brand/tiktok/video-weekend-novembre.mp4` (12 secondi, 6 card,
+zoom lento, senza audio: il sound lo aggiungi in TikTok).
+
+**Titolo:**
+`Cosa fare a Bergamo da giovedì a domenica: quattro serate`
+
+**Descrizione:**
+
+```
+Quattro serate in quattro giorni, e sono tutte sulla mappa.
+
+Giovedì 12 — Pierpaolo Capovilla e i Cattivi Maestri, Druso (21:30, 15 €)
+Venerdì 13 — Santamarea, Druso (22:00, 15 €)
+Sabato 14 — Mai dire 90, NXT (21:00, gratis)
+Domenica 15 — Stalking Blues, NXT (21:00, gratis)
+
+E la settimana dopo tornano Giorgio Canali al NXT e i Peawees al Daste.
+
+Date, orari e mappa su getopenstage.it 👉 link in bio
+
+#bergamo #bergamomusica #weekendabergamo #concertibergamo #drusobg #nxtbergamo #musicadalvivo
+```
+
+**Note**
+
+- **Pubblicalo oggi pomeriggio** (giovedì): TikTok premierà chi arriva prima
+  delle serate, non chi le racconta il lunedì.
+- Se slitta a venerdì, **togli la card di giovedì** e rigenera: cinque card, non
+  sei. Una card che annuncia una serata già passata è peggio di una card in meno.
+- **Mai dire 90, ore 21:00 indicative** (NXT non dichiara l'orario). Nei commenti
+  rispondi «dalle 21, orario indicativo».
+- **Audio:** sound indie in tendenza. Non usare pezzi delle band: senza diritti
+  TikTok li silenzia.
+- Le prime tre card devono reggere da sole: cover, giovedì, venerdì. Chi scorre
+  si ferma lì.
+
+---
+
 ## Una cosa onesta sulla lunghezza
 
 Le descrizioni lunghe aiutano perché TikTok le legge come **testo di ricerca**:
