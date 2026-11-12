@@ -208,6 +208,15 @@ Nessuna immagine profilo: Instagram non permette il download degli avatar e non
 abbiamo foto concesse. Le schede mostrano le iniziali; l'artista carica la sua
 quando reclama.
 
+**The Lullaby Tribute to The Cure — precompilata (12 novembre).** È il primo
+iscritto organico: si è registrato da solo e ha reclamato la scheda, che era
+vuota. Ho aggiunto città (Milano), genere (tribute band · post-punk / new wave) e
+una bio, ricavati da fonti pubbliche: l'evento al C.I.Q. di Milano (5 luglio
+2025), l'annuncio su Villaggio Musicale per un tastierista (zona Milano Nord,
+aggiornato il 9 settembre 2026) e il SoundCloud di Stefano Carlin con i live Cure
+al Hard Rock Cafe (25 settembre 2026). **Non ho messo né foto né link né date**:
+non ci sono fonti e vanno caricate da lui.
+
 **Come arriva il claim** (senza email): la scheda ha già il pulsante «Reclama
 questa scheda» → serve solo portare l'artista lì. Il claim artista è immediato e
 chiede solo di registrarsi come artista e indicare un link pubblico di prova.
