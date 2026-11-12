@@ -96,6 +96,13 @@ scheda mostra «Prezzo da definire».
 **Da fare quando esce:** caricare la **locandina della finale** sulla scheda
 (`cover_image_url`). Oggi la scheda non ha copertina.
 
+**Finalisti — contatti (12 novembre):** UniBg On Air ha risposto e ha girato la
+responsabilità a **Luca Coluccia** (`lucacoluccia@hg80.eu`), che segue il
+festival. Francesco gli ha già scritto il 12. I nomi **non sono ancora
+annunciati** (confermato da ODE via Instagram): l'annuncio dovrebbe uscire in
+settimana. Comune di Bergamo non ha ancora risposto
+(`giovani@comune.bergamo.it`, scritto l'11).
+
 **Locandine (4 novembre):** cinque copertine prese dal sito del Druso
 (`drusobg.com/event-list`), ridimensionate e caricate sul nostro Storage —
 Cek and the Stompers, Santamarea, Indie Power, Savana Funk e anche Pierpaolo
